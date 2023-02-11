@@ -1,5 +1,10 @@
 # Sluv-springboot-server
 
+## Workers
+- 찰스
+- 준커
+- 리야
+
 ## Settings
 
 ![프로젝트 설정](https://user-images.githubusercontent.com/101792740/218247298-0e23cbfe-7977-48a0-b9b9-68167ac27d7e.png)

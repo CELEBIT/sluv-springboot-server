@@ -1,1 +1,21 @@
+spring:
+  profiles:
+    active: dev
+
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: ENC(umIPYOdrigHivpZxQUaBn+1360z+xy13Hb4gHcoDY16JKXGxOF2jx4F+KkoFv9RKiIu7nXxn7tv/PoUCRVEYxqf96mTuqV007F1N8C45mpzyBg+tCBbRyNW66k7k4E0o)
+    username: ENC(gh46WFclECYl96UilXt8Lw==)
+    password: ENC(2HaAZ8j7cAaYFkIcemnUifSA0UAtPFLt)
+
+  security:
+    user:
+      name: user
+      password: 1234
+
+jasypt:
+  encryptor:
+    bean: jasyptStringEncryptor
+    password: celebit-sluv-mvp2
+
 

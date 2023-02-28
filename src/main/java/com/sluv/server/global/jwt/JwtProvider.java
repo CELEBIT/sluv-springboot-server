@@ -2,11 +2,7 @@ package com.sluv.server.global.jwt;
 
 
 import com.sluv.server.domain.user.dto.UserDto;
-import com.sluv.server.domain.user.repository.UserRepository;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jws;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
@@ -14,19 +10,24 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import java.nio.charset.StandardCharsets;
 
 import java.security.Key;
+
 import java.util.Base64;
 import java.util.Date;
+
 
 @Component
 @RequiredArgsConstructor
 @Slf4j
 public class JwtProvider {
-    private final UserRepository userRepository;
+    private final CustomUserDetailsService customUserDetailsService;
 
     @Value("${jwt.secret}")
     private String secretKey = "secretKey";
@@ -43,11 +44,11 @@ public class JwtProvider {
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
-//    public Authentication getAuthentication(String token){
-//        UserDetails user = customUserDetailsService.loadUserByUsername(this.getUserId(token).toString());
-//
-//        return new UsernamePasswordAuthenticationToken(user, "", user.getAuthorities());
-//    }
+    public Authentication getAuthentication(String token){
+        UserDetails user = customUserDetailsService.loadUserByUsername(this.getUserId(token).toString());
+
+        return new UsernamePasswordAuthenticationToken(user, "", user.getAuthorities());
+    }
 
     /**
      * === user Access Token 생성 ===
@@ -101,14 +102,24 @@ public class JwtProvider {
      * @param token
      * @return true or false
      */
-    public boolean validateToken(String token){
-        try{
+    public boolean validateToken(HttpServletRequest request, String token){
+        System.out.println("validate");
+        try {
             Jws<Claims> claims = Jwts.parserBuilder().setSigningKey(secretKey.getBytes()).build()
                     .parseClaimsJws(token);
             return !claims.getBody().getExpiration().before(new Date());
-        }catch (Exception e){
+        } catch (MalformedJwtException e) {
+            log.error("Invalid JWT token");
+        } catch (ExpiredJwtException e) {
+            log.error("Expired JWT token");
+            request.setAttribute("expired",e.getMessage());
+        } catch (UnsupportedJwtException e) {
+            log.error("Unsupported JWT token");
+        } catch (IllegalArgumentException e) {
+            log.error("JWT claims string is empty");
 
-            return false;
         }
+        return false;
+
     }
 }

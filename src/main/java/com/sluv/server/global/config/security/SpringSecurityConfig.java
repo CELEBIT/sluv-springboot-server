@@ -15,7 +15,7 @@ public class SpringSecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
         http.csrf().disable().cors().disable()// csrf, cors -> disable.
                 .authorizeHttpRequests((request) -> request // 허용 범위 설정
-                        .requestMatchers("/login").permitAll() // 허용범위
+                        .requestMatchers("/**").permitAll() // 허용범위
                         .anyRequest().authenticated() // 나머지는 authenticated되어야 함.
                 )
                 .formLogin((form) -> form // authenticated 되지 않은 곳에 접속 시 redirect

@@ -1,6 +1,5 @@
 package com.sluv.server.domain.item.entity;
 
-import com.sluv.server.domain.closet.enums.ClosetStatus;
 import com.sluv.server.domain.item.enums.ItemStatus;
 import com.sluv.server.global.common.entity.BaseEntity;
 import jakarta.persistence.*;
@@ -15,11 +14,11 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @NoArgsConstructor
-@Table(name = "item")
-public class Item extends BaseEntity {
+@Table(name = "temp_item")
+public class TempItem extends BaseEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "item_id")
+    @Column(name = "temp_item_id")
     private Long id;
 
     @NotNull
@@ -27,15 +26,14 @@ public class Item extends BaseEntity {
 
     private Long celebId;
 
-    private Long newCelebId;
+    private String newCelebName;
 
-    @NotNull
     private Long categoryId;
 
     private Long brandId;
 
-    private Long newBrandId;
-    @NotNull
+    private String newBrandName;
+
     @Size(max = 100)
     private String name;
 
@@ -44,11 +42,7 @@ public class Item extends BaseEntity {
     @Size(max = 100)
     private String whereDiscovery;
 
-    @NotNull
     private int price;
-
-    @Size(max = 45)
-    private String color;
 
     @Column(columnDefinition = "TEXT")
     private String additionalInfo;
@@ -61,23 +55,20 @@ public class Item extends BaseEntity {
     private ItemStatus itemStatus;
 
     @Builder
-    public Item(Long id, Long userId, Long celebId, Long newCelebId,
-                Long categoryId, Long brandId, Long newBrandId,
-                String name, LocalDateTime whenDiscovery, String whereDiscovery,
-                int price, String color, String additionalInfo, ItemStatus itemStatus) {
+    public TempItem(Long id, Long userId, Long celebId, String newCelebName, Long categoryId, Long brandId, String newBrandName, String name, LocalDateTime whenDiscovery, String whereDiscovery, int price, String additionalInfo, String infoSource, ItemStatus itemStatus) {
         this.id = id;
         this.userId = userId;
         this.celebId = celebId;
-        this.newCelebId = newCelebId;
+        this.newCelebName = newCelebName;
         this.categoryId = categoryId;
         this.brandId = brandId;
-        this.newBrandId = newBrandId;
+        this.newBrandName = newBrandName;
         this.name = name;
         this.whenDiscovery = whenDiscovery;
         this.whereDiscovery = whereDiscovery;
         this.price = price;
-        this.color = color;
         this.additionalInfo = additionalInfo;
+        this.infoSource = infoSource;
         this.itemStatus = itemStatus;
     }
 }

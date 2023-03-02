@@ -31,19 +31,19 @@ public class Closet extends BaseEntity {
     private String coverImgUrl;
 
     @NotNull
-    private Boolean isBasic;
+    private Boolean basicFlag;
 
     @Enumerated(EnumType.STRING)
     @Column(length = 45, columnDefinition = "varchar(45) default 'PUBLIC'")
     private ClosetStatus closetStatus;
 
     @Builder
-    public Closet(Long id, Long userId, String name, String coverImgUrl, Boolean isBasic, ClosetStatus closetStatus) {
+    public Closet(Long id, Long userId, String name, String coverImgUrl, Boolean basicFlag, ClosetStatus closetStatus) {
         this.id = id;
         this.userId = userId;
         this.name = name;
         this.coverImgUrl = coverImgUrl;
-        this.isBasic = isBasic;
+        this.basicFlag = basicFlag;
         this.closetStatus = closetStatus;
     }
 }

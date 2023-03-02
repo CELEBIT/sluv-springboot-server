@@ -6,5 +6,4 @@ public enum ItemEditReqReason {
     WRONG_DATE,
     WRONG_BANGSONG,
     ETC
-
 }

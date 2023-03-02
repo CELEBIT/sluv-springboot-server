@@ -35,7 +35,7 @@ public class User extends BaseEntity {
     private SnsType snsType;
 
     @Column(columnDefinition = "TEXT")
-    private String profileImageUrl;
+    private String profileImgUrl;
 
     @Size(max = 45)
     private String ageRange;
@@ -48,12 +48,12 @@ public class User extends BaseEntity {
     private UserStatus userStatus;
 
     @Builder
-    public User(Long id, String email, String nickname, SnsType snsType, String profileImageUrl, String ageRange, String gender, UserStatus userStatus) {
+    public User(Long id, String email, String nickname, SnsType snsType, String profileImgUrl, String ageRange, String gender, UserStatus userStatus) {
         this.id = id;
         this.email = email;
         this.nickname = nickname;
         this.snsType = snsType;
-        this.profileImageUrl = profileImageUrl;
+        this.profileImgUrl = profileImgUrl;
         this.ageRange = ageRange;
         this.gender = gender;
         this.userStatus = userStatus;

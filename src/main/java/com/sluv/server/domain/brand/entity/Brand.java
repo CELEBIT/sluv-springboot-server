@@ -1,6 +1,5 @@
 package com.sluv.server.domain.brand.entity;
 
-import com.sluv.server.domain.user.enums.UserStatus;
 import com.sluv.server.global.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -27,10 +26,14 @@ public class Brand extends BaseEntity {
     @Size(max = 300)
     private String brandEn;
 
+    @Column(columnDefinition = "TEXT")
+    private String brandImgUrl;
+
     @Builder
-    public Brand(Long id, String brandKr, String brandEn) {
+    public Brand(Long id, String brandKr, String brandEn, String brandImgUrl) {
         this.id = id;
         this.brandKr = brandKr;
         this.brandEn = brandEn;
+        this.brandImgUrl = brandImgUrl;
     }
 }

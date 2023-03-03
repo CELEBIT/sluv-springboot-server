@@ -1,11 +1,8 @@
 package com.sluv.server.domain.user.service;
 
 import com.sluv.server.domain.user.dto.UserDto;
-import com.sluv.server.domain.user.exception.TestException;
 import com.sluv.server.domain.user.repository.UserRepository;
 import com.sluv.server.global.jwt.JwtProvider;
-import com.sluv.server.global.jwt.exception.ExpiredTokenException;
-import com.sluv.server.global.jwt.exception.NoAuthorizationTokenException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

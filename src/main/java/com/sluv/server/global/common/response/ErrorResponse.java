@@ -12,11 +12,11 @@ import lombok.NoArgsConstructor;
 public class ErrorResponse {
 
     private Boolean isSuccess;
-    private String code;
+    private int code;
     private String message;
 
     @Builder
-    public ErrorResponse(String code, String message) {
+    public ErrorResponse(int code, String message) {
         this.isSuccess = false;
         this.code = code;
         this.message = message;

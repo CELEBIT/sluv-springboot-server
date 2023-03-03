@@ -33,8 +33,8 @@ public class AuthController {
     )
     @ApiResponses({
             @ApiResponse(responseCode = "1000", description = "요청성공"),
-            @ApiResponse(responseCode = "3000", description = "존재하지 않는 유저"),
-            @ApiResponse(responseCode = "3001", description = "유효하지 않는 토큰")
+            @ApiResponse(responseCode = "2000", description = "존재하지 않는 유저"),
+            @ApiResponse(responseCode = "3000", description = "유효하지 않는 토큰")
     })
 
     @GetMapping("/social-login")

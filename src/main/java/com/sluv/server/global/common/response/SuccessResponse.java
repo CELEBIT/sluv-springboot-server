@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 public class SuccessResponse<T> {
     private final Boolean isSuccess = true;
     private final String message = "요청성공.";
-    private final int code = 200;
+    private final int code = 1000;
     private T result;
 
     @Builder

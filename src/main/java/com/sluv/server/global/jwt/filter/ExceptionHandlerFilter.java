@@ -32,7 +32,7 @@ public class ExceptionHandlerFilter extends OncePerRequestFilter {
 //        }
     }
 
-    private void setErrorResponse(HttpServletResponse response, String message, String errorCode, HttpStatus status) throws IOException {
+    private void setErrorResponse(HttpServletResponse response, String message, int errorCode, HttpStatus status) throws IOException {
         log.error("Code : {}, Message : {}", errorCode, message);
         String errorResponse = objectMapper.writeValueAsString(
                 ErrorResponse.builder()

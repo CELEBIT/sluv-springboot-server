@@ -45,7 +45,7 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * == vaildation Exception ==
+     * == Vaildation Exception ==
      *
      * @exception MethodArgumentNotValidException
      * @return INVALID_ARGUMENT

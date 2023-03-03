@@ -8,6 +8,7 @@ import jakarta.validation.constraints.Size;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.ColumnDefault;
 
 @Entity
 @Getter
@@ -31,6 +32,7 @@ public class Closet extends BaseEntity {
     private String coverImgUrl;
 
     @NotNull
+    @ColumnDefault("0")
     private Boolean basicFlag;
 
     @Enumerated(EnumType.STRING)

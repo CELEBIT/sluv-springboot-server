@@ -1,45 +1,52 @@
-package com.sluv.server.domain.item.entity;
+package com.sluv.server.domain.question.entity;
 
 import com.sluv.server.global.common.entity.BaseEntity;
 import com.sluv.server.global.common.enums.ImgStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
 
-@Entity
 @Getter
+@Entity
 @NoArgsConstructor
-@Table(name = "item_img")
-public class ItemImg extends BaseEntity {
+@Table(name = "question_img")
+public class QuestionImg extends BaseEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "item_img_id")
+    @Column(name = "question_img_id")
     private Long id;
 
     @NotNull
-    private Long itemId;
+    private Long questionId;
 
     @NotNull
     @Column(columnDefinition = "TEXT")
-    private String itemImgUrl;
+    private String imgUrl;
+
+    @Size(max = 100)
+    private String description;
+
+    private Long vote;
 
     @NotNull
     @ColumnDefault("0")
     private Boolean representFlag;
 
     @Enumerated(EnumType.STRING)
-    @Column(length = 45, columnDefinition = "varchar(45) default 'ACTIVE'")
+    @Column(columnDefinition = "varchar(45) default 'ACTIVE'")
     private ImgStatus imgStatus;
 
-
     @Builder
-    public ItemImg(Long id, Long itemId, String itemImgUrl, Boolean representFlag, ImgStatus imgStatus) {
+    public QuestionImg(Long id, Long questionId, String imgUrl, String description, Long vote, Boolean representFlag, ImgStatus imgStatus) {
         this.id = id;
-        this.itemId = itemId;
-        this.itemImgUrl = itemImgUrl;
+        this.questionId = questionId;
+        this.imgUrl = imgUrl;
+        this.description = description;
+        this.vote = vote;
         this.representFlag = representFlag;
         this.imgStatus = imgStatus;
     }

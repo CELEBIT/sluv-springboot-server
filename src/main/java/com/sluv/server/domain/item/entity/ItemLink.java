@@ -1,7 +1,7 @@
 package com.sluv.server.domain.item.entity;
 
-import com.sluv.server.domain.item.enums.ItemImgOrLinkStatus;
 import com.sluv.server.global.common.entity.BaseEntity;
+import com.sluv.server.global.common.enums.ImgStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -32,14 +32,14 @@ public class ItemLink extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(length = 45, columnDefinition = "varchar(45) default 'ACTIVE'")
-    private ItemImgOrLinkStatus itemImgOrLinkStatus;
+    private ImgStatus imgStatus;
 
     @Builder
-    public ItemLink(Long id, Long itemId, String linkName, String itemLinkUrl, ItemImgOrLinkStatus itemImgOrLinkStatus) {
+    public ItemLink(Long id, Long itemId, String linkName, String itemLinkUrl, ImgStatus imgStatus) {
         this.id = id;
         this.itemId = itemId;
         this.linkName = linkName;
         this.itemLinkUrl = itemLinkUrl;
-        this.itemImgOrLinkStatus = itemImgOrLinkStatus;
+        this.imgStatus = imgStatus;
     }
 }

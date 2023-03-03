@@ -19,7 +19,23 @@ public class SwaggerConfig {
         Info info = new Info()
                 .version("v1.0.0")
                 .title("Sluv")
-                .description("Sluv Swagger");
+                .description("Sluv Swagger" +
+                        "\n- === Status Code ===" +
+                        "\n- == 1000 == -> 성공" +
+                        "\n- 1000: 요청성공" +
+                        "\n- == 2000 == -> User 관련" +
+                        "\n- 2000: 존재하지 않는 유저" +
+                        "\n- == 3000 == -> Validation 관련" +
+                        "\n- 3000: InValidate" +
+                        "\n- == 4000 == -> Token 관련" +
+                        "\n- 4000: 토큰 없음" +
+                        "\n- 4001: 유효하지 않는 토큰" +
+                        "\n- 4002: 만료된 토큰" +
+                        "\n- == 5000 == -> 서버 내부 에러" +
+                        "\n- 5000: 서버 내부 에러" +
+                        "\n- 5001: DB 에러");
+
+
         // SecuritySecheme명
         String jwtSchemeName = "AccessToken";
         // API 요청헤더에 인증정보 포함

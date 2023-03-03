@@ -25,6 +25,10 @@ public class SpringSecurityConfig {
     private final ExceptionHandlerFilter exceptionHandlerFilter = new ExceptionHandlerFilter();
     private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
 
+    private static final String[] PERMIT_URL = {
+            "/auth/**", "/v3/api-docs/**", "/swagger-ui/**", "/swagger-resources/**"
+    };
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
         http
@@ -41,7 +45,7 @@ public class SpringSecurityConfig {
 
                 .authorizeHttpRequests((request) -> request // 허용 범위 설정
 //                        .requestMatchers(HttpMethod.POST, "/auth/**").permitAll() // 허용범위
-                        .requestMatchers("/auth/**").permitAll() // 허용범위
+                        .requestMatchers(PERMIT_URL).permitAll() // 허용범위
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling().authenticationEntryPoint(customAuthenticationEntryPoint)

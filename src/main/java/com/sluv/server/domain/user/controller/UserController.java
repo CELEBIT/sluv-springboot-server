@@ -2,8 +2,7 @@ package com.sluv.server.domain.user.controller;
 
 
 import com.sluv.server.domain.user.service.UserService;
-import com.sluv.server.global.common.BaseResponse;
-
+import com.sluv.server.global.common.response.SuccessResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +19,10 @@ public class UserController {
     @GetMapping("")
     public ResponseEntity<?> getUserId(HttpServletRequest request) {
 
-            return ResponseEntity.ok().body(new BaseResponse<>(userService.getUserIdByToken(request)));
-
+            return ResponseEntity.ok().body(SuccessResponse.builder()
+                                                            .result(userService.getUserIdByToken(request))
+                                                            .build()
+                            );
     }
+
 }

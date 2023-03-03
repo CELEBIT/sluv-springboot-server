@@ -3,11 +3,11 @@ package com.sluv.server.domain.auth.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.sluv.server.domain.auth.dto.AuthRequestDto;
 import com.sluv.server.domain.auth.dto.AuthResponseDto;
+import com.sluv.server.domain.auth.service.AuthService;
 import com.sluv.server.domain.auth.service.KakaoUserService;
 import com.sluv.server.domain.user.dto.UserDto;
 
-import com.sluv.server.global.common.BaseResponse;
-import com.sluv.server.global.jwt.JwtProvider;
+import com.sluv.server.global.common.response.SuccessResponse;
 import io.swagger.v3.oas.annotations.Operation;
 
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
 
     private final KakaoUserService kakaoUserService;
-    private final JwtProvider jwtProvider;
+    private final AuthService authService;
 
     @Operation(
             summary = "소셜 로그인",
@@ -46,13 +46,19 @@ public class AuthController {
                 case APPLE -> System.out.println("애플");
             }
 
-            return ResponseEntity.ok().body(new BaseResponse<>(response));
+            return ResponseEntity.ok().body(SuccessResponse.builder()
+                                                            .result(response)
+                                                            .build()
+                                        );
     }
 
     @GetMapping("/test")
-    public String testToken(@RequestBody UserDto dto){
-        return jwtProvider.createAccessToken(dto);
-    }
+    public ResponseEntity<?> testToken(@RequestBody UserDto dto){
 
+        return ResponseEntity.ok().body(SuccessResponse.builder()
+                                                        .result(authService.jwtTestService(dto))
+                                                        .build()
+                                    );
+    }
 
 }

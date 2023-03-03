@@ -2,6 +2,9 @@ package com.sluv.server.global.jwt;
 
 
 import com.sluv.server.domain.user.dto.UserDto;
+import com.sluv.server.domain.user.repository.UserRepository;
+import com.sluv.server.global.jwt.exception.ExpiredTokenException;
+import com.sluv.server.global.jwt.exception.InvalidateTokenException;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
@@ -27,7 +30,7 @@ import java.util.Date;
 @RequiredArgsConstructor
 @Slf4j
 public class JwtProvider {
-    private final CustomUserDetailsService customUserDetailsService;
+    private final UserRepository userRepository;
 
     @Value("${jwt.secret}")
     private String secretKey = "secretKey";
@@ -45,7 +48,7 @@ public class JwtProvider {
     }
 
     public Authentication getAuthentication(String token){
-        UserDetails user = customUserDetailsService.loadUserByUsername(this.getUserId(token).toString());
+        UserDetails user = userRepository.findById(Long.valueOf(this.getUserId(token).toString())).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 유저.") );
 
         return new UsernamePasswordAuthenticationToken(user, "", user.getAuthorities());
     }
@@ -93,7 +96,9 @@ public class JwtProvider {
      * @return token
      */
     public String resolveToken(HttpServletRequest request){
+
         return request.getHeader("X-AUTH-TOKEN");
+
     }
 
     /**
@@ -101,25 +106,25 @@ public class JwtProvider {
      *
      * @param token
      * @return true or false
+     * @throws ExpiredTokenException
      */
-    public boolean validateToken(HttpServletRequest request, String token){
-        System.out.println("validate");
+    public boolean validateToken(String token){
         try {
-            Jws<Claims> claims = Jwts.parserBuilder().setSigningKey(secretKey.getBytes()).build()
+            Jwts.parserBuilder().setSigningKey(secretKey.getBytes()).build()
                     .parseClaimsJws(token);
-            return !claims.getBody().getExpiration().before(new Date());
+            return true;
         } catch (MalformedJwtException e) {
-            log.error("Invalid JWT token");
+            // 잘못된 토큰
+            throw new InvalidateTokenException();
         } catch (ExpiredJwtException e) {
-            log.error("Expired JWT token");
-            request.setAttribute("expired",e.getMessage());
+            // 만료된 토큰
+            throw new ExpiredTokenException();
         } catch (UnsupportedJwtException e) {
-            log.error("Unsupported JWT token");
-        } catch (IllegalArgumentException e) {
-            log.error("JWT claims string is empty");
-
+            // 지원하지 않는 토큰
+        } catch (Exception e) {
+            //나머지 예외
         }
-        return false;
 
+        return false;
     }
 }

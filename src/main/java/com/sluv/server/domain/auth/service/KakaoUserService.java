@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
+import static com.sluv.server.domain.user.enums.SnsType.KAKAO;
 
 
 @Service
@@ -124,7 +125,7 @@ public class KakaoUserService {
         if(user == null) {
             userRepository.save(User.builder()
                     .email(kakaoUserInfo.getEmail())
-                    .snsType("KAKAO")
+                    .snsType(KAKAO)
                     .profileImgUrl(kakaoUserInfo.getProfileImgUrl())
                     .ageRange(kakaoUserInfo.getAgeRange())
                     .gender(kakaoUserInfo.getGender())

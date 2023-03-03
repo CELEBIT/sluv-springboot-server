@@ -1,12 +1,12 @@
 package com.sluv.server.global.config.security;
 
-import com.sluv.server.global.jwt.JwtAuthenticationFilter;
+import com.sluv.server.global.jwt.filter.ExceptionHandlerFilter;
+import com.sluv.server.global.jwt.filter.JwtAuthenticationFilter;
 import com.sluv.server.global.jwt.JwtProvider;
 import com.sluv.server.global.jwt.exception.CustomAuthenticationEntryPoint;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -22,6 +22,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SpringSecurityConfig {
 
     private final JwtProvider jwtProvider;
+    private final ExceptionHandlerFilter exceptionHandlerFilter = new ExceptionHandlerFilter();
     private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
 
     @Bean
@@ -45,13 +46,15 @@ public class SpringSecurityConfig {
                 )
                 .exceptionHandling().authenticationEntryPoint(customAuthenticationEntryPoint)
                 .and()
+                .addFilterBefore(new JwtAuthenticationFilter(jwtProvider), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(exceptionHandlerFilter, JwtAuthenticationFilter.class);
 
-                .addFilterBefore(new JwtAuthenticationFilter(jwtProvider), UsernamePasswordAuthenticationFilter.class);
 
 
 
 
         return http.build();
     }
+
 
 }

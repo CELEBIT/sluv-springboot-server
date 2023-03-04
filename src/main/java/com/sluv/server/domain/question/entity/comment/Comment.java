@@ -20,6 +20,8 @@ public class Comment extends BaseEntity {
     @NotNull
     private Long userId;
 
+    private Long parentId;
+
     @NotNull
     private Long questionId;
 

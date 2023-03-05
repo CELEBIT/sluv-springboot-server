@@ -35,7 +35,7 @@ public class User extends BaseEntity implements UserDetails {
     private String nickname;
     @NotNull
     @Enumerated(EnumType.STRING)
-    @Size(max = 45)
+//    @Size(max = 45)
     private SnsType snsType;
     @Column(columnDefinition = "TEXT")
     private String profileImgUrl;

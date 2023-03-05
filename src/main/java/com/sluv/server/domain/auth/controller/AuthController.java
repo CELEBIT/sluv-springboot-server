@@ -1,6 +1,7 @@
 package com.sluv.server.domain.auth.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.sluv.server.domain.auth.SnsType;
 import com.sluv.server.domain.auth.dto.AuthRequestDto;
 import com.sluv.server.domain.auth.dto.AuthResponseDto;
 import com.sluv.server.domain.auth.service.AuthService;
@@ -41,16 +42,17 @@ public class AuthController {
     @GetMapping("/social-login")
     public ResponseEntity<?> socialLogin(@RequestBody AuthRequestDto request) throws JsonProcessingException {
         AuthResponseDto response = null;
-            switch (request.getSnsType()) {
-                case KAKAO -> response = kakaoUserService.kakaoLogin(request);
-                case GOOGLE -> System.out.println("구글");
-                case APPLE -> System.out.println("애플");
-            }
 
-            return ResponseEntity.ok().body(SuccessResponse.builder()
-                                                            .result(response)
-                                                            .build()
-                                        );
+        switch (request.getSnsType()) {
+            case KAKAO -> response = kakaoUserService.kakaoLogin(request);
+            case GOOGLE -> System.out.println("구글");
+            case APPLE -> System.out.println("애플");
+        }
+
+        return ResponseEntity.ok().body(SuccessResponse.builder()
+                                                        .result(response)
+                                                        .build()
+                                    );
     }
 
     @GetMapping("/test")

@@ -67,7 +67,7 @@ public class KakaoUserService {
                     kakaoUserInfoRequest,
                     String.class
             );
-        System.out.println("여기는?");
+
             return convertResponseToSocialUserInfoDto(response);
     }
 
@@ -79,7 +79,6 @@ public class KakaoUserService {
      * @throws JsonProcessingException
      */
     private static SocialUserInfoDto convertResponseToSocialUserInfoDto(ResponseEntity<String> response) throws JsonProcessingException {
-        System.out.println("여기까진 오니?");
         // responseBody에 있는 정보를 꺼냄
         String responseBody = response.getBody();
 

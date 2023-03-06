@@ -22,7 +22,7 @@ public class ErrorResponse {
         this.message = message;
     }
 
-    @Builder(builderMethodName = "customBuilder")
+    @Builder(builderClassName = "customBuilder", builderMethodName = "customBuilder")
     public ErrorResponse(ErrorCode errorCode) {
         this.isSuccess = false;
         this.code = errorCode.getCode();

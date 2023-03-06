@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -17,8 +18,8 @@ import static com.sluv.server.global.common.exception.ErrorCode.INTERNAL_SERVER_
 @Slf4j
 public class GlobalExceptionHandler {
 
-    private static final String LOG_FORMAT = "Class : {}, Message : {}";
-    private static final String LOG_CODE_FORMAT = "Class : {}, Code : {}, Message : {}";
+    private static final String LOG_FORMAT = "Error: {}, Class : {}, Message : {}";
+    private static final String LOG_CODE_FORMAT = "Error: {}, Class : {}, Code : {}, Message : {}";
 
     /**
      * == Application Exception ==
@@ -30,6 +31,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> applicationException(ApplicationException exception){
         log.error(
                 LOG_CODE_FORMAT,
+                "ApplicationException",
                 exception.getClass().getSimpleName(),
                 exception.getErrorCode(),
                 exception.getMessage()
@@ -44,28 +46,6 @@ public class GlobalExceptionHandler {
                 );
     }
 
-    /**
-     * == Vaildation Exception ==
-     *
-     * @exception MethodArgumentNotValidException
-     * @return INVALID_ARGUMENT
-     */
-
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorResponse> methodArgumentNotValidException(MethodArgumentNotValidException exception) {
-        log.error(
-                LOG_CODE_FORMAT,
-                exception.getClass(),
-                INVALID_ARGUMENT.getCode(),
-                INVALID_ARGUMENT.getMessage()
-        );
-
-        return ResponseEntity.badRequest()
-                .body(ErrorResponse.customBuilder()
-                        .errorCode(INVALID_ARGUMENT)
-                        .build()
-                );
-    }
 
     /**
      * == 런타임 Exception ==
@@ -78,6 +58,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> runtimeException(RuntimeException exception){
        log.error(
                LOG_FORMAT,
+               "RuntimeException",
                exception.getClass().getSimpleName(),
                exception.getMessage()
        );
@@ -100,6 +81,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> dataAccessException(DataAccessException exception) {
         log.error(
                 LOG_FORMAT,
+                "DataAccessException",
                 exception.getClass().getSimpleName(),
                 exception.getMessage()
         );
@@ -122,6 +104,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleException(Exception exception) {
         log.error(
                 LOG_FORMAT,
+                "Exception",
                 exception.getClass().getSimpleName(),
                 exception.getMessage()
         );

@@ -2,6 +2,7 @@ package com.sluv.server.global.jwt;
 
 
 import com.sluv.server.domain.user.dto.UserDto;
+import com.sluv.server.domain.user.exception.NotFoundUserException;
 import com.sluv.server.domain.user.repository.UserRepository;
 import com.sluv.server.global.jwt.exception.ExpiredTokenException;
 import com.sluv.server.global.jwt.exception.InvalidateTokenException;
@@ -48,7 +49,7 @@ public class JwtProvider {
     }
 
     public Authentication getAuthentication(String token){
-        UserDetails user = userRepository.findById(Long.valueOf(this.getUserId(token).toString())).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 유저.") );
+        UserDetails user = userRepository.findById(Long.valueOf(this.getUserId(token).toString())).orElseThrow(NotFoundUserException::new);
 
         return new UsernamePasswordAuthenticationToken(user, "", user.getAuthorities());
     }

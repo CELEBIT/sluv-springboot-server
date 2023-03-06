@@ -10,7 +10,6 @@ import com.sluv.server.domain.user.dto.UserDto;
 import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.domain.user.exception.NotFoundUserException;
 import com.sluv.server.domain.user.repository.UserRepository;
-
 import com.sluv.server.global.jwt.JwtProvider;
 import com.sluv.server.global.jwt.exception.InvalidateTokenException;
 import lombok.RequiredArgsConstructor;
@@ -22,37 +21,38 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
-import static com.sluv.server.domain.auth.enums.SnsType.KAKAO;
+import static com.sluv.server.domain.auth.enums.SnsType.GOOGLE;
 
 
 @Service
 @RequiredArgsConstructor
-public class KakaoUserService {
+public class GoogleUserService {
     private final UserRepository userRepository;
     private final JwtProvider jwtProvider;
 
-    public AuthResponseDto kakaoLogin(AuthRequestDto request) throws JsonProcessingException {
+    public AuthResponseDto googleLogin(AuthRequestDto request) throws JsonProcessingException {
         String accessToken = request.getAccessToken();
+
         // 1. accessToken으로 user 정보 요청
-        SocialUserInfoDto userInfo = getKakaoUserInfo(accessToken);
+        SocialUserInfoDto googleUserInfo = getGoogleUserInfo(accessToken);
 
         // 2. user 정보로 DB 탐색 및 등록
-        User kakaoUser = registerKakaoUserIfNeed(userInfo);
+        User googleUser = registerGoogleUserIfNeed(googleUserInfo);
 
         // 3. userToken 생성
         return AuthResponseDto.builder()
-                .token(createUserToken(kakaoUser))
+                .token(createUserToken(googleUser))
                 .build();
     }
 
     /**
-     * == Front에서 준 accessToken으로 KAKAO에게 유저 정보 요청 ==
+     * == Front에서 준 accessToken으로 Google에게 유저 정보 요청 ==
      *
      * @param accessToken
      * @return 유저 정보
      * @throws JsonProcessingException, , BaseException(JWT_AUTHENTICATION_FAILED)
      */
-    private SocialUserInfoDto getKakaoUserInfo(String accessToken) throws JsonProcessingException {
+    private SocialUserInfoDto getGoogleUserInfo(String accessToken) throws JsonProcessingException {
         HttpHeaders headers = new HttpHeaders();
 
         headers.add("Authorization", "Bearer " + accessToken);
@@ -60,11 +60,12 @@ public class KakaoUserService {
 
         // HTTP 요청 보내기
         HttpEntity<MultiValueMap<String, String>> kakaoUserInfoRequest = new HttpEntity<>(headers);
-        try {
-            RestTemplate rt = new RestTemplate();
+
+        RestTemplate rt = new RestTemplate();
+        try{
             ResponseEntity<String> response = rt.exchange(
-                    "https://kapi.kakao.com/v2/user/me",
-                    HttpMethod.POST,
+                    "https://www.googleapis.com/oauth2/v1/userinfo",
+                    HttpMethod.GET,
                     kakaoUserInfoRequest,
                     String.class
             );
@@ -73,6 +74,8 @@ public class KakaoUserService {
         }catch (Exception e){
             throw new InvalidateTokenException();
         }
+
+
     }
 
     /**
@@ -89,52 +92,53 @@ public class KakaoUserService {
         ObjectMapper objectMapper = new ObjectMapper();
         JsonNode jsonNode = objectMapper.readTree(responseBody);
 
-        String email = jsonNode.get("kakao_account").get("email").asText();
-        String profileImgUrl = jsonNode.get("properties")
-                .get("profile_image").asText();
+        String email = jsonNode.get("email").asText();
+        String profileImgUrl = jsonNode.get("picture").asText();
 
-        String gender;
-        try{
-            gender = jsonNode.get("kakao_account").get("gender").asText();
-        }catch (Exception e){
-            gender = null;
-        }
-
-        String ageRange;
-        try{
-            ageRange = jsonNode.get("kakao_account").get("age_range").asText();
-        }catch (Exception e){
-            ageRange = null;
-        }
+        //Google에서 성별과 연령대 정보를 제공하지 않는 것 같음 23.3.5 -junker-
+//        String gender;
+//
+//        try{
+//            gender = jsonNode.get("gender").asText();
+//        }catch (Exception e){
+//            gender = null;
+//        }
+//
+//        String ageRange;
+//        try{
+//            ageRange = jsonNode.get("age_range").asText();
+//        }catch (Exception e){
+//            ageRange = null;
+//        }
 
         return SocialUserInfoDto.builder()
                 .email(email)
                 .profileImgUrl(profileImgUrl)
-                .gender(gender)
-                .ageRange(ageRange)
+                .gender(null)
+                .ageRange(null)
                 .build();
     }
 
     /**
      * == KAKAO에서 받은 정보로 DB에서 유저 탐색 ==
      *
-     * @param UserInfo
+     * @param googleUserIngoDto
      * @return DB에 등록된 user
      * @throws , BaseException(NOT_FOUND_USER)
      */
-    private User registerKakaoUserIfNeed(SocialUserInfoDto UserInfo) {
-        User user = userRepository.findByEmail(UserInfo.getEmail()).orElse(null);
+    private User registerGoogleUserIfNeed(SocialUserInfoDto googleUserIngoDto) {
+        User user = userRepository.findByEmail(googleUserIngoDto.getEmail()).orElse(null);
 
         if(user == null) {
             userRepository.save(User.builder()
-                    .email(UserInfo.getEmail())
-                    .snsType(KAKAO)
-                    .profileImgUrl(UserInfo.getProfileImgUrl())
-                    .ageRange(UserInfo.getAgeRange())
-                    .gender(UserInfo.getGender())
+                    .email(googleUserIngoDto.getEmail())
+                    .snsType(GOOGLE)
+                    .profileImgUrl(googleUserIngoDto.getProfileImgUrl())
+                    .ageRange(googleUserIngoDto.getAgeRange())
+                    .gender(googleUserIngoDto.getGender())
                     .build());
 
-            user = userRepository.findByEmail(UserInfo.getEmail())
+            user = userRepository.findByEmail(googleUserIngoDto.getEmail())
                                             .orElseThrow(NotFoundUserException::new);
         }
         return user;

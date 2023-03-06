@@ -1,5 +1,4 @@
 package com.sluv.server.global.common.exception;
-import lombok.Builder;
 import lombok.Getter;
 
 @Getter

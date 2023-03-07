@@ -9,20 +9,17 @@ spring:
     user:
       name: user
       password: 1234
-  jpa:
-    database: mysql
-    database-platform: org.hibernate.dialect.MySQL8Dialect
-    hibernate:
-      ddl-auto: update
-    properties:
-      hibernate:
-        format_sql: true
 
 jasypt:
   encryptor:
     bean: jasyptStringEncryptor
     password: celebit-sluv-mvp2
+
 logging:
   level:
     org.hibernate.SQL: debug
 
+jwt:
+  header: Authorization
+  secret: and0LXRlc3QtYWxqamFiYWVnaS1qd3QtdGVzdC1hbGpqYWJhZWdpLWp3dC10ZXN0LWFsamphYmFlZ2ktand0LXRlc3QtYWxqamFiYWVnaS1qd3QtdGVzdC1hbGpqYWJhZWdpLWp3dC10ZXN0LWFsamphYmFlZ2ktand0LXRlc3QtYWxqamFiYWVnaS1qd3QtdGVzdC1hbGpqYWJhZWdp
+  expiration-seconds: 864000

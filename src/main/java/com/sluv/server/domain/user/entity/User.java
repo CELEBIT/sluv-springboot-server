@@ -1,6 +1,6 @@
 package com.sluv.server.domain.user.entity;
 
-import com.sluv.server.domain.user.enums.SnsType;
+//import com.sluv.server.domain.user.enums.SnsType;
 
 import com.sluv.server.domain.auth.enums.SnsType;
 import com.sluv.server.domain.user.enums.UserStatus;
@@ -47,31 +47,6 @@ public class User extends BaseEntity implements UserDetails {
 
     @Size(max = 45)
     private String gender;
-    @Enumerated(EnumType.STRING)
-    @Column(length = 45, columnDefinition = "varchar(45) default 'PENDING_PROFILE'")
-    private UserStatus userStatus;
-
-    @NotNull
-    @Size(max = 320)
-    private String email;
-
-    @Size(max = 45)
-    private String nickname;
-
-    @NotNull
-    @Enumerated(EnumType.STRING)
-    @Size(max = 45)
-    private SnsType snsType;
-
-    @Column(columnDefinition = "TEXT")
-    private String profileImgUrl;
-
-    @Size(max = 45)
-    private String ageRange;
-
-    @Size(max = 45)
-    private String gender;
-
     @Enumerated(EnumType.STRING)
     @Column(length = 45, columnDefinition = "varchar(45) default 'PENDING_PROFILE'")
     private UserStatus userStatus;

@@ -1,5 +1,6 @@
 package com.sluv.server.domain.user.service;
 
+import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.domain.user.dto.UserDto;
 import com.sluv.server.domain.user.repository.UserRepository;
 import com.sluv.server.global.jwt.JwtProvider;

@@ -1,4 +1,4 @@
-package com.sluv.server.domain.question.entity.comment;
+package com.sluv.server.domain.comment.entity;
 
 import com.sluv.server.domain.question.enums.comment.CommentReportReason;
 import com.sluv.server.domain.user.enums.UserReportReason;

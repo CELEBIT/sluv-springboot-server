@@ -1,30 +1,32 @@
-package com.sluv.server.domain.question.entity.comment;
+package com.sluv.server.domain.comment.entity;
 
+import com.sluv.server.domain.question.enums.comment.CommentStatus;
 import com.sluv.server.global.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
 
 @Entity
 @NoArgsConstructor
-@Table(name = "comment_like")
-public class CommentLike extends BaseEntity {
+@Table(name = "comment_item")
+public class CommentItem extends BaseEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "comment_like_id")
+    @Column(name = "comment_item_id")
     private Long id;
 
     @NotNull
     private Long commentId;
 
     @NotNull
-    private Long userId;
+    private Long itemId;
 
     @Builder
-    public CommentLike(Long id, Long commentId, Long userId) {
+    public CommentItem(Long id, Long commentId, Long itemId) {
         this.id = id;
         this.commentId = commentId;
-        this.userId = userId;
+        this.itemId = itemId;
     }
 }

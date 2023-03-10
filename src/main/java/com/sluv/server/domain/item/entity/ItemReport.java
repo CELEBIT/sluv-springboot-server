@@ -2,6 +2,7 @@ package com.sluv.server.domain.item.entity;
 
 import com.sluv.server.domain.item.enums.ItemReportReason;
 import com.sluv.server.global.common.entity.BaseEntity;
+import com.sluv.server.global.common.enums.ReportStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -33,13 +34,18 @@ public class ItemReport extends BaseEntity {
     @Size(max = 1002)
     private String content;
 
+    @Enumerated(EnumType.STRING)
+    @Column(length = 45, columnDefinition = "varchar(45) default 'WAITING'")
+    private ReportStatus reportStatus;
+
 
     @Builder
-    public ItemReport(Long id, Long itemId, Long reporterId, ItemReportReason itemReportReason, String content) {
+    public ItemReport(Long id, Long itemId, Long reporterId, ItemReportReason itemReportReason, String content, ReportStatus reportStatus) {
         this.id = id;
         this.itemId = itemId;
         this.reporterId = reporterId;
         this.itemReportReason = itemReportReason;
         this.content = content;
+        this.reportStatus = reportStatus;
     }
 }

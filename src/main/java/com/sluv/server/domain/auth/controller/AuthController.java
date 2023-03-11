@@ -22,10 +22,7 @@ import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/auth")
@@ -50,8 +47,8 @@ public class AuthController {
             @ApiResponse(responseCode = "4002", description = "만료된 토큰", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
 
-    @GetMapping("/social-login")
-    public ResponseEntity<SuccessResponse<Object>> socialLogin(@RequestBody AuthRequestDto request) throws JsonProcessingException {
+    @PostMapping("/social-login")
+    public ResponseEntity<SuccessResponse<?>> socialLogin(@RequestBody AuthRequestDto request) throws JsonProcessingException {
         AuthResponseDto response = null;
 
         SnsType userSnsType = SnsType.fromString(request.getSnsType());
@@ -68,7 +65,7 @@ public class AuthController {
                                     );
     }
 
-    @GetMapping("/test")
+    @PostMapping("/test")
     public ResponseEntity<?> testToken(@RequestBody UserDto dto){
 
         return ResponseEntity.ok().body(SuccessResponse.builder()

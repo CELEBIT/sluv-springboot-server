@@ -34,15 +34,15 @@ public class AppleUserService {
         String accessToken = request.getAccessToken();
         // 1. 3개의 Apple 공개 key 요청
 
-        // 2. accessToken에서 k
+        // 2. idToken 검증
 
-        // 1. accessToken으로 user 정보 요청
+        // 3. idToken가지고 userDto 생성
         SocialUserInfoDto userInfo = getAppleUserInfo(accessToken);
 
-        // 2. user 정보로 DB 탐색 및 등록
+        // 4. user 정보로 DB 탐색 및 등록
         User kakaoUser = registerAppleUserIfNeed(userInfo);
 
-        // 3. userToken 생성
+        // 5. userToken 생성
         return AuthResponseDto.builder()
                 .token(createUserToken(kakaoUser))
                 .build();

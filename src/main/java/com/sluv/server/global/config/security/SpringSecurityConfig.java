@@ -45,12 +45,11 @@ public class SpringSecurityConfig {
 
                 .authorizeHttpRequests((request) -> request // 허용 범위 설정
 //                        .requestMatchers(HttpMethod.POST, "/auth/**").permitAll() // 허용범위
-                        .requestMatchers("/**").permitAll() // 허용범위
-//                        .requestMatchers(PERMIT_URL).permitAll() // 허용범위
-//                        .anyRequest().authenticated()
+                        .requestMatchers(PERMIT_URL).permitAll() // 허용범위
+                        .anyRequest().authenticated()
                 )
-//                .exceptionHandling().authenticationEntryPoint(customAuthenticationEntryPoint)
-//                .and()
+                .exceptionHandling().authenticationEntryPoint(customAuthenticationEntryPoint)
+                .and()
                 .addFilterBefore(new JwtAuthenticationFilter(jwtProvider), UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(exceptionHandlerFilter, JwtAuthenticationFilter.class);
 

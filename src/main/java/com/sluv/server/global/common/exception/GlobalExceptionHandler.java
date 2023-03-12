@@ -100,20 +100,20 @@ public class GlobalExceptionHandler {
      * @return INTERNAL_SERVER_ERROR
      */
 
-//    @ExceptionHandler(Exception.class)
-//    public ResponseEntity<ErrorResponse> handleException(Exception exception) {
-//        log.error(
-//                LOG_FORMAT,
-//                "Exception",
-//                exception.getClass().getSimpleName(),
-//                exception.getMessage()
-//        );
-//        return ResponseEntity.internalServerError()
-//                .body(ErrorResponse.customBuilder()
-//                                    .errorCode(INTERNAL_SERVER_ERROR)
-//                                    .build()
-//                );
-//
-//    }
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorResponse> handleException(Exception exception) {
+        log.error(
+                LOG_FORMAT,
+                "Exception",
+                exception.getClass().getSimpleName(),
+                exception.getMessage()
+        );
+        return ResponseEntity.internalServerError()
+                .body(ErrorResponse.customBuilder()
+                                    .errorCode(INTERNAL_SERVER_ERROR)
+                                    .build()
+                );
+
+    }
 
 }

@@ -27,3 +27,5 @@ jwt:
 apple:
 #  nonce: 1
   clientId: Sluv.sluv-ios-renew
+  openKey: https://appleid.apple.com/auth/keys
+  iss: https://appleid.apple.com

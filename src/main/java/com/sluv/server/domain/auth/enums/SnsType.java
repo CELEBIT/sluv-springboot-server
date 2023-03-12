@@ -2,7 +2,6 @@ package com.sluv.server.domain.auth.enums;
 
 import com.sluv.server.domain.auth.exception.NoSupportSocialTypeException;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Data;
 
 @Schema(description = "SnsType")
 public enum SnsType {

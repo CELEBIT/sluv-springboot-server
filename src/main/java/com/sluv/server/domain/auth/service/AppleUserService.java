@@ -42,6 +42,12 @@ public class AppleUserService {
     @Value("${apple.clientId}")
     private String clientId;
 
+    @Value("${apple.openKeys}")
+    private String appleOpenKeys;
+
+    @Value("${apple.iss}")
+    private String issUrl;
+
     public AuthResponseDto appleLogin(AuthRequestDto request) throws Exception {
         String idToken = request.getAccessToken();
 
@@ -94,7 +100,7 @@ public class AppleUserService {
 //            return false;
 //        }
         String iss = payloadNode.get("iss").asText();
-        if (!iss.equals("https://appleid.apple.com")) {
+        if (!iss.equals(issUrl)) {
             System.out.println("appleId");
             return false;
         }
@@ -157,7 +163,7 @@ public class AppleUserService {
      */
 
     private JsonNode getApplePublicKey(String idKid) throws Exception {
-        URL url = new URL("https://appleid.apple.com/auth/keys");
+        URL url = new URL(appleOpenKeys);
 
 
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();

@@ -23,3 +23,9 @@ jwt:
   header: Authorization
   secret: and0LXRlc3QtYWxqamFiYWVnaS1qd3QtdGVzdC1hbGpqYWJhZWdpLWp3dC10ZXN0LWFsamphYmFlZ2ktand0LXRlc3QtYWxqamFiYWVnaS1qd3QtdGVzdC1hbGpqYWJhZWdpLWp3dC10ZXN0LWFsamphYmFlZ2ktand0LXRlc3QtYWxqamFiYWVnaS1qd3QtdGVzdC1hbGpqYWJhZWdp
   expiration-seconds: 864000
+
+apple:
+#  nonce: 1
+  clientId: Sluv.sluv-ios-renew
+  openKey: https://appleid.apple.com/auth/keys
+  iss: https://appleid.apple.com

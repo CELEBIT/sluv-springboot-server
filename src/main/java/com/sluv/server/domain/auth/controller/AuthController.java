@@ -1,6 +1,5 @@
 package com.sluv.server.domain.auth.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.sluv.server.domain.auth.enums.SnsType;
 import com.sluv.server.domain.auth.dto.AuthRequestDto;
 import com.sluv.server.domain.auth.dto.AuthResponseDto;
@@ -64,7 +63,7 @@ public class AuthController {
                                     );
     }
 
-    @GetMapping("/test")
+    @PostMapping("/test")
     public ResponseEntity<?> testToken(@RequestBody UserDto dto){
 
         return ResponseEntity.ok().body(SuccessResponse.builder()

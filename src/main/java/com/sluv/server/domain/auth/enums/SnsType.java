@@ -2,8 +2,9 @@ package com.sluv.server.domain.auth.enums;
 
 import com.sluv.server.domain.auth.exception.NoSupportSocialTypeException;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Data;
 
-@Schema
+@Schema(description = "SnsType")
 public enum SnsType {
     KAKAO,
     GOOGLE,

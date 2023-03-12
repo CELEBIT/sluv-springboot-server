@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.sluv.server.domain.auth.enums.SnsType;
 import com.sluv.server.domain.auth.dto.AuthRequestDto;
 import com.sluv.server.domain.auth.dto.AuthResponseDto;
+import com.sluv.server.domain.auth.service.AppleUserService;
 import com.sluv.server.domain.auth.service.AuthService;
 import com.sluv.server.domain.auth.service.GoogleUserService;
 import com.sluv.server.domain.auth.service.KakaoUserService;
@@ -30,6 +31,7 @@ public class AuthController {
 
     private final KakaoUserService kakaoUserService;
     private final GoogleUserService googleUserService;
+    private final AppleUserService appleUserService;
     private final AuthService authService;
 
     @Operation(
@@ -45,7 +47,7 @@ public class AuthController {
     })
 
     @PostMapping("/social-login")
-    public ResponseEntity<SuccessResponse<AuthResponseDto>> socialLogin(@RequestBody AuthRequestDto request) throws JsonProcessingException {
+    public ResponseEntity<SuccessResponse<AuthResponseDto>> socialLogin(@RequestBody AuthRequestDto request) throws Exception {
         AuthResponseDto response = null;
 
         SnsType userSnsType = SnsType.fromString(request.getSnsType());
@@ -53,7 +55,7 @@ public class AuthController {
         switch (userSnsType) {
             case KAKAO -> response = kakaoUserService.kakaoLogin(request);
             case GOOGLE -> response = googleUserService.googleLogin(request);
-            case APPLE -> System.out.println("애플");
+            case APPLE -> response = appleUserService.appleLogin(request);
         }
 
         return ResponseEntity.ok().body(SuccessResponse.<AuthResponseDto>builder()

@@ -3,7 +3,6 @@
 ## Workers
 - 찰스
 - 준커
-- 리야
 
 ## Settings
 

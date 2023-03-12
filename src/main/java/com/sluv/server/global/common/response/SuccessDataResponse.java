@@ -7,10 +7,16 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
-@JsonPropertyOrder({"isSuccess", "code", "message"})
-public class SuccessResponse {
+@JsonPropertyOrder({"isSuccess", "code", "message", "result"})
+public class SuccessDataResponse<T> extends SuccessResponse {
     private final Boolean isSuccess = true;
     private final String message = "요청성공.";
     private final int code = 1000;
+    private T result;
+
+    @Builder
+    public SuccessDataResponse(T result) {
+        this.result = result;
+    }
 
 }

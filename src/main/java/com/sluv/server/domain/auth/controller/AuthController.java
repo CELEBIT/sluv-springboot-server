@@ -10,7 +10,9 @@ import com.sluv.server.domain.auth.service.KakaoUserService;
 import com.sluv.server.domain.user.dto.UserDto;
 
 import com.sluv.server.global.common.response.ErrorResponse;
+import com.sluv.server.global.common.response.SuccessDataResponse;
 import com.sluv.server.global.common.response.SuccessResponse;
+import com.sluv.server.global.jwt.JwtProvider;
 import io.swagger.v3.oas.annotations.Operation;
 
 import io.swagger.v3.oas.annotations.media.Content;
@@ -18,6 +20,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.MediaType;
@@ -33,6 +36,8 @@ public class AuthController {
     private final GoogleUserService googleUserService;
     private final AuthService authService;
 
+    private final JwtProvider jwtProvider;
+
     @Operation(
             summary = "소셜 로그인",
             description = "AccessToken과 sysType로 로그인."
@@ -40,7 +45,7 @@ public class AuthController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "1000", description = "요청성공", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
                                         schema = @Schema(
-                                                implementation = SuccessResponse.class))),
+                                                implementation = SuccessDataResponse.class))),
             @ApiResponse(responseCode = "2000", description = "존재하지 않는 유저", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "2001", description = "지원하지 않는 SNS Type", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "4001", description = "유효하지 않는 토큰", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
@@ -48,7 +53,7 @@ public class AuthController {
     })
 
     @PostMapping("/social-login")
-    public ResponseEntity<SuccessResponse<?>> socialLogin(@RequestBody AuthRequestDto request) throws JsonProcessingException {
+    public ResponseEntity<SuccessDataResponse<?>> socialLogin(@RequestBody AuthRequestDto request) throws JsonProcessingException {
         AuthResponseDto response = null;
 
         SnsType userSnsType = SnsType.fromString(request.getSnsType());
@@ -59,16 +64,24 @@ public class AuthController {
             case APPLE -> System.out.println("애플");
         }
 
-        return ResponseEntity.ok().body(SuccessResponse.builder()
+        return ResponseEntity.ok().body(SuccessDataResponse.builder()
                                                         .result(response)
                                                         .build()
                                     );
     }
 
+    @GetMapping("/auto-login")
+    public ResponseEntity<SuccessResponse> autoLogin(HttpServletRequest request){
+        String accessToken = jwtProvider.resolveToken(request);
+        jwtProvider.validateToken(accessToken);
+
+        return ResponseEntity.ok().body(new SuccessResponse());
+    }
+
     @PostMapping("/test")
     public ResponseEntity<?> testToken(@RequestBody UserDto dto){
 
-        return ResponseEntity.ok().body(SuccessResponse.builder()
+        return ResponseEntity.ok().body(SuccessDataResponse.builder()
                                                         .result(authService.jwtTestService(dto))
                                                         .build()
                                     );

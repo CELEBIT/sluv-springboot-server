@@ -10,7 +10,9 @@ import com.sluv.server.domain.auth.service.KakaoUserService;
 
 import com.sluv.server.domain.user.dto.UserDto;
 import com.sluv.server.global.common.response.ErrorResponse;
+import com.sluv.server.global.common.response.SuccessDataResponse;
 import com.sluv.server.global.common.response.SuccessResponse;
+import com.sluv.server.global.jwt.JwtProvider;
 import io.swagger.v3.oas.annotations.Operation;
 
 import io.swagger.v3.oas.annotations.media.Content;
@@ -18,6 +20,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.ResponseEntity;
@@ -33,6 +36,8 @@ public class AuthController {
     private final AppleUserService appleUserService;
     private final AuthService authService;
 
+    private final JwtProvider jwtProvider;
+
     @Operation(
             summary = "소셜 로그인",
             description = "AccessToken과 sysType로 로그인."
@@ -46,7 +51,7 @@ public class AuthController {
     })
 
     @PostMapping("/social-login")
-    public ResponseEntity<SuccessResponse<AuthResponseDto>> socialLogin(@RequestBody AuthRequestDto request) throws Exception {
+    public ResponseEntity<SuccessDataResponse<AuthResponseDto>> socialLogin(@RequestBody AuthRequestDto request) throws Exception {
         AuthResponseDto response = null;
 
         SnsType userSnsType = SnsType.fromString(request.getSnsType());
@@ -57,16 +62,24 @@ public class AuthController {
             case APPLE -> response = appleUserService.appleLogin(request);
         }
 
-        return ResponseEntity.ok().body(SuccessResponse.<AuthResponseDto>builder()
-                                                        .result(response)
-                                                        .build()
-                                    );
+        return ResponseEntity.ok().body(SuccessDataResponse.<AuthResponseDto>builder()
+                                                            .result(response)
+                                                            .build()
+                                                      );
+    }
+
+    @GetMapping("/auto-login")
+    public ResponseEntity<SuccessResponse> autoLogin(HttpServletRequest request){
+        String accessToken = jwtProvider.resolveToken(request);
+        jwtProvider.validateToken(accessToken);
+
+        return ResponseEntity.ok().body(new SuccessResponse());
     }
 
     @PostMapping("/test")
     public ResponseEntity<?> testToken(@RequestBody UserDto dto){
 
-        return ResponseEntity.ok().body(SuccessResponse.builder()
+        return ResponseEntity.ok().body(SuccessDataResponse.builder()
                                                         .result(authService.jwtTestService(dto))
                                                         .build()
                                     );

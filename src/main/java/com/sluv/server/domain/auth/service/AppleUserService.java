@@ -43,7 +43,7 @@ public class AppleUserService {
     @Value("${apple.clientId}")
     private String clientId;
 
-    @Value("${apple.openKeys}")
+    @Value("${apple.openKey}")
     private String appleOpenKeys;
 
     @Value("${apple.iss}")

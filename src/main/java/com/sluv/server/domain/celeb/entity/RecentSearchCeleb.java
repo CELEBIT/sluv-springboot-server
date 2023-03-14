@@ -1,5 +1,6 @@
 package com.sluv.server.domain.celeb.entity;
 
+import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.global.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -17,17 +18,20 @@ public class RecentSearchCeleb extends BaseEntity {
     @Column(name = "recent_search_celeb_id")
     private Long id;
 
+    @ManyToOne
+    @JoinColumn(name = "celeb_id")
     @NotNull
-    private Long celebId;
+    private Celeb celeb;
 
+    @ManyToOne
+    @JoinColumn(name = "user_id")
     @NotNull
-    private Long userId;
-
+    private User user;
 
     @Builder
-    public RecentSearchCeleb(Long id, Long celebId, Long userId) {
+    public RecentSearchCeleb(Long id, Celeb celeb, User user) {
         this.id = id;
-        this.celebId = celebId;
-        this.userId = userId;
+        this.celeb = celeb;
+        this.user = user;
     }
 }

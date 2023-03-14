@@ -1,5 +1,6 @@
 package com.sluv.server.domain.item.entity;
 
+import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.global.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -17,17 +18,21 @@ public class ItemLike extends BaseEntity {
     @Column(name = "item_like_id")
     private Long id;
 
+    @ManyToOne
+    @JoinColumn(name = "item_id")
     @NotNull
-    private Long itemId;
+    private Item item;
 
+    @ManyToOne
+    @JoinColumn(name = "user_id")
     @NotNull
-    private Long userId;
+    private User user;
 
 
     @Builder
-    public ItemLike(Long id, Long itemId, Long userId) {
+    public ItemLike(Long id, Item item, User user) {
         this.id = id;
-        this.itemId = itemId;
-        this.userId = userId;
+        this.item = item;
+        this.user = user;
     }
 }

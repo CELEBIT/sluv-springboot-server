@@ -21,11 +21,15 @@ public class UserReport extends BaseEntity {
     @Column(name = "user_report_id")
     private Long id;
 
+    @ManyToOne
+    @JoinColumn(name = "reporter_id")
     @NotNull
-    private Long reporterId;
+    private User reporter;
 
+    @ManyToOne
+    @JoinColumn(name = "reported_id")
     @NotNull
-    private Long reportedId;
+    private User reported;
 
     @NotNull
     @Enumerated(EnumType.STRING)
@@ -41,10 +45,10 @@ public class UserReport extends BaseEntity {
 
 
     @Builder
-    public UserReport(Long id, Long reporterId, Long reportedId, UserReportReason userReportReason, String content, ReportStatus reportStatus) {
+    public UserReport(Long id, User reporter, User reported, UserReportReason userReportReason, String content, ReportStatus reportStatus) {
         this.id = id;
-        this.reporterId = reporterId;
-        this.reportedId = reportedId;
+        this.reporter = reporter;
+        this.reported = reported;
         this.userReportReason = userReportReason;
         this.content = content;
         this.reportStatus = reportStatus;

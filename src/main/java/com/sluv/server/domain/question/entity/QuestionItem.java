@@ -1,5 +1,6 @@
 package com.sluv.server.domain.question.entity;
 
+import com.sluv.server.domain.item.entity.Item;
 import com.sluv.server.global.common.entity.BaseEntity;
 import com.sluv.server.global.common.enums.ImgStatus;
 import jakarta.persistence.*;
@@ -20,11 +21,14 @@ public class QuestionItem extends BaseEntity {
     @Column(name = "question_item_id")
     private Long id;
 
+    @ManyToOne
+    @JoinColumn(name = "question_id")
     @NotNull
-    private Long questionId;
-
+    private Question question;
+    @ManyToOne
+    @JoinColumn(name = "item_id")
     @NotNull
-    private Long itemId;
+    private Item item;
 
     @Size(max = 100)
     private String description;
@@ -36,12 +40,11 @@ public class QuestionItem extends BaseEntity {
     private Boolean representFlag;
 
     @Builder
-    public QuestionItem(Long id, Long questionId, Long itemId, String description, Long vote, Boolean representFlag) {
+    public QuestionItem(Long id, Question question, Item item, String description, Long vote) {
         this.id = id;
-        this.questionId = questionId;
-        this.itemId = itemId;
+        this.question = question;
+        this.item = item;
         this.description = description;
         this.vote = vote;
-        this.representFlag = representFlag;
     }
 }

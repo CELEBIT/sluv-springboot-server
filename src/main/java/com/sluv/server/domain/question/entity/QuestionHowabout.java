@@ -1,5 +1,6 @@
 package com.sluv.server.domain.question.entity;
 
+import com.sluv.server.domain.user.entity.User;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import lombok.AllArgsConstructor;
@@ -16,7 +17,7 @@ import java.time.LocalDateTime;
 public class QuestionHowabout extends Question{
 
     @Builder
-    public QuestionHowabout(Long id, Long userId, String title, String content, Long searchNum) {
-        super(id, userId, title, content, searchNum);
+    public QuestionHowabout(Long id, User user, String title, String content, Long searchNum) {
+        super(id, user, title, content, searchNum);
     }
 }

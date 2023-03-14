@@ -1,6 +1,7 @@
 package com.sluv.server.domain.item.entity;
 
 import com.sluv.server.domain.item.enums.ItemEditReqReason;
+import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.global.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -19,11 +20,15 @@ public class ItemEditReq extends BaseEntity {
     @Column(name = "item_edit_req_id")
     private Long id;
 
+    @ManyToOne
+    @JoinColumn(name = "requester_id")
     @NotNull
-    private Long requesterId;
+    private User requester;
 
+    @ManyToOne
+    @JoinColumn(name = "item_id")
     @NotNull
-    private Long itemId;
+    private Item item;
 
     @NotNull
     @Enumerated(EnumType.STRING)
@@ -34,10 +39,10 @@ public class ItemEditReq extends BaseEntity {
     private String content;
 
     @Builder
-    public ItemEditReq(Long id, Long requesterId, Long itemId, ItemEditReqReason itemEditReqReason, String content) {
+    public ItemEditReq(Long id, User requester, Item item, ItemEditReqReason itemEditReqReason, String content) {
         this.id = id;
-        this.requesterId = requesterId;
-        this.itemId = itemId;
+        this.requester = requester;
+        this.item = item;
         this.itemEditReqReason = itemEditReqReason;
         this.content = content;
     }

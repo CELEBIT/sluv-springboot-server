@@ -19,8 +19,10 @@ public class ItemLink extends BaseEntity {
     @Column(name = "item_link_id")
     private Long id;
 
+    @ManyToOne
+    @JoinColumn(name = "item_id")
     @NotNull
-    private Long itemId;
+    private Item item;
 
     @NotNull
     @Size(max = 100)
@@ -35,9 +37,9 @@ public class ItemLink extends BaseEntity {
     private ImgStatus imgStatus;
 
     @Builder
-    public ItemLink(Long id, Long itemId, String linkName, String itemLinkUrl, ImgStatus imgStatus) {
+    public ItemLink(Long id, Item item, String linkName, String itemLinkUrl, ImgStatus imgStatus) {
         this.id = id;
-        this.itemId = itemId;
+        this.item = item;
         this.linkName = linkName;
         this.itemLinkUrl = itemLinkUrl;
         this.imgStatus = imgStatus;

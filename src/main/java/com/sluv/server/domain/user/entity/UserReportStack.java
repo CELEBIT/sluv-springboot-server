@@ -19,13 +19,15 @@ public class UserReportStack extends BaseEntity {
     @Column(name = "user_report_stack_id")
     private Long id;
 
+    @ManyToOne
+    @JoinColumn(name = "reported_id")
     @NotNull
-    private Long reportedId;
+    private User reported;
 
 
     @Builder
-    public UserReportStack(Long id, Long reportedId) {
+    public UserReportStack(Long id, User reported) {
         this.id = id;
-        this.reportedId = reportedId;
+        this.reported = reported;
     }
 }

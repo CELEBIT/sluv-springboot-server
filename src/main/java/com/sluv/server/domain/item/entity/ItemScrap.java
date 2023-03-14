@@ -1,5 +1,6 @@
 package com.sluv.server.domain.item.entity;
 
+import com.sluv.server.domain.closet.entity.Closet;
 import com.sluv.server.global.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -17,17 +18,21 @@ public class ItemScrap extends BaseEntity {
     @Column(name = "item_scrap_id")
     private Long id;
 
+    @ManyToOne
+    @JoinColumn(name = "item_id")
     @NotNull
-    private Long itemId;
+    private Item item;
 
+    @ManyToOne
+    @JoinColumn(name = "closet_id")
     @NotNull
-    private Long closetId;
+    private Closet closet;
 
 
     @Builder
-    public ItemScrap(Long id, Long itemId, Long closetId) {
+    public ItemScrap(Long id, Item item, Closet closet) {
         this.id = id;
-        this.itemId = itemId;
-        this.closetId = closetId;
+        this.item = item;
+        this.closet = closet;
     }
 }

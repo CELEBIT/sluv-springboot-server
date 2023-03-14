@@ -1,5 +1,6 @@
 package com.sluv.server.domain.comment.entity;
 
+import com.sluv.server.domain.item.entity.Item;
 import com.sluv.server.global.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -16,16 +17,20 @@ public class CommentItem extends BaseEntity {
     @Column(name = "comment_item_id")
     private Long id;
 
+    @ManyToOne
+    @JoinColumn(name = "comment_id")
     @NotNull
-    private Long commentId;
+    private Comment comment;
 
+    @ManyToOne
+    @JoinColumn(name = "item_id")
     @NotNull
-    private Long itemId;
+    private Item item;
 
     @Builder
-    public CommentItem(Long id, Long commentId, Long itemId) {
+    public CommentItem(Long id, Comment comment, Item item) {
         this.id = id;
-        this.commentId = commentId;
-        this.itemId = itemId;
+        this.comment = comment;
+        this.item = item;
     }
 }

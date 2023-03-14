@@ -1,6 +1,8 @@
 package com.sluv.server.domain.celeb.entity;
 
 import com.sluv.server.domain.celeb.enums.CelebStatus;
+import com.sluv.server.domain.comment.entity.CommentReport;
+import com.sluv.server.domain.item.entity.Item;
 import com.sluv.server.domain.item.enums.ItemStatus;
 import com.sluv.server.global.common.entity.BaseEntity;
 import jakarta.persistence.*;
@@ -51,6 +53,9 @@ public class Celeb extends BaseEntity {
 
     @OneToMany(mappedBy = "celeb")
     List<RecentSearchCeleb> recentSearchCelebList;
+
+    @OneToMany(mappedBy = "celeb")
+    List<Item> itemList;
 
     @Builder
     public Celeb(Long id, Celeb parentCeleb, CelebCategory celebCategory, String celebNameKr, String celebNameEn, CelebStatus celebStatus) {

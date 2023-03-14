@@ -1,6 +1,7 @@
 package com.sluv.server.domain.brand.entity;
 
 import com.sluv.server.domain.brand.enums.NewBrandStatus;
+import com.sluv.server.domain.item.entity.Item;
 import com.sluv.server.domain.item.enums.ItemStatus;
 import com.sluv.server.global.common.entity.BaseEntity;
 import jakarta.persistence.*;
@@ -9,6 +10,8 @@ import jakarta.validation.constraints.Size;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.List;
 
 @Entity
 @Getter
@@ -27,6 +30,9 @@ public class NewBrand extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Column(length = 45, columnDefinition = "varchar(45) default 'ACTIVE'")
     private NewBrandStatus newBrandStatus;
+
+    @OneToMany(mappedBy = "newBrand")
+    List<Item> itemList;
 
     @Builder
     public NewBrand(Long id, String brandName, NewBrandStatus newBrandStatus) {

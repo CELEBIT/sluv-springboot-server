@@ -1,5 +1,6 @@
 package com.sluv.server.domain.item.entity;
 
+import com.sluv.server.domain.comment.entity.CommentReport;
 import com.sluv.server.global.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -7,6 +8,8 @@ import jakarta.validation.constraints.Size;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.List;
 
 @Entity
 @NoArgsConstructor
@@ -23,6 +26,9 @@ public class ItemCategory extends BaseEntity {
     private String name;
 
     private Long parentId;
+
+    @OneToMany(mappedBy = "category")
+    List<Item> itemList;
 
     @Builder
     public ItemCategory(Long id, String name, Long parentId) {

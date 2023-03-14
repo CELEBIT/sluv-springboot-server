@@ -49,6 +49,9 @@ public class Celeb extends BaseEntity {
     @OneToMany(mappedBy = "parentCeleb")
     List<Celeb> celebList;
 
+    @OneToMany(mappedBy = "celeb")
+    List<RecentSearchCeleb> recentSearchCelebList;
+
     @Builder
     public Celeb(Long id, Celeb parentCeleb, CelebCategory celebCategory, String celebNameKr, String celebNameEn, CelebStatus celebStatus) {
         this.id = id;

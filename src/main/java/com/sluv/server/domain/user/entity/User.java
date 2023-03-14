@@ -4,6 +4,7 @@ package com.sluv.server.domain.user.entity;
 
 import com.sluv.server.domain.auth.enums.SnsType;
 import com.sluv.server.domain.celeb.entity.InterestedCeleb;
+import com.sluv.server.domain.celeb.entity.RecentSearchCeleb;
 import com.sluv.server.domain.closet.entity.Closet;
 import com.sluv.server.domain.comment.entity.Comment;
 import com.sluv.server.domain.user.enums.UserStatus;
@@ -63,6 +64,9 @@ public class User extends BaseEntity implements UserDetails {
 
     @OneToMany(mappedBy = "user")
     List<Comment> commentList;
+
+    @OneToMany(mappedBy = "user")
+    List<RecentSearchCeleb> recentSearchCelebList;
 
     @Builder
     public User(Long id, String email, String nickname,

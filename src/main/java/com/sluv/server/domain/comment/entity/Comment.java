@@ -1,5 +1,6 @@
 package com.sluv.server.domain.comment.entity;
 
+import com.sluv.server.domain.comment.enums.CommentReportReason;
 import com.sluv.server.domain.comment.enums.CommentStatus;
 import com.sluv.server.domain.question.entity.Question;
 import com.sluv.server.domain.user.entity.User;
@@ -54,6 +55,9 @@ public class Comment extends BaseEntity {
 
     @OneToMany(mappedBy = "comment")
     List<CommentLike> commentLikeList;
+
+    @OneToMany(mappedBy = "comment")
+    List<CommentReport> commentReportList;
 
     @Builder
     public Comment(Long id, User user, Question question, String content, CommentStatus commentStatus) {

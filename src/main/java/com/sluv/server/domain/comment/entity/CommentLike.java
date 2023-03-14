@@ -27,7 +27,7 @@ public class CommentLike extends BaseEntity {
     private User user;
 
     @Builder
-    public CommentLike(Long id, Comment commentId, User userId) {
+    public CommentLike(Long id, Comment comment, User user) {
         this.id = id;
         this.comment = comment;
         this.user = user;

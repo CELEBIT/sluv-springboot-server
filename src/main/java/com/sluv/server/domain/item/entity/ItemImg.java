@@ -19,8 +19,10 @@ public class ItemImg extends BaseEntity {
     @Column(name = "item_img_id")
     private Long id;
 
+    @ManyToOne
+    @JoinColumn(name = "item_item_id")
     @NotNull
-    private Long itemId;
+    private Item item;
 
     @NotNull
     @Column(columnDefinition = "TEXT")
@@ -36,9 +38,9 @@ public class ItemImg extends BaseEntity {
 
 
     @Builder
-    public ItemImg(Long id, Long itemId, String itemImgUrl, Boolean representFlag, ImgStatus imgStatus) {
+    public ItemImg(Long id, Item item, String itemImgUrl, Boolean representFlag, ImgStatus imgStatus) {
         this.id = id;
-        this.itemId = itemId;
+        this.item = item;
         this.itemImgUrl = itemImgUrl;
         this.representFlag = representFlag;
         this.imgStatus = imgStatus;

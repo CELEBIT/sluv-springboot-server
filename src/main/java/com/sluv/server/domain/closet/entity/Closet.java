@@ -1,6 +1,8 @@
 package com.sluv.server.domain.closet.entity;
 
 import com.sluv.server.domain.closet.enums.ClosetStatus;
+import com.sluv.server.domain.item.entity.Item;
+import com.sluv.server.domain.item.entity.ItemScrap;
 import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.global.common.entity.BaseEntity;
 import jakarta.persistence.*;
@@ -10,6 +12,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
+
+import java.util.List;
 
 @Entity
 @Getter
@@ -41,6 +45,9 @@ public class Closet extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Column(length = 45, columnDefinition = "varchar(45) default 'PUBLIC'")
     private ClosetStatus closetStatus;
+
+    @OneToMany(mappedBy = "closet")
+    List<ItemScrap> itemScrapList;
 
     @Builder
     public Closet(Long id, User user, String name, String coverImgUrl, Boolean basicFlag, ClosetStatus closetStatus) {

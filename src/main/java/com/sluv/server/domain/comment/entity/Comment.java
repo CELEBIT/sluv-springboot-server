@@ -1,6 +1,6 @@
-package com.sluv.server.domain.question.entity.comment;
+package com.sluv.server.domain.comment.entity;
 
-import com.sluv.server.domain.question.enums.comment.CommentStatus;
+import com.sluv.server.domain.comment.enums.CommentStatus;
 import com.sluv.server.global.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;

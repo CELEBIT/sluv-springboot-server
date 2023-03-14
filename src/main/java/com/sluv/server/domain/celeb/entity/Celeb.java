@@ -22,7 +22,9 @@ public class Celeb extends BaseEntity {
     @Column(name = "celeb_id")
     private Long id;
 
-    private Long parentId;
+    @ManyToOne
+    @JoinColumn(name = "celeb_celeb_id")
+    private Celeb parentCeleb;
 
     @ManyToOne
     @JoinColumn(name = "celeb_category_celeb_category_id")
@@ -44,10 +46,13 @@ public class Celeb extends BaseEntity {
     @OneToMany(mappedBy = "celeb")
     List<InterestedCeleb> interestedCelebList;
 
+    @OneToMany(mappedBy = "parentCeleb")
+    List<Celeb> celebList;
+
     @Builder
-    public Celeb(Long id, Long parentId, CelebCategory celebCategory, String celebNameKr, String celebNameEn, CelebStatus celebStatus) {
+    public Celeb(Long id, Celeb parentCeleb, CelebCategory celebCategory, String celebNameKr, String celebNameEn, CelebStatus celebStatus) {
         this.id = id;
-        this.parentId = parentId;
+        this.parentCeleb = parentCeleb;
         this.celebCategory = celebCategory;
         this.celebNameKr = celebNameKr;
         this.celebNameEn = celebNameEn;

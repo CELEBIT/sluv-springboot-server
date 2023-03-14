@@ -11,17 +11,26 @@ import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.domain.user.exception.NotFoundUserException;
 import com.sluv.server.domain.user.repository.UserRepository;
 import com.sluv.server.global.jwt.JwtProvider;
-import com.sluv.server.global.jwt.exception.InvalidateTokenException;
-import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Service;
-import org.springframework.util.MultiValueMap;
-import org.springframework.web.client.RestTemplate;
 
-import static com.sluv.server.domain.auth.enums.SnsType.KAKAO;
+import com.sluv.server.global.jwt.exception.ExpiredTokenException;
+import com.sluv.server.global.jwt.exception.InvalidateTokenException;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtParser;
+import io.jsonwebtoken.Jwts;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+
+import java.math.BigInteger;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.security.*;
+
+import java.security.spec.RSAPublicKeySpec;
+import java.util.Base64;
+
+import static com.sluv.server.domain.auth.enums.SnsType.APPLE;
+
 
 
 @Service
@@ -29,118 +38,152 @@ import static com.sluv.server.domain.auth.enums.SnsType.KAKAO;
 public class AppleUserService {
     private final UserRepository userRepository;
     private final JwtProvider jwtProvider;
+    private final ObjectMapper objectMapper = new ObjectMapper();
+    @Value("${apple.clientId}")
+    private String clientId;
 
-    public AuthResponseDto appleLogin(AuthRequestDto request) throws JsonProcessingException {
-        String accessToken = request.getAccessToken();
-        // 1. 3개의 Apple 공개 key 요청
+    @Value("${apple.openKey}")
+    private String appleOpenKeys;
 
-        // 2. idToken 검증
+    @Value("${apple.iss}")
+    private String issUrl;
 
-        // 3. idToken가지고 userDto 생성
-        SocialUserInfoDto userInfo = getAppleUserInfo(accessToken);
+    public AuthResponseDto appleLogin(AuthRequestDto request) throws Exception {
+        String identityToken = request.getAccessToken();
 
-        // 4. user 정보로 DB 탐색 및 등록
-        User kakaoUser = registerAppleUserIfNeed(userInfo);
-
-        // 5. userToken 생성
-        return AuthResponseDto.builder()
-                .token(createUserToken(kakaoUser))
-                .build();
-    }
-
-    /**
-     * == Front에서 준 accessToken으로 KAKAO에게 유저 정보 요청 ==
-     *
-     * @param accessToken
-     * @return 유저 정보
-     * @throws JsonProcessingException, , BaseException(JWT_AUTHENTICATION_FAILED)
-     */
-    private SocialUserInfoDto getAppleUserInfo(String accessToken) throws JsonProcessingException {
-        HttpHeaders headers = new HttpHeaders();
-
-        headers.add("Authorization", "Bearer " + accessToken);
-        headers.add("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
-
-        // HTTP 요청 보내기
-        HttpEntity<MultiValueMap<String, String>> kakaoUserInfoRequest = new HttpEntity<>(headers);
-        try {
-            RestTemplate rt = new RestTemplate();
-            ResponseEntity<String> response = rt.exchange(
-                    "https://kapi.kakao.com/v2/user/me",
-                    HttpMethod.POST,
-                    kakaoUserInfoRequest,
-                    String.class
-            );
-
-            return convertResponseToSocialUserInfoDto(response);
-        }catch (Exception e){
+        // 1. 검증
+        if(!verifyIdToken(identityToken)){
             throw new InvalidateTokenException();
         }
-    }
 
-    /**
-     * == KAKAO API가 준 Response로 SocialUserInfoDto 생성
-     *
-     * @param response
-     * @return SocialUserInfoDto
-     * @throws JsonProcessingException
-     */
-    private static SocialUserInfoDto convertResponseToSocialUserInfoDto(ResponseEntity<String> response) throws JsonProcessingException {
-        // responseBody에 있는 정보를 꺼냄
-        String responseBody = response.getBody();
+        // 2. UserIngoDto 생성
+        SocialUserInfoDto userInfo = getAppleUserInfo(identityToken);
 
-        ObjectMapper objectMapper = new ObjectMapper();
-        JsonNode jsonNode = objectMapper.readTree(responseBody);
+        // 3. idToken의 정보로 DB 탐색 및 등록
+        User appleUser = registerAppleUserIfNeed(userInfo);
 
-        String email = jsonNode.get("kakao_account").get("email").asText();
-        String profileImgUrl = jsonNode.get("properties")
-                .get("profile_image").asText();
-
-        String gender;
-        try{
-            gender = jsonNode.get("kakao_account").get("gender").asText();
-        }catch (Exception e){
-            gender = null;
-        }
-
-        String ageRange;
-        try{
-            ageRange = jsonNode.get("kakao_account").get("age_range").asText();
-        }catch (Exception e){
-            ageRange = null;
-        }
-
-        return SocialUserInfoDto.builder()
-                .email(email)
-                .profileImgUrl(profileImgUrl)
-                .gender(gender)
-                .ageRange(ageRange)
+        // 4. userToken 생성
+        return AuthResponseDto.builder()
+                .token(createUserToken(appleUser))
                 .build();
     }
 
     /**
-     * == KAKAO에서 받은 정보로 DB에서 유저 탐색 ==
+     * == identitiyToken이 유효한 토큰인지 확인 ==
      *
-     * @param UserInfo
-     * @return DB에 등록된 user
-     * @throws , BaseException(NOT_FOUND_USER)
+     * @param identityToken
+     * @return 유효 여부
+     * @throws Exception
      */
-    private User registerAppleUserIfNeed(SocialUserInfoDto UserInfo) {
-        User user = userRepository.findByEmail(UserInfo.getEmail()).orElse(null);
-
-        if(user == null) {
-            userRepository.save(User.builder()
-                    .email(UserInfo.getEmail())
-                    .snsType(KAKAO)
-                    .profileImgUrl(UserInfo.getProfileImgUrl())
-                    .ageRange(UserInfo.getAgeRange())
-                    .gender(UserInfo.getGender())
-                    .build());
-
-            user = userRepository.findByEmail(UserInfo.getEmail())
-                                            .orElseThrow(NotFoundUserException::new);
+    private boolean verifyIdToken(String identityToken) throws Exception{
+        String[] pieces = identityToken.split("\\.");
+        if (pieces.length != 3) {
+            return false;
         }
-        return user;
+        String header = new String(Base64.getUrlDecoder().decode(pieces[0]));
+        String payload = new String(Base64.getUrlDecoder().decode(pieces[1]));
+
+
+        JsonNode headerNode = objectMapper.readTree(header);
+        JsonNode payloadNode = objectMapper.readTree(payload);
+
+        String algorithm = headerNode.get("alg").asText();
+
+        String idKid = headerNode.get("kid").asText();
+
+        if (!algorithm.equals("RS256")) {
+            return false;
+        }
+        // 원래 처리해야하는데 왜 우리 토큰엔 없죠...? - JunKer
+//        String nonce = payloadNode.get("nonce").asText();
+//        if (!nonce.equals(this.nonce)) {
+//            return false;
+//        }
+        String iss = payloadNode.get("iss").asText();
+        if (!iss.equals(issUrl)) {
+            return false;
+        }
+
+        String aud = payloadNode.get("aud").asText();
+        if (!aud.equals(this.clientId)) {
+            return false;
+        }
+
+        long exp = payloadNode.get("exp").asLong();
+        if (exp < System.currentTimeMillis() / 1000) {
+            throw new ExpiredTokenException();
+        }
+
+        if(getPublicKeyFromPEM(identityToken, idKid) == null){
+            return false;
+        }
+
+        return true;
+
+    }
+
+    /**
+     * == idToken이 검증된 토큰인지 확인 ==
+     *
+     * @param identityToken
+     * @param identityKid
+     * @return
+     * @throws Exception
+     */
+    public Claims getPublicKeyFromPEM(String identityToken, String identityKid) throws Exception{
+        JsonNode correctKey = getApplePublicKey(identityKid);
+        String tN = correctKey.get("n").asText();
+        String tE = correctKey.get("e").asText();
+        String kty = correctKey.get("kty").asText();
+
+        byte[] nBytes = Base64.getUrlDecoder().decode(tN);
+        byte[] eBytes = Base64.getUrlDecoder().decode(tE);
+
+        BigInteger n = new BigInteger(1, nBytes);
+        BigInteger e = new BigInteger(1, eBytes);
+
+        RSAPublicKeySpec publicKeySpec = new RSAPublicKeySpec(n, e);
+        KeyFactory keyFactory = KeyFactory.getInstance(kty);
+        PublicKey publicKey = keyFactory.generatePublic(publicKeySpec);
+
+        JwtParser parser = Jwts.parserBuilder()
+                                .setSigningKey(publicKey)
+                                .build();
+
+        return parser.parseClaimsJws(identityToken).getBody();
+    }
+
+    /**
+     * == Apple에게 공개키를 요청 ==
+     *
+     * @param identityKid
+     * @return 알맞는 공개키의 JsonNode
+     * @throws Exception
+     */
+
+    private JsonNode getApplePublicKey(String identityKid) throws Exception {
+        URL url = new URL(appleOpenKeys);
+
+
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setRequestMethod("GET");
+        connection.connect();
+
+        JsonNode jsonNode = objectMapper.readTree(connection.getInputStream());
+        JsonNode keysNode = jsonNode.get("keys");
+
+        JsonNode correctKey = null;
+
+        for (JsonNode keyNode : keysNode) {
+            String kid = keyNode.get("kid").asText();
+            if (kid.equals(identityKid)) {
+                correctKey = keyNode;
+                break;
+            }
+        }
+
+        return correctKey;
+
     }
 
     /**
@@ -154,4 +197,74 @@ public class AppleUserService {
         return jwtProvider.createAccessToken(UserDto.builder().id(user.getId()).build());
     }
 
+    /**
+     * identityToken의 정보 SocialUserDto로 변환
+     *
+     * @param identityToken
+     * @return SocialUserInfoDto
+     * @throws JsonProcessingException
+     */
+
+    private SocialUserInfoDto getAppleUserInfo(String identityToken) throws JsonProcessingException {
+        String[] pieces = identityToken.split("\\.");
+        String payload = new String(Base64.getUrlDecoder().decode(pieces[1]));
+
+        JsonNode jsonNode = objectMapper.readTree(payload);
+
+        String email = jsonNode.get("email").asText();
+
+        String profileImgUrl;
+        try{
+            profileImgUrl = jsonNode.get("picture").asText();
+        }catch (Exception e){
+            profileImgUrl = null;
+        }
+
+        String gender;
+
+        try{
+            gender = jsonNode.get("gender").asText();
+        }catch (Exception e){
+            gender = null;
+        }
+
+        String ageRange;
+        try{
+            ageRange = jsonNode.get("birthdate").asText();
+        }catch (Exception e){
+            ageRange = null;
+        }
+
+        return SocialUserInfoDto.builder()
+                .email(email)
+                .profileImgUrl(profileImgUrl)
+                .gender(gender)
+                .ageRange(ageRange)
+                .build();
+    }
+
+    /**
+     * == identityToken을 기반으로 user 등록 및 조회 ==
+     *
+     * @param userInfoDto
+     * @return User
+     */
+
+    private User registerAppleUserIfNeed(SocialUserInfoDto userInfoDto) {
+        User user = userRepository.findByEmail(userInfoDto.getEmail()).orElse(null);
+
+        if(user == null) {
+            userRepository.save(User.builder()
+                    .email(userInfoDto.getEmail())
+                    .snsType(APPLE)
+                    .profileImgUrl(userInfoDto.getProfileImgUrl())
+                    .ageRange(userInfoDto.getAgeRange())
+                    .gender(userInfoDto.getGender())
+                    .build());
+
+            user = userRepository.findByEmail(userInfoDto.getEmail())
+                    .orElseThrow(NotFoundUserException::new);
+        }
+        return user;
+    }
 }

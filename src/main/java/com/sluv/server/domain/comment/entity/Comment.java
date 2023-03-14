@@ -46,6 +46,9 @@ public class Comment extends BaseEntity {
     @OneToMany(mappedBy = "parentComment")
     List<Comment> commentList;
 
+    @OneToMany(mappedBy = "comment")
+    List<CommentImg> commentImgList;
+
     @Builder
     public Comment(Long id, User user, Question question, String content, CommentStatus commentStatus) {
         this.id = id;

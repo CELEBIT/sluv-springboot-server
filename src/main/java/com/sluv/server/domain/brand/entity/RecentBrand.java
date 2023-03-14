@@ -1,5 +1,6 @@
 package com.sluv.server.domain.brand.entity;
 
+import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.global.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -17,17 +18,21 @@ public class RecentBrand extends BaseEntity {
     @Column(name = "recent_brand_id")
     private Long id;
 
+    @ManyToOne
+    @JoinColumn(name = "brand_brand_id")
     @NotNull
-    private Long brandId;
+    private Brand brand;
 
+    @ManyToOne
+    @JoinColumn(name = "user_user_id")
     @NotNull
-    private Long userId;
+    private User user;
 
 
     @Builder
-    public RecentBrand(Long id, Long brandId, Long userId) {
+    public RecentBrand(Long id, Brand brand, User user) {
         this.id = id;
-        this.brandId = brandId;
-        this.userId = userId;
+        this.brand = brand;
+        this.user = user;
     }
 }

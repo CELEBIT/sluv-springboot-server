@@ -1,6 +1,7 @@
 package com.sluv.server.domain.closet.entity;
 
 import com.sluv.server.domain.closet.enums.ClosetStatus;
+import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.global.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -20,8 +21,10 @@ public class Closet extends BaseEntity {
     @Column(name = "closet_id")
     private Long id;
 
+    @ManyToOne
+    @JoinColumn(name = "user_user_id")
     @NotNull
-    private Long userId;
+    private User user;
 
     @NotNull
     @Size(max = 45)
@@ -40,9 +43,9 @@ public class Closet extends BaseEntity {
     private ClosetStatus closetStatus;
 
     @Builder
-    public Closet(Long id, Long userId, String name, String coverImgUrl, Boolean basicFlag, ClosetStatus closetStatus) {
+    public Closet(Long id, User user, String name, String coverImgUrl, Boolean basicFlag, ClosetStatus closetStatus) {
         this.id = id;
-        this.userId = userId;
+        this.user = user;
         this.name = name;
         this.coverImgUrl = coverImgUrl;
         this.basicFlag = basicFlag;

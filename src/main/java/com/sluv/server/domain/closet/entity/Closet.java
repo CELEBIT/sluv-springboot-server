@@ -46,9 +46,6 @@ public class Closet extends BaseEntity {
     @Column(length = 45, columnDefinition = "varchar(45) default 'PUBLIC'")
     private ClosetStatus closetStatus;
 
-    @OneToMany(mappedBy = "closet")
-    List<ItemScrap> itemScrapList;
-
     @Builder
     public Closet(Long id, User user, String name, String coverImgUrl, Boolean basicFlag, ClosetStatus closetStatus) {
         this.id = id;

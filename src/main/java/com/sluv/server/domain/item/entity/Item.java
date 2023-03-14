@@ -80,30 +80,6 @@ public class Item extends BaseEntity {
     @Column(length = 45, columnDefinition = "varchar(45) default 'ACTIVE'")
     private ItemStatus itemStatus;
 
-    @OneToMany(mappedBy = "item")
-    List<CommentItem> commentItemList;
-
-    @OneToMany(mappedBy = "item")
-    List<ItemEditReq> itemEditReqList;
-
-    @OneToMany(mappedBy = "item")
-    List<ItemImg> itemImgList;
-
-    @OneToMany(mappedBy = "item")
-    List<ItemLike> itemLikeList;
-
-    @OneToMany(mappedBy = "item")
-    List<ItemLink> itemLinkList;
-
-    @OneToMany(mappedBy = "item")
-    List<ItemReport> itemReportList;
-
-    @OneToMany(mappedBy = "item")
-    List<ItemScrap> itemScrapList;
-
-    @OneToMany(mappedBy = "item")
-    List<RecentItem> recentItemList;
-
     @Builder
     public Item(Long id, User user, Celeb celeb, NewCeleb newCeleb, ItemCategory category, Brand brand, NewBrand newBrand, String name, LocalDateTime whenDiscovery, String whereDiscovery, int price, String color, String additionalInfo, String infoSource, ItemStatus itemStatus) {
         this.id = id;

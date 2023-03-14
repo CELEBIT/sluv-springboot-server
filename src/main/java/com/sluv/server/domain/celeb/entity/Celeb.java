@@ -46,21 +46,6 @@ public class Celeb extends BaseEntity {
     @Column(length = 45, columnDefinition = "varchar(45) default 'ACTIVE'")
     private CelebStatus celebStatus;
 
-    @OneToMany(mappedBy = "celeb")
-    List<InterestedCeleb> interestedCelebList;
-
-    @OneToMany(mappedBy = "parentCeleb")
-    List<Celeb> celebList;
-
-    @OneToMany(mappedBy = "celeb")
-    List<RecentSearchCeleb> recentSearchCelebList;
-
-    @OneToMany(mappedBy = "celeb")
-    List<Item> itemList;
-
-    @OneToMany(mappedBy = "celeb")
-    List<TempItem> tempItemList;
-
     @Builder
     public Celeb(Long id, Celeb parentCeleb, CelebCategory celebCategory, String celebNameKr, String celebNameEn, CelebStatus celebStatus) {
         this.id = id;

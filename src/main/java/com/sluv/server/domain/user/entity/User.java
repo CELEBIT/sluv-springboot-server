@@ -59,42 +59,6 @@ public class User extends BaseEntity implements UserDetails {
     @Column(length = 45, columnDefinition = "varchar(45) default 'PENDING_PROFILE'")
     private UserStatus userStatus;
 
-    @OneToMany(mappedBy = "user")
-    List<InterestedCeleb> interestedCelebList;
-
-    @OneToMany(mappedBy = "user")
-    List<Closet> closetList;
-
-    @OneToMany(mappedBy = "user")
-    List<Comment> commentList;
-
-    @OneToMany(mappedBy = "user")
-    List<RecentSearchCeleb> recentSearchCelebList;
-
-    @OneToMany(mappedBy = "user")
-    List<CommentLike> commentLikeList;
-
-    @OneToMany(mappedBy = "reporter")
-    List<CommentReport> commentReportList;
-
-    @OneToMany(mappedBy = "user")
-    List<Item> itemList;
-
-    @OneToMany(mappedBy = "requester")
-    List<ItemEditReq> itemEditReqs;
-
-    @OneToMany(mappedBy = "user")
-    List<ItemLike> itemLikeList;
-
-    @OneToMany(mappedBy = "reporter")
-    List<ItemReport> itemReportList;
-
-    @OneToMany(mappedBy = "user")
-    List<RecentItem> recentItemList;
-
-    @OneToMany(mappedBy = "user")
-    List<TempItem> tempItemList;
-
     @Builder
     public User(Long id, String email, String nickname,
                 SnsType snsType, String profileImgUrl,

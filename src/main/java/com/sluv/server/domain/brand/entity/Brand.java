@@ -10,6 +10,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -32,12 +33,6 @@ public class Brand extends BaseEntity {
 
     @Column(columnDefinition = "TEXT")
     private String brandImgUrl;
-
-    @OneToMany(mappedBy = "brand")
-    List<Item> itemList;
-
-    @OneToMany(mappedBy = "brand")
-    List<TempItem> tempItemList;
 
     @Builder
     public Brand(Long id, String brandKr, String brandEn, String brandImgUrl) {

@@ -26,9 +26,6 @@ public class CelebCategory extends BaseEntity {
     @Size(max = 45)
     private String name;
 
-    @OneToMany(mappedBy = "celebCategory")
-    List<Celeb> celebs;
-
     @Builder
     public CelebCategory(Long id, Long parentId, String name) {
         this.id = id;

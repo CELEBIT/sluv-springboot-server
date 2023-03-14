@@ -11,6 +11,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -30,9 +31,6 @@ public class NewBrand extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Column(length = 45, columnDefinition = "varchar(45) default 'ACTIVE'")
     private NewBrandStatus newBrandStatus;
-
-    @OneToMany(mappedBy = "newBrand")
-    List<Item> itemList;
 
     @Builder
     public NewBrand(Long id, String brandName, NewBrandStatus newBrandStatus) {

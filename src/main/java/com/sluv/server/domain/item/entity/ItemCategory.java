@@ -29,15 +29,6 @@ public class ItemCategory extends BaseEntity {
     @JoinColumn(name = "item_category_item_category_id")
     private ItemCategory parent;
 
-    @OneToMany(mappedBy = "category")
-    List<Item> itemList;
-
-    @OneToMany(mappedBy = "parent")
-    List<ItemCategory> itemCategoryList;
-
-    @OneToMany(mappedBy = "category")
-    List<TempItem> tempItemList;
-
     @Builder
     public ItemCategory(Long id, String name, ItemCategory parent) {
         this.id = id;

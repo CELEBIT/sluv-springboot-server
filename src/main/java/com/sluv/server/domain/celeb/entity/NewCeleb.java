@@ -32,9 +32,6 @@ public class NewCeleb extends BaseEntity {
     @Column(length = 45, columnDefinition = "varchar(45) default 'ACTIVE'")
     private NewCelebStatus newCelebStatus;
 
-    @OneToMany(mappedBy = "newCeleb")
-    List<Item> itemList;
-
     @Builder
     public NewCeleb(Long id, String celebName, NewCelebStatus newCelebStatus) {
         this.id = id;

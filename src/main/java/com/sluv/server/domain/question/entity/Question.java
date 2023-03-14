@@ -53,9 +53,6 @@ public class Question{
     @LastModifiedDate
     private LocalDateTime updatedAt = LocalDateTime.now();
 
-    @OneToMany(mappedBy = "question")
-    List<Comment> commentList;
-
     public Question(Long id, Long userId, String title, String content, Long searchNum) {
         this.id = id;
         this.userId = userId;

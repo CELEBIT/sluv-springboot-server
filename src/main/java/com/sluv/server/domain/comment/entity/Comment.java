@@ -44,21 +44,6 @@ public class Comment extends BaseEntity {
     @Column(columnDefinition = "varchar(45) default 'ACTIVE'")
     private CommentStatus commentStatus;
 
-    @OneToMany(mappedBy = "parentComment")
-    List<Comment> commentList;
-
-    @OneToMany(mappedBy = "comment")
-    List<CommentImg> commentImgList;
-
-    @OneToMany(mappedBy = "comment")
-    List<CommentItem> commentItemList;
-
-    @OneToMany(mappedBy = "comment")
-    List<CommentLike> commentLikeList;
-
-    @OneToMany(mappedBy = "comment")
-    List<CommentReport> commentReportList;
-
     @Builder
     public Comment(Long id, User user, Question question, String content, CommentStatus commentStatus) {
         this.id = id;

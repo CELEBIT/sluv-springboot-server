@@ -1,4 +1,4 @@
-package com.sluv.server.domain.question.enums.comment;
+package com.sluv.server.domain.comment.enums;
 
 public enum CommentStatus {
     ACTIVE,

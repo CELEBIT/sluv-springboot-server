@@ -1,10 +1,6 @@
 package com.sluv.server.domain.celeb.entity;
 
 import com.sluv.server.domain.celeb.enums.CelebStatus;
-import com.sluv.server.domain.comment.entity.CommentReport;
-import com.sluv.server.domain.item.entity.Item;
-import com.sluv.server.domain.item.entity.TempItem;
-import com.sluv.server.domain.item.enums.ItemStatus;
 import com.sluv.server.global.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -12,8 +8,6 @@ import jakarta.validation.constraints.Size;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.util.List;
 
 @Entity
 @Getter
@@ -26,11 +20,11 @@ public class Celeb extends BaseEntity {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "celeb_celeb_id")
-    private Celeb parentCeleb;
+    @JoinColumn(name = "parent_id")
+    private Celeb parent;
 
     @ManyToOne
-    @JoinColumn(name = "celeb_category_celeb_category_id")
+    @JoinColumn(name = "celeb_category_id")
     @NotNull
     private CelebCategory celebCategory;
 
@@ -47,9 +41,9 @@ public class Celeb extends BaseEntity {
     private CelebStatus celebStatus;
 
     @Builder
-    public Celeb(Long id, Celeb parentCeleb, CelebCategory celebCategory, String celebNameKr, String celebNameEn, CelebStatus celebStatus) {
+    public Celeb(Long id, Celeb parent, CelebCategory celebCategory, String celebNameKr, String celebNameEn, CelebStatus celebStatus) {
         this.id = id;
-        this.parentCeleb = parentCeleb;
+        this.parent = parent;
         this.celebCategory = celebCategory;
         this.celebNameKr = celebNameKr;
         this.celebNameEn = celebNameEn;

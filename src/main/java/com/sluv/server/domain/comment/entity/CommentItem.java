@@ -18,12 +18,12 @@ public class CommentItem extends BaseEntity {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "comment_comment_id")
+    @JoinColumn(name = "comment_id")
     @NotNull
     private Comment comment;
 
     @ManyToOne
-    @JoinColumn(name = "item_item_id")
+    @JoinColumn(name = "item_id")
     @NotNull
     private Item item;
 

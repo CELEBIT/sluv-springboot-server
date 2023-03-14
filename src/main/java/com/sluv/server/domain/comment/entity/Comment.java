@@ -23,16 +23,16 @@ public class Comment extends BaseEntity {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "user_user_id")
+    @JoinColumn(name = "user_id")
     @NotNull
     private User user;
 
     @ManyToOne
-    @JoinColumn(name = "comment_comment_id")
-    private Comment parentComment;
+    @JoinColumn(name = "parent_id")
+    private Comment parent;
 
     @ManyToOne
-    @JoinColumn(name = "question_question_id")
+    @JoinColumn(name = "question_id")
     @NotNull
     private Question question;
 
@@ -45,9 +45,10 @@ public class Comment extends BaseEntity {
     private CommentStatus commentStatus;
 
     @Builder
-    public Comment(Long id, User user, Question question, String content, CommentStatus commentStatus) {
+    public Comment(Long id, User user, Comment parent, Question question, String content, CommentStatus commentStatus) {
         this.id = id;
         this.user = user;
+        this.parent = parent;
         this.question = question;
         this.content = content;
         this.commentStatus = commentStatus;

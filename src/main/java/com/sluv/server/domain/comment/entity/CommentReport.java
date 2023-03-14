@@ -20,12 +20,12 @@ public class CommentReport extends BaseEntity {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "comment_comment_id")
+    @JoinColumn(name = "comment_id")
     @NotNull
     private Comment comment;
 
     @ManyToOne
-    @JoinColumn(name = "user_user_id")
+    @JoinColumn(name = "user_id")
     @NotNull
     private User reporter;
 

@@ -21,12 +21,12 @@ public class ItemEditReq extends BaseEntity {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "user_user_id")
+    @JoinColumn(name = "requester_id")
     @NotNull
     private User requester;
 
     @ManyToOne
-    @JoinColumn(name = "item_item_id")
+    @JoinColumn(name = "item_id")
     @NotNull
     private Item item;
 

@@ -20,7 +20,7 @@ public class ItemImg extends BaseEntity {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "item_item_id")
+    @JoinColumn(name = "item_id")
     @NotNull
     private Item item;
 

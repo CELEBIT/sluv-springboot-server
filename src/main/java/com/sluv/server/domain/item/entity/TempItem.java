@@ -25,21 +25,21 @@ public class TempItem extends BaseEntity {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "user_user_id")
+    @JoinColumn(name = "user_id")
     @NotNull
     private User user;
 
     @ManyToOne
-    @JoinColumn(name = "celeb_celeb_id")
+    @JoinColumn(name = "celeb_id")
     private Celeb celeb;
 
     private String newCelebName;
     @ManyToOne
-    @JoinColumn(name = "item_category_item_category_id")
+    @JoinColumn(name = "item_category_id")
     private ItemCategory category;
 
     @ManyToOne
-    @JoinColumn(name = "brand_brand_id")
+    @JoinColumn(name = "brand_id")
     private Brand brand;
 
     private String newBrandName;

@@ -19,12 +19,12 @@ public class ItemScrap extends BaseEntity {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "item_item_id")
+    @JoinColumn(name = "item_id")
     @NotNull
     private Item item;
 
     @ManyToOne
-    @JoinColumn(name = "closet_closet_id")
+    @JoinColumn(name = "closet_id")
     @NotNull
     private Closet closet;
 

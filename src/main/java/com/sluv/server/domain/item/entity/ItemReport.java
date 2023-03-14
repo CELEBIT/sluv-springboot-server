@@ -22,12 +22,12 @@ public class ItemReport extends BaseEntity {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "item_item_id")
+    @JoinColumn(name = "item_id")
     @NotNull
     private Item item;
 
     @ManyToOne
-    @JoinColumn(name = "user_user_id")
+    @JoinColumn(name = "reporter_id")
     @NotNull
     private User reporter;
 

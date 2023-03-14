@@ -19,12 +19,12 @@ public class QuestionLike extends BaseEntity {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "question_question_id")
+    @JoinColumn(name = "question_id")
     @NotNull
     private Question question;
 
     @ManyToOne
-    @JoinColumn(name = "user_user_id")
+    @JoinColumn(name = "user_id")
     @NotNull
     private User user;
 

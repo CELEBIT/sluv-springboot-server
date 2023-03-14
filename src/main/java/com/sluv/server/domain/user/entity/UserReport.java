@@ -22,12 +22,12 @@ public class UserReport extends BaseEntity {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "user_user_id")
+    @JoinColumn(name = "reporter_id")
     @NotNull
     private User reporter;
 
     @ManyToOne
-    @JoinColumn(name = "user_user_id")
+    @JoinColumn(name = "reported_id")
     @NotNull
     private User reported;
 

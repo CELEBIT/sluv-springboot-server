@@ -26,7 +26,7 @@ public class ItemCategory extends BaseEntity {
     private String name;
 
     @ManyToOne
-    @JoinColumn(name = "item_category_item_category_id")
+    @JoinColumn(name = "parent_id")
     private ItemCategory parent;
 
     @Builder

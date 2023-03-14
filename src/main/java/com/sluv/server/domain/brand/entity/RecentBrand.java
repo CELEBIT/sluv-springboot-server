@@ -19,12 +19,12 @@ public class RecentBrand extends BaseEntity {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "brand_brand_id")
+    @JoinColumn(name = "brand_id")
     @NotNull
     private Brand brand;
 
     @ManyToOne
-    @JoinColumn(name = "user_user_id")
+    @JoinColumn(name = "user_id")
     @NotNull
     private User user;
 

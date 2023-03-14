@@ -20,16 +20,18 @@ public class CelebCategory extends BaseEntity {
     @Column(name = "celeb_category_id")
     private Long id;
 
-    private Long parentId;
+    @ManyToOne
+    @JoinColumn(name = "parent_id")
+    private CelebCategory parent;
 
     @NotNull
     @Size(max = 45)
     private String name;
 
     @Builder
-    public CelebCategory(Long id, Long parentId, String name) {
+    public CelebCategory(Long id, CelebCategory parent, String name) {
         this.id = id;
-        this.parentId = parentId;
+        this.parent = parent;
         this.name = name;
     }
 }

@@ -14,7 +14,7 @@ public class QuestionRecommendCategory {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "question_question_id")
+    @JoinColumn(name = "question_id")
     @NotNull
     private Question question;
 

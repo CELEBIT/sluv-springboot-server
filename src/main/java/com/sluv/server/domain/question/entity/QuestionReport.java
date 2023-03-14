@@ -23,12 +23,12 @@ public class QuestionReport extends BaseEntity {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "user_user_id")
+    @JoinColumn(name = "reporter_id")
     @NotNull
     private User reporter;
 
     @ManyToOne
-    @JoinColumn(name = "question_question_id")
+    @JoinColumn(name = "question_id")
     @NotNull
     private Question question;
 
@@ -45,12 +45,11 @@ public class QuestionReport extends BaseEntity {
     private ReportStatus reportStatus;
 
     @Builder
-    public QuestionReport(Long id, User reporter, Question question, QuestionReportReason questionReportReason, String content, ReportStatus reportStatus) {
+    public QuestionReport(Long id, User reporter, Question question, QuestionReportReason questionReportReason, String content) {
         this.id = id;
         this.reporter = reporter;
         this.question = question;
         this.questionReportReason = questionReportReason;
         this.content = content;
-        this.reportStatus = reportStatus;
     }
 }

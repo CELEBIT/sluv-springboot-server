@@ -20,7 +20,7 @@ public class UserReportStack extends BaseEntity {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "user_user_id")
+    @JoinColumn(name = "reported_id")
     @NotNull
     private User reported;
 

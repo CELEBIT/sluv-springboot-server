@@ -19,12 +19,12 @@ public class RecentSearchCeleb extends BaseEntity {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "celeb_celeb_id")
+    @JoinColumn(name = "celeb_id")
     @NotNull
     private Celeb celeb;
 
     @ManyToOne
-    @JoinColumn(name = "user_user_id")
+    @JoinColumn(name = "user_id")
     @NotNull
     private User user;
 

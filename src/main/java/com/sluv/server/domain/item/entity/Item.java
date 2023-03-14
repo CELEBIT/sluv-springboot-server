@@ -31,29 +31,29 @@ public class Item extends BaseEntity {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "user_user_id")
+    @JoinColumn(name = "user_id")
     @NotNull
     private User user;
 
     @ManyToOne
-    @JoinColumn(name = "celeb_celeb_id")
+    @JoinColumn(name = "celeb_id")
     private Celeb celeb;
 
     @ManyToOne
-    @JoinColumn(name = "new_celeb_new_celeb_id")
+    @JoinColumn(name = "new_celeb_id")
     private NewCeleb newCeleb;
 
     @ManyToOne
-    @JoinColumn(name = "item_category_item_category_id")
+    @JoinColumn(name = "item_category_id")
     @NotNull
     private ItemCategory category;
 
     @ManyToOne
-    @JoinColumn(name = "brand_brand_id")
+    @JoinColumn(name = "brand_id")
     private Brand brand;
 
     @ManyToOne
-    @JoinColumn(name = "new_brand_new_brand_id")
+    @JoinColumn(name = "new_brand_id")
     private NewBrand newBrand;
     @NotNull
     @Size(max = 100)

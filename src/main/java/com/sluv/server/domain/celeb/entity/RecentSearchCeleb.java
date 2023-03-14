@@ -1,30 +1,33 @@
-package com.sluv.server.domain.question.entity.comment;
+package com.sluv.server.domain.celeb.entity;
 
 import com.sluv.server.global.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
+@Getter
 @NoArgsConstructor
-@Table(name = "comment_like")
-public class CommentLike extends BaseEntity {
+@Table(name = "recent_search_celeb")
+public class RecentSearchCeleb extends BaseEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "comment_like_id")
+    @Column(name = "recent_search_celeb_id")
     private Long id;
 
     @NotNull
-    private Long commentId;
+    private Long celebId;
 
     @NotNull
     private Long userId;
 
+
     @Builder
-    public CommentLike(Long id, Long commentId, Long userId) {
+    public RecentSearchCeleb(Long id, Long celebId, Long userId) {
         this.id = id;
-        this.commentId = commentId;
+        this.celebId = celebId;
         this.userId = userId;
     }
 }

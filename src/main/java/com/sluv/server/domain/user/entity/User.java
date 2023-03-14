@@ -3,6 +3,7 @@ package com.sluv.server.domain.user.entity;
 //import com.sluv.server.domain.user.enums.SnsType;
 
 import com.sluv.server.domain.auth.enums.SnsType;
+import com.sluv.server.domain.celeb.entity.InterestedCeleb;
 import com.sluv.server.domain.user.enums.UserStatus;
 import com.sluv.server.global.common.entity.BaseEntity;
 import jakarta.persistence.*;
@@ -18,6 +19,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
+import java.util.List;
 
 
 @Entity
@@ -50,6 +52,9 @@ public class User extends BaseEntity implements UserDetails {
     @Enumerated(EnumType.STRING)
     @Column(length = 45, columnDefinition = "varchar(45) default 'PENDING_PROFILE'")
     private UserStatus userStatus;
+
+    @OneToMany(mappedBy = "user")
+    List<InterestedCeleb> interestedCelebList;
 
     @Builder
     public User(Long id, String email, String nickname,

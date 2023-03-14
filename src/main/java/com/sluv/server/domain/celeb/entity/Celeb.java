@@ -10,6 +10,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Entity
 @Getter
 @NoArgsConstructor
@@ -23,7 +25,7 @@ public class Celeb extends BaseEntity {
     private Long parentId;
 
     @ManyToOne
-    @JoinColumn(name = "celeb_category_id")
+    @JoinColumn(name = "celeb_category_celeb_category_id")
     @NotNull
     private CelebCategory celebCategory;
 
@@ -38,6 +40,9 @@ public class Celeb extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Column(length = 45, columnDefinition = "varchar(45) default 'ACTIVE'")
     private CelebStatus celebStatus;
+
+    @OneToMany(mappedBy = "celeb")
+    List<InterestedCeleb> interestedCelebList;
 
     @Builder
     public Celeb(Long id, Long parentId, CelebCategory celebCategory, String celebNameKr, String celebNameEn, CelebStatus celebStatus) {

@@ -22,8 +22,10 @@ public class Celeb extends BaseEntity {
 
     private Long parentId;
 
+    @ManyToOne
+    @JoinColumn(name = "celeb_category_id")
     @NotNull
-    private Long celebCategoryId;
+    private CelebCategory celebCategory;
 
     @NotNull
     @Size(max = 255)
@@ -38,10 +40,10 @@ public class Celeb extends BaseEntity {
     private CelebStatus celebStatus;
 
     @Builder
-    public Celeb(Long id, Long parentId, Long celebCategoryId, String celebNameKr, String celebNameEn, CelebStatus celebStatus) {
+    public Celeb(Long id, Long parentId, CelebCategory celebCategory, String celebNameKr, String celebNameEn, CelebStatus celebStatus) {
         this.id = id;
         this.parentId = parentId;
-        this.celebCategoryId = celebCategoryId;
+        this.celebCategory = celebCategory;
         this.celebNameKr = celebNameKr;
         this.celebNameEn = celebNameEn;
         this.celebStatus = celebStatus;

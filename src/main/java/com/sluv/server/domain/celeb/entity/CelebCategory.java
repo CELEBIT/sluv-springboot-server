@@ -8,6 +8,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Entity
 @Getter
 @NoArgsConstructor
@@ -23,6 +25,9 @@ public class CelebCategory extends BaseEntity {
     @NotNull
     @Size(max = 45)
     private String name;
+
+    @OneToMany(mappedBy = "celebCategory")
+    List<Celeb> celebs;
 
     @Builder
     public CelebCategory(Long id, Long parentId, String name) {

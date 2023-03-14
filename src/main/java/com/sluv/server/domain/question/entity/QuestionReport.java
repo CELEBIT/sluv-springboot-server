@@ -1,6 +1,7 @@
 package com.sluv.server.domain.question.entity;
 
 import com.sluv.server.domain.question.enums.QuestionReportReason;
+import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.domain.user.enums.UserReportReason;
 import com.sluv.server.global.common.entity.BaseEntity;
 import com.sluv.server.global.common.enums.ReportStatus;
@@ -21,11 +22,15 @@ public class QuestionReport extends BaseEntity {
     @Column(name = "question_report_id")
     private Long id;
 
+    @ManyToOne
+    @JoinColumn(name = "user_user_id")
     @NotNull
-    private Long reporterId;
+    private User reporter;
 
+    @ManyToOne
+    @JoinColumn(name = "question_question_id")
     @NotNull
-    private Long questionId;
+    private Question question;
 
     @NotNull
     @Enumerated(EnumType.STRING)
@@ -40,10 +45,10 @@ public class QuestionReport extends BaseEntity {
     private ReportStatus reportStatus;
 
     @Builder
-    public QuestionReport(Long id, Long reporterId, Long questionId, QuestionReportReason questionReportReason, String content, ReportStatus reportStatus) {
+    public QuestionReport(Long id, User reporter, Question question, QuestionReportReason questionReportReason, String content, ReportStatus reportStatus) {
         this.id = id;
-        this.reporterId = reporterId;
-        this.questionId = questionId;
+        this.reporter = reporter;
+        this.question = question;
         this.questionReportReason = questionReportReason;
         this.content = content;
         this.reportStatus = reportStatus;

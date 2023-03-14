@@ -1,5 +1,6 @@
 package com.sluv.server.domain.question.entity;
 
+import com.sluv.server.domain.comment.entity.Comment;
 import com.sluv.server.domain.question.enums.QuestionStatus;
 import com.sluv.server.global.common.entity.BaseEntity;
 import jakarta.persistence.*;
@@ -14,6 +15,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @NoArgsConstructor
@@ -50,6 +52,9 @@ public class Question{
 
     @LastModifiedDate
     private LocalDateTime updatedAt = LocalDateTime.now();
+
+    @OneToMany(mappedBy = "question")
+    List<Comment> commentList;
 
     public Question(Long id, Long userId, String title, String content, Long searchNum) {
         this.id = id;

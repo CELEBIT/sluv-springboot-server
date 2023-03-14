@@ -1,6 +1,7 @@
 package com.sluv.server.domain.item.entity;
 
 import com.sluv.server.domain.item.enums.ItemReportReason;
+import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.global.common.entity.BaseEntity;
 import com.sluv.server.global.common.enums.ReportStatus;
 import jakarta.persistence.*;
@@ -20,11 +21,15 @@ public class ItemReport extends BaseEntity {
     @Column(name = "item_report_id")
     private Long id;
 
+    @ManyToOne
+    @JoinColumn(name = "item_item_id")
     @NotNull
-    private Long itemId;
+    private Item item;
 
+    @ManyToOne
+    @JoinColumn(name = "user_user_id")
     @NotNull
-    private Long reporterId;
+    private User reporter;
 
     @NotNull
     @Enumerated(EnumType.STRING)
@@ -40,10 +45,10 @@ public class ItemReport extends BaseEntity {
 
 
     @Builder
-    public ItemReport(Long id, Long itemId, Long reporterId, ItemReportReason itemReportReason, String content, ReportStatus reportStatus) {
+    public ItemReport(Long id, Item item, User reporter, ItemReportReason itemReportReason, String content, ReportStatus reportStatus) {
         this.id = id;
-        this.itemId = itemId;
-        this.reporterId = reporterId;
+        this.item = item;
+        this.reporter = reporter;
         this.itemReportReason = itemReportReason;
         this.content = content;
         this.reportStatus = reportStatus;

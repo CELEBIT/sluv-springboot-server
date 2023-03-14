@@ -95,6 +95,9 @@ public class Item extends BaseEntity {
     @OneToMany(mappedBy = "item")
     List<ItemLink> itemLinkList;
 
+    @OneToMany(mappedBy = "item")
+    List<ItemReport> itemReportList;
+
     @Builder
     public Item(Long id, User user, Celeb celeb, NewCeleb newCeleb, ItemCategory category, Brand brand, NewBrand newBrand, String name, LocalDateTime whenDiscovery, String whereDiscovery, int price, String color, String additionalInfo, String infoSource, ItemStatus itemStatus) {
         this.id = id;

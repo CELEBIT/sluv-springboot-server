@@ -12,6 +12,7 @@ import com.sluv.server.domain.comment.entity.CommentReport;
 import com.sluv.server.domain.item.entity.Item;
 import com.sluv.server.domain.item.entity.ItemEditReq;
 import com.sluv.server.domain.item.entity.ItemLike;
+import com.sluv.server.domain.item.entity.ItemReport;
 import com.sluv.server.domain.user.enums.UserStatus;
 import com.sluv.server.global.common.entity.BaseEntity;
 import jakarta.persistence.*;
@@ -87,6 +88,9 @@ public class User extends BaseEntity implements UserDetails {
 
     @OneToMany(mappedBy = "user")
     List<ItemLike> itemLikeList;
+
+    @OneToMany(mappedBy = "reporter")
+    List<ItemReport> itemReportList;
 
     @Builder
     public User(Long id, String email, String nickname,

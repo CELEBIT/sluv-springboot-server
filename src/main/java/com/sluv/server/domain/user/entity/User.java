@@ -92,6 +92,9 @@ public class User extends BaseEntity implements UserDetails {
     @OneToMany(mappedBy = "user")
     List<RecentItem> recentItemList;
 
+    @OneToMany(mappedBy = "user")
+    List<TempItem> tempItemList;
+
     @Builder
     public User(Long id, String email, String nickname,
                 SnsType snsType, String profileImgUrl,

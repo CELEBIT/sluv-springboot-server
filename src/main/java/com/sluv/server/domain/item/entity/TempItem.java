@@ -1,6 +1,9 @@
 package com.sluv.server.domain.item.entity;
 
+import com.sluv.server.domain.brand.entity.Brand;
+import com.sluv.server.domain.celeb.entity.Celeb;
 import com.sluv.server.domain.item.enums.ItemStatus;
+import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.global.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -21,16 +24,23 @@ public class TempItem extends BaseEntity {
     @Column(name = "temp_item_id")
     private Long id;
 
+    @ManyToOne
+    @JoinColumn(name = "user_user_id")
     @NotNull
-    private Long userId;
+    private User user;
 
-    private Long celebId;
+    @ManyToOne
+    @JoinColumn(name = "celeb_celeb_id")
+    private Celeb celeb;
 
     private String newCelebName;
+    @ManyToOne
+    @JoinColumn(name = "item_category_item_category_id")
+    private ItemCategory category;
 
-    private Long categoryId;
-
-    private Long brandId;
+    @ManyToOne
+    @JoinColumn(name = "brand_brand_id")
+    private Brand brand;
 
     private String newBrandName;
 
@@ -55,13 +65,13 @@ public class TempItem extends BaseEntity {
     private ItemStatus itemStatus;
 
     @Builder
-    public TempItem(Long id, Long userId, Long celebId, String newCelebName, Long categoryId, Long brandId, String newBrandName, String name, LocalDateTime whenDiscovery, String whereDiscovery, int price, String additionalInfo, String infoSource, ItemStatus itemStatus) {
+    public TempItem(Long id, User user, Celeb celeb, String newCelebName, ItemCategory category, Brand brand, String newBrandName, String name, LocalDateTime whenDiscovery, String whereDiscovery, int price, String additionalInfo, String infoSource, ItemStatus itemStatus) {
         this.id = id;
-        this.userId = userId;
-        this.celebId = celebId;
+        this.user = user;
+        this.celeb = celeb;
         this.newCelebName = newCelebName;
-        this.categoryId = categoryId;
-        this.brandId = brandId;
+        this.category = category;
+        this.brand = brand;
         this.newBrandName = newBrandName;
         this.name = name;
         this.whenDiscovery = whenDiscovery;

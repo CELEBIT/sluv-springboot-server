@@ -35,6 +35,9 @@ public class ItemCategory extends BaseEntity {
     @OneToMany(mappedBy = "parent")
     List<ItemCategory> itemCategoryList;
 
+    @OneToMany(mappedBy = "category")
+    List<TempItem> tempItemList;
+
     @Builder
     public ItemCategory(Long id, String name, ItemCategory parent) {
         this.id = id;

@@ -1,6 +1,7 @@
 package com.sluv.server.domain.brand.entity;
 
 import com.sluv.server.domain.item.entity.Item;
+import com.sluv.server.domain.item.entity.TempItem;
 import com.sluv.server.global.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -34,6 +35,9 @@ public class Brand extends BaseEntity {
 
     @OneToMany(mappedBy = "brand")
     List<Item> itemList;
+
+    @OneToMany(mappedBy = "brand")
+    List<TempItem> tempItemList;
 
     @Builder
     public Brand(Long id, String brandKr, String brandEn, String brandImgUrl) {

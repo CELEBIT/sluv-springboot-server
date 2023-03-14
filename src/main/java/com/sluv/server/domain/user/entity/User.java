@@ -11,6 +11,7 @@ import com.sluv.server.domain.comment.entity.CommentLike;
 import com.sluv.server.domain.comment.entity.CommentReport;
 import com.sluv.server.domain.item.entity.Item;
 import com.sluv.server.domain.item.entity.ItemEditReq;
+import com.sluv.server.domain.item.entity.ItemLike;
 import com.sluv.server.domain.user.enums.UserStatus;
 import com.sluv.server.global.common.entity.BaseEntity;
 import jakarta.persistence.*;
@@ -83,6 +84,9 @@ public class User extends BaseEntity implements UserDetails {
 
     @OneToMany(mappedBy = "requester")
     List<ItemEditReq> itemEditReqs;
+
+    @OneToMany(mappedBy = "user")
+    List<ItemLike> itemLikeList;
 
     @Builder
     public User(Long id, String email, String nickname,

@@ -1,21 +1,17 @@
 package com.sluv.server.domain.question.entity;
 
-import com.sluv.server.domain.comment.entity.Comment;
 import com.sluv.server.domain.question.enums.QuestionStatus;
-import com.sluv.server.global.common.entity.BaseEntity;
+import com.sluv.server.domain.user.entity.User;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
 import java.time.LocalDateTime;
-import java.util.List;
+
 
 @Entity
 @NoArgsConstructor
@@ -28,8 +24,10 @@ public class Question{
     @Column(name = "question_id")
     private Long id;
 
+    @ManyToOne
+    @JoinColumn(name = "user_user_id")
     @NotNull
-    private Long userId;
+    private User user;
 
     @NotNull
     @Size(max = 255)
@@ -53,9 +51,9 @@ public class Question{
     @LastModifiedDate
     private LocalDateTime updatedAt = LocalDateTime.now();
 
-    public Question(Long id, Long userId, String title, String content, Long searchNum) {
+    public Question(Long id, User user, String title, String content, Long searchNum) {
         this.id = id;
-        this.userId = userId;
+        this.user = user;
         this.title = title;
         this.content = content;
         this.searchNum = searchNum;

@@ -1,36 +1,31 @@
-package com.sluv.server.domain.question.entity.comment;
+package com.sluv.server.domain.comment.entity;
 
 import com.sluv.server.global.common.entity.BaseEntity;
-import com.sluv.server.global.common.enums.ImgStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Builder;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.ColumnDefault;
 
-@Getter
 @Entity
 @NoArgsConstructor
-@Table(name = "comment_img")
-public class CommentImg extends BaseEntity {
+@Table(name = "comment_item")
+public class CommentItem extends BaseEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "comment_img_id")
+    @Column(name = "comment_item_id")
     private Long id;
 
     @NotNull
     private Long commentId;
 
     @NotNull
-    @Column(columnDefinition = "TEXT")
-    private String imgUrl;
+    private Long itemId;
 
     @Builder
-    public CommentImg(Long id, Long commentId, String imgUrl) {
+    public CommentItem(Long id, Long commentId, Long itemId) {
         this.id = id;
         this.commentId = commentId;
-        this.imgUrl = imgUrl;
+        this.itemId = itemId;
     }
 }

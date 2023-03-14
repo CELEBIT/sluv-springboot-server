@@ -11,27 +11,27 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor
-@Table(name = "interested_celeb")
-public class InterestedCeleb extends BaseEntity {
+@Table(name = "recent_search_celeb")
+public class RecentSearchCeleb extends BaseEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "interested_celeb_id")
+    @Column(name = "recent_search_celeb_id")
     private Long id;
-
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    @NotNull
-    private User user;
 
     @ManyToOne
     @JoinColumn(name = "celeb_id")
     @NotNull
     private Celeb celeb;
 
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    @NotNull
+    private User user;
+
     @Builder
-    public InterestedCeleb(Long id, User user, Celeb celeb) {
+    public RecentSearchCeleb(Long id, Celeb celeb, User user) {
         this.id = id;
-        this.user = user;
         this.celeb = celeb;
+        this.user = user;
     }
 }

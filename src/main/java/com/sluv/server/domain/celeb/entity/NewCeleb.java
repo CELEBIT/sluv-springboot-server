@@ -2,6 +2,8 @@ package com.sluv.server.domain.celeb.entity;
 
 import com.sluv.server.domain.brand.enums.NewBrandStatus;
 import com.sluv.server.domain.celeb.enums.NewCelebStatus;
+import com.sluv.server.domain.comment.entity.CommentReport;
+import com.sluv.server.domain.item.entity.Item;
 import com.sluv.server.global.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -9,6 +11,8 @@ import jakarta.validation.constraints.Size;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.List;
 
 @Entity
 @Getter

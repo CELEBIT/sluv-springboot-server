@@ -1,6 +1,5 @@
-package com.sluv.server.domain.user.entity;
+package com.sluv.server.domain.item.entity;
 
-import com.sluv.server.domain.user.enums.UserReportReason;
 import com.sluv.server.global.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -12,22 +11,19 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor
-@Table(name = "user_report_stack")
-public class UserReportStack extends BaseEntity {
+@Table(name = "place_rank")
+public class PlaceRank extends BaseEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "user_report_stack_id")
+    @Column(name = "place_rank_id")
     private Long id;
-
-    @ManyToOne
-    @JoinColumn(name = "reported_id")
     @NotNull
-    private User reported;
-
+    @Size(max = 255)
+    private String place;
 
     @Builder
-    public UserReportStack(Long id, User reported) {
+    public PlaceRank(Long id, String place) {
         this.id = id;
-        this.reported = reported;
+        this.place = place;
     }
 }

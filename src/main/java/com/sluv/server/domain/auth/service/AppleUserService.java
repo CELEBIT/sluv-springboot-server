@@ -1,11 +1,9 @@
 package com.sluv.server.domain.auth.service;
 
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sluv.server.domain.auth.dto.AuthRequestDto;
-
 import com.sluv.server.domain.auth.dto.AuthResponseDto;
 import com.sluv.server.domain.auth.dto.SocialUserInfoDto;
 import com.sluv.server.domain.user.dto.UserDto;
@@ -32,6 +30,7 @@ import java.security.spec.RSAPublicKeySpec;
 import java.util.Base64;
 
 import static com.sluv.server.domain.auth.enums.SnsType.APPLE;
+
 
 
 @Service

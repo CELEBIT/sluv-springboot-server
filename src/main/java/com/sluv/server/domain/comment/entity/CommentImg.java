@@ -1,4 +1,4 @@
-package com.sluv.server.domain.question.entity.comment;
+package com.sluv.server.domain.comment.entity;
 
 import com.sluv.server.global.common.entity.BaseEntity;
 import com.sluv.server.global.common.enums.ImgStatus;
@@ -20,17 +20,19 @@ public class CommentImg extends BaseEntity {
     @Column(name = "comment_img_id")
     private Long id;
 
+    @ManyToOne
+    @JoinColumn(name = "comment_id")
     @NotNull
-    private Long commentId;
+    private Comment comment;
 
     @NotNull
     @Column(columnDefinition = "TEXT")
     private String imgUrl;
 
     @Builder
-    public CommentImg(Long id, Long commentId, String imgUrl) {
+    public CommentImg(Long id, Comment comment, String imgUrl) {
         this.id = id;
-        this.commentId = commentId;
+        this.comment = comment;
         this.imgUrl = imgUrl;
     }
 }

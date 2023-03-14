@@ -19,7 +19,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "QTYPE")
-@SuperBuilder
+//@SuperBuilder
 public class Question{
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -51,4 +51,11 @@ public class Question{
     @LastModifiedDate
     private LocalDateTime updatedAt = LocalDateTime.now();
 
+    public Question(Long id, Long userId, String title, String content, Long searchNum) {
+        this.id = id;
+        this.userId = userId;
+        this.title = title;
+        this.content = content;
+        this.searchNum = searchNum;
+    }
 }

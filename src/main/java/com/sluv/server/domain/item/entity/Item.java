@@ -1,6 +1,8 @@
 package com.sluv.server.domain.item.entity;
 
 import com.sluv.server.domain.closet.enums.ClosetStatus;
+import com.sluv.server.domain.comment.entity.CommentImg;
+import com.sluv.server.domain.comment.entity.CommentItem;
 import com.sluv.server.domain.item.enums.ItemStatus;
 import com.sluv.server.global.common.entity.BaseEntity;
 import jakarta.persistence.*;
@@ -11,6 +13,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Getter
@@ -59,6 +62,9 @@ public class Item extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Column(length = 45, columnDefinition = "varchar(45) default 'ACTIVE'")
     private ItemStatus itemStatus;
+
+    @OneToMany(mappedBy = "item")
+    List<CommentItem> commentItemList;
 
     @Builder
     public Item(Long id, Long userId, Long celebId, Long newCelebId,

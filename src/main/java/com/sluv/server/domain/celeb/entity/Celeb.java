@@ -1,7 +1,6 @@
 package com.sluv.server.domain.celeb.entity;
 
 import com.sluv.server.domain.celeb.enums.CelebStatus;
-import com.sluv.server.domain.item.enums.ItemStatus;
 import com.sluv.server.global.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -20,10 +19,14 @@ public class Celeb extends BaseEntity {
     @Column(name = "celeb_id")
     private Long id;
 
-    private Long parentId;
+    @ManyToOne
+    @JoinColumn(name = "parent_id")
+    private Celeb parent;
 
+    @ManyToOne
+    @JoinColumn(name = "celeb_category_id")
     @NotNull
-    private Long celebCategoryId;
+    private CelebCategory celebCategory;
 
     @NotNull
     @Size(max = 255)
@@ -38,10 +41,10 @@ public class Celeb extends BaseEntity {
     private CelebStatus celebStatus;
 
     @Builder
-    public Celeb(Long id, Long parentId, Long celebCategoryId, String celebNameKr, String celebNameEn, CelebStatus celebStatus) {
+    public Celeb(Long id, Celeb parent, CelebCategory celebCategory, String celebNameKr, String celebNameEn, CelebStatus celebStatus) {
         this.id = id;
-        this.parentId = parentId;
-        this.celebCategoryId = celebCategoryId;
+        this.parent = parent;
+        this.celebCategory = celebCategory;
         this.celebNameKr = celebNameKr;
         this.celebNameEn = celebNameEn;
         this.celebStatus = celebStatus;

@@ -17,16 +17,20 @@ public class Follow extends BaseEntity {
     @Column(name = "follow_id")
     private Long id;
 
+    @ManyToOne
+    @JoinColumn(name = "follower_id")
     @NotNull
-    private Long followerId;
+    private User follower;
 
+    @ManyToOne
+    @JoinColumn(name = "followee_id")
     @NotNull
-    private Long followeeId;
+    private User followee;
 
     @Builder
-    public Follow(Long id, Long followerId, Long followeeId) {
+    public Follow(Long id, User follower, User followee) {
         this.id = id;
-        this.followerId = followerId;
-        this.followeeId = followeeId;
+        this.follower = follower;
+        this.followee = followee;
     }
 }

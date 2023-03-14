@@ -25,15 +25,20 @@ public class ItemCategory extends BaseEntity {
     @Size(max = 50)
     private String name;
 
-    private Long parentId;
+    @ManyToOne
+    @JoinColumn(name = "item_category_item_category_id")
+    private ItemCategory parent;
 
     @OneToMany(mappedBy = "category")
     List<Item> itemList;
 
+    @OneToMany(mappedBy = "parent")
+    List<ItemCategory> itemCategoryList;
+
     @Builder
-    public ItemCategory(Long id, String name, Long parentId) {
+    public ItemCategory(Long id, String name, ItemCategory parent) {
         this.id = id;
         this.name = name;
-        this.parentId = parentId;
+        this.parent = parent;
     }
 }

@@ -44,7 +44,7 @@ public class Item extends BaseEntity {
     private NewCeleb newCeleb;
 
     @ManyToOne
-    @JoinColumn(name = "category_item_category_id")
+    @JoinColumn(name = "item_category_item_category_id")
     @NotNull
     private ItemCategory category;
 

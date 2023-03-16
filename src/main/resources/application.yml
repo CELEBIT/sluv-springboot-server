@@ -9,6 +9,10 @@ spring:
     user:
       name: user
       password: 1234
+    oauth2:
+      client:
+        id: 924373234165-adalqufkonkljl23qk6vv4g3bnc9imfr.apps.googleusercontent.com
+
 
 jasypt:
   encryptor:

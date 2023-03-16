@@ -16,7 +16,8 @@ import com.sluv.server.global.jwt.exception.InvalidateTokenException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import java.util.Collections;
+
+import java.util.Arrays;
 
 import static com.sluv.server.domain.auth.enums.SnsType.GOOGLE;
 
@@ -27,8 +28,11 @@ public class GoogleUserService {
     private final UserRepository userRepository;
     private final JwtProvider jwtProvider;
 
-    @Value("${spring.security.oauth2.client.id}")
-    private String CLIENT_ID;
+    @Value("${spring.security.oauth2.client.android}")
+    private String CLIENT_ANDROID;
+
+    @Value("${spring.security.oauth2.client.apple}")
+    private String CLIENT_APPLE;
 
     public AuthResponseDto googleLogin(AuthRequestDto request) {
         String idToken = request.getAccessToken();
@@ -54,14 +58,13 @@ public class GoogleUserService {
      */
     private SocialUserInfoDto verifyIdToken(String idToken){
         GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), GsonFactory.getDefaultInstance())
-                .setAudience(Collections.singletonList(CLIENT_ID))
+                .setAudience(Arrays.asList(CLIENT_ANDROID, CLIENT_APPLE))
                 .build();
 
         try {
             GoogleIdToken verifiedIdToken = verifier.verify(idToken);
 
             return convertResponseToSocialUserInfoDto(verifiedIdToken);
-
         }catch (Exception e){
             throw new InvalidateTokenException();
         }

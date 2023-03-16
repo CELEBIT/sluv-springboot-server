@@ -1,5 +1,6 @@
 package com.sluv.server.domain.brand.repository;
 
+import com.sluv.server.domain.brand.dto.BrandSearchResDto;
 import com.sluv.server.domain.brand.entity.Brand;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -32,11 +33,10 @@ class BrandRepositoryTest {
         brandRepository.save(brand2);
 
         //when
-        List<Brand> result = brandRepository.findAllByBrandKrStartingWith("폴햄");
+        List<BrandSearchResDto> result = brandRepository.findAllByBrandKrStartingWith("폴");
 
         //then
         assertThat(result).hasSize(2);
-
     }
 
     @AfterEach

@@ -11,7 +11,9 @@ spring:
       password: 1234
     oauth2:
       client:
-        id: 924373234165-adalqufkonkljl23qk6vv4g3bnc9imfr.apps.googleusercontent.com
+        android: 924373234165-adalqufkonkljl23qk6vv4g3bnc9imfr.apps.googleusercontent.com
+        apple: 924373234165-hfd08tk9pt36g4e9r54hqhpe9ircrv4q.apps.googleusercontent.com
+
 
 
 jasypt:

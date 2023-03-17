@@ -5,6 +5,7 @@ import com.sluv.server.domain.brand.entity.Brand;
 import com.sluv.server.domain.brand.service.BrandService;
 import com.sluv.server.global.common.response.SuccessDataResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,13 +20,13 @@ import java.util.List;
 public class BrandController {
     private final BrandService brandService;
     @GetMapping("/search")
-    public ResponseEntity<SuccessDataResponse<List<BrandSearchResDto>>> getBrandSearch(@RequestParam String brandName){
+    public ResponseEntity<SuccessDataResponse<List<BrandSearchResDto>>> getBrandSearch(@RequestParam String brandName, Pageable pageable){
 
 
         return ResponseEntity.ok()
                 .body(
                         SuccessDataResponse.<List<BrandSearchResDto>>builder()
-                                            .result(brandService.findAllBrand(brandName))
+                                            .result(brandService.findAllBrand(brandName, pageable))
                                             .build()
                 );
 

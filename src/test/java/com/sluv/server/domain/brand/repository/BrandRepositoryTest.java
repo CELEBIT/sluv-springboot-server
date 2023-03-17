@@ -1,12 +1,16 @@
 package com.sluv.server.domain.brand.repository;
 
-import com.sluv.server.domain.brand.dto.BrandSearchResDto;
 import com.sluv.server.domain.brand.entity.Brand;
+import org.aspectj.lang.annotation.After;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -18,7 +22,7 @@ class BrandRepositoryTest {
     private BrandRepository brandRepository;
 
     @Test
-    public void findAllByBrandKrStartingWith() throws Exception{
+    public void findByAllBrandKrOrBrandEnStartingWith() throws Exception{
         //given
         Brand brand1 = Brand.builder()
                             .brandKr("폴로")
@@ -28,19 +32,29 @@ class BrandRepositoryTest {
                             .brandKr("폴햄")
                             .brandEn("POLHAM")
                             .build();
+        Brand brand3 = Brand.builder()
+                            .brandKr("Push버튼")
+                            .brandEn("ushButton")
+                            .build();
 
         brandRepository.save(brand1);
         brandRepository.save(brand2);
+        brandRepository.save(brand3);
+        
+        Pageable pageable1 = PageRequest.of(0, 2);
+        Pageable pageable2 = PageRequest.of(1, 2);
 
         //when
-//        List<BrandSearchResDto> result = brandRepository.findAllByBrandKrStartingWith("폴");
+        List<Brand> resultPage1 = brandRepository.findByAllBrandKrOrBrandEnStartingWith("P", pageable1).stream().toList();
+        List<Brand> resultPage2 = brandRepository.findByAllBrandKrOrBrandEnStartingWith("P", pageable2).stream().toList();
 
         //then
-//        assertThat(result).hasSize(2);
-    }
+        assertThat(resultPage1).hasSize(2);
+        assertThat(resultPage2).hasSize(1);
 
-    @AfterEach
-    void tearDown() {
-        brandRepository.deleteAll();
     }
+//    @AfterAll
+//    public static void cleanUp(BrandRepository brandRepository) {
+//        brandRepository.deleteAll();
+//    }
 }

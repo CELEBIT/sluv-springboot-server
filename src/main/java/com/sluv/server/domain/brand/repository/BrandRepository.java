@@ -5,6 +5,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 
-public interface BrandRepository extends JpaRepository<Brand, Long> {
-     List<Brand> findAllByBrandKrStartingWith(String brandName);
+public interface BrandRepository extends JpaRepository<Brand, Long>, BrandRepositoryCustom {
 }

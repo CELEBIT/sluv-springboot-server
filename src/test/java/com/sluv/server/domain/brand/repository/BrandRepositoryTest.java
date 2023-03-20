@@ -1,6 +1,8 @@
 package com.sluv.server.domain.brand.repository;
 
 import com.sluv.server.domain.brand.entity.Brand;
+import com.sluv.server.domain.user.entity.User;
+import com.sluv.server.domain.user.repository.UserRepository;
 import org.aspectj.lang.annotation.After;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
@@ -20,6 +22,9 @@ class BrandRepositoryTest {
 
     @Autowired
     private BrandRepository brandRepository;
+
+    @Autowired
+    private UserRepository userRepository;
 
     @Test
     public void findByAllBrandKrOrBrandEnStartingWith() throws Exception{
@@ -63,6 +68,18 @@ class BrandRepositoryTest {
             //skip
         //when
         List<Brand> result = brandRepository.findTop10By();
+
+        //then
+        assertThat(result).hasSize(9);
+
+    }
+
+    @Test
+    public void findRecentByUserIdTest() throws Exception{
+        //given
+        User user = userRepository.findById(1L).orElse(null);
+        //when
+        List<Brand> result = brandRepository.findRecentByUserId(user);
 
         //then
         assertThat(result).hasSize(9);

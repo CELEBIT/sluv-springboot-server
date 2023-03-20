@@ -2,6 +2,7 @@ package com.sluv.server.domain.brand.repository;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sluv.server.domain.brand.entity.Brand;
+import com.sluv.server.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -38,6 +39,15 @@ public class BrandRepositoryImpl implements BrandRepositoryCustom{
                 .from(recentBrand)
                 .groupBy(recentBrand.brand)
                 .orderBy(recentBrand.brand.count().desc())
+                .limit(10)
+                .fetch();
+    }
+
+    @Override
+    public List<Brand> findRecentByUserId(User user) {
+        return jpaQueryFactory.selectDistinct(recentBrand.brand)
+                .from(recentBrand)
+                .orderBy(recentBrand.createdAt.desc())
                 .limit(10)
                 .fetch();
     }

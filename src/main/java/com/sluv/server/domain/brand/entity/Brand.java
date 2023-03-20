@@ -1,5 +1,6 @@
 package com.sluv.server.domain.brand.entity;
 
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.sluv.server.domain.item.entity.Item;
 import com.sluv.server.domain.item.entity.TempItem;
 import com.sluv.server.global.common.entity.BaseEntity;

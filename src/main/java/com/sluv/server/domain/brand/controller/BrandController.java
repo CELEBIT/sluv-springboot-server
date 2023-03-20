@@ -47,4 +47,17 @@ public class BrandController {
                 );
 
     }
+
+    @GetMapping("/top")
+    public ResponseEntity<SuccessDataResponse<List<BrandSearchResDto>>> getTopBrand(){
+
+
+        return ResponseEntity.ok()
+                .body(
+                        SuccessDataResponse.<List<BrandSearchResDto>>builder()
+                                .result(brandService.findTopBrand())
+                                .build()
+                );
+
+    }
 }

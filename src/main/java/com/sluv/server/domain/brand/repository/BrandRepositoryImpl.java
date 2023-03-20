@@ -1,5 +1,9 @@
 package com.sluv.server.domain.brand.repository;
 
+import com.querydsl.core.Tuple;
+import com.querydsl.core.types.Expression;
+import com.querydsl.core.types.Projections;
+import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sluv.server.domain.brand.entity.Brand;
 import com.sluv.server.domain.user.entity.QUser;
@@ -47,13 +51,16 @@ public class BrandRepositoryImpl implements BrandRepositoryCustom{
 
     @Override
     public Page<Brand> findRecentByUserId(User user, Pageable pageable) {
-        List<Brand> content = jpaQueryFactory.select(recentBrand.brand)
-                                            .from(recentBrand)
-                                            .where(QUser.user.eq(user))
-                                            .orderBy(recentBrand.createdAt.desc())
-                                            .offset(pageable.getOffset())
-                                            .limit(pageable.getPageSize())
-                                            .fetch();
+        List<Brand> content = jpaQueryFactory
+                .selectFrom(brand)
+                .innerJoin(recentBrand)
+                .on(brand.eq(recentBrand.brand))
+                .where(recentBrand.user.eq(user))
+                .groupBy(brand)
+                .orderBy(recentBrand.createdAt.max().desc())
+                .limit(10)
+                .fetch();
+
         return new PageImpl<>(content);
     }
 }

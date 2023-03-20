@@ -63,6 +63,14 @@ public class SwaggerConfig {
     }
 
     @Bean
+    public GroupedOpenApi appGroup(){
+        return GroupedOpenApi.builder()
+                .group("App")
+                .pathsToMatch("/app/**")
+                .build();
+    }
+
+    @Bean
     public GroupedOpenApi authGroup(){
         return GroupedOpenApi.builder()
                 .group("Auth")
@@ -75,6 +83,14 @@ public class SwaggerConfig {
         return GroupedOpenApi.builder()
                 .group("User")
                 .pathsToMatch("/user/**")
+                .build();
+    }
+
+    @Bean
+    public GroupedOpenApi brandGroup(){
+        return GroupedOpenApi.builder()
+                .group("Brand")
+                .pathsToMatch("/app/brand/**")
                 .build();
     }
 

@@ -10,11 +10,13 @@ import org.springframework.data.domain.Pageable;
 import java.util.List;
 
 import static com.sluv.server.domain.brand.entity.QBrand.brand;
+import static com.sluv.server.domain.brand.entity.QRecentBrand.recentBrand;
 
 @RequiredArgsConstructor
 public class BrandRepositoryImpl implements BrandRepositoryCustom{
     private final JPAQueryFactory jpaQueryFactory;
 
+    @Override
     public Page<Brand> findByAllBrandKrOrBrandEnStartingWith(String brandName, Pageable pageable){
         List<Brand> contents = jpaQueryFactory.selectFrom(brand)
                 .where(brand.brandKr.like(brandName+"%")
@@ -29,4 +31,14 @@ public class BrandRepositoryImpl implements BrandRepositoryCustom{
 
     }
 
+    @Override
+    public List<Brand> findTop10By() {
+
+        return jpaQueryFactory.select(recentBrand.brand)
+                .from(recentBrand)
+                .groupBy(recentBrand.brand)
+                .orderBy(recentBrand.brand.count().desc())
+                .limit(10)
+                .fetch();
+    }
 }

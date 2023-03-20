@@ -10,5 +10,5 @@ import java.util.List;
 public interface BrandRepositoryCustom {
     Page<Brand> findByAllBrandKrOrBrandEnStartingWith(String brandName, Pageable pageable);
     List<Brand> findTop10By();
-    List<Brand> findRecentByUserId(User user);
+    Page<Brand> findRecentByUserId(User user, Pageable pageable);
 }

@@ -2,6 +2,7 @@ package com.sluv.server.domain.brand.repository;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sluv.server.domain.brand.entity.Brand;
+import com.sluv.server.domain.user.entity.QUser;
 import com.sluv.server.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -11,6 +12,7 @@ import org.springframework.data.domain.Pageable;
 import java.util.List;
 
 import static com.sluv.server.domain.brand.entity.QBrand.brand;
+import static com.sluv.server.domain.user.entity.QUser.user;
 import static com.sluv.server.domain.brand.entity.QRecentBrand.recentBrand;
 
 @RequiredArgsConstructor
@@ -44,11 +46,14 @@ public class BrandRepositoryImpl implements BrandRepositoryCustom{
     }
 
     @Override
-    public List<Brand> findRecentByUserId(User user) {
-        return jpaQueryFactory.selectDistinct(recentBrand.brand)
-                .from(recentBrand)
-                .orderBy(recentBrand.createdAt.desc())
-                .limit(10)
-                .fetch();
+    public Page<Brand> findRecentByUserId(User user, Pageable pageable) {
+        List<Brand> content = jpaQueryFactory.select(recentBrand.brand)
+                                            .from(recentBrand)
+                                            .where(QUser.user.eq(user))
+                                            .orderBy(recentBrand.createdAt.desc())
+                                            .offset(pageable.getOffset())
+                                            .limit(pageable.getPageSize())
+                                            .fetch();
+        return new PageImpl<>(content);
     }
 }

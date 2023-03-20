@@ -40,9 +40,9 @@ public class BrandService {
                                             ).collect(Collectors.toList());
     }
 
-    public List<BrandSearchResDto> findRecentBrand(User user) {
+    public List<BrandSearchResDto> findRecentBrand(User user, Pageable pageable) {
 
-        return brandRepository.findRecentByUserId(user).stream()
+        return brandRepository.findRecentByUserId(user, pageable).stream()
                                                     .map(data -> BrandSearchResDto.builder()
                                                                                     .id(data.getId())
                                                                                     .brandKr(data.getBrandKr())

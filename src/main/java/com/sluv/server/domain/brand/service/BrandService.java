@@ -25,4 +25,15 @@ public class BrandService {
                                                                                                     .build()
                                                                     ).collect(Collectors.toList());
     }
+
+    public List<BrandSearchResDto> findTopBrand() {
+        return brandRepository.findTop10By().stream()
+                                            .map(data -> BrandSearchResDto.builder()
+                                                                            .id(data.getId())
+                                                                            .brandKr(data.getBrandKr())
+                                                                            .brandEn(data.getBrandEn())
+                                                                            .brandImgUrl(data.getBrandImgUrl())
+                                                                            .build()
+                                            ).collect(Collectors.toList());
+    }
 }

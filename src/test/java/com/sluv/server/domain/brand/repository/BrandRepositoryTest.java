@@ -57,4 +57,15 @@ class BrandRepositoryTest {
 //    public static void cleanUp(BrandRepository brandRepository) {
 //        brandRepository.deleteAll();
 //    }
+    @Test
+    public void findTop10ByTest() throws Exception{
+        //given
+            //skip
+        //when
+        List<Brand> result = brandRepository.findTop10By();
+
+        //then
+        assertThat(result).hasSize(9);
+
+    }
 }

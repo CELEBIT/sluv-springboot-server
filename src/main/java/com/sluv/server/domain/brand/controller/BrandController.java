@@ -30,7 +30,7 @@ public class BrandController {
 
     @Operation(
             summary = "브랜드 검색",
-            description = "브랜드 검색(Pagenation)"
+            description = "브랜드 검색(Pagination)"
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "1000", description = "요청성공"),
@@ -71,6 +71,15 @@ public class BrandController {
 
     }
 
+    @Operation(
+            summary = "최근 검색한 브랜드",
+            description = "최근 검색한 브랜드(Pagination)"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "1000", description = "요청성공"),
+            @ApiResponse(responseCode = "5000", description = "서버내부 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "5001", description = "DB 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
     @GetMapping("/search/recent")
     public ResponseEntity<SuccessDataResponse<List<BrandSearchResDto>>> getRecentSearchBrand(@AuthenticationPrincipal User user, Pageable pageable){
 

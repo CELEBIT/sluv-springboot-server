@@ -2,6 +2,8 @@ package com.sluv.server.domain.brand.service;
 
 import com.sluv.server.domain.brand.dto.BrandSearchResDto;
 import com.sluv.server.domain.brand.repository.BrandRepository;
+import com.sluv.server.domain.user.entity.User;
+import com.sluv.server.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -13,6 +15,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class BrandService {
     private final BrandRepository brandRepository;
+    private final UserRepository userRepository;
 
     public List<BrandSearchResDto> findAllBrand(String brandName, Pageable pageable){
 
@@ -36,4 +39,17 @@ public class BrandService {
                                                                             .build()
                                             ).collect(Collectors.toList());
     }
+
+    public List<BrandSearchResDto> findRecentBrand(User user, Pageable pageable) {
+
+        return brandRepository.findRecentByUserId(user, pageable).stream()
+                                                    .map(data -> BrandSearchResDto.builder()
+                                                                                    .id(data.getId())
+                                                                                    .brandKr(data.getBrandKr())
+                                                                                    .brandEn(data.getBrandEn())
+                                                                                    .brandImgUrl(data.getBrandImgUrl())
+                                                                                    .build()
+                                                    ).collect(Collectors.toList());
+    }
 }
+

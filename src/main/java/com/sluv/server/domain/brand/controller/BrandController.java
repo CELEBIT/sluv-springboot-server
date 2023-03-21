@@ -3,6 +3,7 @@ package com.sluv.server.domain.brand.controller;
 import com.sluv.server.domain.brand.dto.BrandSearchResDto;
 import com.sluv.server.domain.brand.entity.Brand;
 import com.sluv.server.domain.brand.service.BrandService;
+import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.global.common.response.ErrorResponse;
 import com.sluv.server.global.common.response.SuccessDataResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -13,6 +14,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -28,7 +30,7 @@ public class BrandController {
 
     @Operation(
             summary = "브랜드 검색",
-            description = "브랜드 검색(Pagenation)"
+            description = "브랜드 검색(Pagination)"
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "1000", description = "요청성공"),
@@ -64,6 +66,28 @@ public class BrandController {
                 .body(
                         SuccessDataResponse.<List<BrandSearchResDto>>builder()
                                 .result(brandService.findTopBrand())
+                                .build()
+                );
+
+    }
+
+    @Operation(
+            summary = "최근 검색한 브랜드",
+            description = "최근 검색한 브랜드(Pagination)"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "1000", description = "요청성공"),
+            @ApiResponse(responseCode = "5000", description = "서버내부 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "5001", description = "DB 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @GetMapping("/search/recent")
+    public ResponseEntity<SuccessDataResponse<List<BrandSearchResDto>>> getRecentSearchBrand(@AuthenticationPrincipal User user, Pageable pageable){
+
+
+        return ResponseEntity.ok()
+                .body(
+                        SuccessDataResponse.<List<BrandSearchResDto>>builder()
+                                .result(brandService.findRecentBrand(user, pageable))
                                 .build()
                 );
 

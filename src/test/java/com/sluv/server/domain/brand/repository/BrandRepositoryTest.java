@@ -1,6 +1,8 @@
 package com.sluv.server.domain.brand.repository;
 
 import com.sluv.server.domain.brand.entity.Brand;
+import com.sluv.server.domain.user.entity.User;
+import com.sluv.server.domain.user.repository.UserRepository;
 import org.aspectj.lang.annotation.After;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
@@ -12,6 +14,7 @@ import org.springframework.data.domain.Pageable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -20,6 +23,9 @@ class BrandRepositoryTest {
 
     @Autowired
     private BrandRepository brandRepository;
+
+    @Autowired
+    private UserRepository userRepository;
 
     @Test
     public void findByAllBrandKrOrBrandEnStartingWith() throws Exception{
@@ -66,6 +72,19 @@ class BrandRepositoryTest {
 
         //then
 //        assertThat(result).hasSize(9);
+
+    }
+
+    @Test
+    public void findRecentByUserIdTest() throws Exception{
+        //given
+        User user = userRepository.findById(1L).orElse(null);
+        Pageable pageable = PageRequest.of(0, 10);
+        //when
+        List<Brand> result = brandRepository.findRecentByUserId(user, pageable).stream().collect(Collectors.toList());
+
+        //then
+        assertThat(result).hasSize(9);
 
     }
 }

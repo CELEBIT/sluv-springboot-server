@@ -26,7 +26,30 @@ public class SpringSecurityConfig {
     private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
 
     private static final String[] PERMIT_URL = {
-            "/auth/**", "/v3/api-docs/**", "/swagger-ui/**", "/swagger-resources/**"
+            // Elastic Beanstalk
+            "/",
+
+            // Swagger
+            "/v3/api-docs/**", "/swagger-ui/**", "/swagger-resources/**",
+
+            // Auth
+            "/app/auth/test", "/app/auth/social-login",
+
+            // Brand
+            "/app/brand/search", "/app/brand/top",
+
+            // Celeb
+            "/app/celeb/search", "/app/celeb/top",
+
+            // Item
+            "/app/item/{itemId}", "/app/item/category", "/app/item/hashtag", "/app/item/place/top",
+
+            // Notice
+            "/app/notice", "/app/notice/{noticeId}",
+
+            // Closet
+            "/app/closet/{closetId}"
+
     };
 
     @Bean

@@ -1,9 +1,12 @@
 package com.sluv.server.domain.item.controller;
 
+import com.sluv.server.domain.item.dto.HashtagPostResponseDto;
+import com.sluv.server.domain.item.dto.HashtagRequestDto;
 import com.sluv.server.domain.item.dto.HashtagResponseDto;
 import com.sluv.server.domain.item.service.HashtagService;
 import com.sluv.server.global.common.response.ErrorResponse;
 import com.sluv.server.global.common.response.SuccessDataResponse;
+import com.sluv.server.global.common.response.SuccessResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -12,10 +15,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -43,6 +43,14 @@ public class HashtagController {
                         .result(hashtagService.getHashtag(name, pageable))
                         .build()
 
+        );
+    }
+    @PostMapping("")
+    public ResponseEntity<SuccessDataResponse<HashtagPostResponseDto>> postHashtag(@RequestBody HashtagRequestDto requestDto) {
+
+        return ResponseEntity.ok().body(SuccessDataResponse.<HashtagPostResponseDto>builder()
+                .result(hashtagService.postHashtag(requestDto))
+                .build()
         );
     }
 }

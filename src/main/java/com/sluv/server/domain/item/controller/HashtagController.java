@@ -45,6 +45,16 @@ public class HashtagController {
 
         );
     }
+
+    @Operation(
+            summary = "새로운 해쉬태그 등록",
+            description = "동시 등록을 방지하기 위해 Hashtag DB 탐색 후, 있으면 해당 값 반환, 없으면 등록 후 반환"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "1000", description = "요청성공"),
+            @ApiResponse(responseCode = "5000", description = "서버내부 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "5001", description = "DB 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
     @PostMapping("")
     public ResponseEntity<SuccessDataResponse<HashtagPostResponseDto>> postHashtag(@RequestBody HashtagRequestDto requestDto) {
 

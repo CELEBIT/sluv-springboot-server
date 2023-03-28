@@ -2,8 +2,8 @@ package com.sluv.server.domain.user.service;
 
 import com.sluv.server.domain.celeb.entity.Celeb;
 import com.sluv.server.domain.celeb.repository.CelebRepository;
-import com.sluv.server.domain.item.dto.CelebParentResponseDto;
-import com.sluv.server.domain.item.dto.CelebResponseDto;
+import com.sluv.server.domain.celeb.dto.CelebParentResDto;
+import com.sluv.server.domain.celeb.dto.CelebChildResDto;
 import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.domain.user.dto.UserDto;
 import com.sluv.server.domain.user.repository.UserRepository;
@@ -12,14 +12,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
 import java.util.stream.Collectors;
-
-import static java.util.stream.Collectors.toList;
 
 
 @Service
@@ -40,18 +35,18 @@ public class UserService {
      * == user의 관심 Celeb 검색
      * @param user
      */
-    public List<CelebParentResponseDto> getInterestedCeleb(User user) {
+    public List<CelebParentResDto> getInterestedCeleb(User user) {
         List<Celeb> interestedCelebs = celebRepository.findInterestedCeleb(user);
         return interestedCelebs.stream()
                 .collect(Collectors.groupingBy(Celeb::getParent))
                 .entrySet().stream()
                 .sorted(Comparator.comparing(entry -> entry.getKey().getCelebNameKr()))
-                .map(entry -> CelebParentResponseDto.builder()
+                .map(entry -> CelebParentResDto.builder()
                         .id(entry.getKey().getId())
                         .celebNameKr(entry.getKey().getCelebNameKr())
                         .celebNameEn(entry.getKey().getCelebNameEn())
                         .subCelebList(entry.getValue().stream()
-                                .map(child -> CelebResponseDto.builder()
+                                .map(child -> CelebChildResDto.builder()
                                         .id(child.getId())
                                         .celebNameKr(child.getCelebNameKr())
                                         .celebNameEn(child.getCelebNameEn())

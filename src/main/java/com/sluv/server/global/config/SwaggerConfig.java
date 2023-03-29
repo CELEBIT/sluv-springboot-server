@@ -94,4 +94,12 @@ public class SwaggerConfig {
                 .build();
     }
 
+    @Bean
+    public GroupedOpenApi itemGroup(){
+        return GroupedOpenApi.builder()
+                .group("Item")
+                .pathsToMatch("/app/item/**")
+                .build();
+    }
+
 }

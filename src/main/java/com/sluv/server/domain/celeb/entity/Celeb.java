@@ -1,5 +1,6 @@
 package com.sluv.server.domain.celeb.entity;
 
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.sluv.server.domain.celeb.enums.CelebStatus;
 import com.sluv.server.global.common.entity.BaseEntity;
 import jakarta.persistence.*;
@@ -12,6 +13,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor
+@JsonPropertyOrder({"id", "parent", "celebCategory", "celebNameKr", "celebNameEn", "celebStatus", "created_at", "updated_at"})
 @Table(name = "celeb")
 public class Celeb extends BaseEntity {
 

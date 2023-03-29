@@ -12,8 +12,10 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 
@@ -37,24 +39,42 @@ public class UserService {
      */
     public List<CelebParentResDto> getInterestedCeleb(User user) {
         List<Celeb> interestedCelebs = celebRepository.findInterestedCeleb(user);
-        return interestedCelebs.stream()
-                .collect(Collectors.groupingBy(Celeb::getParent))
-                .entrySet().stream()
-                .sorted(Comparator.comparing(entry -> entry.getKey().getCelebNameKr()))
-                .map(entry -> CelebParentResDto.builder()
-                        .id(entry.getKey().getId())
-                        .celebNameKr(entry.getKey().getCelebNameKr())
-                        .celebNameEn(entry.getKey().getCelebNameEn())
-                        .subCelebList(entry.getValue().stream()
-                                .map(child -> CelebChildResDto.builder()
-                                        .id(child.getId())
-                                        .celebNameKr(child.getCelebNameKr())
-                                        .celebNameEn(child.getCelebNameEn())
-                                        .build()
-                                ).collect(Collectors.toList())
-                        ).build()
-                ).toList();
 
+        return interestedCelebs.stream()
+                .collect(Collectors.partitioningBy(c -> c.getParent() == null))
+                .entrySet().stream()
+                // parent가 있는 Celeb인지 분류
+                .flatMap(entry ->{
+                    // parent가 없는 Celeb
+                    if (entry.getKey()) {
+                        return entry.getValue().stream().map(data -> CelebParentResDto.builder()
+                                .id(data.getId())
+                                .celebNameKr(data.getCelebNameKr())
+                                .celebNameEn(data.getCelebNameEn())
+                                .subCelebList(null)
+                                .build()
+                        );
+                    } else {
+                        // parent가 있는 Celeb
+                        return entry.getValue().stream()
+                                .collect(Collectors.groupingBy(Celeb::getParent))
+                                .entrySet().stream()
+                                .map(subEntry -> CelebParentResDto.builder()
+                                        .id(subEntry.getKey().getId())
+                                        .celebNameKr(subEntry.getKey().getCelebNameKr())
+                                        .celebNameEn(subEntry.getKey().getCelebNameEn())
+                                        .subCelebList(
+                                                subEntry.getValue().stream()
+                                                        .map(child -> CelebChildResDto.builder()
+                                                                .id(child.getId())
+                                                                .celebNameKr(child.getCelebNameKr())
+                                                                .celebNameEn(child.getCelebNameEn())
+                                                                .build()
+                                                        ).toList()
+                                        ).build()
+                                );
+                    }
+                }).toList();
 
     }
 }

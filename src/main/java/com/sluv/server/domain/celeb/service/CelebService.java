@@ -2,6 +2,7 @@ package com.sluv.server.domain.celeb.service;
 
 import com.sluv.server.domain.celeb.dto.CelebSearchResDto;
 import com.sluv.server.domain.celeb.repository.CelebRepository;
+import com.sluv.server.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -65,5 +66,26 @@ public class CelebService {
 
                 }).toList();
 
+    }
+
+    public List<CelebSearchResDto> getUserRecentSearchCeleb(User user){
+
+
+        return celebRepository.findRecentCeleb(user).stream()
+                                                    .map(celeb -> {
+                                                        String celebNameKr = celeb.getCelebNameKr();
+                                                        String celebNameEn = celeb.getCelebNameEn();
+
+                                                        if (celeb.getParent() != null){
+                                                            celebNameKr = celeb.getParent().getCelebNameKr() + " " + celeb.getCelebNameKr();
+                                                            celebNameEn = celeb.getParent().getCelebNameEn() + " " + celeb.getCelebNameEn();
+                                                        }
+
+                                                        return CelebSearchResDto.builder()
+                                                                .id(celeb.getId())
+                                                                .celebNameKr(celebNameKr)
+                                                                .celebNameEn(celebNameEn)
+                                                                .build();
+                                                    }).toList();
     }
 }

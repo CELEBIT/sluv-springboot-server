@@ -78,4 +78,15 @@ public class CelebRepositoryImpl implements CelebRepositoryCustom{
                 .fetch();
 
     }
+
+    @Override
+    public List<Celeb> findTop10Celeb() {
+
+        return jpaQueryFactory.select(celeb)
+                .from(recentSearchCeleb)
+                .groupBy(recentSearchCeleb.celeb)
+                .orderBy(recentSearchCeleb.celeb.count().desc())
+                .limit(10)
+                .fetch();
+    }
 }

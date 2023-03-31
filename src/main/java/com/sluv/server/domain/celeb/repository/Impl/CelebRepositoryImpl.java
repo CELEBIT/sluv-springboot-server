@@ -13,6 +13,7 @@ import java.util.List;
 
 import static com.sluv.server.domain.brand.entity.QBrand.brand;
 import static com.sluv.server.domain.brand.entity.QRecentBrand.recentBrand;
+import static com.sluv.server.domain.celeb.entity.QRecentSearchCeleb.recentSearchCeleb;
 import static com.sluv.server.domain.user.entity.QUser.user;
 import static com.sluv.server.domain.celeb.entity.QCeleb.celeb;
 import static com.sluv.server.domain.celeb.entity.QInterestedCeleb.interestedCeleb;
@@ -63,5 +64,18 @@ public class CelebRepositoryImpl implements CelebRepositoryCustom{
 
 
         return new PageImpl<>(content);
+    }
+
+    @Override
+    public List<Celeb> findRecentCeleb(User _user) {
+        return jpaQueryFactory.select(celeb)
+                .from(recentSearchCeleb)
+                .innerJoin(celeb).on(recentSearchCeleb.celeb.eq(celeb))
+                .where(recentSearchCeleb.user.eq(_user))
+                .groupBy(recentSearchCeleb.celeb)
+                .orderBy(recentSearchCeleb.createdAt.max().desc())
+                .limit(20)
+                .fetch();
+
     }
 }

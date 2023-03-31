@@ -6,18 +6,19 @@ import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.global.common.response.ErrorResponse;
 import com.sluv.server.global.common.response.SuccessDataResponse;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.headers.Header;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,8 +49,20 @@ public class CelebController {
         );
     }
 
+    @Operation(
+            summary = "최근 검색 Celeb 조회",
+            description = "유저가 최근 검색한 20개의 Celeb 조회",
+            parameters = {@Parameter(name = "X-AUTH-TOKEN", required = true, description = "Authentication token", in = ParameterIn.HEADER)}
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "1000", description = "요청성공"),
+            @ApiResponse(responseCode = "5000", description = "서버내부 에ffff러", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "5001", description = "DB 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
     @GetMapping("/search/recent")
-    public ResponseEntity<SuccessDataResponse<List<CelebSearchResDto>>> searchUserRecentSearchCeleb(@AuthenticationPrincipal User user){
+    public ResponseEntity<SuccessDataResponse<List<CelebSearchResDto>>> searchUserRecentSearchCeleb(
+
+            @AuthenticationPrincipal User user){
 
         return ResponseEntity.ok().body(
                 SuccessDataResponse.<List<CelebSearchResDto>>builder()

@@ -56,7 +56,7 @@ public class CelebController {
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "1000", description = "요청성공"),
-            @ApiResponse(responseCode = "5000", description = "서버내부 에ffff러", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "5000", description = "서버내부 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "5001", description = "DB 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @GetMapping("/search/recent")
@@ -77,7 +77,7 @@ public class CelebController {
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "1000", description = "요청성공"),
-            @ApiResponse(responseCode = "5000", description = "서버내부 에ffff러", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "5000", description = "서버내부 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "5001", description = "DB 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @GetMapping("/top")

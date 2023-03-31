@@ -1,6 +1,7 @@
 package com.sluv.server.domain.celeb.service;
 
 import com.sluv.server.domain.celeb.dto.CelebSearchResDto;
+import com.sluv.server.domain.celeb.entity.Celeb;
 import com.sluv.server.domain.celeb.repository.CelebRepository;
 import com.sluv.server.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
@@ -69,23 +70,35 @@ public class CelebService {
     }
 
     public List<CelebSearchResDto> getUserRecentSearchCeleb(User user){
+        return changeCelebSearchResDto(celebRepository.findRecentCeleb(user));
+    }
+
+    public List<CelebSearchResDto> getTop10Celeb(){
+        return  changeCelebSearchResDto(celebRepository.findTop10Celeb());
+    }
+
+    /**
+     * Celeb 리스트를 CelebSearchResDto 리스트로 변경
+     */
+    private List<CelebSearchResDto> changeCelebSearchResDto(List<Celeb> celebList){
+        return celebList.stream()
+                .map(celeb -> {
+                            String celebNameKr = celeb.getCelebNameKr();
+                            String celebNameEn = celeb.getCelebNameEn();
+
+                            if (celeb.getParent() != null){
+                                celebNameKr = celeb.getParent().getCelebNameKr() + " " + celeb.getCelebNameKr();
+                                celebNameEn = celeb.getParent().getCelebNameEn() + " " + celeb.getCelebNameEn();
+                            }
 
 
-        return celebRepository.findRecentCeleb(user).stream()
-                                                    .map(celeb -> {
-                                                        String celebNameKr = celeb.getCelebNameKr();
-                                                        String celebNameEn = celeb.getCelebNameEn();
+                            return CelebSearchResDto.builder()
+                                    .id(celeb.getId())
+                                    .celebNameKr(celebNameKr)
+                                    .celebNameEn(celebNameEn)
+                                    .build();
+                        }
 
-                                                        if (celeb.getParent() != null){
-                                                            celebNameKr = celeb.getParent().getCelebNameKr() + " " + celeb.getCelebNameKr();
-                                                            celebNameEn = celeb.getParent().getCelebNameEn() + " " + celeb.getCelebNameEn();
-                                                        }
-
-                                                        return CelebSearchResDto.builder()
-                                                                .id(celeb.getId())
-                                                                .celebNameKr(celebNameKr)
-                                                                .celebNameEn(celebNameEn)
-                                                                .build();
-                                                    }).toList();
+                ).toList();
     }
 }

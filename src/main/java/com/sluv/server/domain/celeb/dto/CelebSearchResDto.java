@@ -8,7 +8,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Data
-@Getter
 @NoArgsConstructor
 @JsonPropertyOrder({"id", "CelebNameKr", "CelebNameEn"})
 public class CelebSearchResDto {

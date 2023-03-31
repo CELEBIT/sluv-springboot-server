@@ -71,6 +71,15 @@ public class CelebController {
         );
     }
 
+    @Operation(
+            summary = "인기 셀럽 조회",
+            description = "조회가 많이된 Celeb 상위 10개 조회"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "1000", description = "요청성공"),
+            @ApiResponse(responseCode = "5000", description = "서버내부 에ffff러", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "5001", description = "DB 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
     @GetMapping("/top")
     public ResponseEntity<SuccessDataResponse<List<CelebSearchResDto>>> searchTop10Celeb(){
 

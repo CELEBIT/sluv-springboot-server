@@ -70,4 +70,14 @@ public class CelebController {
                         .build()
         );
     }
+
+    @GetMapping("/top")
+    public ResponseEntity<SuccessDataResponse<List<CelebSearchResDto>>> searchTop10Celeb(){
+
+        return ResponseEntity.ok().body(
+                SuccessDataResponse.<List<CelebSearchResDto>>builder()
+                        .result(celebService.getTop10Celeb())
+                        .build()
+        );
+    }
 }

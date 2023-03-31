@@ -1,5 +1,6 @@
 package com.sluv.server.domain.celeb.entity;
 
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.sluv.server.domain.celeb.enums.CelebStatus;
 import com.sluv.server.global.common.entity.BaseEntity;
 import jakarta.persistence.*;
@@ -9,9 +10,13 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Getter
 @NoArgsConstructor
+@JsonPropertyOrder({"id", "parent", "celebCategory", "celebNameKr", "celebNameEn", "celebStatus", "created_at", "updated_at"})
 @Table(name = "celeb")
 public class Celeb extends BaseEntity {
 
@@ -39,6 +44,9 @@ public class Celeb extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Column(length = 45, columnDefinition = "varchar(45) default 'ACTIVE'")
     private CelebStatus celebStatus;
+
+    @OneToMany(mappedBy = "parent")
+    private List<Celeb> subCelebList = new ArrayList<>();
 
     @Builder
     public Celeb(Long id, Celeb parent, CelebCategory celebCategory, String celebNameKr, String celebNameEn, CelebStatus celebStatus) {

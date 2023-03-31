@@ -2,6 +2,7 @@ package com.sluv.server.domain.celeb.controller;
 
 import com.sluv.server.domain.celeb.dto.CelebSearchResDto;
 import com.sluv.server.domain.celeb.service.CelebService;
+import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.global.common.response.ErrorResponse;
 import com.sluv.server.global.common.response.SuccessDataResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -12,6 +13,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -43,6 +45,16 @@ public class CelebController {
             SuccessDataResponse.<List<CelebSearchResDto>>builder()
                     .result(celebService.searchCeleb(celebName, pageable))
                     .build()
+        );
+    }
+
+    @GetMapping("/search/recent")
+    public ResponseEntity<SuccessDataResponse<List<CelebSearchResDto>>> searchUserRecentSearchCeleb(@AuthenticationPrincipal User user){
+
+        return ResponseEntity.ok().body(
+                SuccessDataResponse.<List<CelebSearchResDto>>builder()
+                        .result(celebService.getUserRecentSearchCeleb(user))
+                        .build()
         );
     }
 }

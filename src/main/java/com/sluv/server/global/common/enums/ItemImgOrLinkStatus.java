@@ -1,6 +1,6 @@
 package com.sluv.server.global.common.enums;
 
-public enum ImgStatus {
+public enum ItemImgOrLinkStatus {
     ACTIVE,
     DELETED
 }

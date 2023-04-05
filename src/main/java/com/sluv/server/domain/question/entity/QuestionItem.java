@@ -2,7 +2,6 @@ package com.sluv.server.domain.question.entity;
 
 import com.sluv.server.domain.item.entity.Item;
 import com.sluv.server.global.common.entity.BaseEntity;
-import com.sluv.server.global.common.enums.ImgStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;

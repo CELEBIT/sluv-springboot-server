@@ -1,14 +1,11 @@
 package com.sluv.server.domain.comment.entity;
 
 import com.sluv.server.global.common.entity.BaseEntity;
-import com.sluv.server.global.common.enums.ImgStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.ColumnDefault;
 
 @Getter
 @Entity

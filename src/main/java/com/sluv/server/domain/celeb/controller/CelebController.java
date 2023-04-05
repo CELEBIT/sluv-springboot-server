@@ -56,7 +56,7 @@ public class CelebController {
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "1000", description = "요청성공"),
-            @ApiResponse(responseCode = "5000", description = "서버내부 에ffff러", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "5000", description = "서버내부 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "5001", description = "DB 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @GetMapping("/search/recent")
@@ -67,6 +67,25 @@ public class CelebController {
         return ResponseEntity.ok().body(
                 SuccessDataResponse.<List<CelebSearchResDto>>builder()
                         .result(celebService.getUserRecentSearchCeleb(user))
+                        .build()
+        );
+    }
+
+    @Operation(
+            summary = "인기 셀럽 조회",
+            description = "조회가 많이된 Celeb 상위 10개 조회"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "1000", description = "요청성공"),
+            @ApiResponse(responseCode = "5000", description = "서버내부 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "5001", description = "DB 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @GetMapping("/top")
+    public ResponseEntity<SuccessDataResponse<List<CelebSearchResDto>>> searchTop10Celeb(){
+
+        return ResponseEntity.ok().body(
+                SuccessDataResponse.<List<CelebSearchResDto>>builder()
+                        .result(celebService.getTop10Celeb())
                         .build()
         );
     }

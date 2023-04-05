@@ -1,4 +1,4 @@
-package com.sluv.server.domain.item.repository.impl;
+package com.sluv.server.domain.item.repository.hashtag.impl;
 
 import com.querydsl.core.Tuple;
 import org.springframework.data.domain.Page;

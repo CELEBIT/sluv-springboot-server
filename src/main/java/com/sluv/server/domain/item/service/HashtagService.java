@@ -4,7 +4,7 @@ import com.sluv.server.domain.item.dto.HashtagPostResponseDto;
 import com.sluv.server.domain.item.dto.HashtagRequestDto;
 import com.sluv.server.domain.item.dto.HashtagResponseDto;
 import com.sluv.server.domain.item.entity.hashtag.Hashtag;
-import com.sluv.server.domain.item.repository.HashtagRepository;
+import com.sluv.server.domain.item.repository.hashtag.HashtagRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;

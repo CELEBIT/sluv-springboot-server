@@ -1,7 +1,7 @@
-package com.sluv.server.domain.item.repository;
+package com.sluv.server.domain.item.repository.hashtag;
 
 import com.sluv.server.domain.item.entity.hashtag.Hashtag;
-import com.sluv.server.domain.item.repository.impl.HashtagRepositoryCustom;
+import com.sluv.server.domain.item.repository.hashtag.impl.HashtagRepositoryCustom;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

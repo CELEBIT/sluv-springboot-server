@@ -1,5 +1,6 @@
 package com.sluv.server.domain.celeb.entity;
 
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.sluv.server.global.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -13,6 +14,7 @@ import java.util.List;
 @Entity
 @Getter
 @NoArgsConstructor
+@JsonPropertyOrder({"id", "parent", "name", "created_at", "updated_at"})
 @Table(name = "celeb_category")
 public class CelebCategory extends BaseEntity {
 

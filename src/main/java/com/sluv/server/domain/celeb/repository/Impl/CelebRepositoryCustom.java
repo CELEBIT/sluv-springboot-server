@@ -10,4 +10,5 @@ import java.util.List;
 public interface CelebRepositoryCustom {
     List<Celeb> findInterestedCeleb(User user);
     Page<Celeb> searchCeleb(String celebName, Pageable pageable);
+    List<Celeb> findRecentCeleb(User user);
 }

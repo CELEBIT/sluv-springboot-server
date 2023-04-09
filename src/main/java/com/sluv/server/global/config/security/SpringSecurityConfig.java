@@ -39,7 +39,7 @@ public class SpringSecurityConfig {
             "/app/brand/search", "/app/brand/top",
 
             // Celeb
-            "/app/celeb/search", "/app/celeb/top", "/app/newceleb",
+            "/app/celeb/search", "/app/celeb/top",
 
             // Item
             "/app/item/{itemId}", "/app/item/category", "/app/item/hashtag", "/app/item/place/top",

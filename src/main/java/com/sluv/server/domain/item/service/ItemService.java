@@ -155,10 +155,12 @@ public class ItemService {
                 ).forEach(itemHashtagRepository::save);
 
         // PlaceRank 테이블에 추가
-        placeRankRepository.save(PlaceRank.builder()
-                .place(reqDto.getWhereDiscovery())
-                .build()
-        );
+        if(reqDto.getWhereDiscovery() != null) {
+            placeRankRepository.save(PlaceRank.builder()
+                    .place(reqDto.getWhereDiscovery())
+                    .build()
+            );
+        }
 
     }
 }

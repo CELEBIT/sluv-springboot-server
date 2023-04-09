@@ -1,9 +1,13 @@
 package com.sluv.server.domain.item.controller;
 
 import com.sluv.server.domain.item.dto.ItemPostReqDto;
+import com.sluv.server.domain.item.dto.PlaceRankResDto;
 import com.sluv.server.domain.item.service.ItemService;
+import com.sluv.server.domain.item.service.PlaceRankService;
+import com.sluv.server.domain.item.service.TempItemService;
 import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.global.common.response.ErrorResponse;
+import com.sluv.server.global.common.response.SuccessDataResponse;
 import com.sluv.server.global.common.response.SuccessResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -15,12 +19,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/app/item")
 public class ItemController {
 
     private final ItemService itemService;
+    private final PlaceRankService placeRankService;
 
     @Operation(
             summary = "아이템 등록",
@@ -38,6 +45,15 @@ public class ItemController {
 
         return ResponseEntity.ok().body(
                 new SuccessResponse()
+        );
+    }
+
+    @GetMapping("/place/top")
+    public ResponseEntity<SuccessDataResponse<List<PlaceRankResDto>>> getTopPlace(){
+        return ResponseEntity.ok().body(
+                SuccessDataResponse.<List<PlaceRankResDto>>builder()
+                        .result(placeRankService.getTopPlace())
+                        .build()
         );
     }
 }

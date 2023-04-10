@@ -19,7 +19,7 @@ public class ItemPostReqDto {
      */
 
     @Schema(description = "item 이미지 리스트 \"{대표여부 0 or 1}\":\"이미지링크\"")
-    private List<Map<Long, String>> imgList;
+    private Map<Long, String> imgList;
     @Schema(description = "celebId")
     private Long celebId;
     @Schema(description = "발견 시간 ex)2021-11-20T09:10:20")
@@ -52,7 +52,7 @@ public class ItemPostReqDto {
     @Schema(description = "해쉬태그 Id 리스트")
     private List<Long> hashTagIdList;
     @Schema(description = "item 링크 리스트 \"제목\":\"링크\"")
-    private List<Map<String, String>> linkList;
+    private Map<String, String> linkList;
     @Schema(description = "추가정보를 발견한 출처")
     private String infoSource;
 

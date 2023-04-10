@@ -7,7 +7,9 @@ import com.sluv.server.domain.celeb.entity.Celeb;
 import com.sluv.server.domain.celeb.exception.CelebNotFoundException;
 import com.sluv.server.domain.celeb.repository.CelebRepository;
 import com.sluv.server.domain.item.dto.TempItemPostReqDto;
+import com.sluv.server.domain.item.dto.TempItemResDto;
 import com.sluv.server.domain.item.entity.*;
+import com.sluv.server.domain.item.entity.hashtag.Hashtag;
 import com.sluv.server.domain.item.entity.hashtag.TempItemHashtag;
 import com.sluv.server.domain.item.enums.ItemStatus;
 import com.sluv.server.domain.item.exception.ItemCategoryNotFoundException;
@@ -18,7 +20,11 @@ import com.sluv.server.domain.item.repository.hashtag.TempItemHashtagRepository;
 import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.global.common.enums.ItemImgOrLinkStatus;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -76,8 +82,8 @@ public class TempItemService {
 
         // ItemImg 테이블에 추가
         if(reqDto.getImgList() != null) {
-            reqDto.getImgList().stream()
-                    .map(img -> img.entrySet().stream()
+
+            reqDto.getImgList().entrySet().stream()
                             .map(entry -> {
                                 boolean flag = entry.getKey() == 1;
                                 return TempItemImg.builder()
@@ -86,16 +92,13 @@ public class TempItemService {
                                         .representFlag(flag)
                                         .itemImgOrLinkStatus(ItemImgOrLinkStatus.ACTIVE)
                                         .build();
-                            })
-                            .toList()
-                    )
-                    .forEach(tempItemImgRepository::saveAll);
+                            }).forEach(tempItemImgRepository::save);
+
         }
 
         // ItemLink 테이블에 추가
         if(reqDto.getLinkList() != null) {
-            reqDto.getLinkList().stream()
-                    .map(link -> link.entrySet().stream()
+            reqDto.getLinkList().entrySet().stream()
                             .map(entry ->
                                     TempItemLink.builder()
                                             .tempItem(tempitem)
@@ -104,8 +107,7 @@ public class TempItemService {
                                             .itemImgOrLinkStatus(ItemImgOrLinkStatus.ACTIVE)
                                             .build()
 
-                            ).toList()
-                    ).forEach(tempItemLinkRepository::saveAll);
+                            ).forEach(tempItemLinkRepository::save);
         }
 
         // ItemHashtag 테이블에 추가
@@ -124,4 +126,30 @@ public class TempItemService {
         }
 
     }
+
+//    public List<TempItemResDto> getTempItemList(User user, Pageable pageable){
+//
+//
+//        return tempItemRepository.getTempItemList(user, pageable).stream().map(tempItem -> {
+//
+//            Map<Long, String> tempImgList = tempItemImgRepository.findAllByTempItem(tempItem)
+//                    .stream().map(itemImg -> new Map);
+//            List<Hashtag> tempHashtagList = tempItemHashtagRepository.findAllByTempItem(tempItem);
+//            Map<String, String>> tempLinkList = tempItemLinkRepository.findAllByTempItem(tempItem);
+//
+//            return TempItemResDto.builder()
+//                            .imgList(tempImgList)
+//                            .celeb(tempItem.getCeleb())
+//                            .whenDiscovery(tempItem.getWhenDiscovery())
+//                            .whereDiscovery(tempItem.getWhereDiscovery())
+//                            .category(tempItem.getCategory())
+//                            .itemName(tempItem.getName())
+//                            .price(tempItem.getPrice())
+//                            .additionalInfo(tempItem.getAdditionalInfo())
+//                            .hashTagList(tempHashtagList)
+//                            .linkList(tempLinkList);
+//                }
+//            }
+//        )
+//    }
 }

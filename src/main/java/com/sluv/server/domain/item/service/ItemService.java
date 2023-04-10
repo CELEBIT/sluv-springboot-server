@@ -111,8 +111,7 @@ public class ItemService {
         );
 
         // ItemImg 테이블에 추가
-        reqDto.getImgList().stream()
-                .map(img -> img.entrySet().stream()
+        reqDto.getImgList().entrySet().stream()
                         .map(entry -> {
                             boolean flag = entry.getKey() == 1;
                             return ItemImg.builder()
@@ -121,14 +120,12 @@ public class ItemService {
                                     .representFlag(flag)
                                     .itemImgOrLinkStatus(ItemImgOrLinkStatus.ACTIVE)
                                     .build();
-                        })
-                        .toList()
-                )
-                .forEach(itemImgRepository::saveAll);
+                        }).forEach(itemImgRepository::save);
+
+
 
         // ItemLink 테이블에 추가
-        reqDto.getLinkList().stream()
-                .map(link -> link.entrySet().stream()
+        reqDto.getLinkList().entrySet().stream()
                                                 .map(entry ->
                                                         ItemLink.builder()
                                                                 .item(newItem)
@@ -137,8 +134,7 @@ public class ItemService {
                                                                 .itemImgOrLinkStatus(ItemImgOrLinkStatus.ACTIVE)
                                                                 .build()
 
-                                                ).toList()
-                ).forEach(itemLinkRepository::saveAll);
+                                                ).forEach(itemLinkRepository::save);
 
 
         // ItemHashtag 테이블에 추가

@@ -2,6 +2,7 @@ package com.sluv.server.domain.item.controller;
 
 import com.sluv.server.domain.item.dto.ItemPostReqDto;
 import com.sluv.server.domain.item.dto.PlaceRankResDto;
+import com.sluv.server.domain.item.dto.TempItemPostReqDto;
 import com.sluv.server.domain.item.service.ItemService;
 import com.sluv.server.domain.item.service.PlaceRankService;
 import com.sluv.server.domain.item.service.TempItemService;
@@ -28,6 +29,7 @@ public class ItemController {
 
     private final ItemService itemService;
     private final PlaceRankService placeRankService;
+    private final TempItemService tempItemService;
 
     @Operation(
             summary = "아이템 등록",
@@ -63,6 +65,16 @@ public class ItemController {
                 SuccessDataResponse.<List<PlaceRankResDto>>builder()
                         .result(placeRankService.getTopPlace())
                         .build()
+        );
+    }
+
+    @PostMapping("/temp")
+    public ResponseEntity<SuccessResponse> postTempItem(@AuthenticationPrincipal User user, @RequestBody TempItemPostReqDto reqDto){
+
+        tempItemService.postTempItem(user, reqDto);
+
+        return ResponseEntity.ok().body(
+                new SuccessResponse()
         );
     }
 }

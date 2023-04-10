@@ -25,7 +25,6 @@ public class TempItemHashtag extends BaseEntity {
 
     @ManyToOne
     @JoinColumn(name = "hashtag_id")
-    @NotNull
     private Hashtag hashtag;
 
     @Builder

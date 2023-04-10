@@ -23,11 +23,9 @@ public class TempItemLink extends BaseEntity {
     @JoinColumn(name = "temp_item_id")
     @NotNull
     private TempItem tempItem;
-    @NotNull
     @Size(max = 100)
     private String linkName;
 
-    @NotNull
     @Column(columnDefinition = "TEXT")
     private String tempItemLinkUrl;
 

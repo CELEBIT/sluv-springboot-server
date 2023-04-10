@@ -24,7 +24,6 @@ public class TempItemImg extends BaseEntity {
     @NotNull
     private TempItem tempItem;
 
-    @NotNull
     @Column(columnDefinition = "TEXT")
     private String tempItemImgUrl;
 

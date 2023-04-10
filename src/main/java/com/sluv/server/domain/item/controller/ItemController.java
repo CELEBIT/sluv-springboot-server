@@ -68,6 +68,15 @@ public class ItemController {
         );
     }
 
+    @Operation(
+            summary = "Item 임시저장",
+            description = "작성중이 Item을 임시저장"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "1000", description = "요청성공"),
+            @ApiResponse(responseCode = "5000", description = "서버내부 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "5001", description = "DB 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
     @PostMapping("/temp")
     public ResponseEntity<SuccessResponse> postTempItem(@AuthenticationPrincipal User user, @RequestBody TempItemPostReqDto reqDto){
 

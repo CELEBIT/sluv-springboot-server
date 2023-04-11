@@ -111,30 +111,29 @@ public class ItemService {
         );
 
         // ItemImg 테이블에 추가
-        reqDto.getImgList().entrySet().stream()
-                        .map(entry -> {
-                            boolean flag = entry.getKey() == 1;
-                            return ItemImg.builder()
+        reqDto.getImgList().stream()
+                        .map(itemImg->
+                            ItemImg.builder()
                                     .item(newItem)
-                                    .itemImgUrl(entry.getValue())
-                                    .representFlag(flag)
+                                    .itemImgUrl(itemImg.getImgUrl())
+                                    .representFlag(itemImg.getRepresentFlag())
                                     .itemImgOrLinkStatus(ItemImgOrLinkStatus.ACTIVE)
-                                    .build();
-                        }).forEach(itemImgRepository::save);
+                                    .build()
+                        ).forEach(itemImgRepository::save);
 
 
 
         // ItemLink 테이블에 추가
-        reqDto.getLinkList().entrySet().stream()
-                                                .map(entry ->
-                                                        ItemLink.builder()
-                                                                .item(newItem)
-                                                                .linkName(entry.getKey())
-                                                                .itemLinkUrl(entry.getValue())
-                                                                .itemImgOrLinkStatus(ItemImgOrLinkStatus.ACTIVE)
-                                                                .build()
+        reqDto.getLinkList().stream()
+                                    .map(itemLink ->
+                                            ItemLink.builder()
+                                                    .item(newItem)
+                                                    .linkName(itemLink.getLinkName())
+                                                    .itemLinkUrl(itemLink.getItemLinkUrl())
+                                                    .itemImgOrLinkStatus(ItemImgOrLinkStatus.ACTIVE)
+                                                    .build()
 
-                                                ).forEach(itemLinkRepository::save);
+                                    ).forEach(itemLinkRepository::save);
 
 
         // ItemHashtag 테이블에 추가

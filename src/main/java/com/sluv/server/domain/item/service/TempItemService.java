@@ -3,11 +3,11 @@ package com.sluv.server.domain.item.service;
 import com.sluv.server.domain.brand.entity.Brand;
 import com.sluv.server.domain.brand.exception.BrandNotFoundException;
 import com.sluv.server.domain.brand.repository.BrandRepository;
+import com.sluv.server.domain.celeb.dto.CelebDto;
 import com.sluv.server.domain.celeb.entity.Celeb;
 import com.sluv.server.domain.celeb.exception.CelebNotFoundException;
 import com.sluv.server.domain.celeb.repository.CelebRepository;
-import com.sluv.server.domain.item.dto.TempItemPostReqDto;
-import com.sluv.server.domain.item.dto.TempItemResDto;
+import com.sluv.server.domain.item.dto.*;
 import com.sluv.server.domain.item.entity.*;
 import com.sluv.server.domain.item.entity.hashtag.Hashtag;
 import com.sluv.server.domain.item.entity.hashtag.TempItemHashtag;
@@ -23,8 +23,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -78,32 +80,30 @@ public class TempItemService {
                 .itemStatus(ItemStatus.ACTIVE)
                 .build()
             );
-        System.out.println("악");
 
         // ItemImg 테이블에 추가
         if(reqDto.getImgList() != null) {
 
-            reqDto.getImgList().entrySet().stream()
-                            .map(entry -> {
-                                boolean flag = entry.getKey() == 1;
-                                return TempItemImg.builder()
+            reqDto.getImgList().stream()
+                            .map(tempItemImg ->
+                                TempItemImg.builder()
                                         .tempItem(tempitem)
-                                        .tempItemImgUrl(entry.getValue())
-                                        .representFlag(flag)
+                                        .tempItemImgUrl(tempItemImg.getImgUrl())
+                                        .representFlag(tempItemImg.getRepresentFlag())
                                         .itemImgOrLinkStatus(ItemImgOrLinkStatus.ACTIVE)
-                                        .build();
-                            }).forEach(tempItemImgRepository::save);
+                                        .build()
+                            ).forEach(tempItemImgRepository::save);
 
         }
 
         // ItemLink 테이블에 추가
         if(reqDto.getLinkList() != null) {
-            reqDto.getLinkList().entrySet().stream()
-                            .map(entry ->
+            reqDto.getLinkList().stream()
+                            .map(tempItemLink ->
                                     TempItemLink.builder()
                                             .tempItem(tempitem)
-                                            .linkName(entry.getKey())
-                                            .tempItemLinkUrl(entry.getValue())
+                                            .linkName(tempItemLink.getLinkName())
+                                            .tempItemLinkUrl(tempItemLink.getItemLinkUrl())
                                             .itemImgOrLinkStatus(ItemImgOrLinkStatus.ACTIVE)
                                             .build()
 
@@ -127,29 +127,68 @@ public class TempItemService {
 
     }
 
-//    public List<TempItemResDto> getTempItemList(User user, Pageable pageable){
-//
-//
-//        return tempItemRepository.getTempItemList(user, pageable).stream().map(tempItem -> {
-//
-//            Map<Long, String> tempImgList = tempItemImgRepository.findAllByTempItem(tempItem)
-//                    .stream().map(itemImg -> new Map);
-//            List<Hashtag> tempHashtagList = tempItemHashtagRepository.findAllByTempItem(tempItem);
-//            Map<String, String>> tempLinkList = tempItemLinkRepository.findAllByTempItem(tempItem);
-//
-//            return TempItemResDto.builder()
-//                            .imgList(tempImgList)
-//                            .celeb(tempItem.getCeleb())
-//                            .whenDiscovery(tempItem.getWhenDiscovery())
-//                            .whereDiscovery(tempItem.getWhereDiscovery())
-//                            .category(tempItem.getCategory())
-//                            .itemName(tempItem.getName())
-//                            .price(tempItem.getPrice())
-//                            .additionalInfo(tempItem.getAdditionalInfo())
-//                            .hashTagList(tempHashtagList)
-//                            .linkList(tempLinkList);
-//                }
-//            }
-//        )
-//    }
+    public List<TempItemResDto> getTempItemList(User user, Pageable pageable){
+
+
+        return tempItemRepository.getTempItemList(user, pageable).stream().map(tempItem -> {
+
+            List<ItemImgResDto> tempImgList = tempItemImgRepository.findAllByTempItem(tempItem)
+                    .stream().map(tempItemImg -> ItemImgResDto.builder()
+                            .imgUrl(tempItemImg.getTempItemImgUrl())
+                            .representFlag(tempItemImg.getRepresentFlag())
+                            .build()
+                    ).collect(Collectors.toList());
+
+            List<Hashtag> tempHashtagList = tempItemHashtagRepository.findAllByTempItem(tempItem)
+                    .stream().map(TempItemHashtag::getHashtag).toList();
+
+            List<ItemLinkResDto> tempLinkList = tempItemLinkRepository.findAllByTempItem(tempItem)
+                    .stream().map(tempItemLink -> ItemLinkResDto.builder()
+                            .linkName(tempItemLink.getLinkName())
+                            .itemLinkUrl(tempItemLink.getTempItemLinkUrl())
+                            .build()
+                    ).collect(Collectors.toList());
+
+                CelebDto celebDto = tempItem.getCeleb() != null ?
+                        CelebDto.builder()
+                        .id(tempItem.getCeleb().getId())
+                        .celebNameKr(tempItem.getCeleb().getCelebNameKr())
+                        .celebNameEn(tempItem.getCeleb().getCelebNameEn())
+                        .categoryChild(tempItem.getCeleb().getCelebCategory().getName())
+                        .categoryParent(tempItem.getCeleb().getCelebCategory().getParent().getName())
+                        .parentCelebNameKr(tempItem.getCeleb().getParent() != null ? tempItem.getCeleb().getParent().getCelebNameKr() : null)
+                        .parentCelebNameEn(tempItem.getCeleb().getParent() != null ? tempItem.getCeleb().getParent().getCelebNameEn() : null)
+                        .build()
+                        : null;
+
+                ItemCategoryDto itemCategory = tempItem.getCategory() != null ?
+                        ItemCategoryDto.builder()
+                                .id(tempItem.getCategory().getId())
+                                .name(tempItem.getCategory().getName())
+                                .parentName(tempItem.getCategory().getParent().getName())
+                                .build()
+                        : null;
+
+
+            return TempItemResDto.builder()
+                            .id(tempItem.getId())
+                            .imgList(tempImgList)
+                            .celeb(celebDto)
+                            .whenDiscovery(tempItem.getWhenDiscovery())
+                            .whereDiscovery(tempItem.getWhereDiscovery())
+                            .category(itemCategory)
+                            .itemName(tempItem.getName())
+                            .price(tempItem.getPrice())
+                            .additionalInfo(tempItem.getAdditionalInfo())
+                            .hashTagList(tempHashtagList)
+                            .linkList(tempLinkList)
+                    .infoSource(tempItem.getInfoSource())
+                    .newCelebName(tempItem.getNewCelebName())
+                    .newBrandName(tempItem.getNewBrandName())
+                    .updatedAt(tempItem.getUpdatedAt())
+                    .build();
+
+            }
+        ).collect(Collectors.toList());
+    }
 }

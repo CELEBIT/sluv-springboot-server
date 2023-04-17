@@ -1,6 +1,8 @@
 package com.sluv.server.domain.item.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -22,22 +24,42 @@ public class ItemPostReqDto {
     private Long celebId;
     @Schema(description = "발견 시간 ex)2021-11-20T09:10:20")
     private LocalDateTime whenDiscovery;
+
+    @Size(max = 100)
     @Schema(description = "발견 장소")
     private String whereDiscovery;
+
+    @NotNull
     @Schema(description = "아이템 카테고리 Id")
     private Long categoryId;
+
     @Schema(description = "브랜드 Id")
     private Long brandId;
+
+    @NotNull
+    @Size(max = 100)
     @Schema(description = "아이템명")
     private String itemName;
     @Schema(description = "가격")
     private Integer price;
 
+    @Size(max = 45)
+    @Schema(description = "색")
+    private String color;
+
     @Schema(description = "추가정보")
     private String additionalInfo;
     @Schema(description = "해쉬태그 Id 리스트")
     private List<Long> hashTagIdList;
-    @Schema(description = "item 이미지 리스트 \"제목\":\"링크\"")
-    private List<Map<String, String>> infoSourceList;
+    @Schema(description = "item 링크 리스트 \"제목\":\"링크\"")
+    private List<Map<String, String>> linkList;
+    @Schema(description = "추가정보를 발견한 출처")
+    private String infoSource;
+
+    @Schema(description = "새로운 Celeb 이름")
+    private String newCelebName;
+    @Schema(description = "새로운 Brand 이름")
+    private String newBrandName;
+
 
 }

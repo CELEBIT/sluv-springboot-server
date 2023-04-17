@@ -3,6 +3,7 @@ package com.sluv.server.domain.item.controller;
 import com.sluv.server.domain.item.dto.ItemPostReqDto;
 import com.sluv.server.domain.item.dto.PlaceRankResDto;
 import com.sluv.server.domain.item.dto.TempItemPostReqDto;
+import com.sluv.server.domain.item.dto.TempItemResDto;
 import com.sluv.server.domain.item.service.ItemService;
 import com.sluv.server.domain.item.service.PlaceRankService;
 import com.sluv.server.domain.item.service.TempItemService;
@@ -16,6 +17,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -84,6 +86,16 @@ public class ItemController {
 
         return ResponseEntity.ok().body(
                 new SuccessResponse()
+        );
+    }
+
+    @GetMapping("/temp")
+    public ResponseEntity<SuccessDataResponse<List<TempItemResDto>>> getTempItem(@AuthenticationPrincipal User user, Pageable pageable){
+
+        return ResponseEntity.ok().body(
+                SuccessDataResponse.<List<TempItemResDto>>builder()
+                        .result(tempItemService.getTempItemList(user, pageable))
+                        .build()
         );
     }
 }

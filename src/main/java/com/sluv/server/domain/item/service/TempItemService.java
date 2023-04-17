@@ -3,11 +3,13 @@ package com.sluv.server.domain.item.service;
 import com.sluv.server.domain.brand.entity.Brand;
 import com.sluv.server.domain.brand.exception.BrandNotFoundException;
 import com.sluv.server.domain.brand.repository.BrandRepository;
+import com.sluv.server.domain.celeb.dto.CelebDto;
 import com.sluv.server.domain.celeb.entity.Celeb;
 import com.sluv.server.domain.celeb.exception.CelebNotFoundException;
 import com.sluv.server.domain.celeb.repository.CelebRepository;
-import com.sluv.server.domain.item.dto.TempItemPostReqDto;
+import com.sluv.server.domain.item.dto.*;
 import com.sluv.server.domain.item.entity.*;
+import com.sluv.server.domain.item.entity.hashtag.Hashtag;
 import com.sluv.server.domain.item.entity.hashtag.TempItemHashtag;
 import com.sluv.server.domain.item.enums.ItemStatus;
 import com.sluv.server.domain.item.exception.ItemCategoryNotFoundException;
@@ -18,7 +20,13 @@ import com.sluv.server.domain.item.repository.hashtag.TempItemHashtagRepository;
 import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.global.common.enums.ItemImgOrLinkStatus;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -72,40 +80,34 @@ public class TempItemService {
                 .itemStatus(ItemStatus.ACTIVE)
                 .build()
             );
-        System.out.println("악");
 
         // ItemImg 테이블에 추가
         if(reqDto.getImgList() != null) {
+
             reqDto.getImgList().stream()
-                    .map(img -> img.entrySet().stream()
-                            .map(entry -> {
-                                boolean flag = entry.getKey() == 1;
-                                return TempItemImg.builder()
+                            .map(tempItemImg ->
+                                TempItemImg.builder()
                                         .tempItem(tempitem)
-                                        .tempItemImgUrl(entry.getValue())
-                                        .representFlag(flag)
+                                        .tempItemImgUrl(tempItemImg.getImgUrl())
+                                        .representFlag(tempItemImg.getRepresentFlag())
                                         .itemImgOrLinkStatus(ItemImgOrLinkStatus.ACTIVE)
-                                        .build();
-                            })
-                            .toList()
-                    )
-                    .forEach(tempItemImgRepository::saveAll);
+                                        .build()
+                            ).forEach(tempItemImgRepository::save);
+
         }
 
         // ItemLink 테이블에 추가
         if(reqDto.getLinkList() != null) {
             reqDto.getLinkList().stream()
-                    .map(link -> link.entrySet().stream()
-                            .map(entry ->
+                            .map(tempItemLink ->
                                     TempItemLink.builder()
                                             .tempItem(tempitem)
-                                            .linkName(entry.getKey())
-                                            .tempItemLinkUrl(entry.getValue())
+                                            .linkName(tempItemLink.getLinkName())
+                                            .tempItemLinkUrl(tempItemLink.getItemLinkUrl())
                                             .itemImgOrLinkStatus(ItemImgOrLinkStatus.ACTIVE)
                                             .build()
 
-                            ).toList()
-                    ).forEach(tempItemLinkRepository::saveAll);
+                            ).forEach(tempItemLinkRepository::save);
         }
 
         // ItemHashtag 테이블에 추가
@@ -123,5 +125,70 @@ public class TempItemService {
             ).forEach(tempItemHashtagRepository::save);
         }
 
+    }
+
+    public List<TempItemResDto> getTempItemList(User user, Pageable pageable){
+
+
+        return tempItemRepository.getTempItemList(user, pageable).stream().map(tempItem -> {
+
+            List<ItemImgResDto> tempImgList = tempItemImgRepository.findAllByTempItem(tempItem)
+                    .stream().map(tempItemImg -> ItemImgResDto.builder()
+                            .imgUrl(tempItemImg.getTempItemImgUrl())
+                            .representFlag(tempItemImg.getRepresentFlag())
+                            .build()
+                    ).collect(Collectors.toList());
+
+            List<Hashtag> tempHashtagList = tempItemHashtagRepository.findAllByTempItem(tempItem)
+                    .stream().map(TempItemHashtag::getHashtag).toList();
+
+            List<ItemLinkResDto> tempLinkList = tempItemLinkRepository.findAllByTempItem(tempItem)
+                    .stream().map(tempItemLink -> ItemLinkResDto.builder()
+                            .linkName(tempItemLink.getLinkName())
+                            .itemLinkUrl(tempItemLink.getTempItemLinkUrl())
+                            .build()
+                    ).collect(Collectors.toList());
+
+                CelebDto celebDto = tempItem.getCeleb() != null ?
+                        CelebDto.builder()
+                        .id(tempItem.getCeleb().getId())
+                        .celebNameKr(tempItem.getCeleb().getCelebNameKr())
+                        .celebNameEn(tempItem.getCeleb().getCelebNameEn())
+                        .categoryChild(tempItem.getCeleb().getCelebCategory().getName())
+                        .categoryParent(tempItem.getCeleb().getCelebCategory().getParent().getName())
+                        .parentCelebNameKr(tempItem.getCeleb().getParent() != null ? tempItem.getCeleb().getParent().getCelebNameKr() : null)
+                        .parentCelebNameEn(tempItem.getCeleb().getParent() != null ? tempItem.getCeleb().getParent().getCelebNameEn() : null)
+                        .build()
+                        : null;
+
+                ItemCategoryDto itemCategory = tempItem.getCategory() != null ?
+                        ItemCategoryDto.builder()
+                                .id(tempItem.getCategory().getId())
+                                .name(tempItem.getCategory().getName())
+                                .parentName(tempItem.getCategory().getParent().getName())
+                                .build()
+                        : null;
+
+
+            return TempItemResDto.builder()
+                            .id(tempItem.getId())
+                            .imgList(tempImgList)
+                            .celeb(celebDto)
+                            .whenDiscovery(tempItem.getWhenDiscovery())
+                            .whereDiscovery(tempItem.getWhereDiscovery())
+                            .category(itemCategory)
+                            .itemName(tempItem.getName())
+                            .price(tempItem.getPrice())
+                            .additionalInfo(tempItem.getAdditionalInfo())
+                            .hashTagList(tempHashtagList)
+                            .linkList(tempLinkList)
+                    .infoSource(tempItem.getInfoSource())
+                    .newCelebName(tempItem.getNewCelebName())
+                    .newBrandName(tempItem.getNewBrandName())
+                    .updatedAt(tempItem.getUpdatedAt())
+                    .build();
+
+            }
+        ).collect(Collectors.toList());
     }
 }

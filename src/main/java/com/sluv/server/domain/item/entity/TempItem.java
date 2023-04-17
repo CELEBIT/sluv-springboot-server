@@ -52,7 +52,7 @@ public class TempItem extends BaseEntity {
     @Size(max = 100)
     private String whereDiscovery;
 
-    private int price;
+    private Integer price;
 
     @Column(columnDefinition = "TEXT")
     private String additionalInfo;
@@ -65,7 +65,7 @@ public class TempItem extends BaseEntity {
     private ItemStatus itemStatus;
 
     @Builder
-    public TempItem(Long id, User user, Celeb celeb, String newCelebName, ItemCategory category, Brand brand, String newBrandName, String name, LocalDateTime whenDiscovery, String whereDiscovery, int price, String additionalInfo, String infoSource, ItemStatus itemStatus) {
+    public TempItem(Long id, User user, Celeb celeb, String newCelebName, ItemCategory category, Brand brand, String newBrandName, String name, LocalDateTime whenDiscovery, String whereDiscovery, Integer price, String additionalInfo, String infoSource, ItemStatus itemStatus) {
         this.id = id;
         this.user = user;
         this.celeb = celeb;

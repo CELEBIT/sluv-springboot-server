@@ -63,6 +63,11 @@ public class TempItemService {
                     .orElseThrow(ItemCategoryNotFoundException::new);
         }
 
+        Integer price = null;
+        if(reqDto.getPrice() != null){
+            price = reqDto.getPrice();
+        }
+
         TempItem tempitem = tempItemRepository.save(TempItem
                 .builder()
                 .user(user)
@@ -74,7 +79,7 @@ public class TempItemService {
                 .name(reqDto.getItemName())
                 .whenDiscovery(reqDto.getWhenDiscovery())
                 .whereDiscovery(reqDto.getWhereDiscovery())
-                .price(reqDto.getPrice())
+                .price(price)
                 .additionalInfo(reqDto.getAdditionalInfo())
                 .infoSource(reqDto.getInfoSource())
                 .itemStatus(ItemStatus.ACTIVE)

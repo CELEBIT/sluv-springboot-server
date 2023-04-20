@@ -280,7 +280,6 @@ public class TempItemService {
 
     @Transactional
     public void deleteTempItem(Long tempItemId){
-
         // 관련된 삭제
         // 1. tempItemImg 삭제
         tempItemImgRepository.deleteAllByTempItemId(tempItemId);
@@ -291,7 +290,25 @@ public class TempItemService {
 
         // tempItem 삭제
         tempItemRepository.deleteById(tempItemId);
+    }
 
+    @Transactional
+    public void deleteAllTempItem(User user){
+        // 1. 해당 유저의 모든 TempItem 조회
+        List<TempItem> tempItemList = tempItemRepository.findAllByUserId(user.getId());
+
+        // 2. 모든 TempItem에 대한 관련된 삭제
+        tempItemList.forEach(tempItem -> {
+            // 2-1. tempItemImg 삭제
+            tempItemImgRepository.deleteAllByTempItemId(tempItem.getId());
+            // 2-2. tempItemLink 삭제
+            tempItemLinkRepository.deleteAllByTempItemId(tempItem.getId());
+            // 2-3. tempItemHashtag 삭제
+            tempItemHashtagRepository.deleteAllByTempItemId(tempItem.getId());
+        });
+
+        // 3. 모든 TempItem 삭제
+        tempItemRepository.deleteAllByUserId(user.getId());
     }
 
 }

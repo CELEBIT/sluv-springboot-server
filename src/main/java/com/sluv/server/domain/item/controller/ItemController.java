@@ -135,4 +135,10 @@ public class ItemController {
         tempItemService.deleteTempItem(tempItemId);
         return ResponseEntity.ok().body(new SuccessResponse());
     }
+
+    @DeleteMapping("/temp")
+    public ResponseEntity<SuccessResponse> deleteAllTempItem(@AuthenticationPrincipal User user){
+        tempItemService.deleteAllTempItem(user);
+        return ResponseEntity.ok().body(new SuccessResponse());
+    }
 }

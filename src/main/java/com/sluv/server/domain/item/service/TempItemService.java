@@ -13,7 +13,8 @@ import com.sluv.server.domain.item.entity.hashtag.Hashtag;
 import com.sluv.server.domain.item.entity.hashtag.TempItemHashtag;
 import com.sluv.server.domain.item.enums.ItemStatus;
 import com.sluv.server.domain.item.exception.ItemCategoryNotFoundException;
-import com.sluv.server.domain.item.exception.hashtag.NotFoundHashtagException;
+import com.sluv.server.domain.item.exception.TempItemNotFoundException;
+import com.sluv.server.domain.item.exception.hashtag.HashtagNotFoundException;
 import com.sluv.server.domain.item.repository.*;
 import com.sluv.server.domain.item.repository.hashtag.HashtagRepository;
 import com.sluv.server.domain.item.repository.hashtag.TempItemHashtagRepository;
@@ -22,10 +23,9 @@ import com.sluv.server.global.common.enums.ItemImgOrLinkStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -123,7 +123,7 @@ public class TempItemService {
                             .tempItem(tempitem)
                             .hashtag(
                                     hashtagRepository.findById(hashTag)
-                                            .orElseThrow(NotFoundHashtagException::new)
+                                            .orElseThrow(HashtagNotFoundException::new)
                             )
                             .build()
 
@@ -195,5 +195,86 @@ public class TempItemService {
 
             }
         ).collect(Collectors.toList());
+    }
+
+    @Transactional
+    public void putTempItem(User user, Long tempItemId, TempItemPostReqDto dto){
+
+        TempItem tempItem = tempItemRepository.findById(tempItemId).orElseThrow(TempItemNotFoundException::new);
+        Celeb celeb = dto.getCelebId() != null ? celebRepository.findById(dto.getCelebId()).orElseThrow(CelebNotFoundException::new) : null;
+        ItemCategory itemCategory = dto.getCategoryId() != null ? itemCategoryRepository.findById(dto.getCategoryId()).orElseThrow(ItemCategoryNotFoundException::new) : null;
+        Brand brand = dto.getBrandId() != null ?brandRepository.findById(dto.getBrandId()).orElseThrow(BrandNotFoundException::new) : null;
+
+        // temp Item 변경.
+        tempItem.setCeleb(celeb);
+        tempItem.setCeleb(celeb);
+        tempItem.setNewCelebName(dto.getNewCelebName());
+        tempItem.setCategory(itemCategory);
+        tempItem.setBrand(brand);
+        tempItem.setNewBrandName(dto.getNewBrandName());
+        tempItem.setName(dto.getItemName());
+        tempItem.setWhenDiscovery(dto.getWhenDiscovery());
+        tempItem.setWhereDiscovery(dto.getWhereDiscovery());
+        tempItem.setPrice(dto.getPrice());
+        tempItem.setAdditionalInfo(dto.getAdditionalInfo());
+        tempItem.setInfoSource(dto.getInfoSource());
+        tempItem.setUser(user);
+
+        /**
+         * 위 작업을 병렬로 실행 -> 캐시호출 기준 0.1초 차이남.
+         * 하지만 가독성을 위해 일단, 위 코드로 실행.
+         */
+//        Runnable runnable1 = ()-> tempItem.setCeleb(celeb);
+//        Runnable runnable2 = () -> tempItem.setCeleb(celeb);
+//        Runnable runnable3 = () -> tempItem.setNewCelebName(dto.getNewCelebName());
+//        Runnable runnable4 = () -> tempItem.setCategory(itemCategory);
+//        Runnable runnable5 = () -> tempItem.setBrand(brand);
+//        Runnable runnable6 = () -> tempItem.setNewBrandName(dto.getNewBrandName());
+//        Runnable runnable7 = () -> tempItem.setName(dto.getItemName());
+//        Runnable runnable8 = () -> tempItem.setWhenDiscovery(dto.getWhenDiscovery());
+//        Runnable runnable9 = () -> tempItem.setWhereDiscovery(dto.getWhereDiscovery());
+//        Runnable runnable10 = () -> tempItem.setPrice(dto.getPrice());
+//        Runnable runnable11 = () -> tempItem.setAdditionalInfo(dto.getAdditionalInfo());
+//        Runnable runnable12 = () -> tempItem.setInfoSource(dto.getInfoSource());
+//        Runnable runnable13 = () -> tempItem.setUser(user);
+//        synchronized(tempItem) {
+//            Stream.of(
+//                    runnable1, runnable2, runnable3, runnable4, runnable5,runnable6,runnable7,runnable8,runnable9,runnable10,runnable11,runnable12, runnable13
+//            ).parallel().forEach(Runnable::run);
+//        }
+
+        // tempItemImg 모두 삭제 후 변경
+        tempItemImgRepository.deleteAllByTempItemId(tempItem.getId());
+        if(dto.getImgList() != null) {
+            dto.getImgList().stream().map(img -> TempItemImg.builder()
+                    .tempItem(tempItem)
+                    .tempItemImgUrl(img.getImgUrl())
+                    .representFlag(img.getRepresentFlag())
+                    .itemImgOrLinkStatus(ItemImgOrLinkStatus.ACTIVE)
+                    .build()).forEach(tempItemImgRepository::save);
+        }
+
+        // tempItemLink 모두 삭제 후 변경
+        tempItemLinkRepository.deleteAllByTempItemId(tempItem.getId());
+        if(dto.getLinkList() != null) {
+            dto.getLinkList().stream().map(link -> TempItemLink.builder()
+                    .tempItem(tempItem)
+                    .tempItemLinkUrl(link.getItemLinkUrl())
+                    .linkName(link.getLinkName())
+                    .itemImgOrLinkStatus(ItemImgOrLinkStatus.ACTIVE)
+                    .build()).forEach(tempItemLinkRepository::save);
+        }
+
+        // tempItemHashtag 모두 삭제 후 변경
+        tempItemHashtagRepository.deleteAllByTempItemId(tempItem.getId());
+        if(dto.getHashTagIdList() != null) {
+            dto.getHashTagIdList().stream().map(hashtag -> TempItemHashtag.builder()
+                    .tempItem(tempItem)
+                    .hashtag(hashtagRepository.findById(hashtag).orElseThrow(HashtagNotFoundException::new))
+                    .build()).forEach(tempItemHashtagRepository::save);
+        }
+
+        tempItemRepository.save(tempItem);
+
     }
 }

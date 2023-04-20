@@ -98,4 +98,10 @@ public class ItemController {
                         .build()
         );
     }
+
+    @PutMapping("/temp/{tempItemId}")
+    public ResponseEntity<SuccessResponse> putTempItem(@AuthenticationPrincipal User user, @PathVariable Long tempItemId, @RequestBody TempItemPostReqDto dto){
+        tempItemService.putTempItem(user, tempItemId, dto);
+        return ResponseEntity.ok().body(new SuccessResponse());
+    }
 }

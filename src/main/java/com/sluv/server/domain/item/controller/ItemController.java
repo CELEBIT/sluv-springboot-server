@@ -136,6 +136,15 @@ public class ItemController {
         return ResponseEntity.ok().body(new SuccessResponse());
     }
 
+    @Operation(
+            summary = "임시저장 아이템 전체삭제",
+            description = "사용자의 임시저장 아이템 전체삭제."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "1000", description = "요청성공"),
+            @ApiResponse(responseCode = "5000", description = "서버내부 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "5001", description = "DB 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
     @DeleteMapping("/temp")
     public ResponseEntity<SuccessResponse> deleteAllTempItem(@AuthenticationPrincipal User user){
         tempItemService.deleteAllTempItem(user);

@@ -120,4 +120,10 @@ public class ItemController {
         tempItemService.putTempItem(user, tempItemId, dto);
         return ResponseEntity.ok().body(new SuccessResponse());
     }
+
+    @DeleteMapping("/temp/{tempItemId}")
+    public ResponseEntity<SuccessResponse> deleteTempItem(@PathVariable Long tempItemId){
+        tempItemService.deleteTempItem(tempItemId);
+        return ResponseEntity.ok().body(new SuccessResponse());
+    }
 }

@@ -11,21 +11,18 @@ import java.util.List;
 @Data
 @Getter
 @NoArgsConstructor
-public class CelebParentResDto {
+public class InterestedCelebParentResDto {
     @Schema(description = "상위 Celeb id")
     private Long id;
     @Schema(description = "상위 Celeb 한글 이름")
     private String celebNameKr;
-    @Schema(description = "상위 Celeb 영어 이름")
-    private String celebNameEn;
     @Schema(description = "하위 Celeb 리스트")
-    private List<CelebChildResDto> subCelebList;
+    private List<InterestedCelebChildResDto> subCelebList;
 
     @Builder
-    public CelebParentResDto(Long id, String celebNameKr, String celebNameEn, List<CelebChildResDto> subCelebList) {
+    public InterestedCelebParentResDto(Long id, String celebNameKr, List<InterestedCelebChildResDto> subCelebList) {
         this.id = id;
         this.celebNameKr = celebNameKr;
-        this.celebNameEn = celebNameEn;
         this.subCelebList = subCelebList;
     }
 }

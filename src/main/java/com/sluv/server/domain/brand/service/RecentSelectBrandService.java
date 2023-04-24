@@ -45,4 +45,13 @@ public class RecentSelectBrandService {
     public void deleteAllRecentSelectBrand(User user) {
         recentSelectBrandRepository.deleteAllByUserId(user.getId());
     }
+
+    @Transactional
+    public void deleteRecentSelectBrand(User user, Long id, String flag){
+        if(flag.equals("Y")){
+            recentSelectBrandRepository.deleteByUserIdAndBrandId(user.getId(), id);
+        }else{
+            recentSelectBrandRepository.deleteByUserIdAndNewBrandId(user.getId(), id);
+        }
+    }
 }

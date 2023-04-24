@@ -5,4 +5,5 @@ import com.sluv.server.domain.celeb.repository.Impl.RecentSelectCelebRepositoryC
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface RecentSelectCelebRepository extends JpaRepository<RecentSelectCeleb, Long>, RecentSelectCelebRepositoryCustom {
+    void deleteAllByUserId(Long id);
 }

@@ -67,4 +67,21 @@ public class RecentSelectCelebController {
                 new SuccessResponse()
         );
     }
+    @Operation(
+            summary = "*유저가 최근 선택한 셀럽 모두 삭제",
+            description = "유저가 최근 선택한 셀럽 모두 삭제 API"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "1000", description = "요청성공"),
+            @ApiResponse(responseCode = "5000", description = "서버내부 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "5001", description = "DB 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @DeleteMapping("")
+    public ResponseEntity<SuccessResponse> deleteAllRecentSelectCeleb(@AuthenticationPrincipal User user){
+        recentSelectCelebService.deleteAllRecentSelectCeleb(user);
+
+        return ResponseEntity.ok().body(
+                new SuccessResponse()
+        );
+    }
 }

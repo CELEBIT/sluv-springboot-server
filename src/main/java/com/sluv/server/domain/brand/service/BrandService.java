@@ -1,7 +1,10 @@
 package com.sluv.server.domain.brand.service;
 
 import com.sluv.server.domain.brand.dto.BrandSearchResDto;
+import com.sluv.server.domain.brand.dto.RecentBrandResDto;
+import com.sluv.server.domain.brand.entity.RecentBrand;
 import com.sluv.server.domain.brand.repository.BrandRepository;
+import com.sluv.server.domain.brand.repository.RecentBrandRepository;
 import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +18,9 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class BrandService {
     private final BrandRepository brandRepository;
+    private final RecentBrandRepository recentBrandRepository;
     private final UserRepository userRepository;
+
 
     public List<BrandSearchResDto> findAllBrand(String brandName, Pageable pageable){
 
@@ -40,16 +45,27 @@ public class BrandService {
                                             ).collect(Collectors.toList());
     }
 
-    public List<BrandSearchResDto> findRecentBrand(User user, Pageable pageable) {
+    public List<RecentBrandResDto> findRecentBrand(User user) {
 
-        return brandRepository.findRecentByUserId(user, pageable).stream()
-                                                    .map(data -> BrandSearchResDto.builder()
-                                                                                    .id(data.getId())
-                                                                                    .brandKr(data.getBrandKr())
-                                                                                    .brandEn(data.getBrandEn())
-                                                                                    .brandImgUrl(data.getBrandImgUrl())
-                                                                                    .build()
-                                                    ).collect(Collectors.toList());
+        List<RecentBrand> recentBrandList = recentBrandRepository.getRecentSearchBrandTop20(user);
+
+        return recentBrandList.stream().map(recentBrand -> {
+            Long brandId;
+            String brandName;
+            String flag = recentBrand.getBrand() != null ? "Y" :"N";
+            if(flag.equals("Y")){
+                brandId = recentBrand.getBrand().getId();
+                brandName = recentBrand.getBrand().getBrandKr();
+            }else{
+                brandId = recentBrand.getNewBrand().getId();
+                brandName = recentBrand.getNewBrand().getBrandName();
+            }
+            return RecentBrandResDto.builder()
+                    .id(brandId)
+                    .brandName(brandName)
+                    .flag(flag)
+                    .build();
+        }).toList();
     }
 }
 

@@ -20,8 +20,11 @@ public class RecentSearchCeleb extends BaseEntity {
 
     @ManyToOne
     @JoinColumn(name = "celeb_id")
-    @NotNull
     private Celeb celeb;
+
+    @ManyToOne
+    @JoinColumn(name = "new_celeb_id")
+    private NewCeleb newCeleb;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
@@ -29,9 +32,10 @@ public class RecentSearchCeleb extends BaseEntity {
     private User user;
 
     @Builder
-    public RecentSearchCeleb(Long id, Celeb celeb, User user) {
+    public RecentSearchCeleb(Long id, Celeb celeb, NewCeleb newCeleb, User user) {
         this.id = id;
         this.celeb = celeb;
+        this.newCeleb = newCeleb;
         this.user = user;
     }
 }

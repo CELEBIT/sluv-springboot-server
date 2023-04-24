@@ -13,11 +13,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.CorsConfigurationSource;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-
-import java.util.Arrays;
 
 
 @Configuration
@@ -30,30 +25,23 @@ public class SpringSecurityConfig {
     private final ExceptionHandlerFilter exceptionHandlerFilter = new ExceptionHandlerFilter();
     private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
 
-    private static final String[] PERMIT_URL = {
-            // Elastic Beanstalk
-            "/",
+    private static final String[] AUTH_URL = {
+            // auth
+            "/app/auth/auto-login",
 
-            // Swagger
-            "/v3/api-docs/**", "/swagger-ui/**", "/swagger-resources/**",
+            // brand
+            "/app/brand/recent",
 
-            // Auth
-            "/app/auth/test", "/app/auth/social-login",
+            // celeb
+            "/app/celeb/recent",
 
-            // Brand
-            "/app/brand/search", "/app/brand/top",
+            // item
+            "/app/item",
+            "/app/item/temp",
+            "/app/item/temp/{tempItemId}",
 
-            // Celeb
-            "/app/celeb/search", "/app/celeb/top",
-
-            // Item
-            "/app/item/{itemId}", "/app/item/category", "/app/item/hashtag", "/app/item/place/top",
-
-            // Notice
-            "/app/notice", "/app/notice/{noticeId}",
-
-            // Closet
-            "/app/closet/{closetId}"
+            // user
+            "/app/user/celeb"
 
     };
 
@@ -74,8 +62,10 @@ public class SpringSecurityConfig {
 
                 .authorizeHttpRequests((request) -> request // 허용 범위 설정
 //                        .requestMatchers(HttpMethod.POST, "/auth/**").permitAll() // 허용범위
-                        .requestMatchers(PERMIT_URL).permitAll() // 허용범위
-                        .anyRequest().authenticated()
+//                        .requestMatchers(PERMIT_URL).permitAll() // 허용범위
+//                        .anyRequest().authenticated()
+                        .requestMatchers(AUTH_URL).authenticated() // 허용범위
+                        .anyRequest().permitAll()
                 )
                 .exceptionHandling().authenticationEntryPoint(customAuthenticationEntryPoint)
                 .and()

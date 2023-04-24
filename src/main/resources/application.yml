@@ -4,11 +4,22 @@ spring:
     url: ENC(umIPYOdrigHivpZxQUaBn+1360z+xy13Hb4gHcoDY16JKXGxOF2jx4F+KkoFv9RKiIu7nXxn7tv/PoUCRVEYxqf96mTuqV007F1N8C45mpzyBg+tCBbRyNW66k7k4E0o)
     username: ENC(gh46WFclECYl96UilXt8Lw==)
     password: ENC(2HaAZ8j7cAaYFkIcemnUifSA0UAtPFLt)
+  jpa:
+    properties:
+      hibernate:
+        format_sql: true
 
   security:
     user:
       name: user
       password: 1234
+    oauth2:
+      client:
+        android: 924373234165-adalqufkonkljl23qk6vv4g3bnc9imfr.apps.googleusercontent.com
+        apple: 924373234165-hfd08tk9pt36g4e9r54hqhpe9ircrv4q.apps.googleusercontent.com
+
+
+
 
 jasypt:
   encryptor:
@@ -22,7 +33,7 @@ logging:
 jwt:
   header: Authorization
   secret: and0LXRlc3QtYWxqamFiYWVnaS1qd3QtdGVzdC1hbGpqYWJhZWdpLWp3dC10ZXN0LWFsamphYmFlZ2ktand0LXRlc3QtYWxqamFiYWVnaS1qd3QtdGVzdC1hbGpqYWJhZWdpLWp3dC10ZXN0LWFsamphYmFlZ2ktand0LXRlc3QtYWxqamFiYWVnaS1qd3QtdGVzdC1hbGpqYWJhZWdp
-  expiration-seconds: 864000
+  expiration-seconds: 31536000000
 
 apple:
 #  nonce: 1

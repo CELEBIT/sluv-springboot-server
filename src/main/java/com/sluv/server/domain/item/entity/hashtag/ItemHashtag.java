@@ -1,5 +1,6 @@
 package com.sluv.server.domain.item.entity.hashtag;
 
+import com.sluv.server.domain.item.entity.Item;
 import com.sluv.server.global.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -17,16 +18,20 @@ public class ItemHashtag extends BaseEntity {
     @Column(name = "item_hashtag_id")
     private Long id;
 
+    @ManyToOne
+    @JoinColumn(name = "item_id")
     @NotNull
-    private Long item_id;
+    private Item item;
 
+    @ManyToOne
+    @JoinColumn(name = "hashtag_id")
     @NotNull
-    private Long hashtag_id;
+    private Hashtag hashtag;
 
     @Builder
-    public ItemHashtag(Long id, Long item_id, Long hashtag_id) {
+    public ItemHashtag(Long id, Item item, Hashtag hashtag) {
         this.id = id;
-        this.item_id = item_id;
-        this.hashtag_id = hashtag_id;
+        this.item = item;
+        this.hashtag = hashtag;
     }
 }

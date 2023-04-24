@@ -25,15 +25,32 @@ public class SpringSecurityConfig {
     private final ExceptionHandlerFilter exceptionHandlerFilter = new ExceptionHandlerFilter();
     private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
 
-    private static final String[] PERMIT_URL = {
-            "/auth/**", "/v3/api-docs/**", "/swagger-ui/**", "/swagger-resources/**"
+    private static final String[] AUTH_URL = {
+            // auth
+            "/app/auth/auto-login",
+
+            // brand
+            "/app/brand/recent",
+
+            // celeb
+            "/app/celeb/recent",
+
+            // item
+            "/app/item",
+            "/app/item/temp",
+            "/app/item/temp/{tempItemId}",
+
+            // user
+            "/app/user/celeb"
+
     };
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
         http
                 .csrf().disable()
-                .cors().disable()
+                .cors()
+                .and()
                 // stateless
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
@@ -45,8 +62,10 @@ public class SpringSecurityConfig {
 
                 .authorizeHttpRequests((request) -> request // 허용 범위 설정
 //                        .requestMatchers(HttpMethod.POST, "/auth/**").permitAll() // 허용범위
-                        .requestMatchers(PERMIT_URL).permitAll() // 허용범위
-                        .anyRequest().authenticated()
+//                        .requestMatchers(PERMIT_URL).permitAll() // 허용범위
+//                        .anyRequest().authenticated()
+                        .requestMatchers(AUTH_URL).authenticated() // 허용범위
+                        .anyRequest().permitAll()
                 )
                 .exceptionHandling().authenticationEntryPoint(customAuthenticationEntryPoint)
                 .and()

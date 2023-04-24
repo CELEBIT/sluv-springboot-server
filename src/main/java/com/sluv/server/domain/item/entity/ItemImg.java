@@ -1,7 +1,7 @@
 package com.sluv.server.domain.item.entity;
 
 import com.sluv.server.global.common.entity.BaseEntity;
-import com.sluv.server.global.common.enums.ImgStatus;
+import com.sluv.server.global.common.enums.ItemImgOrLinkStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
@@ -19,8 +19,10 @@ public class ItemImg extends BaseEntity {
     @Column(name = "item_img_id")
     private Long id;
 
+    @ManyToOne
+    @JoinColumn(name = "item_id")
     @NotNull
-    private Long itemId;
+    private Item item;
 
     @NotNull
     @Column(columnDefinition = "TEXT")
@@ -32,15 +34,15 @@ public class ItemImg extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(length = 45, columnDefinition = "varchar(45) default 'ACTIVE'")
-    private ImgStatus imgStatus;
+    private ItemImgOrLinkStatus itemImgOrLinkStatus = ItemImgOrLinkStatus.ACTIVE;
 
 
     @Builder
-    public ItemImg(Long id, Long itemId, String itemImgUrl, Boolean representFlag, ImgStatus imgStatus) {
+    public ItemImg(Long id, Item item, String itemImgUrl, Boolean representFlag, ItemImgOrLinkStatus itemImgOrLinkStatus) {
         this.id = id;
-        this.itemId = itemId;
+        this.item = item;
         this.itemImgUrl = itemImgUrl;
         this.representFlag = representFlag;
-        this.imgStatus = imgStatus;
+        this.itemImgOrLinkStatus = itemImgOrLinkStatus;
     }
 }

@@ -23,13 +23,15 @@ public class Hashtag extends BaseEntity {
     private String content;
 
     @Enumerated(EnumType.STRING)
-    @Column(length = 45, columnDefinition = "varchar(45) default 'ACTIVE'")
-    private HashtagStatus hashtagStatus;
+    private HashtagStatus hashtagStatus = HashtagStatus.ACTIVE;
 
     @Builder
-    public Hashtag(Long id, String content, HashtagStatus hashtagStatus) {
+    public Hashtag(Long id, String content) {
         this.id = id;
         this.content = content;
-        this.hashtagStatus = hashtagStatus;
+    }
+
+    public void changeStatus(HashtagStatus status){
+        this.hashtagStatus = status;
     }
 }

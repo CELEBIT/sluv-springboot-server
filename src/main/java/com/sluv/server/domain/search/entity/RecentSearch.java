@@ -1,5 +1,6 @@
 package com.sluv.server.domain.search.entity;
 
+import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.global.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -18,17 +19,19 @@ public class RecentSearch extends BaseEntity {
     @Column(name = "recent_search_id")
     private Long id;
 
+    @ManyToOne
+    @JoinColumn(name = "user_id")
     @NotNull
-    private Long userId;
+    private User user;
 
     @NotNull
     @Size(max = 255)
     private String searchWord;
 
     @Builder
-    public RecentSearch(Long id, Long userId, String searchWord) {
+    public RecentSearch(Long id, User user, String searchWord) {
         this.id = id;
-        this.userId = userId;
+        this.user = user;
         this.searchWord = searchWord;
     }
 }

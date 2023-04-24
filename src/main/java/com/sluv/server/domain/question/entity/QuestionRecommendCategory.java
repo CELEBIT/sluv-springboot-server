@@ -1,9 +1,6 @@
 package com.sluv.server.domain.question.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Builder;
@@ -16,17 +13,19 @@ public class QuestionRecommendCategory {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @ManyToOne
+    @JoinColumn(name = "question_id")
     @NotNull
-    private Long questionId;
+    private Question question;
 
     @NotNull
     @Size(max = 45)
     private String name;
 
     @Builder
-    public QuestionRecommendCategory(Long id, Long questionId, String name) {
+    public QuestionRecommendCategory(Long id, Question question, String name) {
         this.id = id;
-        this.questionId = questionId;
+        this.question = question;
         this.name = name;
     }
 }

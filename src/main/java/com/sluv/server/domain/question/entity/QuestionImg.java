@@ -1,7 +1,7 @@
 package com.sluv.server.domain.question.entity;
 
 import com.sluv.server.global.common.entity.BaseEntity;
-import com.sluv.server.global.common.enums.ImgStatus;
+import com.sluv.server.global.common.enums.ItemImgOrLinkStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -20,8 +20,10 @@ public class QuestionImg extends BaseEntity {
     @Column(name = "question_img_id")
     private Long id;
 
+    @ManyToOne
+    @JoinColumn(name = "question_id")
     @NotNull
-    private Long questionId;
+    private Question question;
 
     @NotNull
     @Column(columnDefinition = "TEXT")
@@ -38,16 +40,16 @@ public class QuestionImg extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(columnDefinition = "varchar(45) default 'ACTIVE'")
-    private ImgStatus imgStatus;
+    private ItemImgOrLinkStatus itemImgOrLinkStatus;
 
     @Builder
-    public QuestionImg(Long id, Long questionId, String imgUrl, String description, Long vote, Boolean representFlag, ImgStatus imgStatus) {
+    public QuestionImg(Long id, Question question, String imgUrl, String description, Long vote, Boolean representFlag, ItemImgOrLinkStatus itemImgOrLinkStatus) {
         this.id = id;
-        this.questionId = questionId;
+        this.question = question;
         this.imgUrl = imgUrl;
         this.description = description;
         this.vote = vote;
         this.representFlag = representFlag;
-        this.imgStatus = imgStatus;
+        this.itemImgOrLinkStatus = itemImgOrLinkStatus;
     }
 }

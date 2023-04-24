@@ -1,9 +1,9 @@
 package com.sluv.server.domain.celeb.entity;
 
+import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.global.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,16 +18,20 @@ public class InterestedCeleb extends BaseEntity {
     @Column(name = "interested_celeb_id")
     private Long id;
 
+    @ManyToOne
+    @JoinColumn(name = "user_id")
     @NotNull
-    private Long userId;
+    private User user;
 
+    @ManyToOne
+    @JoinColumn(name = "celeb_id")
     @NotNull
-    private Long celebId;
+    private Celeb celeb;
 
     @Builder
-    public InterestedCeleb(Long id, Long userId, Long celebId) {
+    public InterestedCeleb(Long id, User user, Celeb celeb) {
         this.id = id;
-        this.userId = userId;
-        this.celebId = celebId;
+        this.user = user;
+        this.celeb = celeb;
     }
 }

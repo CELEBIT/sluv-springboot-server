@@ -1,5 +1,6 @@
 package com.sluv.server.domain.celeb.controller;
 
+import com.sluv.server.domain.celeb.dto.NewCelebPostReqDto;
 import com.sluv.server.domain.celeb.service.NewCelebService;
 import com.sluv.server.global.common.response.SuccessDataResponse;
 import lombok.RequiredArgsConstructor;
@@ -13,14 +14,14 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @RequestMapping("/app/newCeleb")
 public class NewCelebController {
-    private NewCelebService newCelebService;
+    private final NewCelebService newCelebService;
 
 
     @PostMapping("")
-    public ResponseEntity<SuccessDataResponse<Long>> postNewCeleb(@RequestBody String newCelebName){
+    public ResponseEntity<SuccessDataResponse<Long>> postNewCeleb(@RequestBody NewCelebPostReqDto dto){
         return ResponseEntity.ok().body(
                 SuccessDataResponse.<Long>builder()
-                        .result(newCelebService.postNewCeleb(newCelebName))
+                        .result(newCelebService.postNewCeleb(dto))
                         .build()
         );
     }

@@ -34,7 +34,7 @@ public class ItemController {
     private final TempItemService tempItemService;
 
     @Operation(
-            summary = "아이템 등록",
+            summary = "*아이템 등록",
             description = "아이템 등록 요청"
     )
     @ApiResponses(value = {
@@ -71,7 +71,7 @@ public class ItemController {
     }
 
     @Operation(
-            summary = "Item 임시저장",
+            summary = "*Item 임시저장",
             description = "작성중이 Item을 임시저장"
     )
     @ApiResponses(value = {
@@ -89,7 +89,7 @@ public class ItemController {
         );
     }
     @Operation(
-            summary = "임시저장 아이템 리스트 조회",
+            summary = "*임시저장 아이템 리스트 조회",
             description = "사용자의 임시저장 아이템 리스트 조회"
     )
     @ApiResponses(value = {
@@ -107,7 +107,7 @@ public class ItemController {
         );
     }
     @Operation(
-            summary = "임시저장 아이템 수정",
+            summary = "*임시저장 아이템 수정",
             description = "사용자의 임시저장 아이템 수정."
     )
     @ApiResponses(value = {
@@ -137,7 +137,7 @@ public class ItemController {
     }
 
     @Operation(
-            summary = "임시저장 아이템 전체삭제",
+            summary = "*임시저장 아이템 전체삭제",
             description = "사용자의 임시저장 아이템 전체삭제."
     )
     @ApiResponses(value = {

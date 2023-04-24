@@ -67,7 +67,9 @@ public class AuthController {
                                                             .build()
                                                       );
     }
-
+    @Operation(
+            summary = "*자동 로그인"
+    )
     @GetMapping("/auto-login")
     public ResponseEntity<SuccessResponse> autoLogin(HttpServletRequest request){
         String accessToken = jwtProvider.resolveToken(request);

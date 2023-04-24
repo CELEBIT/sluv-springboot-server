@@ -26,7 +26,7 @@ import java.util.List;
 public class UserController {
     private final UserService userService;
     @Operation(
-            summary = "유저의 관심 샐럽 조회",
+            summary = "*유저의 관심 샐럽 조회",
             description = "유저를 기준으로 InterstedCeleb 테이블에서 일치하는 Celeb을 검색"
     )
     @ApiResponses(value = {

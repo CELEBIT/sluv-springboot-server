@@ -30,7 +30,7 @@ public class RecentSelectCelebController {
     private final RecentSelectCelebService recentSelectCelebService;
 
     @Operation(
-            summary = "최근 선택한 Celeb 조회",
+            summary = "*최근 선택한 Celeb 조회",
             description = "유저가 최근 선택한 20개의 Celeb 조회",
             parameters = {@Parameter(name = "X-AUTH-TOKEN", required = true, description = "Authentication token", in = ParameterIn.HEADER)}
     )
@@ -50,7 +50,7 @@ public class RecentSelectCelebController {
     }
 
     @Operation(
-            summary = "최근 선택한 셀럽 등록",
+            summary = "*최근 선택한 셀럽 등록",
             description = "최근 선택한 셀럽을 등록"
     )
     @ApiResponses(value = {

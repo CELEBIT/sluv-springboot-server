@@ -28,7 +28,7 @@ public class RecentSelectBrandController {
     private final RecentSelectBrandService recentSelectBrandService;
 
     @Operation(
-            summary = "최근 선택한 브랜드 검색",
+            summary = "*최근 선택한 브랜드 검색",
             description = "최근 선택한 브랜드을 검색"
     )
     @ApiResponses(value = {
@@ -49,7 +49,7 @@ public class RecentSelectBrandController {
 
     }
     @Operation(
-            summary = "최근 선택한 브랜드 등록",
+            summary = "*최근 선택한 브랜드 등록",
             description = "최근 선택한 브랜드을 등록"
     )
     @ApiResponses(value = {

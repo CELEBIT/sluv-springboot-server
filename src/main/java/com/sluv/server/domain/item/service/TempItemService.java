@@ -277,4 +277,21 @@ public class TempItemService {
         tempItemRepository.save(tempItem);
 
     }
+
+    @Transactional
+    public void deleteTempItem(Long tempItemId){
+
+        // 관련된 삭제
+        // 1. tempItemImg 삭제
+        tempItemImgRepository.deleteAllByTempItemId(tempItemId);
+        // 2. tempItemLink 삭제
+        tempItemLinkRepository.deleteAllByTempItemId(tempItemId);
+        // 3. tempItemHashtag 삭제
+        tempItemHashtagRepository.deleteAllByTempItemId(tempItemId);
+
+        // tempItem 삭제
+        tempItemRepository.deleteById(tempItemId);
+
+    }
+
 }

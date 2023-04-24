@@ -120,4 +120,19 @@ public class ItemController {
         tempItemService.putTempItem(user, tempItemId, dto);
         return ResponseEntity.ok().body(new SuccessResponse());
     }
+
+    @Operation(
+            summary = "임시저장 아이템 선택삭제",
+            description = "사용자가 선택한 임시저장 아이템 삭제."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "1000", description = "요청성공"),
+            @ApiResponse(responseCode = "5000", description = "서버내부 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "5001", description = "DB 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @DeleteMapping("/temp/{tempItemId}")
+    public ResponseEntity<SuccessResponse> deleteTempItem(@PathVariable Long tempItemId){
+        tempItemService.deleteTempItem(tempItemId);
+        return ResponseEntity.ok().body(new SuccessResponse());
+    }
 }

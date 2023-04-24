@@ -83,7 +83,15 @@ public class RecentSelectBrandController {
                 new SuccessResponse()
         );
     }
-
+    @Operation(
+            summary = "*유저의 특정 [최근 선택한 브랜드] 삭제",
+            description = "유저의 특정 [최근 선택한 브랜드] 삭제 API"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "1000", description = "요청성공"),
+            @ApiResponse(responseCode = "5000", description = "서버내부 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "5001", description = "DB 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
     @DeleteMapping("/{brandId}")
     public ResponseEntity<SuccessResponse> deleteRecentSelectBrand(@AuthenticationPrincipal User user, @PathVariable("brandId") Long brandId, @RequestParam("flag") String flag){
         recentSelectBrandService.deleteRecentSelectBrand(user, brandId, flag);

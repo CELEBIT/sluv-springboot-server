@@ -1,4 +1,4 @@
-package com.sluv.server.domain.celeb.entity;
+package com.sluv.server.domain.brand.entity;
 
 import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.global.common.entity.BaseEntity;
@@ -11,27 +11,32 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor
-@Table(name = "recent_search_celeb")
-public class RecentSearchCeleb extends BaseEntity {
+@Table(name = "recent_select_brand")
+public class RecentSelectBrand extends BaseEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "recent_search_celeb_id")
+    @Column(name = "recent_select_brand_id")
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "celeb_id")
-    @NotNull
-    private Celeb celeb;
+    @JoinColumn(name = "brand_id")
+    private Brand brand;
+
+    @ManyToOne
+    @JoinColumn(name = "new_brand_id")
+    private NewBrand newBrand;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
     @NotNull
     private User user;
 
+
     @Builder
-    public RecentSearchCeleb(Long id, Celeb celeb, User user) {
+    public RecentSelectBrand(Long id, Brand brand, NewBrand newBrand, User user) {
         this.id = id;
-        this.celeb = celeb;
+        this.brand = brand;
+        this.newBrand = newBrand;
         this.user = user;
     }
 }

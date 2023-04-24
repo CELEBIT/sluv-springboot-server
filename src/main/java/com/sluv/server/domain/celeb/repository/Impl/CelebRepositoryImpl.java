@@ -11,10 +11,7 @@ import org.springframework.data.domain.Pageable;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.sluv.server.domain.brand.entity.QBrand.brand;
-import static com.sluv.server.domain.brand.entity.QRecentBrand.recentBrand;
-import static com.sluv.server.domain.celeb.entity.QRecentSearchCeleb.recentSearchCeleb;
-import static com.sluv.server.domain.user.entity.QUser.user;
+import static com.sluv.server.domain.celeb.entity.QRecentSelectCeleb.recentSelectCeleb;
 import static com.sluv.server.domain.celeb.entity.QCeleb.celeb;
 import static com.sluv.server.domain.celeb.entity.QInterestedCeleb.interestedCeleb;
 
@@ -70,11 +67,11 @@ public class CelebRepositoryImpl implements CelebRepositoryCustom{
     @Override
     public List<Celeb> findRecentCeleb(User _user) {
         return jpaQueryFactory.select(celeb)
-                .from(recentSearchCeleb)
-                .innerJoin(celeb).on(recentSearchCeleb.celeb.eq(celeb))
-                .where(recentSearchCeleb.user.eq(_user))
-                .groupBy(recentSearchCeleb.celeb)
-                .orderBy(recentSearchCeleb.createdAt.max().desc())
+                .from(recentSelectCeleb)
+                .innerJoin(celeb).on(recentSelectCeleb.celeb.eq(celeb))
+                .where(recentSelectCeleb.user.eq(_user))
+                .groupBy(recentSelectCeleb.celeb)
+                .orderBy(recentSelectCeleb.createdAt.max().desc())
                 .limit(20)
                 .fetch();
 
@@ -84,9 +81,9 @@ public class CelebRepositoryImpl implements CelebRepositoryCustom{
     public List<Celeb> findTop10Celeb() {
 
         return jpaQueryFactory.select(celeb)
-                .from(recentSearchCeleb)
-                .groupBy(recentSearchCeleb.celeb)
-                .orderBy(recentSearchCeleb.celeb.count().desc())
+                .from(recentSelectCeleb)
+                .groupBy(recentSelectCeleb.celeb)
+                .orderBy(recentSelectCeleb.celeb.count().desc())
                 .limit(10)
                 .fetch();
     }

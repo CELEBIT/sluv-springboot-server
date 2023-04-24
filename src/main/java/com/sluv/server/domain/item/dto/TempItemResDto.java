@@ -52,10 +52,10 @@ public class TempItemResDto {
     @Schema(description = "추가정보를 발견한 출처")
     private String infoSource;
 
-    @Schema(description = "새로운 Celeb 이름")
-    private String newCelebName;
-    @Schema(description = "새로운 Brand 이름")
-    private String newBrandName;
+    @Schema(description = "새로운 Celeb id")
+    private Long newCelebId;
+    @Schema(description = "새로운 Brand id")
+    private Long newBrandId;
 
     @Schema(description = "최신 update 시점")
     private LocalDateTime updatedAt;

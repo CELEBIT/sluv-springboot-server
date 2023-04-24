@@ -1,7 +1,9 @@
 package com.sluv.server.domain.item.entity;
 
 import com.sluv.server.domain.brand.entity.Brand;
+import com.sluv.server.domain.brand.entity.NewBrand;
 import com.sluv.server.domain.celeb.entity.Celeb;
+import com.sluv.server.domain.celeb.entity.NewCeleb;
 import com.sluv.server.domain.item.enums.ItemStatus;
 import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.global.common.entity.BaseEntity;
@@ -35,7 +37,9 @@ public class TempItem extends BaseEntity {
     @JoinColumn(name = "celeb_id")
     private Celeb celeb;
 
-    private String newCelebName;
+    @ManyToOne
+    @JoinColumn(name = "new_celeb_id")
+    private NewCeleb newCeleb;
     @ManyToOne
     @JoinColumn(name = "item_category_id")
     private ItemCategory category;
@@ -44,7 +48,9 @@ public class TempItem extends BaseEntity {
     @JoinColumn(name = "brand_id")
     private Brand brand;
 
-    private String newBrandName;
+    @ManyToOne
+    @JoinColumn(name = "new_brand_id")
+    private NewBrand newBrand;
 
     @Size(max = 100)
     private String name;
@@ -67,14 +73,14 @@ public class TempItem extends BaseEntity {
     private ItemStatus itemStatus;
 
     @Builder
-    public TempItem(Long id, User user, Celeb celeb, String newCelebName, ItemCategory category, Brand brand, String newBrandName, String name, LocalDateTime whenDiscovery, String whereDiscovery, Integer price, String additionalInfo, String infoSource, ItemStatus itemStatus) {
+    public TempItem(Long id, User user, Celeb celeb, NewCeleb newCeleb, ItemCategory category, Brand brand, NewBrand newBrand, String name, LocalDateTime whenDiscovery, String whereDiscovery, Integer price, String additionalInfo, String infoSource, ItemStatus itemStatus) {
         this.id = id;
         this.user = user;
         this.celeb = celeb;
-        this.newCelebName = newCelebName;
+        this.newCeleb = newCeleb;
         this.category = category;
         this.brand = brand;
-        this.newBrandName = newBrandName;
+        this.newBrand = newBrand;
         this.name = name;
         this.whenDiscovery = whenDiscovery;
         this.whereDiscovery = whereDiscovery;

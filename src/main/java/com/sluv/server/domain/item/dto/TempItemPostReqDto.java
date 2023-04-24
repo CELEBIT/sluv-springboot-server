@@ -1,5 +1,6 @@
 package com.sluv.server.domain.item.dto;
 
+import com.sluv.server.domain.celeb.entity.NewCeleb;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -47,10 +48,10 @@ public class TempItemPostReqDto {
     @Schema(description = "추가정보를 발견한 출처")
     private String infoSource;
 
-    @Schema(description = "새로운 Celeb 이름")
-    private String newCelebName;
-    @Schema(description = "새로운 Brand 이름")
-    private String newBrandName;
+    @Schema(description = "새로운 Celeb Id")
+    private Long newCelebId;
+    @Schema(description = "새로운 Brand 이름 Id")
+    private Long newBrandId;
 
 
 }

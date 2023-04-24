@@ -2,16 +2,20 @@ package com.sluv.server.domain.item.service;
 
 import com.sluv.server.domain.brand.entity.Brand;
 import com.sluv.server.domain.brand.entity.NewBrand;
-import com.sluv.server.domain.brand.enums.NewBrandStatus;
+import com.sluv.server.domain.brand.entity.RecentSelectBrand;
 import com.sluv.server.domain.brand.exception.BrandNotFoundException;
+import com.sluv.server.domain.brand.exception.NewBrandNotFoundException;
 import com.sluv.server.domain.brand.repository.BrandRepository;
 import com.sluv.server.domain.brand.repository.NewBrandRepository;
+import com.sluv.server.domain.brand.repository.RecentSelectBrandRepository;
 import com.sluv.server.domain.celeb.entity.Celeb;
 import com.sluv.server.domain.celeb.entity.NewCeleb;
-import com.sluv.server.domain.celeb.enums.NewCelebStatus;
+import com.sluv.server.domain.celeb.entity.RecentSelectCeleb;
 import com.sluv.server.domain.celeb.exception.CelebNotFoundException;
+import com.sluv.server.domain.celeb.exception.NewCelebNotFoundException;
 import com.sluv.server.domain.celeb.repository.CelebRepository;
 import com.sluv.server.domain.celeb.repository.NewCelebRepository;
+import com.sluv.server.domain.celeb.repository.RecentSelectCelebRepository;
 import com.sluv.server.domain.item.dto.ItemPostReqDto;
 import com.sluv.server.domain.item.entity.*;
 import com.sluv.server.domain.item.entity.hashtag.ItemHashtag;
@@ -42,6 +46,8 @@ public class ItemService {
     private final NewCelebRepository newCelebRepository;
 
     private final PlaceRankRepository placeRankRepository;
+    private final RecentSelectCelebRepository recentSearchCelebRepository;
+    private final RecentSelectBrandRepository recentSelectBrandRepository;
 
     public void postItem(User user, ItemPostReqDto reqDto) {
         Celeb celeb = null;
@@ -57,34 +63,15 @@ public class ItemService {
         }
 
         NewCeleb newCeleb = null;
-        if(reqDto.getNewCelebName() != null){
-            // 이미 NewCeleb 테이블에 있다면, DB에 있는 것을 할당
-            newCeleb = newCelebRepository.findByCelebName(reqDto.getNewCelebName()).orElse(null);
-
-            if(newCeleb == null){
-                // NewCeleb 테이블에 없다면, 저장 후 할당
-                newCeleb = newCelebRepository.save(NewCeleb.builder()
-                        .celebName(reqDto.getNewCelebName())
-                        .newCelebStatus(NewCelebStatus.ACTIVE)
-                        .build()
-                );
-            }
+        if(reqDto.getNewCelebId() != null){
+            newCeleb = newCelebRepository.findById(reqDto.getNewCelebId())
+                    .orElseThrow(NewCelebNotFoundException::new);
         }
 
         NewBrand newBrand = null;
-        if(reqDto.getNewBrandName() != null){
-            // 이미 NewBrand 테이블에 있다면, DB에 있는 것을 할당
-            newBrand = newBrandRepository.findByBrandName(reqDto.getNewBrandName()).orElse(null);
-
-            if(newBrand == null){
-                // NewBrand 테이블에 없다면, 저장 후 할당
-                newBrand = newBrandRepository.save(NewBrand.builder()
-                        .brandName(reqDto.getNewBrandName())
-                        .newBrandStatus(NewBrandStatus.ACTIVE)
-                        .build()
-                );
-            }
-
+        if(reqDto.getNewCelebId() != null){
+            newBrand = newBrandRepository.findById(reqDto.getNewBrandId())
+                    .orElseThrow(NewBrandNotFoundException::new);
         }
 
         ItemCategory itemCategory = itemCategoryRepository.findById(reqDto.getCategoryId())
@@ -122,20 +109,23 @@ public class ItemService {
 
 
         // ItemLink 테이블에 추가
-        reqDto.getLinkList().stream()
-                                    .map(itemLink ->
-                                            ItemLink.builder()
-                                                    .item(newItem)
-                                                    .linkName(itemLink.getLinkName())
-                                                    .itemLinkUrl(itemLink.getItemLinkUrl())
-                                                    .itemImgOrLinkStatus(ItemImgOrLinkStatus.ACTIVE)
-                                                    .build()
+        if(reqDto.getLinkList() != null) {
+            reqDto.getLinkList().stream()
+                    .map(itemLink ->
+                            ItemLink.builder()
+                                    .item(newItem)
+                                    .linkName(itemLink.getLinkName())
+                                    .itemLinkUrl(itemLink.getItemLinkUrl())
+                                    .itemImgOrLinkStatus(ItemImgOrLinkStatus.ACTIVE)
+                                    .build()
 
-                                    ).forEach(itemLinkRepository::save);
+                    ).forEach(itemLinkRepository::save);
+        }
 
 
         // ItemHashtag 테이블에 추가
-        reqDto.getHashTagIdList().stream().map(hashTag ->
+        if(reqDto.getHashTagIdList() != null) {
+            reqDto.getHashTagIdList().stream().map(hashTag ->
 
                     ItemHashtag.builder()
                             .item(newItem)
@@ -145,7 +135,8 @@ public class ItemService {
                             )
                             .build()
 
-                ).forEach(itemHashtagRepository::save);
+            ).forEach(itemHashtagRepository::save);
+        }
 
         // PlaceRank 테이블에 추가
         if(reqDto.getWhereDiscovery() != null) {
@@ -154,6 +145,21 @@ public class ItemService {
                     .build()
             );
         }
+
+        // Recent Search Celeb 테이블에 추가
+        recentSearchCelebRepository.save(RecentSelectCeleb.builder()
+                .user(user)
+                .celeb(celeb)
+                .newCeleb(newCeleb)
+                .build()
+        );
+
+        recentSelectBrandRepository.save(RecentSelectBrand.builder()
+                .user(user)
+                .brand(brand)
+                .newBrand(newBrand)
+                .build()
+        );
 
     }
 }

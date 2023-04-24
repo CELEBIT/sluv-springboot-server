@@ -1,8 +1,11 @@
 package com.sluv.server.domain.celeb.service;
 
 import com.sluv.server.domain.celeb.dto.CelebSearchResDto;
+import com.sluv.server.domain.celeb.dto.RecentSelectCelebResDto;
 import com.sluv.server.domain.celeb.entity.Celeb;
+import com.sluv.server.domain.celeb.entity.RecentSelectCeleb;
 import com.sluv.server.domain.celeb.repository.CelebRepository;
+import com.sluv.server.domain.celeb.repository.RecentSelectCelebRepository;
 import com.sluv.server.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -16,6 +19,7 @@ import java.util.stream.Collectors;
 public class CelebService {
 
     private final CelebRepository celebRepository;
+    private final RecentSelectCelebRepository recentSearchCelebRepository;
 
     public List<CelebSearchResDto> searchCeleb(String celebName, Pageable pageable) {
 
@@ -69,8 +73,28 @@ public class CelebService {
 
     }
 
-    public List<CelebSearchResDto> getUserRecentSearchCeleb(User user){
-        return changeCelebSearchResDto(celebRepository.findRecentCeleb(user));
+    public List<RecentSelectCelebResDto> getUserRecentSelectCeleb(User user){
+        List<RecentSelectCeleb> recentSelectCelebList = recentSearchCelebRepository.getRecentSelectCelebTop20(user);
+
+        return recentSelectCelebList.stream().map(recentSelectCeleb -> {
+            Long celebId;
+            String celebName;
+            String flag = recentSelectCeleb.getCeleb() != null ? "Y" :"N";
+            if(flag.equals("Y")){
+                celebId = recentSelectCeleb.getCeleb().getId();
+                celebName = recentSelectCeleb.getCeleb().getCelebNameKr();
+            }else{
+                celebId = recentSelectCeleb.getNewCeleb().getId();
+                celebName = recentSelectCeleb.getNewCeleb().getCelebName();
+            }
+            return RecentSelectCelebResDto.builder()
+                    .id(celebId)
+                    .celebName(celebName)
+                    .flag(flag)
+                    .build();
+        }).toList();
+
+
     }
 
     public List<CelebSearchResDto> getTop10Celeb(){

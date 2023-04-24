@@ -45,4 +45,13 @@ public class RecentSelectCelebService {
     public void deleteAllRecentSelectCeleb(User user) {
         recentSelectCelebRepository.deleteAllByUserId(user.getId());
     }
+
+    @Transactional
+    public void deleteRecentSelectCeleb(User user, Long celebId, String flag) {
+        if(flag.equals("Y")){
+            recentSelectCelebRepository.deleteByUserIdAndCelebId(user.getId(), celebId);
+        }else{
+            recentSelectCelebRepository.deleteByUserIdAndNewCelebId(user.getId(), celebId);
+        }
+    }
 }

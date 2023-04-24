@@ -75,8 +75,8 @@ public class BrandController {
     }
 
     @Operation(
-            summary = "최근 검색한 브랜드",
-            description = "최근 검색한 브랜드"
+            summary = "최근 선택한 브랜드 조회",
+            description = "최근 선택한 브랜드 조회"
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "1000", description = "요청성공"),
@@ -95,7 +95,15 @@ public class BrandController {
                 );
 
     }
-
+    @Operation(
+            summary = "최근 선택한 브랜드 등록",
+            description = "최근 선택 브랜드를 등록"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "1000", description = "요청성공"),
+            @ApiResponse(responseCode = "5000", description = "서버내부 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "5001", description = "DB 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
     @PostMapping("/search/recent")
     public ResponseEntity<SuccessResponse> postRecentBrand(@AuthenticationPrincipal User user, @RequestBody RecentBrandReqDto dto ){
 

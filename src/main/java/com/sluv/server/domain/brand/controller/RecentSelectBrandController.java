@@ -83,4 +83,12 @@ public class RecentSelectBrandController {
                 new SuccessResponse()
         );
     }
+
+    @DeleteMapping("/{brandId}")
+    public ResponseEntity<SuccessResponse> deleteRecentSelectBrand(@AuthenticationPrincipal User user, @PathVariable("brandId") Long brandId, @RequestParam("flag") String flag){
+        recentSelectBrandService.deleteRecentSelectBrand(user, brandId, flag);
+        return ResponseEntity.ok().body(
+                new SuccessResponse()
+        );
+    }
 }

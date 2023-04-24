@@ -1,6 +1,6 @@
 package com.sluv.server.domain.brand.controller;
 
-import com.sluv.server.domain.brand.dto.RecentBrandReqDto;
+import com.sluv.server.domain.brand.dto.RecentSelectBrandReqDto;
 import com.sluv.server.domain.brand.dto.RecentBrandResDto;
 import com.sluv.server.domain.brand.service.BrandService;
 import com.sluv.server.domain.brand.service.RecentBrandService;
@@ -22,14 +22,14 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/app/recentBrand")
+@RequestMapping("/app/brand/recent")
 public class RecentBrandController {
     private final BrandService brandService;
     private final RecentBrandService recentBrandService;
 
     @Operation(
-            summary = "최근 검색한 브랜드",
-            description = "최근 검색한 브랜드"
+            summary = "최근 선택한 브랜드 검색",
+            description = "최근 선택한 브랜드을 검색"
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "1000", description = "요청성공"),
@@ -37,7 +37,7 @@ public class RecentBrandController {
             @ApiResponse(responseCode = "5001", description = "DB 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @GetMapping("")
-    public ResponseEntity<SuccessDataResponse<List<RecentBrandResDto>>> getRecentSearchBrand(@AuthenticationPrincipal User user){
+    public ResponseEntity<SuccessDataResponse<List<RecentBrandResDto>>> getRecentSelectBrand(@AuthenticationPrincipal User user){
 
 
         return ResponseEntity.ok()
@@ -49,8 +49,8 @@ public class RecentBrandController {
 
     }
     @Operation(
-            summary = "최근 검색한 브랜드",
-            description = "최근 검색한 브랜드"
+            summary = "최근 선택한 브랜드 등록",
+            description = "최근 선택한 브랜드을 등록"
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "1000", description = "요청성공"),
@@ -58,9 +58,9 @@ public class RecentBrandController {
             @ApiResponse(responseCode = "5001", description = "DB 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @PostMapping("")
-    public ResponseEntity<SuccessResponse> postRecentBrand(@AuthenticationPrincipal User user, @RequestBody RecentBrandReqDto dto ){
+    public ResponseEntity<SuccessResponse> postRecentSelectBrand(@AuthenticationPrincipal User user, @RequestBody RecentSelectBrandReqDto dto ){
 
-        recentBrandService.postRecentBrand(user, dto);
+        recentBrandService.postRecentSelectBrand(user, dto);
 
         return ResponseEntity.ok().body(
                 new SuccessResponse()

@@ -2,9 +2,9 @@ package com.sluv.server.domain.brand.service;
 
 import com.sluv.server.domain.brand.dto.BrandSearchResDto;
 import com.sluv.server.domain.brand.dto.RecentBrandResDto;
-import com.sluv.server.domain.brand.entity.RecentBrand;
+import com.sluv.server.domain.brand.entity.RecentSelectBrand;
 import com.sluv.server.domain.brand.repository.BrandRepository;
-import com.sluv.server.domain.brand.repository.RecentBrandRepository;
+import com.sluv.server.domain.brand.repository.RecentSelectSelectBrandRepository;
 import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class BrandService {
     private final BrandRepository brandRepository;
-    private final RecentBrandRepository recentBrandRepository;
+    private final RecentSelectSelectBrandRepository recentSelectBrandRepository;
     private final UserRepository userRepository;
 
 
@@ -47,9 +47,9 @@ public class BrandService {
 
     public List<RecentBrandResDto> findRecentBrand(User user) {
 
-        List<RecentBrand> recentBrandList = recentBrandRepository.getRecentSearchBrandTop20(user);
+        List<RecentSelectBrand> recentSelectBrandList = recentSelectBrandRepository.getRecentSearchBrandTop20(user);
 
-        return recentBrandList.stream().map(recentBrand -> {
+        return recentSelectBrandList.stream().map(recentBrand -> {
             Long brandId;
             String brandName;
             String flag = recentBrand.getBrand() != null ? "Y" :"N";

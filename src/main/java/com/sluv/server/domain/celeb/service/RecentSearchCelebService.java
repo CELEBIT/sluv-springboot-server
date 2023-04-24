@@ -1,14 +1,5 @@
 package com.sluv.server.domain.celeb.service;
 
-import com.sluv.server.domain.brand.dto.RecentBrandReqDto;
-import com.sluv.server.domain.brand.entity.Brand;
-import com.sluv.server.domain.brand.entity.NewBrand;
-import com.sluv.server.domain.brand.entity.RecentBrand;
-import com.sluv.server.domain.brand.exception.BrandNotFoundException;
-import com.sluv.server.domain.brand.exception.NewBrandNotFoundException;
-import com.sluv.server.domain.brand.repository.BrandRepository;
-import com.sluv.server.domain.brand.repository.NewBrandRepository;
-import com.sluv.server.domain.brand.repository.RecentBrandRepository;
 import com.sluv.server.domain.celeb.dto.RecentSearchCelebReqDto;
 import com.sluv.server.domain.celeb.entity.Celeb;
 import com.sluv.server.domain.celeb.entity.NewCeleb;

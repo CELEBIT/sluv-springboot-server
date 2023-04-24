@@ -2,12 +2,12 @@ package com.sluv.server.domain.item.service;
 
 import com.sluv.server.domain.brand.entity.Brand;
 import com.sluv.server.domain.brand.entity.NewBrand;
-import com.sluv.server.domain.brand.entity.RecentBrand;
+import com.sluv.server.domain.brand.entity.RecentSelectBrand;
 import com.sluv.server.domain.brand.exception.BrandNotFoundException;
 import com.sluv.server.domain.brand.exception.NewBrandNotFoundException;
 import com.sluv.server.domain.brand.repository.BrandRepository;
 import com.sluv.server.domain.brand.repository.NewBrandRepository;
-import com.sluv.server.domain.brand.repository.RecentBrandRepository;
+import com.sluv.server.domain.brand.repository.RecentSelectSelectBrandRepository;
 import com.sluv.server.domain.celeb.dto.CelebDto;
 import com.sluv.server.domain.celeb.entity.Celeb;
 import com.sluv.server.domain.celeb.entity.NewCeleb;
@@ -29,7 +29,6 @@ import com.sluv.server.domain.item.repository.*;
 import com.sluv.server.domain.item.repository.hashtag.HashtagRepository;
 import com.sluv.server.domain.item.repository.hashtag.TempItemHashtagRepository;
 import com.sluv.server.domain.user.entity.User;
-import com.sluv.server.domain.user.exception.NotFoundUserException;
 import com.sluv.server.global.common.enums.ItemImgOrLinkStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -55,7 +54,7 @@ public class TempItemService {
     private final NewBrandRepository newBrandRepository;
     private final NewCelebRepository newCelebRepository;
     private final RecentSearchCelebRepository recentSearchCelebRepository;
-    private final RecentBrandRepository recentBrandRepository;
+    private final RecentSelectSelectBrandRepository recentSelectBrandRepository;
 
 
     public void postTempItem(User user, TempItemPostReqDto reqDto) {
@@ -146,7 +145,7 @@ public class TempItemService {
                 .build()
         );
 
-        recentBrandRepository.save(RecentBrand.builder()
+        recentSelectBrandRepository.save(RecentSelectBrand.builder()
                 .user(user)
                 .brand(brand)
                 .newBrand(newBrand)
@@ -307,7 +306,7 @@ public class TempItemService {
                 .build()
         );
 
-        recentBrandRepository.save(RecentBrand.builder()
+        recentSelectBrandRepository.save(RecentSelectBrand.builder()
                 .user(user)
                 .brand(brand)
                 .newBrand(newBrand)

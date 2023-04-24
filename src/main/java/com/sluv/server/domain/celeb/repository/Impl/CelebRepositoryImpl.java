@@ -29,6 +29,7 @@ public class CelebRepositoryImpl implements CelebRepositoryCustom{
         return jpaQueryFactory.select(interestedCeleb.celeb)
                 .from(interestedCeleb)
                 .where(interestedCeleb.user.eq(_user))
+                .orderBy(interestedCeleb.createdAt.desc())
                 .fetch();
     }
 

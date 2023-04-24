@@ -66,4 +66,13 @@ public class RecentSelectBrandController {
                 new SuccessResponse()
         );
     }
+
+    @DeleteMapping("")
+    public ResponseEntity<SuccessResponse> deleteAllRecentSelectBrand(@AuthenticationPrincipal User user){
+        recentSelectBrandService.deleteAllRecentSelectBrand(user);
+
+        return ResponseEntity.ok().body(
+                new SuccessResponse()
+        );
+    }
 }

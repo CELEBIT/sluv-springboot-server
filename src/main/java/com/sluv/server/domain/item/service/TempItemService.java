@@ -7,16 +7,16 @@ import com.sluv.server.domain.brand.exception.BrandNotFoundException;
 import com.sluv.server.domain.brand.exception.NewBrandNotFoundException;
 import com.sluv.server.domain.brand.repository.BrandRepository;
 import com.sluv.server.domain.brand.repository.NewBrandRepository;
-import com.sluv.server.domain.brand.repository.RecentSelectSelectBrandRepository;
+import com.sluv.server.domain.brand.repository.RecentSelectBrandRepository;
 import com.sluv.server.domain.celeb.dto.CelebDto;
 import com.sluv.server.domain.celeb.entity.Celeb;
 import com.sluv.server.domain.celeb.entity.NewCeleb;
-import com.sluv.server.domain.celeb.entity.RecentSearchCeleb;
+import com.sluv.server.domain.celeb.entity.RecentSelectCeleb;
 import com.sluv.server.domain.celeb.exception.CelebNotFoundException;
 import com.sluv.server.domain.celeb.exception.NewCelebNotFoundException;
 import com.sluv.server.domain.celeb.repository.CelebRepository;
 import com.sluv.server.domain.celeb.repository.NewCelebRepository;
-import com.sluv.server.domain.celeb.repository.RecentSearchCelebRepository;
+import com.sluv.server.domain.celeb.repository.RecentSelectCelebRepository;
 import com.sluv.server.domain.item.dto.*;
 import com.sluv.server.domain.item.entity.*;
 import com.sluv.server.domain.item.entity.hashtag.Hashtag;
@@ -53,8 +53,8 @@ public class TempItemService {
     private final BrandRepository brandRepository;
     private final NewBrandRepository newBrandRepository;
     private final NewCelebRepository newCelebRepository;
-    private final RecentSearchCelebRepository recentSearchCelebRepository;
-    private final RecentSelectSelectBrandRepository recentSelectBrandRepository;
+    private final RecentSelectCelebRepository recentSearchCelebRepository;
+    private final RecentSelectBrandRepository recentSelectBrandRepository;
 
 
     public void postTempItem(User user, TempItemPostReqDto reqDto) {
@@ -138,7 +138,7 @@ public class TempItemService {
         }
 
         // Recent Search Celeb 테이블에 추가
-        recentSearchCelebRepository.save(RecentSearchCeleb.builder()
+        recentSearchCelebRepository.save(RecentSelectCeleb.builder()
                 .user(user)
                 .celeb(celeb)
                 .newCeleb(newCeleb)
@@ -299,7 +299,7 @@ public class TempItemService {
         tempItemRepository.save(tempItem);
 
         // Recent Search Celeb 테이블에 추가
-        recentSearchCelebRepository.save(RecentSearchCeleb.builder()
+        recentSearchCelebRepository.save(RecentSelectCeleb.builder()
                 .user(user)
                 .celeb(celeb)
                 .newCeleb(newCeleb)

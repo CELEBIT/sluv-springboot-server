@@ -2,7 +2,7 @@ package com.sluv.server.domain.brand.controller;
 
 import com.sluv.server.domain.brand.dto.BrandSearchResDto;
 import com.sluv.server.domain.brand.service.BrandService;
-import com.sluv.server.domain.brand.service.RecentBrandService;
+import com.sluv.server.domain.brand.service.RecentSelectBrandService;
 import com.sluv.server.global.common.response.ErrorResponse;
 import com.sluv.server.global.common.response.SuccessDataResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -22,7 +22,7 @@ import java.util.List;
 @RequestMapping("/app/brand")
 public class BrandController {
     private final BrandService brandService;
-    private final RecentBrandService recentBrandService;
+    private final RecentSelectBrandService recentSelectBrandService;
 
 
     @Operation(

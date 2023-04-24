@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 
-import static com.sluv.server.domain.brand.entity.QRecentBrand.recentBrand;
+import static com.sluv.server.domain.brand.entity.QRecentSelectBrand.recentSelectBrand;
 
 @RequiredArgsConstructor
 public class RecentSelectBrandRepositoryImpl implements RecentSelectBrandRepositoryCustom {
@@ -15,11 +15,11 @@ public class RecentSelectBrandRepositoryImpl implements RecentSelectBrandReposit
 
     @Override
     public List<RecentSelectBrand> getRecentSearchBrandTop20(User user) {
-        return jpaQueryFactory.selectFrom(recentBrand)
-                .where(recentBrand.user.eq(user))
-                .groupBy(recentBrand.brand, recentBrand.newBrand)
+        return jpaQueryFactory.selectFrom(recentSelectBrand)
+                .where(recentSelectBrand.user.eq(user))
+                .groupBy(recentSelectBrand.brand, recentSelectBrand.newBrand)
                 .limit(20)
-                .orderBy(recentBrand.createdAt.max().desc())
+                .orderBy(recentSelectBrand.createdAt.max().desc())
                 .fetch();
     }
 }

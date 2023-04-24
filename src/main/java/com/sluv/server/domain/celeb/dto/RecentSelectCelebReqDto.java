@@ -5,7 +5,7 @@ import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-public class RecentSearchCelebReqDto {
+public class RecentSelectCelebReqDto {
     private Long celebId;
     private Long newCelebId;
 }

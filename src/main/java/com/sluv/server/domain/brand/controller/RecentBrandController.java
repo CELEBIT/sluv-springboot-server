@@ -3,7 +3,7 @@ package com.sluv.server.domain.brand.controller;
 import com.sluv.server.domain.brand.dto.RecentSelectBrandReqDto;
 import com.sluv.server.domain.brand.dto.RecentBrandResDto;
 import com.sluv.server.domain.brand.service.BrandService;
-import com.sluv.server.domain.brand.service.RecentBrandService;
+import com.sluv.server.domain.brand.service.RecentSelectBrandService;
 import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.global.common.response.ErrorResponse;
 import com.sluv.server.global.common.response.SuccessDataResponse;
@@ -25,7 +25,7 @@ import java.util.List;
 @RequestMapping("/app/brand/recent")
 public class RecentBrandController {
     private final BrandService brandService;
-    private final RecentBrandService recentBrandService;
+    private final RecentSelectBrandService recentSelectBrandService;
 
     @Operation(
             summary = "최근 선택한 브랜드 검색",
@@ -60,7 +60,7 @@ public class RecentBrandController {
     @PostMapping("")
     public ResponseEntity<SuccessResponse> postRecentSelectBrand(@AuthenticationPrincipal User user, @RequestBody RecentSelectBrandReqDto dto ){
 
-        recentBrandService.postRecentSelectBrand(user, dto);
+        recentSelectBrandService.postRecentSelectBrand(user, dto);
 
         return ResponseEntity.ok().body(
                 new SuccessResponse()

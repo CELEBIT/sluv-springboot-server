@@ -1,26 +1,26 @@
 package com.sluv.server.domain.celeb.service;
 
-import com.sluv.server.domain.celeb.dto.RecentSearchCelebReqDto;
+import com.sluv.server.domain.celeb.dto.RecentSelectCelebReqDto;
 import com.sluv.server.domain.celeb.entity.Celeb;
 import com.sluv.server.domain.celeb.entity.NewCeleb;
-import com.sluv.server.domain.celeb.entity.RecentSearchCeleb;
+import com.sluv.server.domain.celeb.entity.RecentSelectCeleb;
 import com.sluv.server.domain.celeb.exception.CelebNotFoundException;
 import com.sluv.server.domain.celeb.exception.NewCelebNotFoundException;
 import com.sluv.server.domain.celeb.repository.CelebRepository;
 import com.sluv.server.domain.celeb.repository.NewCelebRepository;
-import com.sluv.server.domain.celeb.repository.RecentSearchCelebRepository;
+import com.sluv.server.domain.celeb.repository.RecentSelectCelebRepository;
 import com.sluv.server.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class RecentSearchCelebService {
+public class RecentSelectCelebService {
     private final CelebRepository celebRepository;
     private final NewCelebRepository newCelebRepository;
-    private final RecentSearchCelebRepository recentSearchCelebRepository;
+    private final RecentSelectCelebRepository recentSelectCelebRepository;
 
-    public void postRecentSearchCeleb(User user, RecentSearchCelebReqDto dto){
+    public void postRecentSelectCeleb(User user, RecentSelectCelebReqDto dto){
         Celeb celeb = dto.getCelebId() != null
                 ? celebRepository.findById(dto.getCelebId())
                                 .orElseThrow(CelebNotFoundException::new)
@@ -31,8 +31,8 @@ public class RecentSearchCelebService {
                 .orElseThrow(NewCelebNotFoundException::new)
                 : null;
 
-        recentSearchCelebRepository.save(
-                RecentSearchCeleb.builder()
+        recentSelectCelebRepository.save(
+                RecentSelectCeleb.builder()
                         .celeb(celeb)
                         .newCeleb(newCeleb)
                         .user(user)

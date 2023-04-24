@@ -3,13 +3,6 @@ package com.sluv.server.domain.user.entity;
 //import com.sluv.server.domain.user.enums.SnsType;
 
 import com.sluv.server.domain.auth.enums.SnsType;
-import com.sluv.server.domain.celeb.entity.InterestedCeleb;
-import com.sluv.server.domain.celeb.entity.RecentSearchCeleb;
-import com.sluv.server.domain.closet.entity.Closet;
-import com.sluv.server.domain.comment.entity.Comment;
-import com.sluv.server.domain.comment.entity.CommentLike;
-import com.sluv.server.domain.comment.entity.CommentReport;
-import com.sluv.server.domain.item.entity.*;
 import com.sluv.server.domain.user.enums.UserStatus;
 import com.sluv.server.global.common.entity.BaseEntity;
 import jakarta.persistence.*;
@@ -20,12 +13,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicInsert;
 
-import org.hibernate.annotations.DynamicInsert;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
-import java.util.List;
 
 
 @Entity

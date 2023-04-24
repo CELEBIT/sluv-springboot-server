@@ -8,17 +8,17 @@ import com.sluv.server.domain.brand.exception.BrandNotFoundException;
 import com.sluv.server.domain.brand.exception.NewBrandNotFoundException;
 import com.sluv.server.domain.brand.repository.BrandRepository;
 import com.sluv.server.domain.brand.repository.NewBrandRepository;
-import com.sluv.server.domain.brand.repository.RecentSelectSelectBrandRepository;
+import com.sluv.server.domain.brand.repository.RecentSelectBrandRepository;
 import com.sluv.server.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class RecentBrandService {
+public class RecentSelectBrandService {
     private final BrandRepository brandRepository;
     private final NewBrandRepository newBrandRepository;
-    private final RecentSelectSelectBrandRepository recentSelectBrandRepository;
+    private final RecentSelectBrandRepository recentSelectBrandRepository;
 
     public void postRecentSelectBrand(User user, RecentSelectBrandReqDto dto){
         Brand brand = dto.getBrandId() != null

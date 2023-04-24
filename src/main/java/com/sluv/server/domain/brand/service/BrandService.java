@@ -4,7 +4,7 @@ import com.sluv.server.domain.brand.dto.BrandSearchResDto;
 import com.sluv.server.domain.brand.dto.RecentBrandResDto;
 import com.sluv.server.domain.brand.entity.RecentSelectBrand;
 import com.sluv.server.domain.brand.repository.BrandRepository;
-import com.sluv.server.domain.brand.repository.RecentSelectSelectBrandRepository;
+import com.sluv.server.domain.brand.repository.RecentSelectBrandRepository;
 import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class BrandService {
     private final BrandRepository brandRepository;
-    private final RecentSelectSelectBrandRepository recentSelectBrandRepository;
+    private final RecentSelectBrandRepository recentSelectBrandRepository;
     private final UserRepository userRepository;
 
 

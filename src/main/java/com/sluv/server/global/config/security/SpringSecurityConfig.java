@@ -31,6 +31,7 @@ public class SpringSecurityConfig {
 
             // brand
             "/app/brand/recent",
+            "/app/brand/recent/{brandId}",
 
             // celeb
             "/app/celeb/recent",

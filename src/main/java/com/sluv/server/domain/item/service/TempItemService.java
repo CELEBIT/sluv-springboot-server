@@ -1,12 +1,22 @@
 package com.sluv.server.domain.item.service;
 
 import com.sluv.server.domain.brand.entity.Brand;
+import com.sluv.server.domain.brand.entity.NewBrand;
+import com.sluv.server.domain.brand.entity.RecentBrand;
 import com.sluv.server.domain.brand.exception.BrandNotFoundException;
+import com.sluv.server.domain.brand.exception.NewBrandNotFoundException;
 import com.sluv.server.domain.brand.repository.BrandRepository;
+import com.sluv.server.domain.brand.repository.NewBrandRepository;
+import com.sluv.server.domain.brand.repository.RecentBrandRepository;
 import com.sluv.server.domain.celeb.dto.CelebDto;
 import com.sluv.server.domain.celeb.entity.Celeb;
+import com.sluv.server.domain.celeb.entity.NewCeleb;
+import com.sluv.server.domain.celeb.entity.RecentSearchCeleb;
 import com.sluv.server.domain.celeb.exception.CelebNotFoundException;
+import com.sluv.server.domain.celeb.exception.NewCelebNotFoundException;
 import com.sluv.server.domain.celeb.repository.CelebRepository;
+import com.sluv.server.domain.celeb.repository.NewCelebRepository;
+import com.sluv.server.domain.celeb.repository.RecentSearchCelebRepository;
 import com.sluv.server.domain.item.dto.*;
 import com.sluv.server.domain.item.entity.*;
 import com.sluv.server.domain.item.entity.hashtag.Hashtag;
@@ -19,6 +29,7 @@ import com.sluv.server.domain.item.repository.*;
 import com.sluv.server.domain.item.repository.hashtag.HashtagRepository;
 import com.sluv.server.domain.item.repository.hashtag.TempItemHashtagRepository;
 import com.sluv.server.domain.user.entity.User;
+import com.sluv.server.domain.user.exception.NotFoundUserException;
 import com.sluv.server.global.common.enums.ItemImgOrLinkStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -37,49 +48,46 @@ public class TempItemService {
     private final TempItemImgRepository tempItemImgRepository;
     private final TempItemHashtagRepository tempItemHashtagRepository;
 
-
-
     private final HashtagRepository hashtagRepository;
     private final CelebRepository celebRepository;
     private final ItemCategoryRepository itemCategoryRepository;
     private final BrandRepository brandRepository;
+    private final NewBrandRepository newBrandRepository;
+    private final NewCelebRepository newCelebRepository;
+    private final RecentSearchCelebRepository recentSearchCelebRepository;
+    private final RecentBrandRepository recentBrandRepository;
 
 
     public void postTempItem(User user, TempItemPostReqDto reqDto) {
-        Celeb celeb = null;
-        if(reqDto.getCelebId() != null){
-            celeb = celebRepository.findById(reqDto.getCelebId())
-                    .orElseThrow(CelebNotFoundException::new);
-        }
+        Celeb celeb = reqDto.getCelebId() != null ? celebRepository.findById(reqDto.getCelebId())
+                .orElseThrow(CelebNotFoundException::new)
+                : null;
+        Brand brand = reqDto.getBrandId() != null ? brandRepository.findById(reqDto.getBrandId())
+                .orElseThrow(BrandNotFoundException::new)
+                : null;
+        NewCeleb newCeleb = reqDto.getNewCelebId() != null ? newCelebRepository.findById(reqDto.getNewCelebId())
+                .orElseThrow(NewCelebNotFoundException::new)
+                : null;
 
-        Brand brand = null;
-        if(reqDto.getBrandId() != null){
-            brand = brandRepository.findById(reqDto.getBrandId())
-                    .orElseThrow(BrandNotFoundException::new);
-        }
-        ItemCategory itemCategory = null;
-        if(reqDto.getCategoryId() != null){
-            itemCategory = itemCategoryRepository.findById(reqDto.getCategoryId())
-                    .orElseThrow(ItemCategoryNotFoundException::new);
-        }
-
-        Integer price = null;
-        if(reqDto.getPrice() != null){
-            price = reqDto.getPrice();
-        }
+        NewBrand newBrand = reqDto.getNewBrandId() != null ? newBrandRepository.findById(reqDto.getNewBrandId())
+                .orElseThrow(NewBrandNotFoundException::new)
+                : null;
+        ItemCategory itemCategory = reqDto.getCategoryId() != null ? itemCategoryRepository.findById(reqDto.getCategoryId())
+                .orElseThrow(ItemCategoryNotFoundException::new)
+                : null;
 
         TempItem tempitem = tempItemRepository.save(TempItem
                 .builder()
                 .user(user)
                 .celeb(celeb)
-                .newCelebName(reqDto.getNewCelebName())
+                .newCeleb(newCeleb)
                 .category(itemCategory)
                 .brand(brand)
-                .newBrandName(reqDto.getNewBrandName())
+                .newBrand(newBrand)
                 .name(reqDto.getItemName())
                 .whenDiscovery(reqDto.getWhenDiscovery())
                 .whereDiscovery(reqDto.getWhereDiscovery())
-                .price(price)
+                .price(reqDto.getPrice())
                 .additionalInfo(reqDto.getAdditionalInfo())
                 .infoSource(reqDto.getInfoSource())
                 .itemStatus(ItemStatus.ACTIVE)
@@ -130,6 +138,21 @@ public class TempItemService {
             ).forEach(tempItemHashtagRepository::save);
         }
 
+        // Recent Search Celeb 테이블에 추가
+        recentSearchCelebRepository.save(RecentSearchCeleb.builder()
+                .user(user)
+                .celeb(celeb)
+                .newCeleb(newCeleb)
+                .build()
+        );
+
+        recentBrandRepository.save(RecentBrand.builder()
+                .user(user)
+                .brand(brand)
+                .newBrand(newBrand)
+                .build()
+        );
+
     }
 
     public List<TempItemResDto> getTempItemList(User user, Pageable pageable){
@@ -156,7 +179,7 @@ public class TempItemService {
 
                 CelebDto celebDto = tempItem.getCeleb() != null ?
                         CelebDto.builder()
-                        .id(tempItem.getCeleb().getId())
+                        .id(tempItem.getId())
                         .celebNameKr(tempItem.getCeleb().getCelebNameKr())
                         .celebNameEn(tempItem.getCeleb().getCelebNameEn())
                         .categoryChild(tempItem.getCeleb().getCelebCategory().getName())
@@ -166,7 +189,7 @@ public class TempItemService {
                         .build()
                         : null;
 
-                ItemCategoryDto itemCategory = tempItem.getCategory() != null ?
+                ItemCategoryDto itemCategoryDto = tempItem.getCategory() != null ?
                         ItemCategoryDto.builder()
                                 .id(tempItem.getCategory().getId())
                                 .name(tempItem.getCategory().getName())
@@ -174,22 +197,21 @@ public class TempItemService {
                                 .build()
                         : null;
 
-
             return TempItemResDto.builder()
                             .id(tempItem.getId())
                             .imgList(tempImgList)
                             .celeb(celebDto)
                             .whenDiscovery(tempItem.getWhenDiscovery())
                             .whereDiscovery(tempItem.getWhereDiscovery())
-                            .category(itemCategory)
+                            .category(itemCategoryDto)
                             .itemName(tempItem.getName())
                             .price(tempItem.getPrice())
                             .additionalInfo(tempItem.getAdditionalInfo())
                             .hashTagList(tempHashtagList)
                             .linkList(tempLinkList)
                     .infoSource(tempItem.getInfoSource())
-                    .newCelebName(tempItem.getNewCelebName())
-                    .newBrandName(tempItem.getNewBrandName())
+                    .newCelebId(tempItem.getNewCeleb().getId())
+                    .newBrandId(tempItem.getNewBrand().getId())
                     .updatedAt(tempItem.getUpdatedAt())
                     .build();
 
@@ -204,14 +226,15 @@ public class TempItemService {
         Celeb celeb = dto.getCelebId() != null ? celebRepository.findById(dto.getCelebId()).orElseThrow(CelebNotFoundException::new) : null;
         ItemCategory itemCategory = dto.getCategoryId() != null ? itemCategoryRepository.findById(dto.getCategoryId()).orElseThrow(ItemCategoryNotFoundException::new) : null;
         Brand brand = dto.getBrandId() != null ?brandRepository.findById(dto.getBrandId()).orElseThrow(BrandNotFoundException::new) : null;
+        NewCeleb newCeleb = dto.getNewCelebId() != null ?newCelebRepository.findById(dto.getNewCelebId()).orElseThrow(NewCelebNotFoundException::new) : null;
+        NewBrand newBrand = dto.getNewBrandId() != null ?newBrandRepository.findById(dto.getNewBrandId()).orElseThrow(NewBrandNotFoundException::new) : null;
 
         // temp Item 변경.
         tempItem.setCeleb(celeb);
-        tempItem.setCeleb(celeb);
-        tempItem.setNewCelebName(dto.getNewCelebName());
+        tempItem.setNewCeleb(newCeleb);
         tempItem.setCategory(itemCategory);
         tempItem.setBrand(brand);
-        tempItem.setNewBrandName(dto.getNewBrandName());
+        tempItem.setNewBrand(newBrand);
         tempItem.setName(dto.getItemName());
         tempItem.setWhenDiscovery(dto.getWhenDiscovery());
         tempItem.setWhereDiscovery(dto.getWhereDiscovery());
@@ -275,6 +298,21 @@ public class TempItemService {
         }
 
         tempItemRepository.save(tempItem);
+
+        // Recent Search Celeb 테이블에 추가
+        recentSearchCelebRepository.save(RecentSearchCeleb.builder()
+                .user(user)
+                .celeb(celeb)
+                .newCeleb(newCeleb)
+                .build()
+        );
+
+        recentBrandRepository.save(RecentBrand.builder()
+                .user(user)
+                .brand(brand)
+                .newBrand(newBrand)
+                .build()
+        );
 
     }
 

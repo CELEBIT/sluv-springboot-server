@@ -56,10 +56,10 @@ public class ItemPostReqDto {
     @Schema(description = "추가정보를 발견한 출처")
     private String infoSource;
 
-    @Schema(description = "새로운 Celeb 이름")
-    private String newCelebName;
-    @Schema(description = "새로운 Brand 이름")
-    private String newBrandName;
+    @Schema(description = "새로운 Celeb Id")
+    private Long newCelebId;
+    @Schema(description = "새로운 Brand Id")
+    private Long newBrandId;
 
 
 }

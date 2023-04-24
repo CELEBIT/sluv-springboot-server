@@ -1,12 +1,7 @@
-package com.sluv.server.domain.brand.repository;
+package com.sluv.server.domain.brand.repository.impl;
 
-import com.querydsl.core.Tuple;
-import com.querydsl.core.types.Expression;
-import com.querydsl.core.types.Projections;
-import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sluv.server.domain.brand.entity.Brand;
-import com.sluv.server.domain.user.entity.QUser;
 import com.sluv.server.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -16,7 +11,6 @@ import org.springframework.data.domain.Pageable;
 import java.util.List;
 
 import static com.sluv.server.domain.brand.entity.QBrand.brand;
-import static com.sluv.server.domain.user.entity.QUser.user;
 import static com.sluv.server.domain.brand.entity.QRecentBrand.recentBrand;
 
 @RequiredArgsConstructor

@@ -1,4 +1,4 @@
-package com.sluv.server.domain.brand.repository;
+package com.sluv.server.domain.brand.repository.impl;
 
 import com.sluv.server.domain.brand.entity.Brand;
 import com.sluv.server.domain.user.entity.User;

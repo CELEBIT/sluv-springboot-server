@@ -74,18 +74,18 @@ public class CelebService {
     }
 
     public List<RecentSelectCelebResDto> getUserRecentSelectCeleb(User user){
-        List<RecentSelectCeleb> recentSelectCelebList = recentSearchCelebRepository.getRecentSearchCelebTop20(user);
+        List<RecentSelectCeleb> recentSelectCelebList = recentSearchCelebRepository.getRecentSelectCelebTop20(user);
 
-        return recentSelectCelebList.stream().map(recentSearchCeleb -> {
+        return recentSelectCelebList.stream().map(recentSelectCeleb -> {
             Long celebId;
             String celebName;
-            String flag = recentSearchCeleb.getCeleb() != null ? "Y" :"N";
+            String flag = recentSelectCeleb.getCeleb() != null ? "Y" :"N";
             if(flag.equals("Y")){
-                celebId = recentSearchCeleb.getCeleb().getId();
-                celebName = recentSearchCeleb.getCeleb().getCelebNameKr();
+                celebId = recentSelectCeleb.getCeleb().getId();
+                celebName = recentSelectCeleb.getCeleb().getCelebNameKr();
             }else{
-                celebId = recentSearchCeleb.getNewCeleb().getId();
-                celebName = recentSearchCeleb.getNewCeleb().getCelebName();
+                celebId = recentSelectCeleb.getNewCeleb().getId();
+                celebName = recentSelectCeleb.getNewCeleb().getCelebName();
             }
             return RecentSelectCelebResDto.builder()
                     .id(celebId)

@@ -1,7 +1,7 @@
 package com.sluv.server.domain.brand.service;
 
 import com.sluv.server.domain.brand.dto.BrandSearchResDto;
-import com.sluv.server.domain.brand.dto.RecentBrandResDto;
+import com.sluv.server.domain.brand.dto.RecentSelectBrandResDto;
 import com.sluv.server.domain.brand.entity.RecentSelectBrand;
 import com.sluv.server.domain.brand.repository.BrandRepository;
 import com.sluv.server.domain.brand.repository.RecentSelectBrandRepository;
@@ -45,22 +45,22 @@ public class BrandService {
                                             ).collect(Collectors.toList());
     }
 
-    public List<RecentBrandResDto> findRecentBrand(User user) {
+    public List<RecentSelectBrandResDto> findRecentSelectBrand(User user) {
 
-        List<RecentSelectBrand> recentSelectBrandList = recentSelectBrandRepository.getRecentSearchBrandTop20(user);
+        List<RecentSelectBrand> recentSelectBrandList = recentSelectBrandRepository.getRecentSelectBrandTop20(user);
 
-        return recentSelectBrandList.stream().map(recentBrand -> {
+        return recentSelectBrandList.stream().map(recentSelectBrand -> {
             Long brandId;
             String brandName;
-            String flag = recentBrand.getBrand() != null ? "Y" :"N";
+            String flag = recentSelectBrand.getBrand() != null ? "Y" :"N";
             if(flag.equals("Y")){
-                brandId = recentBrand.getBrand().getId();
-                brandName = recentBrand.getBrand().getBrandKr();
+                brandId = recentSelectBrand.getBrand().getId();
+                brandName = recentSelectBrand.getBrand().getBrandKr();
             }else{
-                brandId = recentBrand.getNewBrand().getId();
-                brandName = recentBrand.getNewBrand().getBrandName();
+                brandId = recentSelectBrand.getNewBrand().getId();
+                brandName = recentSelectBrand.getNewBrand().getBrandName();
             }
-            return RecentBrandResDto.builder()
+            return RecentSelectBrandResDto.builder()
                     .id(brandId)
                     .brandName(brandName)
                     .flag(flag)

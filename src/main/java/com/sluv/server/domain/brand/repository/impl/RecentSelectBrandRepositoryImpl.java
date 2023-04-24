@@ -14,7 +14,7 @@ public class RecentSelectBrandRepositoryImpl implements RecentSelectBrandReposit
     private final JPAQueryFactory jpaQueryFactory;
 
     @Override
-    public List<RecentSelectBrand> getRecentSearchBrandTop20(User user) {
+    public List<RecentSelectBrand> getRecentSelectBrandTop20(User user) {
         return jpaQueryFactory.selectFrom(recentSelectBrand)
                 .where(recentSelectBrand.user.eq(user))
                 .groupBy(recentSelectBrand.brand, recentSelectBrand.newBrand)

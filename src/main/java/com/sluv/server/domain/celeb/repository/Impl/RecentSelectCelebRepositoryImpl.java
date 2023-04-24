@@ -15,7 +15,7 @@ public class RecentSelectCelebRepositoryImpl implements RecentSelectCelebReposit
     private final JPAQueryFactory jpaQueryFactory;
 
     @Override
-    public List<RecentSelectCeleb> getRecentSearchCelebTop20(User user) {
+    public List<RecentSelectCeleb> getRecentSelectCelebTop20(User user) {
         return jpaQueryFactory.selectFrom(recentSelectCeleb)
                 .where(recentSelectCeleb.user.eq(user))
                 .limit(20)

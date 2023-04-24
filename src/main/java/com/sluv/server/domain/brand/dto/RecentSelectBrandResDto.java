@@ -6,13 +6,13 @@ import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-public class RecentBrandResDto {
+public class RecentSelectBrandResDto {
     private Long id;
     private String brandName;
     private String flag;
 
     @Builder
-    public RecentBrandResDto(Long id, String brandName, String flag) {
+    public RecentSelectBrandResDto(Long id, String brandName, String flag) {
         this.id = id;
         this.brandName = brandName;
         this.flag = flag;

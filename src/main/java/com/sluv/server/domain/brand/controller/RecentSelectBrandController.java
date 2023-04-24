@@ -1,7 +1,7 @@
 package com.sluv.server.domain.brand.controller;
 
 import com.sluv.server.domain.brand.dto.RecentSelectBrandReqDto;
-import com.sluv.server.domain.brand.dto.RecentBrandResDto;
+import com.sluv.server.domain.brand.dto.RecentSelectBrandResDto;
 import com.sluv.server.domain.brand.service.BrandService;
 import com.sluv.server.domain.brand.service.RecentSelectBrandService;
 import com.sluv.server.domain.user.entity.User;
@@ -23,7 +23,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/app/brand/recent")
-public class RecentBrandController {
+public class RecentSelectBrandController {
     private final BrandService brandService;
     private final RecentSelectBrandService recentSelectBrandService;
 
@@ -37,13 +37,13 @@ public class RecentBrandController {
             @ApiResponse(responseCode = "5001", description = "DB 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @GetMapping("")
-    public ResponseEntity<SuccessDataResponse<List<RecentBrandResDto>>> getRecentSelectBrand(@AuthenticationPrincipal User user){
+    public ResponseEntity<SuccessDataResponse<List<RecentSelectBrandResDto>>> getRecentSelectBrand(@AuthenticationPrincipal User user){
 
 
         return ResponseEntity.ok()
                 .body(
-                        SuccessDataResponse.<List<RecentBrandResDto>>builder()
-                                .result(brandService.findRecentBrand(user))
+                        SuccessDataResponse.<List<RecentSelectBrandResDto>>builder()
+                                .result(brandService.findRecentSelectBrand(user))
                                 .build()
                 );
 

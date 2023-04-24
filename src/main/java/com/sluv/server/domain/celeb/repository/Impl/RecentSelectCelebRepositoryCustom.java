@@ -7,5 +7,5 @@ import java.util.List;
 
 public interface RecentSelectCelebRepositoryCustom {
 
-    List<RecentSelectCeleb> getRecentSearchCelebTop20(User user);
+    List<RecentSelectCeleb> getRecentSelectCelebTop20(User user);
 }

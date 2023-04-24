@@ -6,4 +6,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface RecentSelectCelebRepository extends JpaRepository<RecentSelectCeleb, Long>, RecentSelectCelebRepositoryCustom {
     void deleteAllByUserId(Long id);
+
+    void deleteByUserIdAndCelebId(Long userId, Long celebId);
+
+    void deleteByUserIdAndNewCelebId(Long userId, Long newCelebId);
 }

@@ -35,6 +35,7 @@ public class SpringSecurityConfig {
 
             // celeb
             "/app/celeb/recent",
+            "/app/celeb/recent/{celebId}",
 
             // item
             "/app/item",

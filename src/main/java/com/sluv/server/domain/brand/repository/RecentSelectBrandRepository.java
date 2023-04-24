@@ -5,4 +5,5 @@ import com.sluv.server.domain.brand.repository.impl.RecentSelectBrandRepositoryC
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface RecentSelectBrandRepository extends JpaRepository<RecentSelectBrand, Long>, RecentSelectBrandRepositoryCustom {
+    void deleteAllByUserId(Long id);
 }

@@ -67,4 +67,13 @@ public class RecentSelectCelebController {
                 new SuccessResponse()
         );
     }
+
+    @DeleteMapping("")
+    public ResponseEntity<SuccessResponse> deleteAllRecentSelectCeleb(@AuthenticationPrincipal User user){
+        recentSelectCelebService.deleteAllRecentSelectCeleb(user);
+
+        return ResponseEntity.ok().body(
+                new SuccessResponse()
+        );
+    }
 }

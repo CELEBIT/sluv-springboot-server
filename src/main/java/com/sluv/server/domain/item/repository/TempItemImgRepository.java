@@ -8,4 +8,6 @@ import java.util.List;
 
 public interface TempItemImgRepository extends JpaRepository<TempItemImg, Long> {
     List<TempItemImg> findAllByTempItem(TempItem tempItem);
+
+    void deleteAllByTempItemId(Long id);
 }

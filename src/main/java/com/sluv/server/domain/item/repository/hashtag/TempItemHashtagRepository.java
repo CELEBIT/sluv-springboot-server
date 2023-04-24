@@ -8,4 +8,6 @@ import java.util.List;
 
 public interface TempItemHashtagRepository extends JpaRepository<TempItemHashtag, Long> {
     List<TempItemHashtag> findAllByTempItem(TempItem tempItem);
+
+    void deleteAllByTempItemId(Long id);
 }

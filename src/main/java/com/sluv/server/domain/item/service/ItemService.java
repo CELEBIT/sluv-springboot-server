@@ -17,7 +17,7 @@ import com.sluv.server.domain.item.entity.*;
 import com.sluv.server.domain.item.entity.hashtag.ItemHashtag;
 import com.sluv.server.domain.item.enums.ItemStatus;
 import com.sluv.server.domain.item.exception.ItemCategoryNotFoundException;
-import com.sluv.server.domain.item.exception.hashtag.NotFoundHashtagException;
+import com.sluv.server.domain.item.exception.hashtag.HashtagNotFoundException;
 import com.sluv.server.domain.item.repository.*;
 import com.sluv.server.domain.item.repository.hashtag.HashtagRepository;
 import com.sluv.server.domain.item.repository.hashtag.ItemHashtagRepository;
@@ -25,8 +25,6 @@ import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.global.common.enums.ItemImgOrLinkStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -143,7 +141,7 @@ public class ItemService {
                             .item(newItem)
                             .hashtag(
                                     hashtagRepository.findById(hashTag)
-                                            .orElseThrow(NotFoundHashtagException::new)
+                                            .orElseThrow(HashtagNotFoundException::new)
                             )
                             .build()
 

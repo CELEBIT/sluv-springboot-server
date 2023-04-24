@@ -12,6 +12,7 @@ import com.sluv.server.domain.celeb.repository.RecentSelectCelebRepository;
 import com.sluv.server.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -38,5 +39,10 @@ public class RecentSelectCelebService {
                         .user(user)
                         .build()
         );
+    }
+
+    @Transactional
+    public void deleteAllRecentSelectCeleb(User user) {
+        recentSelectCelebRepository.deleteAllByUserId(user.getId());
     }
 }

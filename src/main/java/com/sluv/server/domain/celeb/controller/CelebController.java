@@ -1,6 +1,7 @@
 package com.sluv.server.domain.celeb.controller;
 
 import com.sluv.server.domain.celeb.dto.CelebSearchResDto;
+import com.sluv.server.domain.celeb.dto.RecentCelebResDto;
 import com.sluv.server.domain.celeb.service.CelebService;
 import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.global.common.response.ErrorResponse;
@@ -60,12 +61,12 @@ public class CelebController {
             @ApiResponse(responseCode = "5001", description = "DB 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @GetMapping("/search/recent")
-    public ResponseEntity<SuccessDataResponse<List<CelebSearchResDto>>> searchUserRecentSearchCeleb(
+    public ResponseEntity<SuccessDataResponse<List<RecentCelebResDto>>> searchUserRecentSearchCeleb(
 
             @AuthenticationPrincipal User user){
 
         return ResponseEntity.ok().body(
-                SuccessDataResponse.<List<CelebSearchResDto>>builder()
+                SuccessDataResponse.<List<RecentCelebResDto>>builder()
                         .result(celebService.getUserRecentSearchCeleb(user))
                         .build()
         );

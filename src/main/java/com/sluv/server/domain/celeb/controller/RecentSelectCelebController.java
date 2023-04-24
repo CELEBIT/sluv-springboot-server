@@ -84,4 +84,13 @@ public class RecentSelectCelebController {
                 new SuccessResponse()
         );
     }
+
+    @DeleteMapping("/{celebId}")
+    public ResponseEntity<SuccessResponse> deleteRecentSelectCeleb(@AuthenticationPrincipal User user, @PathVariable("celebId") Long celebId, @RequestParam("flag") String flag){
+        recentSelectCelebService.deleteRecentSelectCeleb(user, celebId, flag);
+
+        return ResponseEntity.ok().body(
+                new SuccessResponse()
+        );
+    }
 }

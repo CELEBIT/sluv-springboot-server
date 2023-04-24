@@ -20,8 +20,11 @@ public class RecentBrand extends BaseEntity {
 
     @ManyToOne
     @JoinColumn(name = "brand_id")
-    @NotNull
     private Brand brand;
+
+    @ManyToOne
+    @JoinColumn(name = "new_brand_id")
+    private NewBrand newBrand;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
@@ -30,9 +33,10 @@ public class RecentBrand extends BaseEntity {
 
 
     @Builder
-    public RecentBrand(Long id, Brand brand, User user) {
+    public RecentBrand(Long id, Brand brand, NewBrand newBrand, User user) {
         this.id = id;
         this.brand = brand;
+        this.newBrand = newBrand;
         this.user = user;
     }
 }

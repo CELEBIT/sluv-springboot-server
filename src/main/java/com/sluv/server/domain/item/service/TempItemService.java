@@ -57,7 +57,7 @@ public class TempItemService {
     private final RecentSelectBrandRepository recentSelectBrandRepository;
 
 
-    public void postTempItem(User user, TempItemPostReqDto reqDto) {
+    public Long postTempItem(User user, TempItemPostReqDto reqDto) {
         Celeb celeb = reqDto.getCelebId() != null ? celebRepository.findById(reqDto.getCelebId())
                 .orElseThrow(CelebNotFoundException::new)
                 : null;
@@ -75,31 +75,32 @@ public class TempItemService {
                 .orElseThrow(ItemCategoryNotFoundException::new)
                 : null;
 
-        TempItem tempitem = tempItemRepository.save(TempItem
-                .builder()
-                .user(user)
-                .celeb(celeb)
-                .newCeleb(newCeleb)
-                .category(itemCategory)
-                .brand(brand)
-                .newBrand(newBrand)
-                .name(reqDto.getItemName())
-                .whenDiscovery(reqDto.getWhenDiscovery())
-                .whereDiscovery(reqDto.getWhereDiscovery())
-                .price(reqDto.getPrice())
-                .additionalInfo(reqDto.getAdditionalInfo())
-                .infoSource(reqDto.getInfoSource())
-                .itemStatus(ItemStatus.ACTIVE)
-                .build()
-            );
+        TempItem tempItem = reqDto.getId() != null ? tempItemRepository.findById(reqDto.getId())
+                .orElseThrow(TempItemNotFoundException::new)
+                :TempItem.builder().itemStatus(ItemStatus.ACTIVE).build();
+
+        tempItem.setUser(user);
+        tempItem.setCeleb(celeb);
+        tempItem.setNewCeleb(newCeleb);
+        tempItem.setCategory(itemCategory);
+        tempItem.setBrand(brand);
+        tempItem.setNewBrand(newBrand);
+        tempItem.setName(reqDto.getItemName());
+        tempItem.setWhenDiscovery(reqDto.getWhenDiscovery());
+        tempItem.setWhereDiscovery(reqDto.getWhereDiscovery());
+        tempItem.setPrice(reqDto.getPrice());
+        tempItem.setAdditionalInfo(reqDto.getAdditionalInfo());
+        tempItem.setInfoSource(reqDto.getInfoSource());
+
+        TempItem saveTempItem = tempItemRepository.save(tempItem);
 
         // ItemImg 테이블에 추가
+        tempItemImgRepository.deleteAllByTempItemId(tempItem.getId());
         if(reqDto.getImgList() != null) {
-
             reqDto.getImgList().stream()
                             .map(tempItemImg ->
                                 TempItemImg.builder()
-                                        .tempItem(tempitem)
+                                        .tempItem(saveTempItem)
                                         .tempItemImgUrl(tempItemImg.getImgUrl())
                                         .representFlag(tempItemImg.getRepresentFlag())
                                         .itemImgOrLinkStatus(ItemImgOrLinkStatus.ACTIVE)
@@ -109,11 +110,12 @@ public class TempItemService {
         }
 
         // ItemLink 테이블에 추가
+        tempItemLinkRepository.deleteAllByTempItemId(tempItem.getId());
         if(reqDto.getLinkList() != null) {
             reqDto.getLinkList().stream()
                             .map(tempItemLink ->
                                     TempItemLink.builder()
-                                            .tempItem(tempitem)
+                                            .tempItem(saveTempItem)
                                             .linkName(tempItemLink.getLinkName())
                                             .tempItemLinkUrl(tempItemLink.getItemLinkUrl())
                                             .itemImgOrLinkStatus(ItemImgOrLinkStatus.ACTIVE)
@@ -123,11 +125,11 @@ public class TempItemService {
         }
 
         // ItemHashtag 테이블에 추가
+        tempItemHashtagRepository.deleteAllByTempItemId(tempItem.getId());
         if(reqDto.getHashTagIdList() != null) {
             reqDto.getHashTagIdList().stream().map(hashTag ->
-
                     TempItemHashtag.builder()
-                            .tempItem(tempitem)
+                            .tempItem(saveTempItem)
                             .hashtag(
                                     hashtagRepository.findById(hashTag)
                                             .orElseThrow(HashtagNotFoundException::new)
@@ -137,21 +139,7 @@ public class TempItemService {
             ).forEach(tempItemHashtagRepository::save);
         }
 
-        // Recent Search Celeb 테이블에 추가
-        recentSearchCelebRepository.save(RecentSelectCeleb.builder()
-                .user(user)
-                .celeb(celeb)
-                .newCeleb(newCeleb)
-                .build()
-        );
-
-        recentSelectBrandRepository.save(RecentSelectBrand.builder()
-                .user(user)
-                .brand(brand)
-                .newBrand(newBrand)
-                .build()
-        );
-
+        return saveTempItem.getId();
     }
 
     public List<TempItemResDto> getTempItemList(User user, Pageable pageable){
@@ -216,6 +204,7 @@ public class TempItemService {
 
             }
         ).collect(Collectors.toList());
+
     }
 
     @Transactional

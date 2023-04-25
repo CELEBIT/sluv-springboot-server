@@ -7,7 +7,4 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface TempItemRepository extends JpaRepository<TempItem, Long>, TempItemRepositoryCustom {
-    List<TempItem> findAllByUserId(Long id);
-
-    void deleteAllByUserId(Long id);
 }

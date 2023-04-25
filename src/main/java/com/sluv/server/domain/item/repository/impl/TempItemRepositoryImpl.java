@@ -29,4 +29,14 @@ public class TempItemRepositoryImpl implements TempItemRepositoryCustom{
         return new PageImpl<>(result);
     }
 
+    @Override
+    public List<TempItem> findAllExceptLast(User user) {
+
+        return jpaQueryFactory.selectFrom(tempItem)
+                .where(tempItem.user.eq(user))
+                .orderBy(tempItem.updatedAt.desc())
+                .offset(1)
+                .fetch();
+    }
+
 }

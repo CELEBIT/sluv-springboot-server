@@ -2,21 +2,17 @@ package com.sluv.server.domain.item.service;
 
 import com.sluv.server.domain.brand.entity.Brand;
 import com.sluv.server.domain.brand.entity.NewBrand;
-import com.sluv.server.domain.brand.entity.RecentSelectBrand;
 import com.sluv.server.domain.brand.exception.BrandNotFoundException;
 import com.sluv.server.domain.brand.exception.NewBrandNotFoundException;
 import com.sluv.server.domain.brand.repository.BrandRepository;
 import com.sluv.server.domain.brand.repository.NewBrandRepository;
-import com.sluv.server.domain.brand.repository.RecentSelectBrandRepository;
 import com.sluv.server.domain.celeb.dto.CelebDto;
 import com.sluv.server.domain.celeb.entity.Celeb;
 import com.sluv.server.domain.celeb.entity.NewCeleb;
-import com.sluv.server.domain.celeb.entity.RecentSelectCeleb;
 import com.sluv.server.domain.celeb.exception.CelebNotFoundException;
 import com.sluv.server.domain.celeb.exception.NewCelebNotFoundException;
 import com.sluv.server.domain.celeb.repository.CelebRepository;
 import com.sluv.server.domain.celeb.repository.NewCelebRepository;
-import com.sluv.server.domain.celeb.repository.RecentSelectCelebRepository;
 import com.sluv.server.domain.item.dto.*;
 import com.sluv.server.domain.item.entity.*;
 import com.sluv.server.domain.item.entity.hashtag.Hashtag;
@@ -53,8 +49,6 @@ public class TempItemService {
     private final BrandRepository brandRepository;
     private final NewBrandRepository newBrandRepository;
     private final NewCelebRepository newCelebRepository;
-    private final RecentSelectCelebRepository recentSearchCelebRepository;
-    private final RecentSelectBrandRepository recentSelectBrandRepository;
 
 
     public Long postTempItem(User user, TempItemPostReqDto reqDto) {
@@ -224,20 +218,20 @@ public class TempItemService {
     @Transactional
     public void deleteAllTempItem(User user){
         // 1. 해당 유저의 모든 TempItem 조회
-        List<TempItem> tempItemList = tempItemRepository.findAllByUserId(user.getId());
+        List<TempItem> tempItemList = tempItemRepository.findAllExceptLast(user);
 
         // 2. 모든 TempItem에 대한 관련된 삭제
         tempItemList.forEach(tempItem -> {
             // 2-1. tempItemImg 삭제
             tempItemImgRepository.deleteAllByTempItemId(tempItem.getId());
-            // 2-2. tempItemLink 삭제
+            // 2-2. tempItemLink 삭제ㅎ
             tempItemLinkRepository.deleteAllByTempItemId(tempItem.getId());
             // 2-3. tempItemHashtag 삭제
             tempItemHashtagRepository.deleteAllByTempItemId(tempItem.getId());
+            // 3. TempItem 삭제
+            tempItemRepository.deleteById(tempItem.getId());
         });
 
-        // 3. 모든 TempItem 삭제
-        tempItemRepository.deleteAllByUserId(user.getId());
     }
 
 }

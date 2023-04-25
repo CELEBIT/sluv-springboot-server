@@ -1,6 +1,5 @@
 package com.sluv.server.domain.item.dto;
 
-import com.sluv.server.domain.celeb.entity.NewCeleb;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,7 +8,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
+
 
 @Data
 @NoArgsConstructor
@@ -21,6 +20,8 @@ public class TempItemPostReqDto {
      * 날짜, 장소, 추가 정보, 구매 링크
      */
 
+    @Schema(description = "tempItem id(PK)")
+    private Long id;
     @Schema(description = "item 이미지 리스트 \"{대표여부 0 or 1}\":\"이미지링크\"")
     private List<ItemImgResDto> imgList;
     @Schema(description = "celebId")

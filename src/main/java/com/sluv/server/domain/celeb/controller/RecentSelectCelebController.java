@@ -31,8 +31,7 @@ public class RecentSelectCelebController {
 
     @Operation(
             summary = "*최근 선택한 Celeb 조회",
-            description = "유저가 최근 선택한 20개의 Celeb 조회",
-            parameters = {@Parameter(name = "X-AUTH-TOKEN", required = true, description = "Authentication token", in = ParameterIn.HEADER)}
+            description = "유저가 최근 선택한 20개의 Celeb 조회"
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "1000", description = "요청성공"),

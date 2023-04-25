@@ -17,7 +17,7 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
 
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
-        if (request.getHeader("X-AUTH-TOKEN") == null){
+        if (request.getHeader("Authorization") == null){
             throw new NoAuthorizationTokenException();
         }
     }

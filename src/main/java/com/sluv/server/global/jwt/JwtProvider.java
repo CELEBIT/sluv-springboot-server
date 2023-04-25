@@ -39,6 +39,8 @@ public class JwtProvider {
     @Value("${jwt.expiration-seconds}")
     private Long tokenValidMillisecond = 0L;
 
+    @Value("${jwt.type}")
+    private String tokenType;
     @PostConstruct
     protected void init(){
         secretKey = Base64.getEncoder().encodeToString(secretKey.getBytes(StandardCharsets.UTF_8));
@@ -48,7 +50,8 @@ public class JwtProvider {
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public Authentication getAuthentication(String token){
+    public Authentication getAuthentication(String _token){
+        String token = _token.split(tokenType + " ")[1];
         UserDetails user = userRepository.findById(Long.valueOf(this.getUserId(token).toString())).orElseThrow(NotFoundUserException::new);
 
         return new UsernamePasswordAuthenticationToken(user, "", user.getAuthorities());
@@ -86,7 +89,6 @@ public class JwtProvider {
                 .parseClaimsJws(token)
                 .getBody()
                 .getSubject();
-
         return Long.valueOf(info);
     }
 
@@ -97,20 +99,19 @@ public class JwtProvider {
      * @return token
      */
     public String resolveToken(HttpServletRequest request){
-
-        return request.getHeader("X-AUTH-TOKEN");
-
+        return request.getHeader("Authorization");
     }
 
     /**
      * === token 만료 확인 ===
      *
-     * @param token
+     * @param _token
      * @return true or false
      * @throws ExpiredTokenException
      */
-    public boolean validateToken(String token){
+    public boolean validateToken(String _token){
         try {
+            String token = _token.split(tokenType + " ")[1];
             Jwts.parserBuilder().setSigningKey(secretKey.getBytes()).build()
                     .parseClaimsJws(token);
             return true;
@@ -124,6 +125,7 @@ public class JwtProvider {
             // 지원하지 않는 토큰
         } catch (Exception e) {
             //나머지 예외
+            throw new InvalidateTokenException();
         }
 
         return false;

@@ -106,20 +106,6 @@ public class ItemController {
                         .build()
         );
     }
-    @Operation(
-            summary = "*임시저장 아이템 수정",
-            description = "사용자의 임시저장 아이템 수정."
-    )
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "1000", description = "요청성공"),
-            @ApiResponse(responseCode = "5000", description = "서버내부 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-            @ApiResponse(responseCode = "5001", description = "DB 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
-    })
-    @PutMapping("/temp/{tempItemId}")
-    public ResponseEntity<SuccessResponse> putTempItem(@AuthenticationPrincipal User user, @PathVariable Long tempItemId, @RequestBody TempItemPostReqDto dto){
-        tempItemService.putTempItem(user, tempItemId, dto);
-        return ResponseEntity.ok().body(new SuccessResponse());
-    }
 
     @Operation(
             summary = "임시저장 아이템 선택삭제",

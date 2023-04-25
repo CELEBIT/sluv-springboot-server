@@ -1,9 +1,6 @@
 package com.sluv.server.domain.item.controller;
 
-import com.sluv.server.domain.item.dto.ItemPostReqDto;
-import com.sluv.server.domain.item.dto.PlaceRankResDto;
-import com.sluv.server.domain.item.dto.TempItemPostReqDto;
-import com.sluv.server.domain.item.dto.TempItemResDto;
+import com.sluv.server.domain.item.dto.*;
 import com.sluv.server.domain.item.service.ItemService;
 import com.sluv.server.domain.item.service.PlaceRankService;
 import com.sluv.server.domain.item.service.TempItemService;
@@ -80,12 +77,16 @@ public class ItemController {
             @ApiResponse(responseCode = "5001", description = "DB 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @PostMapping("/temp")
-    public ResponseEntity<SuccessResponse> postTempItem(@AuthenticationPrincipal User user, @RequestBody TempItemPostReqDto reqDto){
-
-        tempItemService.postTempItem(user, reqDto);
+    public ResponseEntity<SuccessDataResponse<TempItemPostResDto>> postTempItem(@AuthenticationPrincipal User user, @RequestBody TempItemPostReqDto reqDto){
 
         return ResponseEntity.ok().body(
-                new SuccessResponse()
+                SuccessDataResponse.<TempItemPostResDto>builder()
+                        .result(
+                                TempItemPostResDto.builder()
+                                                .tempItemId(tempItemService.postTempItem(user, reqDto))
+                                                .build()
+                                )
+                        .build()
         );
     }
     @Operation(

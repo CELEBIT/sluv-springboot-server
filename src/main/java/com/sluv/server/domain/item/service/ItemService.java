@@ -146,20 +146,5 @@ public class ItemService {
             );
         }
 
-        // Recent Search Celeb 테이블에 추가
-        recentSearchCelebRepository.save(RecentSelectCeleb.builder()
-                .user(user)
-                .celeb(celeb)
-                .newCeleb(newCeleb)
-                .build()
-        );
-
-        recentSelectBrandRepository.save(RecentSelectBrand.builder()
-                .user(user)
-                .brand(brand)
-                .newBrand(newBrand)
-                .build()
-        );
-
     }
 }

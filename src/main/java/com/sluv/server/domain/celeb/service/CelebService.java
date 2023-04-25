@@ -36,22 +36,42 @@ public class CelebService {
                                     // Celeb이 솔로일 경우
                                     if(parentEntry.getKey()){
                                         return parentEntry.getValue().stream()
-                                                        .map(data -> CelebSearchResDto.builder()
-                                                                .id(data.getId())
-                                                                .celebNameKr(data.getCelebNameKr())
-                                                                .celebNameEn(data.getCelebNameEn())
-                                                                .build()
+                                                        .map(data -> {
+                                                            String category;
+                                                            if(data.getCelebCategory().getParent() != null){
+                                                                category = data.getCelebCategory().getParent().getName();
+                                                            }else {
+                                                                category = data.getCelebCategory().getName();
+                                                            }
+
+                                                            return CelebSearchResDto.builder()
+                                                                            .id(data.getId())
+                                                                            .category(category)
+                                                                            .celebNameKr(data.getCelebNameKr())
+                                                                            .celebNameEn(data.getCelebNameEn())
+                                                                            .build();
+                                                                }
+
                                                         );
 
                                     }else{
                                         // Celeb이 그룹명일 경우
                                         return parentEntry.getValue().stream()
                                                 .flatMap(parent -> parent.getSubCelebList().stream()
-                                                        .map(child -> CelebSearchResDto.builder()
-                                                                .id(child.getId())
-                                                                .celebNameKr(parent.getCelebNameKr() + " " + child.getCelebNameKr())
-                                                                .celebNameEn(parent.getCelebNameEn() + " " + child.getCelebNameEn())
-                                                                .build()
+                                                        .map(child -> {
+                                                            String category;
+                                                            if(child.getCelebCategory().getParent() != null){
+                                                                category = child.getCelebCategory().getParent().getName();
+                                                            }else {
+                                                                category = child.getCelebCategory().getName();
+                                                            }
+                                                            return CelebSearchResDto.builder()
+                                                                            .id(child.getId())
+                                                                            .category(category)
+                                                                            .celebNameKr(parent.getCelebNameKr() + " " + child.getCelebNameKr())
+                                                                            .celebNameEn(parent.getCelebNameEn() + " " + child.getCelebNameEn())
+                                                                            .build();
+                                                                }
                                                         )
                                                 );
                                     }
@@ -60,12 +80,20 @@ public class CelebService {
                     } else {
                         // 검색어가 child Celeb 일 때
                         return entry.getValue().stream()
-                                .map(child ->
-                                        CelebSearchResDto.builder()
+                                .map(child -> {
+                                        String category;
+                                        if(child.getCelebCategory().getParent() != null){
+                                            category = child.getCelebCategory().getParent().getName();
+                                        }else{
+                                            category = child.getCelebCategory().getName();
+                                        }
+                                        return CelebSearchResDto.builder()
                                                 .id(child.getId())
+                                                .category(category)
                                                 .celebNameKr(child.getParent().getCelebNameKr() + " " + child.getCelebNameKr())
                                                 .celebNameEn(child.getParent().getCelebNameEn() + " " + child.getCelebNameEn())
-                                                .build()
+                                                .build();
+                                    }
                                 );
                     }
 

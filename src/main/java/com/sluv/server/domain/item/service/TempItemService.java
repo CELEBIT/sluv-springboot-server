@@ -174,7 +174,11 @@ public class TempItemService {
                         ItemCategoryDto.builder()
                                 .id(tempItem.getCategory().getId())
                                 .name(tempItem.getCategory().getName())
-                                .parentName(tempItem.getCategory().getParent().getName())
+                                .parentName(
+                                        tempItem.getCategory().getParent() != null
+                                                ? tempItem.getCategory().getParent().getName()
+                                                :null
+                                        )
                                 .build()
                         : null;
 

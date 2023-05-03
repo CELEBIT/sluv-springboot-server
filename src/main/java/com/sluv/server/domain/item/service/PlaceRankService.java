@@ -37,4 +37,9 @@ public class PlaceRankService {
     public void deleteAllPlace(User user) {
         placeRankRepository.deleteAllByUserId(user.getId());
     }
+
+    @Transactional
+    public void deletePlace(User user, String placeName) {
+        placeRankRepository.deleteByUserIdAndPlace(user.getId(), placeName);
+    }
 }

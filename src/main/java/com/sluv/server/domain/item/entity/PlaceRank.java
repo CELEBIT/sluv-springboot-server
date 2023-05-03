@@ -1,5 +1,6 @@
 package com.sluv.server.domain.item.entity;
 
+import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.global.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -17,13 +18,22 @@ public class PlaceRank extends BaseEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "place_rank_id")
     private Long id;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    @NotNull
+    private User user;
+
     @NotNull
     @Size(max = 255)
     private String place;
 
+
+
     @Builder
-    public PlaceRank(Long id, String place) {
+    public PlaceRank(Long id, User user, String place) {
         this.id = id;
+        this.user = user;
         this.place = place;
     }
 }

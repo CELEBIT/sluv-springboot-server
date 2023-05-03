@@ -50,24 +50,6 @@ public class ItemController {
     }
 
     @Operation(
-            summary = "인기 장소 조회",
-            description = "인기 장소 조회. 상위 10개"
-    )
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "1000", description = "요청성공"),
-            @ApiResponse(responseCode = "5000", description = "서버내부 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-            @ApiResponse(responseCode = "5001", description = "DB 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
-    })
-    @GetMapping("/place/top")
-    public ResponseEntity<SuccessDataResponse<List<PlaceRankResDto>>> getTopPlace(){
-        return ResponseEntity.ok().body(
-                SuccessDataResponse.<List<PlaceRankResDto>>builder()
-                        .result(placeRankService.getTopPlace())
-                        .build()
-        );
-    }
-
-    @Operation(
             summary = "*Item 임시저장",
             description = "작성중이 Item을 임시저장"
     )

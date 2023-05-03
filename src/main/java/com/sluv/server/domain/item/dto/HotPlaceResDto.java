@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class PlaceRankResDto {
+public class HotPlaceResDto {
     @Schema(description = "장소명")
     private String placeName;
 }

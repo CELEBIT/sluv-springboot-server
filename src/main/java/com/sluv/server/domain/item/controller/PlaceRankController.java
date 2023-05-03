@@ -1,7 +1,8 @@
 package com.sluv.server.domain.item.controller;
 
 import com.sluv.server.domain.item.dto.PlaceRankReqDto;
-import com.sluv.server.domain.item.dto.PlaceRankResDto;
+import com.sluv.server.domain.item.dto.HotPlaceResDto;
+import com.sluv.server.domain.item.service.ItemService;
 import com.sluv.server.domain.item.service.PlaceRankService;
 import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.global.common.response.ErrorResponse;
@@ -25,6 +26,7 @@ import java.util.List;
 public class PlaceRankController {
 
     private final PlaceRankService placeRankService;
+    private final ItemService itemService;
 
     @Operation(
             summary = "인기 장소 조회",
@@ -36,10 +38,10 @@ public class PlaceRankController {
             @ApiResponse(responseCode = "5001", description = "DB 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @GetMapping("/top")
-    public ResponseEntity<SuccessDataResponse<List<PlaceRankResDto>>> getTopPlace(){
+    public ResponseEntity<SuccessDataResponse<List<HotPlaceResDto>>> getTopPlace(){
         return ResponseEntity.ok().body(
-                SuccessDataResponse.<List<PlaceRankResDto>>builder()
-                        .result(placeRankService.getTopPlace())
+                SuccessDataResponse.<List<HotPlaceResDto>>builder()
+                        .result(itemService.getTopPlace())
                         .build()
         );
     }

@@ -7,6 +7,7 @@ import com.sluv.server.domain.item.repository.PlaceRankRepository;
 import com.sluv.server.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -30,5 +31,10 @@ public class PlaceRankService {
                         .build()
         );
 
+    }
+
+    @Transactional
+    public void deleteAllPlace(User user) {
+        placeRankRepository.deleteAllByUserId(user.getId());
     }
 }

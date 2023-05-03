@@ -62,4 +62,23 @@ public class PlaceRankController {
                 new SuccessResponse()
         );
     }
+
+    @Operation(
+            summary = "*유저의 최근 입력한 장소 모두 삭제",
+            description = "PlaceRank 테이블에서 유저의 최근 입력한 장소 모두 삭제 " +
+                    "User Id 가 필요함."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "1000", description = "요청성공"),
+            @ApiResponse(responseCode = "5000", description = "서버내부 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "5001", description = "DB 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @DeleteMapping("")
+    public ResponseEntity<SuccessResponse> deleteAllPlace(@AuthenticationPrincipal User user){
+        placeRankService.deleteAllPlace(user);
+
+        return ResponseEntity.ok().body(
+                new SuccessResponse()
+        );
+    }
 }

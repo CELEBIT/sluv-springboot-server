@@ -119,4 +119,17 @@ public class ItemController {
         tempItemService.deleteAllTempItem(user);
         return ResponseEntity.ok().body(new SuccessResponse());
     }
+
+    @GetMapping("/{itemId}")
+    public ResponseEntity<SuccessDataResponse<ItemDetailResDto>> getItemDetail(@PathVariable("itemId") Long itemId){
+
+        return ResponseEntity.ok().body(
+                SuccessDataResponse.<ItemDetailResDto>builder()
+                        .result(
+                                itemService.getItemDetail(itemId)
+                        )
+                        .build()
+        );
+    }
+
 }

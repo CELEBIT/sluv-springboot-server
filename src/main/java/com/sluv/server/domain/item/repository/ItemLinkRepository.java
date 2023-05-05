@@ -7,4 +7,6 @@ import java.util.List;
 
 public interface ItemLinkRepository extends JpaRepository<ItemLink, Long> {
     List<ItemLink> findByItemId(Long itemId);
+
+    void deleteAllByItemId(Long itemId);
 }

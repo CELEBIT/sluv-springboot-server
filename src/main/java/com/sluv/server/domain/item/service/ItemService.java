@@ -18,6 +18,7 @@ import com.sluv.server.domain.celeb.repository.NewCelebRepository;
 import com.sluv.server.domain.celeb.repository.RecentSelectCelebRepository;
 import com.sluv.server.domain.item.dto.*;
 import com.sluv.server.domain.item.entity.*;
+import com.sluv.server.domain.item.entity.hashtag.Hashtag;
 import com.sluv.server.domain.item.entity.hashtag.ItemHashtag;
 import com.sluv.server.domain.item.enums.ItemStatus;
 import com.sluv.server.domain.item.exception.ItemCategoryNotFoundException;
@@ -59,36 +60,47 @@ public class ItemService {
     private final RecentSelectCelebRepository recentSearchCelebRepository;
     private final RecentSelectBrandRepository recentSelectBrandRepository;
 
-    public void postItem(User user, ItemPostReqDto reqDto) {
+    @Transactional
+    public ItemPostResDto postItem(User user, ItemPostReqDto reqDto) {
+
+        // 추가될 Celeb 확인
         Celeb celeb = null;
         if(reqDto.getCelebId() != null){
             celeb = celebRepository.findById(reqDto.getCelebId())
                     .orElseThrow(CelebNotFoundException::new);
         }
 
+        // 추가될 Brand 확인
         Brand brand = null;
         if(reqDto.getBrandId() != null){
             brand = brandRepository.findById(reqDto.getBrandId())
                     .orElseThrow(BrandNotFoundException::new);
         }
 
+        // 추가될 NewCeleb 확인
         NewCeleb newCeleb = null;
         if(reqDto.getNewCelebId() != null){
             newCeleb = newCelebRepository.findById(reqDto.getNewCelebId())
                     .orElseThrow(NewCelebNotFoundException::new);
         }
 
+        // 추가될 NewBrand 확인
         NewBrand newBrand = null;
         if(reqDto.getNewCelebId() != null){
             newBrand = newBrandRepository.findById(reqDto.getNewBrandId())
                     .orElseThrow(NewBrandNotFoundException::new);
         }
 
+        // 추가될 Category 확인
         ItemCategory itemCategory = itemCategoryRepository.findById(reqDto.getCategoryId())
                 .orElseThrow(ItemCategoryNotFoundException::new);
 
+        // Item을 등록인지 수정인지 판단.
+        Item item = reqDto.getId() != null ? itemRepository.findById(reqDto.getId()).orElseThrow(ItemNotFoundException::new)
+                :null;
 
-        Item newItem = itemRepository.save(Item.builder()
+        // Item id를 제외한 나머지 부분 Builder로 조립.
+        Item.ItemBuilder itemBuilder = Item.builder()
                 .user(user)
                 .celeb(celeb)
                 .category(itemCategory)
@@ -102,9 +114,22 @@ public class ItemService {
                 .additionalInfo(reqDto.getAdditionalInfo())
                 .infoSource(reqDto.getInfoSource())
                 .itemStatus(ItemStatus.ACTIVE)
-                .viewNum(0L)
-                .build()
+                .viewNum(0L);
+
+        // Item 수정이라면, 기존의 Item의 Id를 추가.
+        if(item != null){
+            itemBuilder.id(item.getId());
+        }
+
+        // 완성된 Item save
+        Item newItem = itemRepository.save(
+                itemBuilder.build()
         );
+
+        // 기존의 Img, Link, Hashtag가 있다면 모두 삭제
+        itemImgRepository.deleteAllByItemId(newItem.getId());
+        itemLinkRepository.deleteAllByItemId(newItem.getId());
+        itemHashtagRepository.deleteAllByItemId(newItem.getId());
 
         // ItemImg 테이블에 추가
         reqDto.getImgList().stream()
@@ -148,6 +173,12 @@ public class ItemService {
 
             ).forEach(itemHashtagRepository::save);
         }
+
+
+
+        return ItemPostResDto.builder()
+                .itemId(newItem.getId())
+                .build();
     }
 
     public List<HotPlaceResDto> getTopPlace() {

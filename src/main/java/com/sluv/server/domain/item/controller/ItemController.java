@@ -31,7 +31,7 @@ public class ItemController {
     private final TempItemService tempItemService;
 
     @Operation(
-            summary = "*아이템 등록",
+            summary = "*아이템 등록 및 삭제",
             description = "아이템 등록 요청"
     )
     @ApiResponses(value = {
@@ -40,12 +40,12 @@ public class ItemController {
             @ApiResponse(responseCode = "5001", description = "DB 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @PostMapping("")
-    public ResponseEntity<SuccessResponse> postItem(@AuthenticationPrincipal User user, @RequestBody ItemPostReqDto reqDto){
-
-        itemService.postItem(user, reqDto);
+    public ResponseEntity<SuccessDataResponse<ItemPostResDto>> postItem(@AuthenticationPrincipal User user, @RequestBody ItemPostReqDto reqDto){
 
         return ResponseEntity.ok().body(
-                new SuccessResponse()
+                SuccessDataResponse.<ItemPostResDto>builder()
+                        .result(itemService.postItem(user, reqDto))
+                        .build()
         );
     }
 

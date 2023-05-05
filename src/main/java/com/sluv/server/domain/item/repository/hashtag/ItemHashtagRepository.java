@@ -7,4 +7,6 @@ import java.util.List;
 
 public interface ItemHashtagRepository extends JpaRepository<ItemHashtag, Long> {
     List<ItemHashtag> findAllByItemId(Long itemId);
+
+    void deleteAllByItemId(Long itemId);
 }

@@ -18,6 +18,8 @@ public class ItemPostReqDto {
      * 날짜, 장소, 추가 정보, 구매 링크
      */
 
+    @Schema(description = "Item id(PK)")
+    private Long id;
     @Schema(description = "item 이미지 리스트")
     private List<ItemImgResDto> imgList;
     @Schema(description = "celebId")

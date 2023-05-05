@@ -1,6 +1,5 @@
 package com.sluv.server.domain.item.dto;
 
-import com.sluv.server.domain.item.entity.hashtag.Hashtag;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Data;

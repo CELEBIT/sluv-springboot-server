@@ -8,7 +8,7 @@ import com.sluv.server.domain.auth.dto.AuthResponseDto;
 import com.sluv.server.domain.auth.dto.SocialUserInfoDto;
 import com.sluv.server.domain.user.dto.UserDto;
 import com.sluv.server.domain.user.entity.User;
-import com.sluv.server.domain.user.exception.NotFoundUserException;
+import com.sluv.server.domain.user.exception.UserNotFoundException;
 import com.sluv.server.domain.user.repository.UserRepository;
 
 import com.sluv.server.global.jwt.JwtProvider;
@@ -135,7 +135,7 @@ public class KakaoUserService {
                     .build());
 
             user = userRepository.findByEmail(UserInfo.getEmail())
-                                            .orElseThrow(NotFoundUserException::new);
+                                            .orElseThrow(UserNotFoundException::new);
         }
         return user;
     }

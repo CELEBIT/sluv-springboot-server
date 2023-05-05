@@ -130,14 +130,22 @@ public class ItemController {
             @ApiResponse(responseCode = "5001", description = "DB 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @GetMapping("/{itemId}")
-    public ResponseEntity<SuccessDataResponse<ItemDetailResDto>> getItemDetail(@PathVariable("itemId") Long itemId){
+    public ResponseEntity<SuccessDataResponse<ItemDetailResDto>> getItemDetail(@AuthenticationPrincipal User user, @PathVariable("itemId") Long itemId){
 
         return ResponseEntity.ok().body(
                 SuccessDataResponse.<ItemDetailResDto>builder()
                         .result(
-                                itemService.getItemDetail(itemId)
+                                itemService.getItemDetail(user, itemId)
                         )
                         .build()
+        );
+    }
+
+    @PostMapping("/{itemId}/like")
+    public ResponseEntity<SuccessResponse> postItemLike(@AuthenticationPrincipal User user, @PathVariable("itemId") Long itemId){
+        itemService.postItemLike(user, itemId);
+        return ResponseEntity.ok().body(
+                new SuccessResponse()
         );
     }
 

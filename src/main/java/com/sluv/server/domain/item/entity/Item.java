@@ -106,4 +106,7 @@ public class Item extends BaseEntity {
     public void increaseViewNum(){
         this.viewNum++;
     }
+    public void changeStatus(ItemStatus itemStatus){
+        this.itemStatus = itemStatus;
+    }
 }

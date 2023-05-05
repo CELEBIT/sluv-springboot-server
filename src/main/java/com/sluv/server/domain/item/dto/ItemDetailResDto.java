@@ -44,6 +44,8 @@ public class ItemDetailResDto {
     private Boolean likeStatus;
     @Schema(description = "스크랩 수")
     private Integer scrapNum;
+    @Schema(description = "스크랩 여부")
+    private Boolean scrapStatus;
     @Schema(description = "조회수")
     private Long viewNum;
     @Schema(description = "item 링크 리스트")

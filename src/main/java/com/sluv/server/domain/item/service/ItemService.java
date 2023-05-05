@@ -2,7 +2,6 @@ package com.sluv.server.domain.item.service;
 
 import com.sluv.server.domain.brand.entity.Brand;
 import com.sluv.server.domain.brand.entity.NewBrand;
-import com.sluv.server.domain.brand.entity.RecentSelectBrand;
 import com.sluv.server.domain.brand.exception.BrandNotFoundException;
 import com.sluv.server.domain.brand.exception.NewBrandNotFoundException;
 import com.sluv.server.domain.brand.repository.BrandRepository;
@@ -10,13 +9,13 @@ import com.sluv.server.domain.brand.repository.NewBrandRepository;
 import com.sluv.server.domain.brand.repository.RecentSelectBrandRepository;
 import com.sluv.server.domain.celeb.entity.Celeb;
 import com.sluv.server.domain.celeb.entity.NewCeleb;
-import com.sluv.server.domain.celeb.entity.RecentSelectCeleb;
 import com.sluv.server.domain.celeb.exception.CelebNotFoundException;
 import com.sluv.server.domain.celeb.exception.NewCelebNotFoundException;
 import com.sluv.server.domain.celeb.repository.CelebRepository;
 import com.sluv.server.domain.celeb.repository.NewCelebRepository;
 import com.sluv.server.domain.celeb.repository.RecentSelectCelebRepository;
 import com.sluv.server.domain.item.dto.ItemPostReqDto;
+import com.sluv.server.domain.item.dto.HotPlaceResDto;
 import com.sluv.server.domain.item.entity.*;
 import com.sluv.server.domain.item.entity.hashtag.ItemHashtag;
 import com.sluv.server.domain.item.enums.ItemStatus;
@@ -29,6 +28,8 @@ import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.global.common.enums.ItemImgOrLinkStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -137,14 +138,16 @@ public class ItemService {
 
             ).forEach(itemHashtagRepository::save);
         }
+    }
 
-        // PlaceRank 테이블에 추가
-        if(reqDto.getWhereDiscovery() != null) {
-            placeRankRepository.save(PlaceRank.builder()
-                    .place(reqDto.getWhereDiscovery())
-                    .build()
-            );
-        }
+    public List<HotPlaceResDto> getTopPlace() {
+
+        return itemRepository.findTopPlace().stream()
+                .map(placeName ->
+                        HotPlaceResDto.builder()
+                                .placeName(placeName)
+                                .build()
+                ).toList();
 
     }
 }

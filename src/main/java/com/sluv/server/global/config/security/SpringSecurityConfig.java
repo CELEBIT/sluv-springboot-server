@@ -39,6 +39,8 @@ public class SpringSecurityConfig {
 
             // item
             "/app/item",
+            "/app/item/{ItemId}",
+            "/app/item/{ItemId}/like",
             "/app/item/temp",
             "/app/item/temp/{tempItemId}",
 

@@ -40,6 +40,8 @@ public class ItemDetailResDto {
     private String newBrandName;
     @Schema(description = "좋아요 수")
     private Integer likeNum;
+    @Schema(description = "좋아요 여부")
+    private Boolean likeStatus;
     @Schema(description = "스크랩 수")
     private Integer scrapNum;
     @Schema(description = "조회수")
@@ -47,7 +49,7 @@ public class ItemDetailResDto {
     @Schema(description = "item 링크 리스트")
     private List<ItemLinkResDto> linkList;
     @Schema(description = "게시글 작성자")
-    private UserInfoDto user;
+    private UserInfoDto writer;
     @Schema(description = "발견 시간 ex)2021-11-20T09:10:20")
     private LocalDateTime whenDiscovery;
     @Size(max = 100)

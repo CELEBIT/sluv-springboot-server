@@ -76,12 +76,15 @@ public class Item extends BaseEntity {
     @Column(columnDefinition = "TEXT")
     private String infoSource;
 
+    @Column(name = "view_num")
+    private Long viewNum;
+
     @Enumerated(EnumType.STRING)
     @Column(length = 45, columnDefinition = "varchar(45) default 'ACTIVE'")
     private ItemStatus itemStatus;
 
     @Builder
-    public Item(Long id, User user, Celeb celeb, NewCeleb newCeleb, ItemCategory category, Brand brand, NewBrand newBrand, String name, LocalDateTime whenDiscovery, String whereDiscovery, int price, String color, String additionalInfo, String infoSource, ItemStatus itemStatus) {
+    public Item(Long id, User user, Celeb celeb, NewCeleb newCeleb, ItemCategory category, Brand brand, NewBrand newBrand, String name, LocalDateTime whenDiscovery, String whereDiscovery, int price, String color, String additionalInfo, String infoSource, Long viewNum, ItemStatus itemStatus) {
         this.id = id;
         this.user = user;
         this.celeb = celeb;
@@ -96,6 +99,11 @@ public class Item extends BaseEntity {
         this.color = color;
         this.additionalInfo = additionalInfo;
         this.infoSource = infoSource;
+        this.viewNum = viewNum;
         this.itemStatus = itemStatus;
+    }
+
+    public void increaseViewNum(){
+        this.viewNum++;
     }
 }

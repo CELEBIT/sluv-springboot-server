@@ -121,8 +121,9 @@ public class ItemController {
     }
 
     @Operation(
-            summary = "특정 아이템 게시글 상세조회",
-            description = "특정 아이템 게시글의 상세조회를 하는 API."
+            summary = "*특정 아이템 게시글 상세조회",
+            description = "특정 아이템 게시글의 상세조회를 하는 API." +
+                    " (User Token 필요)"
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "1000", description = "요청성공"),
@@ -130,14 +131,31 @@ public class ItemController {
             @ApiResponse(responseCode = "5001", description = "DB 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @GetMapping("/{itemId}")
-    public ResponseEntity<SuccessDataResponse<ItemDetailResDto>> getItemDetail(@PathVariable("itemId") Long itemId){
+    public ResponseEntity<SuccessDataResponse<ItemDetailResDto>> getItemDetail(@AuthenticationPrincipal User user, @PathVariable("itemId") Long itemId){
 
         return ResponseEntity.ok().body(
                 SuccessDataResponse.<ItemDetailResDto>builder()
                         .result(
-                                itemService.getItemDetail(itemId)
+                                itemService.getItemDetail(user, itemId)
                         )
                         .build()
+        );
+    }
+    @Operation(
+            summary = "아이템 게시글 좋아요",
+            description = "특정 아이템 게시글에 좋아요, 취소 기능 API." +
+                    " (User Token 필요)"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "1000", description = "요청성공"),
+            @ApiResponse(responseCode = "5000", description = "서버내부 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "5001", description = "DB 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @PostMapping("/{itemId}/like")
+    public ResponseEntity<SuccessResponse> postItemLike(@AuthenticationPrincipal User user, @PathVariable("itemId") Long itemId){
+        itemService.postItemLike(user, itemId);
+        return ResponseEntity.ok().body(
+                new SuccessResponse()
         );
     }
 

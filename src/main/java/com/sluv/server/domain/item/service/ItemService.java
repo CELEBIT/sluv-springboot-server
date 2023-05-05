@@ -32,8 +32,8 @@ import com.sluv.server.domain.user.exception.UserNotFoundException;
 import com.sluv.server.domain.user.repository.UserRepository;
 import com.sluv.server.global.common.enums.ItemImgOrLinkStatus;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -52,6 +52,8 @@ public class ItemService {
 
     private final NewBrandRepository newBrandRepository;
     private final NewCelebRepository newCelebRepository;
+
+    private final ItemLikeRepository itemLikeRepository;
 
     private final PlaceRankRepository placeRankRepository;
     private final RecentSelectCelebRepository recentSearchCelebRepository;
@@ -159,7 +161,7 @@ public class ItemService {
 
     }
 
-    public ItemDetailResDto getItemDetail(Long itemId) {
+    public ItemDetailResDto getItemDetail(User user, Long itemId) {
 
         // 1. Item 조회
         Item item = itemRepository.findById(itemId)
@@ -223,7 +225,7 @@ public class ItemService {
                 : null;
 
         // 5. 좋아요 수
-
+        Integer likeNum = itemLikeRepository.countByItemId(item.getId());
 
         // 6. 스크랩 수
 
@@ -242,12 +244,12 @@ public class ItemService {
                                                         .toList();
 
         // 9. 작성자 info
-        User user = userRepository.findById(item.getUser().getId())
+        User writer = userRepository.findById(item.getUser().getId())
                                                 .orElseThrow(UserNotFoundException::new);
-        UserInfoDto userInfo = UserInfoDto.builder()
-                .id(user.getId())
-                .profileImgUrl(user.getProfileImgUrl())
-                .nickName(user.getNickname())
+        UserInfoDto writerInfo = UserInfoDto.builder()
+                .id(writer.getId())
+                .profileImgUrl(writer.getProfileImgUrl())
+                .nickName(writer.getNickname())
                 .build();
 
         // 10. Hashtag
@@ -307,6 +309,10 @@ public class ItemService {
                         .toList();
         // 13. 다른 스러버들이 함께 보관한 아이템 리스트
 
+
+        // 14. 좋아요 여부
+        boolean likeStatus = itemLikeRepository.existsByUserIdAndItemId(user.getId(), itemId);
+
         // Dto 조립
         return ItemDetailResDto.builder()
                 .imgList(imgList)
@@ -316,11 +322,12 @@ public class ItemService {
                 .itemName(item.getName())
                 .brand(brand)
                 .newBrandName(newBrand)
-                .likeNum(null) // like 완성 후 변경 예정
+                .likeNum(likeNum) // like 완성 후 변경 예정
+                .likeStatus(likeStatus)
                 .scrapNum(null) // closet 완성 후 변경 예정
                 .viewNum(item.getViewNum())
                 .linkList(linkList)
-                .user(userInfo)
+                .writer(writerInfo)
                 .whenDiscovery(item.getWhenDiscovery())
                 .whereDiscovery(item.getWhereDiscovery())
                 .price(item.getPrice())
@@ -332,5 +339,22 @@ public class ItemService {
 //                .sameClosetItemList(sameClosetItemList)
                 .color(item.getColor())
                 .build();
+    }
+
+    @Transactional
+    public void postItemLike(User user, Long itemId) {
+        Item item = itemRepository.findById(itemId).orElseThrow(ItemNotFoundException::new);
+
+        boolean likeExist = itemLikeRepository.existsByUserIdAndItemId(user.getId(), itemId);
+        if(!likeExist){
+            itemLikeRepository.save(
+                    ItemLike.builder()
+                            .item(item)
+                            .user(user)
+                            .build()
+            );
+        }else{
+            itemLikeRepository.deleteByUserIdAndItemId(user.getId(), itemId);
+        }
     }
 }

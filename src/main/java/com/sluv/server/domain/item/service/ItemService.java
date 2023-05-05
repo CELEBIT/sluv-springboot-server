@@ -388,4 +388,11 @@ public class ItemService {
             itemLikeRepository.deleteByUserIdAndItemId(user.getId(), itemId);
         }
     }
+
+    public void deleteItem(Long itemId) {
+        Item item = itemRepository.findById(itemId).orElseThrow(ItemNotFoundException::new);
+
+        item.changeStatus(ItemStatus.DELETED);
+        itemRepository.save(item);
+    }
 }

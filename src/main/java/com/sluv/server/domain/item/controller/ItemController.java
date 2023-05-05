@@ -31,7 +31,7 @@ public class ItemController {
     private final TempItemService tempItemService;
 
     @Operation(
-            summary = "*아이템 등록 및 삭제",
+            summary = "*아이템 등록 및 수정",
             description = "아이템 등록 요청"
     )
     @ApiResponses(value = {
@@ -154,6 +154,22 @@ public class ItemController {
     @PostMapping("/{itemId}/like")
     public ResponseEntity<SuccessResponse> postItemLike(@AuthenticationPrincipal User user, @PathVariable("itemId") Long itemId){
         itemService.postItemLike(user, itemId);
+        return ResponseEntity.ok().body(
+                new SuccessResponse()
+        );
+    }
+    @Operation(
+            summary = "아이템 게시글 삭제",
+            description = "특정 아이템 게시글을 삭제 기능 API."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "1000", description = "요청성공"),
+            @ApiResponse(responseCode = "5000", description = "서버내부 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "5001", description = "DB 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @DeleteMapping("/{itemId}")
+    public ResponseEntity<SuccessResponse> deleteItemLike(@PathVariable("itemId") Long itemId){
+        itemService.deleteItem(itemId);
         return ResponseEntity.ok().body(
                 new SuccessResponse()
         );

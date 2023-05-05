@@ -9,6 +9,7 @@ import lombok.Data;
 @Builder
 public class ItemCategoryDto {
     private Long id;
+    private Long parentId;
     private String name;
     private String parentName;
 }

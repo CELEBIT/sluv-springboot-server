@@ -179,6 +179,11 @@ public class TempItemService {
                                                 ? tempItem.getCategory().getParent().getName()
                                                 :null
                                         )
+                                .parentId(
+                                        tempItem.getCategory().getParent() != null
+                                                ? tempItem.getCategory().getParent().getId()
+                                                :null
+                                )
                                 .build()
                         : null;
 

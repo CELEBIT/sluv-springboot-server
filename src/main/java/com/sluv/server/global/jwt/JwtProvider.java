@@ -2,7 +2,7 @@ package com.sluv.server.global.jwt;
 
 
 import com.sluv.server.domain.user.dto.UserDto;
-import com.sluv.server.domain.user.exception.NotFoundUserException;
+import com.sluv.server.domain.user.exception.UserNotFoundException;
 import com.sluv.server.domain.user.repository.UserRepository;
 import com.sluv.server.global.jwt.exception.ExpiredTokenException;
 import com.sluv.server.global.jwt.exception.InvalidateTokenException;
@@ -52,7 +52,7 @@ public class JwtProvider {
 
     public Authentication getAuthentication(String _token){
         String token = _token.split(tokenType + " ")[1];
-        UserDetails user = userRepository.findById(Long.valueOf(this.getUserId(token).toString())).orElseThrow(NotFoundUserException::new);
+        UserDetails user = userRepository.findById(Long.valueOf(this.getUserId(token).toString())).orElseThrow(UserNotFoundException::new);
 
         return new UsernamePasswordAuthenticationToken(user, "", user.getAuthorities());
     }

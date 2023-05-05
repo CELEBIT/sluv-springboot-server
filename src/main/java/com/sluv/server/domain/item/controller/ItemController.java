@@ -119,4 +119,26 @@ public class ItemController {
         tempItemService.deleteAllTempItem(user);
         return ResponseEntity.ok().body(new SuccessResponse());
     }
+
+    @Operation(
+            summary = "특정 아이템 게시글 상세조회",
+            description = "특정 아이템 게시글의 상세조회를 하는 API."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "1000", description = "요청성공"),
+            @ApiResponse(responseCode = "5000", description = "서버내부 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "5001", description = "DB 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @GetMapping("/{itemId}")
+    public ResponseEntity<SuccessDataResponse<ItemDetailResDto>> getItemDetail(@PathVariable("itemId") Long itemId){
+
+        return ResponseEntity.ok().body(
+                SuccessDataResponse.<ItemDetailResDto>builder()
+                        .result(
+                                itemService.getItemDetail(itemId)
+                        )
+                        .build()
+        );
+    }
+
 }

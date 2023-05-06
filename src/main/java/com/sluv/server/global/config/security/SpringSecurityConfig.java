@@ -7,6 +7,7 @@ import com.sluv.server.global.jwt.exception.CustomAuthenticationEntryPoint;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -65,10 +66,8 @@ public class SpringSecurityConfig {
                 .httpBasic().disable()
 
                 .authorizeHttpRequests((request) -> request // 허용 범위 설정
-//                        .requestMatchers(HttpMethod.POST, "/auth/**").permitAll() // 허용범위
-//                        .requestMatchers(PERMIT_URL).permitAll() // 허용범위
-//                        .anyRequest().authenticated()
-                        .requestMatchers(AUTH_URL).authenticated() // 허용범위
+                                .requestMatchers(HttpMethod.GET, "/app/item/category").permitAll()
+                                .requestMatchers(AUTH_URL).authenticated() // 허용범위
                         .anyRequest().permitAll()
                 )
                 .exceptionHandling().authenticationEntryPoint(customAuthenticationEntryPoint)

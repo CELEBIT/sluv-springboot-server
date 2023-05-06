@@ -13,6 +13,8 @@ import lombok.NoArgsConstructor;
 public class CelebSearchResDto {
     @Schema(description = "Celeb id")
     private Long id;
+    @Schema(description = "Parent Celeb id")
+    private Long parentId;
     @Schema(description = "Celeb 카테고리")
     private String category;
     @Schema(description = "Celeb 한글 이름")
@@ -21,8 +23,9 @@ public class CelebSearchResDto {
     private String CelebNameEn;
 
     @Builder
-    public CelebSearchResDto(Long id, String category, String celebNameKr, String celebNameEn) {
+    public CelebSearchResDto(Long id, Long parentId, String category, String celebNameKr, String celebNameEn) {
         this.id = id;
+        this.parentId = parentId;
         this.category = category;
         CelebNameKr = celebNameKr;
         CelebNameEn = celebNameEn;

@@ -46,6 +46,7 @@ public class CelebService {
 
                                                             return CelebSearchResDto.builder()
                                                                             .id(data.getId())
+                                                                            .parentId(null)
                                                                             .category(category)
                                                                             .celebNameKr(data.getCelebNameKr())
                                                                             .celebNameEn(data.getCelebNameEn())
@@ -67,6 +68,7 @@ public class CelebService {
                                                             }
                                                             return CelebSearchResDto.builder()
                                                                             .id(child.getId())
+                                                                            .parentId(parent.getId())
                                                                             .category(category)
                                                                             .celebNameKr(parent.getCelebNameKr() + " " + child.getCelebNameKr())
                                                                             .celebNameEn(parent.getCelebNameEn() + " " + child.getCelebNameEn())
@@ -89,6 +91,7 @@ public class CelebService {
                                         }
                                         return CelebSearchResDto.builder()
                                                 .id(child.getId())
+                                                .parentId(child.getParent().getId())
                                                 .category(category)
                                                 .celebNameKr(child.getParent().getCelebNameKr() + " " + child.getCelebNameKr())
                                                 .celebNameEn(child.getParent().getCelebNameEn() + " " + child.getCelebNameEn())
@@ -146,6 +149,8 @@ public class CelebService {
 
                             return CelebSearchResDto.builder()
                                     .id(celeb.getId())
+                                    .parentId(celeb.getParent().getId())
+                                    .category(celeb.getCelebCategory().getParent().getName())
                                     .celebNameKr(celebNameKr)
                                     .celebNameEn(celebNameEn)
                                     .build();

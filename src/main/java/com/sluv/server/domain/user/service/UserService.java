@@ -9,6 +9,7 @@ import com.sluv.server.domain.user.entity.Follow;
 import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.domain.user.dto.UserDto;
 import com.sluv.server.domain.user.entity.UserReport;
+import com.sluv.server.domain.user.exception.UserReportDuplicateException;
 import com.sluv.server.domain.user.exception.UserNotFoundException;
 import com.sluv.server.domain.user.repository.FollowRepository;
 import com.sluv.server.domain.user.repository.UserReportRepository;
@@ -90,20 +91,5 @@ public class UserService {
             );
         }
 
-    }
-
-    public void postUserReport(User user, Long userId, UserReportReqDto dto) {
-        // 피신고자 검색
-        User target = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
-
-        userReportRepository.save(
-                UserReport.builder()
-                        .reporter(user)
-                        .reported(target)
-                        .userReportReason(dto.getReportReason())
-                        .content(dto.getContent())
-                        .reportStatus(ReportStatus.WAITING)
-                        .build()
-        );
     }
 }

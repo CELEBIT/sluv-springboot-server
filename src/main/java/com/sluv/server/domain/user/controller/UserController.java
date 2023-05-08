@@ -60,22 +60,5 @@ public class UserController {
                 new SuccessResponse()
         );
     }
-    @Operation(
-            summary = "*아이템 게시글 수정 요청",
-            description = "유저가 특정 아이템 게시글의 내용을 수정 요청" +
-                    " (User Id 필요)"
-    )
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "1000", description = "요청성공"),
-            @ApiResponse(responseCode = "5000", description = "서버내부 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-            @ApiResponse(responseCode = "5001", description = "DB 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
-    })
-    @PostMapping("/{itemId}/edit-req")
-    public ResponseEntity<SuccessResponse> postItemEdit(@AuthenticationPrincipal User user, @PathVariable(name = "itemId") Long itemId, @RequestBody ItemEditReqDto dto) {
-        itemEditReqService.postItemEdit(user, itemId, dto);
-        return ResponseEntity.ok().body(
-                new SuccessResponse()
-        );
-    }
 
 }

@@ -33,7 +33,6 @@ public class UserReport extends BaseEntity {
 
     @NotNull
     @Enumerated(EnumType.STRING)
-    @Size(max = 45)
     private UserReportReason userReportReason;
 
     @Size(max = 1002)

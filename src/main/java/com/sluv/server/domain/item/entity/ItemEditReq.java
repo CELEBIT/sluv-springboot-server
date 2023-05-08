@@ -32,7 +32,6 @@ public class ItemEditReq extends BaseEntity {
 
     @NotNull
     @Enumerated(EnumType.STRING)
-    @Size(max = 45)
     private ItemEditReqReason itemEditReqReason;
 
     @Size(max = 1002)

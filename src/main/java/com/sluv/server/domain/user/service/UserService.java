@@ -4,12 +4,16 @@ import com.sluv.server.domain.celeb.entity.Celeb;
 import com.sluv.server.domain.celeb.repository.CelebRepository;
 import com.sluv.server.domain.celeb.dto.InterestedCelebParentResDto;
 import com.sluv.server.domain.celeb.dto.InterestedCelebChildResDto;
+import com.sluv.server.domain.user.dto.UserReportReqDto;
 import com.sluv.server.domain.user.entity.Follow;
 import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.domain.user.dto.UserDto;
+import com.sluv.server.domain.user.entity.UserReport;
 import com.sluv.server.domain.user.exception.UserNotFoundException;
 import com.sluv.server.domain.user.repository.FollowRepository;
+import com.sluv.server.domain.user.repository.UserReportRepository;
 import com.sluv.server.domain.user.repository.UserRepository;
+import com.sluv.server.global.common.enums.ReportStatus;
 import com.sluv.server.global.jwt.JwtProvider;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +29,8 @@ public class UserService {
     private final UserRepository userRepository;
     private final CelebRepository celebRepository;
     private final FollowRepository followRepository;
+    private final UserReportRepository userReportRepository;
+
     private final JwtProvider jwtProvider;
 
     public UserDto getUserIdByToken(HttpServletRequest request) {
@@ -84,5 +90,20 @@ public class UserService {
             );
         }
 
+    }
+
+    public void postUserReport(User user, Long userId, UserReportReqDto dto) {
+        // 피신고자 검색
+        User target = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+
+        userReportRepository.save(
+                UserReport.builder()
+                        .reporter(user)
+                        .reported(target)
+                        .userReportReason(dto.getReportReason())
+                        .content(dto.getContent())
+                        .reportStatus(ReportStatus.WAITING)
+                        .build()
+        );
     }
 }

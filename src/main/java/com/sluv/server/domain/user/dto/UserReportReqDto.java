@@ -1,6 +1,6 @@
-package com.sluv.server.domain.item.dto;
+package com.sluv.server.domain.user.dto;
 
-import com.sluv.server.domain.item.enums.ItemReportReason;
+import com.sluv.server.domain.user.enums.UserReportReason;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,9 +11,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ItemReportReqDto {
+public class UserReportReqDto {
     @Schema(description = "신고 이유")
-    private ItemReportReason reportReason;
+    private UserReportReason reportReason;
     @Schema(description = "신고 내용")
     private String content;
 }

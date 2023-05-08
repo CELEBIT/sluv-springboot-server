@@ -6,6 +6,7 @@ import com.sluv.server.domain.item.dto.ItemEditReqDto;
 import com.sluv.server.domain.item.service.ItemEditReqService;
 import com.sluv.server.domain.user.dto.UserReportReqDto;
 import com.sluv.server.domain.user.entity.User;
+import com.sluv.server.domain.user.service.UserReportService;
 import com.sluv.server.domain.user.service.UserService;
 import com.sluv.server.global.common.response.ErrorResponse;
 import com.sluv.server.global.common.response.SuccessDataResponse;
@@ -27,7 +28,8 @@ import java.util.List;
 @RequestMapping("/app/user")
 public class UserController {
     private final UserService userService;
-    private final ItemEditReqService itemEditReqService;
+    private final UserReportService userReportService;
+
     @Operation(
             summary = "*유저의 관심 샐럽 조회",
             description = "유저를 기준으로 InterstedCeleb 테이블에서 일치하는 Celeb을 검색"
@@ -73,7 +75,7 @@ public class UserController {
     })
     @PostMapping("/{userId}/report")
     public ResponseEntity<SuccessResponse> postUserReport(@AuthenticationPrincipal User user, @PathVariable(name = "userId") Long userId, @RequestBody UserReportReqDto dto) {
-        userService.postUserReport(user, userId, dto);
+        userReportService.postUserReport(user, userId, dto);
         return ResponseEntity.ok().body(
                 new SuccessResponse()
         );

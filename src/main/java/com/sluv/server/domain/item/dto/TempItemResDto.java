@@ -27,7 +27,7 @@ public class TempItemResDto {
 
     @Schema(description = "item Id")
     private Long id;
-    @Schema(description = "item 이미지 리스트 \"{대표여부 0 or 1}\":\"이미지링크\"")
+    @Schema(description = "item 이미지 리스트")
     private List<ItemImgResDto> imgList;
     @Schema(description = "celeb")
     private CelebDto celeb;
@@ -47,7 +47,7 @@ public class TempItemResDto {
     private String additionalInfo;
     @Schema(description = "해쉬태그 리스트")
     private List<Hashtag> hashTagList;
-    @Schema(description = "item 링크 리스트 \"제목\":\"링크\"")
+    @Schema(description = "item 링크 리스트 ")
     private List<ItemLinkResDto> linkList;
     @Schema(description = "추가정보를 발견한 출처")
     private String infoSource;

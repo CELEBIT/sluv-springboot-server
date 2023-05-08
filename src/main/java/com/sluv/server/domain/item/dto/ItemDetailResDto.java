@@ -30,7 +30,7 @@ public class ItemDetailResDto {
     private CelebSearchResDto celeb;
     @Schema(description = "새로운 Celeb")
     private String newCelebName;
-    @Schema(description = "아이템 카테고리 Id")
+    @Schema(description = "아이템 카테고리")
     private ItemCategoryDto category;
     @Schema(description = "아이템명")
     private String itemName;

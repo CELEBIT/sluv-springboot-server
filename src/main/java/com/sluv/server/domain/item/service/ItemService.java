@@ -30,6 +30,7 @@ import com.sluv.server.domain.item.repository.hashtag.ItemHashtagRepository;
 import com.sluv.server.domain.user.dto.UserInfoDto;
 import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.domain.user.exception.UserNotFoundException;
+import com.sluv.server.domain.user.repository.FollowRepository;
 import com.sluv.server.domain.user.repository.UserRepository;
 import com.sluv.server.global.common.enums.ItemImgOrLinkStatus;
 import lombok.RequiredArgsConstructor;
@@ -55,6 +56,7 @@ public class ItemService {
     private final NewCelebRepository newCelebRepository;
 
     private final ItemLikeRepository itemLikeRepository;
+    private final FollowRepository followRepository;
 
     private final PlaceRankRepository placeRankRepository;
     private final RecentSelectCelebRepository recentSearchCelebRepository;
@@ -344,6 +346,9 @@ public class ItemService {
         // 14. 좋아요 여부
         boolean likeStatus = itemLikeRepository.existsByUserIdAndItemId(user.getId(), itemId);
 
+        // 15. 팔로우 여부
+        boolean followStatus = followRepository.getFollowStatus(user, writer);
+
         // Dto 조립
         return ItemDetailResDto.builder()
                 .imgList(imgList)
@@ -369,6 +374,7 @@ public class ItemService {
                 .sameBrandItemList(sameBrandItemList)
 //                .sameClosetItemList(sameClosetItemList)
                 .color(item.getColor())
+                .followStatus(followStatus)
                 .build();
     }
 

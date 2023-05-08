@@ -78,6 +78,9 @@ public class ItemDetailResDto {
     @Schema(description = "색")
     private String color;
 
+    @Schema(description = "팔로우 여부")
+    private Boolean followStatus;
+
 
 
 

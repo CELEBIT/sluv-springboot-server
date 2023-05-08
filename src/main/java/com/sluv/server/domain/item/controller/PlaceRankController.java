@@ -2,6 +2,7 @@ package com.sluv.server.domain.item.controller;
 
 import com.sluv.server.domain.item.dto.PlaceRankReqDto;
 import com.sluv.server.domain.item.dto.HotPlaceResDto;
+import com.sluv.server.domain.item.dto.PlaceRankResDto;
 import com.sluv.server.domain.item.service.ItemService;
 import com.sluv.server.domain.item.service.PlaceRankService;
 import com.sluv.server.domain.user.entity.User;
@@ -101,5 +102,25 @@ public class PlaceRankController {
         return ResponseEntity.ok().body(
                 new SuccessResponse()
         );
+    }
+
+    @Operation(
+            summary = "*유저가 최근 입력한 장소 검색",
+            description = "유저가 최근 입력한 장소 최근 20개 검색" +
+                    "User Id 가 필요함."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "1000", description = "요청성공"),
+            @ApiResponse(responseCode = "5000", description = "서버내부 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "5001", description = "DB 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @GetMapping("/recent")
+    public ResponseEntity<SuccessDataResponse<List<PlaceRankResDto>>> getRecentPlaceTop20(@AuthenticationPrincipal User user){
+
+        return ResponseEntity.ok().body(
+                SuccessDataResponse.<List<PlaceRankResDto>>builder()
+                                    .result(placeRankService.getRecentPlaceTop20(user))
+                                    .build()
+                );
     }
 }

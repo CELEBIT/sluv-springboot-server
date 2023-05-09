@@ -1,9 +1,13 @@
 package com.sluv.server.domain.celeb.service;
 
+import com.sluv.server.domain.celeb.dto.CelebChipResDto;
+import com.sluv.server.domain.celeb.dto.CelebSearchByCategoryResDto;
 import com.sluv.server.domain.celeb.dto.CelebSearchResDto;
 import com.sluv.server.domain.celeb.dto.RecentSelectCelebResDto;
 import com.sluv.server.domain.celeb.entity.Celeb;
+import com.sluv.server.domain.celeb.entity.CelebCategory;
 import com.sluv.server.domain.celeb.entity.RecentSelectCeleb;
+import com.sluv.server.domain.celeb.repository.CelebCategoryRepository;
 import com.sluv.server.domain.celeb.repository.CelebRepository;
 import com.sluv.server.domain.celeb.repository.RecentSelectCelebRepository;
 import com.sluv.server.domain.user.entity.User;
@@ -20,6 +24,7 @@ public class CelebService {
 
     private final CelebRepository celebRepository;
     private final RecentSelectCelebRepository recentSearchCelebRepository;
+    private final CelebCategoryRepository celebCategoryRepository;
 
     public List<CelebSearchResDto> searchCeleb(String celebName, Pageable pageable) {
 
@@ -157,5 +162,29 @@ public class CelebService {
                         }
 
                 ).toList();
+    }
+
+    public List<CelebSearchByCategoryResDto> getCelebByCategory() {
+        // Parent Id가 null인 CelebCategory를 모두 조회 후 이름순으로 정렬
+        List<CelebCategory> categoryList = celebCategoryRepository.findAllByParentIdIsNull();
+
+        return categoryList.stream()
+                            .parallel()
+                            // 카테고리별 CelebSearchByCategoryResDto 생성
+                            .map(category ->  CelebSearchByCategoryResDto.builder()
+                                                                        .categoryId(category.getId())
+                                                                        .categoryName(category.getName())
+                                                                        .celebList(
+                                                                                celebRepository.getCelebByCategory(category)
+                                                                                        .stream()
+                                                                                        // 셀럽별 CelebChipResDto 생성
+                                                                                        .map(celeb -> CelebChipResDto.builder()
+                                                                                                .celebId(celeb.getId())
+                                                                                                .celebName(celeb.getCelebNameKr())
+                                                                                                .build()
+                                                                                        ).toList()
+                                                                        ).build()
+                            ).toList();
+
     }
 }

@@ -1,5 +1,6 @@
 package com.sluv.server.domain.celeb.controller;
 
+import com.sluv.server.domain.celeb.dto.CelebSearchByCategoryResDto;
 import com.sluv.server.domain.celeb.dto.CelebSearchResDto;
 import com.sluv.server.domain.celeb.service.CelebService;
 import com.sluv.server.global.common.response.ErrorResponse;
@@ -57,6 +58,24 @@ public class CelebController {
         return ResponseEntity.ok().body(
                 SuccessDataResponse.<List<CelebSearchResDto>>builder()
                         .result(celebService.getTop10Celeb())
+                        .build()
+        );
+    }
+    @Operation(
+            summary = "관심 셀럽 조회 시, 카테고리별 셀럽 조회",
+            description = "카테고리별 최대 30개를 한번에 전달, 카테고리는 순서 X, 셀럽는 가나다 순서."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "1000", description = "요청성공"),
+            @ApiResponse(responseCode = "5000", description = "서버내부 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "5001", description = "DB 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @GetMapping("/search/category")
+    public ResponseEntity<SuccessDataResponse<List<CelebSearchByCategoryResDto>>> searchCelebByCategory(){
+
+        return ResponseEntity.ok().body(
+                SuccessDataResponse.<List<CelebSearchByCategoryResDto>>builder()
+                        .result(celebService.getCelebByCategory())
                         .build()
         );
     }

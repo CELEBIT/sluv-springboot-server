@@ -2,6 +2,7 @@ package com.sluv.server.domain.celeb.repository.Impl;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sluv.server.domain.celeb.entity.Celeb;
+import com.sluv.server.domain.celeb.entity.CelebCategory;
 import com.sluv.server.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -86,5 +87,19 @@ public class CelebRepositoryImpl implements CelebRepositoryCustom{
                 .orderBy(recentSelectCeleb.celeb.count().desc())
                 .limit(10)
                 .fetch();
+    }
+
+    @Override
+    public List<Celeb> getCelebByCategory(CelebCategory celebCategory) {
+
+        return jpaQueryFactory.selectFrom(celeb)
+                .where(celeb.celebCategory.eq(celebCategory)
+                        .or(celeb.celebCategory.parent.eq(celebCategory)
+                        ).and(celeb.parent.isNull())
+                )
+                .limit(30)
+                .orderBy(celeb.celebNameKr.asc())
+                .fetch();
+
     }
 }

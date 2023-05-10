@@ -70,7 +70,7 @@ public class CelebController {
             @ApiResponse(responseCode = "5000", description = "서버내부 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "5001", description = "DB 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
-    @GetMapping("/each/category")
+    @GetMapping("/category")
     public ResponseEntity<SuccessDataResponse<List<CelebSearchByCategoryResDto>>> searchCelebByCategory(){
 
         return ResponseEntity.ok().body(

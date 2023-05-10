@@ -2,6 +2,7 @@ package com.sluv.server.domain.celeb.controller;
 
 import com.sluv.server.domain.celeb.dto.CelebSearchByCategoryResDto;
 import com.sluv.server.domain.celeb.dto.CelebSearchResDto;
+import com.sluv.server.domain.celeb.dto.InterestedCelebParentResDto;
 import com.sluv.server.domain.celeb.service.CelebService;
 import com.sluv.server.global.common.response.ErrorResponse;
 import com.sluv.server.global.common.response.SuccessDataResponse;
@@ -76,6 +77,28 @@ public class CelebController {
         return ResponseEntity.ok().body(
                 SuccessDataResponse.<List<CelebSearchByCategoryResDto>>builder()
                         .result(celebService.getCelebByCategory())
+                        .build()
+        );
+    }
+
+    @Operation(
+            summary = "관심셀럽 등록 시 Celeb 검색",
+            description = "- 관심셀럽 등록 시 입력한 이름으로 Celeb을 검색." +
+                    "\n- 멤버 이름을 검색하면 그룹이 검색됨. " +
+                    "\n- 페이지네이션 구현 X. 즉, 모두 검색"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "1000", description = "요청성공"),
+            @ApiResponse(responseCode = "5000", description = "서버내부 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "5001", description = "DB 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @GetMapping("/search/interested")
+    public ResponseEntity<SuccessDataResponse<List<InterestedCelebParentResDto>>> searchInterestedCelebByName(@RequestParam String celebName){
+
+
+        return ResponseEntity.ok().body(
+                SuccessDataResponse.<List<InterestedCelebParentResDto>>builder()
+                        .result(celebService.searchInterestedCelebByName(celebName))
                         .build()
         );
     }

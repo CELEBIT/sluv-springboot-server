@@ -1,11 +1,9 @@
 package com.sluv.server.domain.celeb.service;
 
-import com.sluv.server.domain.celeb.dto.CelebChipResDto;
-import com.sluv.server.domain.celeb.dto.CelebSearchByCategoryResDto;
-import com.sluv.server.domain.celeb.dto.CelebSearchResDto;
-import com.sluv.server.domain.celeb.dto.RecentSelectCelebResDto;
+import com.sluv.server.domain.celeb.dto.*;
 import com.sluv.server.domain.celeb.entity.Celeb;
 import com.sluv.server.domain.celeb.entity.CelebCategory;
+import com.sluv.server.domain.celeb.entity.InterestedCeleb;
 import com.sluv.server.domain.celeb.entity.RecentSelectCeleb;
 import com.sluv.server.domain.celeb.repository.CelebCategoryRepository;
 import com.sluv.server.domain.celeb.repository.CelebRepository;
@@ -15,8 +13,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -165,7 +165,7 @@ public class CelebService {
     }
 
     public List<CelebSearchByCategoryResDto> getCelebByCategory() {
-        // Parent Id가 null인 CelebCategory를 모두 조회 후 이름순으로 정렬
+        // Parent Id가 null인 CelebCategory를 모두 조회
         List<CelebCategory> categoryList = celebCategoryRepository.findAllByParentIdIsNull();
 
         return categoryList.stream()
@@ -186,5 +186,50 @@ public class CelebService {
                                                                         ).build()
                             ).toList();
 
+    }
+
+    public List<InterestedCelebParentResDto> searchInterestedCelebByName(String celebName) {
+        // 1. Parent Celeb과 일치
+        List<Celeb> celebByParent = celebRepository.searchInterestedCelebByParent(celebName);
+
+        // 2. Child Celeb과 일치
+        List<Celeb> celebByChild = celebRepository.searchInterestedCelebByChild(celebName);
+
+        // 1 + 2 를 합친 Celeb
+        List<Celeb> celebList = Stream.concat(celebByParent.stream(), celebByChild.stream()).distinct().toList();
+
+        // Celeb의 모든 카테고리 조회
+        List<CelebCategory> celebCategoryList = celebCategoryRepository.findAllByParentIdIsNull();
+
+        // Category별 맞는 celeb들을 골라내서 조립.
+        return celebCategoryList.stream()
+                // 카테고리별 분류
+                .map(category ->{
+                             List<InterestedCelebChildResDto> eachCategoryCeleb =
+                                     // 카테고리에 맞는 셀럽 filtering
+                                     celebList.stream().filter(celeb -> {
+                                        // ParentCategory가 있다면 ParentCategory. 없다면, CelebCategory.
+                                        CelebCategory tempCategory = celeb.getCelebCategory().getParent() != null
+                                                ? celeb.getCelebCategory().getParent()
+                                                : celeb.getCelebCategory();
+
+                                        return tempCategory == category;
+                                        // Category에 맞게 분류된 celeb을 Dto로 변경
+                                    }).map(celeb -> InterestedCelebChildResDto.builder()
+                                                         .id(celeb.getId())
+                                                         .celebNameKr(celeb.getCelebNameKr())
+                                                         .build()
+                            )
+                             // 가나다 순으로 정렬
+                            .sorted(Comparator.comparing(InterestedCelebChildResDto::getCelebNameKr))
+                            .toList();
+
+                 return InterestedCelebParentResDto.builder()
+                         .id(category.getId())
+                         .celebNameKr(category.getName())
+                         .subCelebList(eachCategoryCeleb)
+                         .build();
+                })
+                .toList();
     }
 }

@@ -10,7 +10,10 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.sluv.server.domain.celeb.entity.QRecentSelectCeleb.recentSelectCeleb;
 import static com.sluv.server.domain.celeb.entity.QCeleb.celeb;
@@ -101,5 +104,36 @@ public class CelebRepositoryImpl implements CelebRepositoryCustom{
                 .orderBy(celeb.celebNameKr.asc())
                 .fetch();
 
+    }
+
+    @Override
+    public List<Celeb> searchInterestedCelebByParent(String celebName) {
+
+        // celeb's parent와 이름이 일치
+        return jpaQueryFactory
+                .selectFrom(celeb)
+                .where(celeb.parent.isNull()
+                        .and(
+                                celeb.celebNameKr.like(celebName+"%")
+                                        .or(celeb.celebNameEn.like(celebName+"%"))
+                        )
+                )
+                .fetch();
+    }
+
+    @Override
+    public List<Celeb> searchInterestedCelebByChild(String celebName) {
+
+        // celeb's child와 이름이 일치
+        return jpaQueryFactory
+                .select(celeb.parent)
+                .from(celeb)
+                .where(celeb.parent.isNotNull()
+                        .and(
+                                celeb.celebNameKr.like(celebName+"%")
+                                        .or(celeb.celebNameEn.like(celebName+"%"))
+                        )
+                )
+                .fetch();
     }
 }

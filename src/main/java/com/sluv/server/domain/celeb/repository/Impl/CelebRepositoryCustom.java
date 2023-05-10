@@ -15,4 +15,8 @@ public interface CelebRepositoryCustom {
     List<Celeb> findTop10Celeb();
 
     List<Celeb> getCelebByCategory(CelebCategory category);
+
+    List<Celeb> searchInterestedCelebByParent(String celebName);
+
+    List<Celeb> searchInterestedCelebByChild(String celebName);
 }

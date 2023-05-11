@@ -1,11 +1,14 @@
 package com.sluv.server.domain.item.service;
 
+import com.querydsl.core.Tuple;
 import com.sluv.server.domain.item.dto.HashtagPostResponseDto;
 import com.sluv.server.domain.item.dto.HashtagRequestDto;
 import com.sluv.server.domain.item.dto.HashtagResponseDto;
 import com.sluv.server.domain.item.entity.hashtag.Hashtag;
 import com.sluv.server.domain.item.repository.hashtag.HashtagRepository;
+import com.sluv.server.global.common.response.PaginationResDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -20,8 +23,9 @@ public class HashtagService {
 
     private final HashtagRepository hashtagRepository;
 
-    public List<HashtagResponseDto> getHashtag(String name, Pageable pageable){
-        return hashtagRepository.findAllByContent(name, pageable)
+    public PaginationResDto<HashtagResponseDto> getHashtag(String name, Pageable pageable){
+        Page<Tuple> hashtagPage = hashtagRepository.findAllByContent(name, pageable);
+        List<HashtagResponseDto> dtoList = hashtagPage
                 .stream().map(data -> {
                     Hashtag hashtag = data.get(0, Hashtag.class);
 
@@ -30,7 +34,14 @@ public class HashtagService {
                             .hashtagContent(hashtag.getContent())
                             .count(data.get(1, Long.class))
                             .build();
-                }).collect(toList());
+                }).toList();
+
+
+        return PaginationResDto.<HashtagResponseDto>builder()
+                .hasNext(hashtagPage.hasNext())
+                .page(hashtagPage.getNumber())
+                .content(dtoList)
+                .build();
     }
 
     public HashtagPostResponseDto postHashtag(HashtagRequestDto requestDto){

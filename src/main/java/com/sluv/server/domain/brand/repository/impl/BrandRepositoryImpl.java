@@ -1,5 +1,6 @@
 package com.sluv.server.domain.brand.repository.impl;
 
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sluv.server.domain.brand.entity.Brand;
 import com.sluv.server.domain.brand.entity.QRecentSelectBrand;
@@ -8,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.support.PageableExecutionUtils;
 
 import java.util.List;
 
@@ -29,8 +31,13 @@ public class BrandRepositoryImpl implements BrandRepositoryCustom{
                 .orderBy(brand.brandKr.asc())
                 .fetch();
 
-        return new PageImpl<>(contents);
+        JPAQuery<Brand> countQuery = jpaQueryFactory.selectFrom(brand)
+                .where(brand.brandKr.like(brandName + "%")
+                        .or(brand.brandEn.like(brandName + "%"))
+                );
 
+
+        return PageableExecutionUtils.getPage(contents, pageable, ()-> countQuery.fetch().size());
     }
 
     @Override

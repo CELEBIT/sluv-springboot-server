@@ -2,12 +2,15 @@ package com.sluv.server.domain.brand.service;
 
 import com.sluv.server.domain.brand.dto.BrandSearchResDto;
 import com.sluv.server.domain.brand.dto.RecentSelectBrandResDto;
+import com.sluv.server.domain.brand.entity.Brand;
 import com.sluv.server.domain.brand.entity.RecentSelectBrand;
 import com.sluv.server.domain.brand.repository.BrandRepository;
 import com.sluv.server.domain.brand.repository.RecentSelectBrandRepository;
 import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.domain.user.repository.UserRepository;
+import com.sluv.server.global.common.response.PaginationResDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -22,16 +25,26 @@ public class BrandService {
     private final UserRepository userRepository;
 
 
-    public List<BrandSearchResDto> findAllBrand(String brandName, Pageable pageable){
+    public PaginationResDto<BrandSearchResDto> findAllBrand(String brandName, Pageable pageable){
 
-        return brandRepository.findByAllBrandKrOrBrandEnStartingWith(brandName, pageable).stream()
-                                                                    .map(data -> BrandSearchResDto.builder()
-                                                                                                    .id(data.getId())
-                                                                                                    .brandKr(data.getBrandKr())
-                                                                                                    .brandEn(data.getBrandEn())
-                                                                                                    .brandImgUrl(data.getBrandImgUrl())
-                                                                                                    .build()
-                                                                    ).collect(Collectors.toList());
+        Page<Brand> brandPage = brandRepository.findByAllBrandKrOrBrandEnStartingWith(brandName, pageable);
+
+        List<BrandSearchResDto> dtoList = brandPage.stream()
+                .map(data -> BrandSearchResDto.builder()
+                        .id(data.getId())
+                        .brandKr(data.getBrandKr())
+                        .brandEn(data.getBrandEn())
+                        .brandImgUrl(data.getBrandImgUrl())
+                        .build()
+                ).toList();
+
+        return PaginationResDto.<BrandSearchResDto>builder()
+                .hasNext(brandPage.hasNext())
+                .page(brandPage.getNumber())
+                .content(dtoList)
+                .build();
+
+
     }
 
     public List<BrandSearchResDto> findTopBrand() {

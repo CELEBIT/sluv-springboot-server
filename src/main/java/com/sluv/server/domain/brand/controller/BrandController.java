@@ -4,6 +4,7 @@ import com.sluv.server.domain.brand.dto.BrandSearchResDto;
 import com.sluv.server.domain.brand.service.BrandService;
 import com.sluv.server.domain.brand.service.RecentSelectBrandService;
 import com.sluv.server.global.common.response.ErrorResponse;
+import com.sluv.server.global.common.response.PaginationResDto;
 import com.sluv.server.global.common.response.SuccessDataResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -35,12 +36,12 @@ public class BrandController {
             @ApiResponse(responseCode = "5001", description = "DB 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @GetMapping("/search")
-    public ResponseEntity<SuccessDataResponse<List<BrandSearchResDto>>> getBrandSearch(@RequestParam String brandName, Pageable pageable){
+    public ResponseEntity<SuccessDataResponse<PaginationResDto<BrandSearchResDto>>> getBrandSearch(@RequestParam String brandName, Pageable pageable){
 
 
         return ResponseEntity.ok()
                 .body(
-                        SuccessDataResponse.<List<BrandSearchResDto>>builder()
+                        SuccessDataResponse.<PaginationResDto<BrandSearchResDto>>builder()
                                             .result(brandService.findAllBrand(brandName, pageable))
                                             .build()
                 );

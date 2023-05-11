@@ -1,5 +1,6 @@
 package com.sluv.server.domain.item.repository.impl;
 
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sluv.server.domain.item.entity.TempItem;
 import com.sluv.server.domain.user.entity.User;
@@ -7,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.support.PageableExecutionUtils;
 
 import java.util.List;
 
@@ -20,13 +22,17 @@ public class TempItemRepositoryImpl implements TempItemRepositoryCustom{
 
     @Override
     public Page<TempItem> getTempItemList(User user, Pageable pageable) {
-        List<TempItem> result = jpaQueryFactory.selectFrom(tempItem)
+        List<TempItem> content = jpaQueryFactory.selectFrom(tempItem)
                 .where(tempItem.user.eq(user))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .orderBy(tempItem.updatedAt.desc())
                 .fetch();
-        return new PageImpl<>(result);
+
+        JPAQuery<TempItem> countContent = jpaQueryFactory.selectFrom(tempItem)
+                .where(tempItem.user.eq(user));
+
+        return PageableExecutionUtils.getPage(content, pageable, () -> countContent.fetch().size());
     }
 
     @Override

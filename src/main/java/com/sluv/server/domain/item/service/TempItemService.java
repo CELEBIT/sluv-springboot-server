@@ -26,7 +26,9 @@ import com.sluv.server.domain.item.repository.hashtag.HashtagRepository;
 import com.sluv.server.domain.item.repository.hashtag.TempItemHashtagRepository;
 import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.global.common.enums.ItemImgOrLinkStatus;
+import com.sluv.server.global.common.response.PaginationResDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -136,58 +138,59 @@ public class TempItemService {
         return saveTempItem.getId();
     }
 
-    public List<TempItemResDto> getTempItemList(User user, Pageable pageable){
+    public PaginationResDto<TempItemResDto> getTempItemList(User user, Pageable pageable){
 
+        Page<TempItem> contentPage = tempItemRepository.getTempItemList(user, pageable);
 
-        return tempItemRepository.getTempItemList(user, pageable).stream().map(tempItem -> {
+        List<TempItemResDto> dtoList = contentPage.stream().map(tempItem -> {
 
-            List<ItemImgResDto> tempImgList = tempItemImgRepository.findAllByTempItem(tempItem)
-                    .stream().map(tempItemImg -> ItemImgResDto.builder()
-                            .imgUrl(tempItemImg.getTempItemImgUrl())
-                            .representFlag(tempItemImg.getRepresentFlag())
-                            .build()
-                    ).collect(Collectors.toList());
+                    List<ItemImgResDto> tempImgList = tempItemImgRepository.findAllByTempItem(tempItem)
+                            .stream().map(tempItemImg -> ItemImgResDto.builder()
+                                    .imgUrl(tempItemImg.getTempItemImgUrl())
+                                    .representFlag(tempItemImg.getRepresentFlag())
+                                    .build()
+                            ).collect(Collectors.toList());
 
-            List<Hashtag> tempHashtagList = tempItemHashtagRepository.findAllByTempItem(tempItem)
-                    .stream().map(TempItemHashtag::getHashtag).toList();
+                    List<Hashtag> tempHashtagList = tempItemHashtagRepository.findAllByTempItem(tempItem)
+                            .stream().map(TempItemHashtag::getHashtag).toList();
 
-            List<ItemLinkResDto> tempLinkList = tempItemLinkRepository.findAllByTempItem(tempItem)
-                    .stream().map(tempItemLink -> ItemLinkResDto.builder()
-                            .linkName(tempItemLink.getLinkName())
-                            .itemLinkUrl(tempItemLink.getTempItemLinkUrl())
-                            .build()
-                    ).collect(Collectors.toList());
+                    List<ItemLinkResDto> tempLinkList = tempItemLinkRepository.findAllByTempItem(tempItem)
+                            .stream().map(tempItemLink -> ItemLinkResDto.builder()
+                                    .linkName(tempItemLink.getLinkName())
+                                    .itemLinkUrl(tempItemLink.getTempItemLinkUrl())
+                                    .build()
+                            ).collect(Collectors.toList());
 
-                CelebDto celebDto = tempItem.getCeleb() != null ?
-                        CelebDto.builder()
-                        .id(tempItem.getId())
-                        .celebNameKr(tempItem.getCeleb().getCelebNameKr())
-                        .celebNameEn(tempItem.getCeleb().getCelebNameEn())
-                        .categoryChild(tempItem.getCeleb().getCelebCategory().getName())
-                        .categoryParent(tempItem.getCeleb().getCelebCategory().getParent().getName())
-                        .parentCelebNameKr(tempItem.getCeleb().getParent() != null ? tempItem.getCeleb().getParent().getCelebNameKr() : null)
-                        .parentCelebNameEn(tempItem.getCeleb().getParent() != null ? tempItem.getCeleb().getParent().getCelebNameEn() : null)
-                        .build()
-                        : null;
+                    CelebDto celebDto = tempItem.getCeleb() != null ?
+                            CelebDto.builder()
+                                    .id(tempItem.getId())
+                                    .celebNameKr(tempItem.getCeleb().getCelebNameKr())
+                                    .celebNameEn(tempItem.getCeleb().getCelebNameEn())
+                                    .categoryChild(tempItem.getCeleb().getCelebCategory().getName())
+                                    .categoryParent(tempItem.getCeleb().getCelebCategory().getParent().getName())
+                                    .parentCelebNameKr(tempItem.getCeleb().getParent() != null ? tempItem.getCeleb().getParent().getCelebNameKr() : null)
+                                    .parentCelebNameEn(tempItem.getCeleb().getParent() != null ? tempItem.getCeleb().getParent().getCelebNameEn() : null)
+                                    .build()
+                            : null;
 
-                ItemCategoryDto itemCategoryDto = tempItem.getCategory() != null ?
-                        ItemCategoryDto.builder()
-                                .id(tempItem.getCategory().getId())
-                                .name(tempItem.getCategory().getName())
-                                .parentName(
-                                        tempItem.getCategory().getParent() != null
-                                                ? tempItem.getCategory().getParent().getName()
-                                                :null
-                                        )
-                                .parentId(
-                                        tempItem.getCategory().getParent() != null
-                                                ? tempItem.getCategory().getParent().getId()
-                                                :null
-                                )
-                                .build()
-                        : null;
+                    ItemCategoryDto itemCategoryDto = tempItem.getCategory() != null ?
+                            ItemCategoryDto.builder()
+                                    .id(tempItem.getCategory().getId())
+                                    .name(tempItem.getCategory().getName())
+                                    .parentName(
+                                            tempItem.getCategory().getParent() != null
+                                                    ? tempItem.getCategory().getParent().getName()
+                                                    : null
+                                    )
+                                    .parentId(
+                                            tempItem.getCategory().getParent() != null
+                                                    ? tempItem.getCategory().getParent().getId()
+                                                    : null
+                                    )
+                                    .build()
+                            : null;
 
-            return TempItemResDto.builder()
+                    return TempItemResDto.builder()
                             .id(tempItem.getId())
                             .imgList(tempImgList)
                             .celeb(celebDto)
@@ -199,14 +202,20 @@ public class TempItemService {
                             .additionalInfo(tempItem.getAdditionalInfo())
                             .hashTagList(tempHashtagList)
                             .linkList(tempLinkList)
-                    .infoSource(tempItem.getInfoSource())
-                    .newCelebId(tempItem.getNewCeleb().getId())
-                    .newBrandId(tempItem.getNewBrand().getId())
-                    .updatedAt(tempItem.getUpdatedAt())
-                    .build();
+                            .infoSource(tempItem.getInfoSource())
+                            .newCelebId(tempItem.getNewCeleb().getId())
+                            .newBrandId(tempItem.getNewBrand().getId())
+                            .updatedAt(tempItem.getUpdatedAt())
+                            .build();
 
-            }
-        ).collect(Collectors.toList());
+                }
+        ).toList();
+
+        return PaginationResDto.<TempItemResDto>builder()
+                .hasNext(contentPage.hasNext())
+                .page(contentPage.getNumber())
+                .content(dtoList)
+                .build();
 
     }
 

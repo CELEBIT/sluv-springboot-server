@@ -5,6 +5,7 @@ import com.sluv.server.domain.item.repository.ItemReportRepository;
 import com.sluv.server.domain.item.service.*;
 import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.global.common.response.ErrorResponse;
+import com.sluv.server.global.common.response.PaginationResDto;
 import com.sluv.server.global.common.response.SuccessDataResponse;
 import com.sluv.server.global.common.response.SuccessResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -82,10 +83,10 @@ public class ItemController {
             @ApiResponse(responseCode = "5001", description = "DB 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @GetMapping("/temp")
-    public ResponseEntity<SuccessDataResponse<List<TempItemResDto>>> getTempItemList(@AuthenticationPrincipal User user, Pageable pageable){
+    public ResponseEntity<SuccessDataResponse<PaginationResDto<TempItemResDto>>> getTempItemList(@AuthenticationPrincipal User user, Pageable pageable){
 
         return ResponseEntity.ok().body(
-                SuccessDataResponse.<List<TempItemResDto>>builder()
+                SuccessDataResponse.<PaginationResDto<TempItemResDto>>builder()
                         .result(tempItemService.getTempItemList(user, pageable))
                         .build()
         );

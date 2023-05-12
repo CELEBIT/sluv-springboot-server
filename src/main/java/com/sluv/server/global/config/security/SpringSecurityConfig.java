@@ -66,6 +66,7 @@ public class SpringSecurityConfig {
                 .httpBasic().disable()
 
                 .authorizeHttpRequests((request) -> request // 허용 범위 설정
+                                .requestMatchers(HttpMethod.OPTIONS, "/**/*").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/app/item/category").permitAll()
                                 .requestMatchers(AUTH_URL).authenticated() // 허용범위
                         .anyRequest().permitAll()

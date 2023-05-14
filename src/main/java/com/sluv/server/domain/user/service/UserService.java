@@ -1,9 +1,13 @@
 package com.sluv.server.domain.user.service;
 
+import com.sluv.server.domain.celeb.dto.InterestedCelebPostReqDto;
 import com.sluv.server.domain.celeb.entity.Celeb;
+import com.sluv.server.domain.celeb.entity.InterestedCeleb;
+import com.sluv.server.domain.celeb.exception.CelebNotFoundException;
 import com.sluv.server.domain.celeb.repository.CelebRepository;
 import com.sluv.server.domain.celeb.dto.InterestedCelebParentResDto;
 import com.sluv.server.domain.celeb.dto.InterestedCelebChildResDto;
+import com.sluv.server.domain.celeb.repository.InterestedCelebRepository;
 import com.sluv.server.domain.user.dto.UserReportReqDto;
 import com.sluv.server.domain.user.entity.Follow;
 import com.sluv.server.domain.user.entity.User;
@@ -31,6 +35,7 @@ public class UserService {
     private final CelebRepository celebRepository;
     private final FollowRepository followRepository;
     private final UserReportRepository userReportRepository;
+    private final InterestedCelebRepository interestedCelebRepository;
 
     private final JwtProvider jwtProvider;
 
@@ -91,5 +96,22 @@ public class UserService {
             );
         }
 
+    }
+
+    @Transactional
+    public void postInterestedCeleb(User user, InterestedCelebPostReqDto dto) {
+        // 기존에 있는 해당 유저의 관심셀럽 초기화
+        interestedCelebRepository.deleteAllByUserId(user.getId());
+
+        // 초기화 상태에서 다시 추가.
+        List<InterestedCeleb> interestedCelebList = dto.getCelebIdList().stream()
+                .map(celeb ->
+                        InterestedCeleb.builder()
+                                .user(user)
+                                .celeb(celebRepository.findById(celeb).orElseThrow(CelebNotFoundException::new))
+                                .build()
+                ).toList();
+
+        interestedCelebRepository.saveAll(interestedCelebList);
     }
 }

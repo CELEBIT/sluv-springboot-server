@@ -13,4 +13,6 @@ import lombok.NoArgsConstructor;
 public class NewBrandPostResDto {
     @Schema(description = "생성된 newBrand의 Id")
     private Long newBrandId;
+    @Schema(description = "생성된 newBrand의 이름")
+    private String newBrandName;
 }

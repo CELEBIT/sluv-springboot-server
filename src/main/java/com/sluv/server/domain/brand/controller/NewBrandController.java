@@ -1,6 +1,7 @@
 package com.sluv.server.domain.brand.controller;
 
 import com.sluv.server.domain.brand.dto.NewBrandPostReqDto;
+import com.sluv.server.domain.brand.dto.NewBrandPostResDto;
 import com.sluv.server.domain.brand.service.NewBrandService;
 import com.sluv.server.global.common.response.SuccessDataResponse;
 import lombok.RequiredArgsConstructor;
@@ -18,9 +19,9 @@ public class NewBrandController {
 
 
     @PostMapping("")
-    public ResponseEntity<SuccessDataResponse<Long>> postNewBrand(@RequestBody NewBrandPostReqDto dto){
+    public ResponseEntity<SuccessDataResponse<NewBrandPostResDto>> postNewBrand(@RequestBody NewBrandPostReqDto dto){
         return ResponseEntity.ok().body(
-                SuccessDataResponse.<Long>builder()
+                SuccessDataResponse.<NewBrandPostResDto>builder()
                         .result(newBrandService.postNewBrand(dto))
                         .build()
         );

@@ -25,4 +25,6 @@ public class ItemSameResDto {
     private String itemName;
     @Schema(description = "아이템의 셀럽 이름")
     private String celebName;
+    @Schema(description = "스크랩 여부")
+    private Boolean scrapStatus;
 }

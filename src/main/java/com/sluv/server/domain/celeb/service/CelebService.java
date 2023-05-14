@@ -103,7 +103,11 @@ public class CelebService {
                 .map(celeb ->
                          CelebSearchResDto.builder()
                                 .id(celeb.getId())
-                                .parentId(celeb.getParent().getId())
+                                .parentId(
+                                        celeb.getParent() != null
+                                        ? celeb.getParent().getId()
+                                        : null
+                                )
                                 .category(celeb.getCelebCategory().getParent() != null
                                         ? celeb.getCelebCategory().getParent().getName()
                                         : celeb.getCelebCategory().getName()

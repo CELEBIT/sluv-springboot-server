@@ -79,7 +79,9 @@ public class CelebService {
             String flag = recentSelectCeleb.getCeleb() != null ? "Y" :"N";
             if(flag.equals("Y")){
                 celebId = recentSelectCeleb.getCeleb().getId();
-                celebName = recentSelectCeleb.getCeleb().getCelebNameKr();
+                celebName = recentSelectCeleb.getCeleb().getParent() != null?
+                        recentSelectCeleb.getCeleb().getParent().getCelebNameKr() + " " + recentSelectCeleb.getCeleb().getCelebNameKr()
+                        : recentSelectCeleb.getCeleb().getCelebNameKr();
             }else{
                 celebId = recentSelectCeleb.getNewCeleb().getId();
                 celebName = recentSelectCeleb.getNewCeleb().getCelebName();

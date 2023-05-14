@@ -5,6 +5,7 @@ import com.sluv.server.domain.celeb.dto.CelebSearchResDto;
 import com.sluv.server.domain.celeb.dto.InterestedCelebParentResDto;
 import com.sluv.server.domain.celeb.service.CelebService;
 import com.sluv.server.global.common.response.ErrorResponse;
+import com.sluv.server.global.common.response.PaginationResDto;
 import com.sluv.server.global.common.response.SuccessDataResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -34,11 +35,11 @@ public class CelebController {
             @ApiResponse(responseCode = "5001", description = "DB 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @GetMapping("/search")
-    public ResponseEntity<SuccessDataResponse<List<CelebSearchResDto>>> searchCelebByName(@RequestParam String celebName, Pageable pageable){
+    public ResponseEntity<SuccessDataResponse<PaginationResDto<CelebSearchResDto>>> searchCelebByName(@RequestParam String celebName, Pageable pageable){
 
 
         return ResponseEntity.ok().body(
-            SuccessDataResponse.<List<CelebSearchResDto>>builder()
+            SuccessDataResponse.<PaginationResDto<CelebSearchResDto>>builder()
                     .result(celebService.searchCeleb(celebName, pageable))
                     .build()
         );

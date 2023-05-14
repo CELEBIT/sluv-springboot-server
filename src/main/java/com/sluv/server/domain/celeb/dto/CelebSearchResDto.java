@@ -17,17 +17,24 @@ public class CelebSearchResDto {
     private Long parentId;
     @Schema(description = "Celeb 카테고리")
     private String category;
-    @Schema(description = "Celeb 한글 이름")
-    private String CelebNameKr;
-    @Schema(description = "Celeb 영어 이름")
-    private String CelebNameEn;
+    @Schema(description = "Celeb Parent 한글 이름")
+    private String celebParentNameKr;
+    @Schema(description = "Celeb Child 한글 이름")
+    private String celebChildNameKr;
+    @Schema(description = "total 한글 이름")
+    private String celebTotalNameKr;
+    @Schema(description = "total 영어 이름")
+    private String celebTotalNameEn;
+
 
     @Builder
-    public CelebSearchResDto(Long id, Long parentId, String category, String celebNameKr, String celebNameEn) {
+    public CelebSearchResDto(Long id, Long parentId, String category, String celebParentNameKr, String celebChildNameKr, String celebTotalNameKr, String celebTotalNameEn) {
         this.id = id;
         this.parentId = parentId;
         this.category = category;
-        CelebNameKr = celebNameKr;
-        CelebNameEn = celebNameEn;
+        this.celebParentNameKr = celebParentNameKr;
+        this.celebChildNameKr = celebChildNameKr;
+        this.celebTotalNameKr = celebTotalNameKr;
+        this.celebTotalNameEn = celebTotalNameEn;
     }
 }

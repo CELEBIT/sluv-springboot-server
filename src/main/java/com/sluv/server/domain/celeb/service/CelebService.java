@@ -33,39 +33,23 @@ public class CelebService {
 
         Page<Celeb> celebPage = celebRepository.searchCeleb(celebName, pageable);
 
-        Stream<CelebSearchResDto> childCelebDtoStream = celebPage.stream()
+        List<Celeb> childCelebList = celebPage.stream()
                 .filter(celeb -> celeb.getParent() != null)
-                .map(celeb -> CelebSearchResDto.builder()
-                        .id(celeb.getId())
-                        .parentId(celeb.getParent().getId())
-                        .category(celeb.getCelebCategory().getParent() != null
-                                ? celeb.getCelebCategory().getParent().getName()
-                                : celeb.getCelebCategory().getName()
-                        )
-                        .celebNameKr(celeb.getParent().getCelebNameKr() + " " + celeb.getCelebNameKr())
-                        .celebNameEn(celeb.getParent().getCelebNameEn() + " " + celeb.getCelebNameEn())
-                        .build()
-                );
+                .toList();
 
-        Stream<CelebSearchResDto> parentCelebDtoStream = celebPage.stream()
+        Stream<CelebSearchResDto> childCelebDtoStream = changeCelebSearchResDto(childCelebList).stream();
+
+
+        List<Celeb> parentCelebList = celebPage.stream()
                 .filter(celeb -> celeb.getParent() == null)
-                .map(celeb -> CelebSearchResDto.builder()
-                        .id(celeb.getId())
-                        .parentId(null)
-                        .category(celeb.getCelebCategory().getParent() != null
-                                ? celeb.getCelebCategory().getParent().getName()
-                                : celeb.getCelebCategory().getName()
-                        )
-                        .celebNameKr(celeb.getCelebNameKr())
-                        .celebNameEn(celeb.getCelebNameEn())
-                        .build()
+                .toList();
+        Stream<CelebSearchResDto> parentCelebDtoStream = changeCelebSearchResDto(parentCelebList).stream();
 
-                );
 
         return PaginationResDto.<CelebSearchResDto>builder()
                 .page(celebPage.getNumber())
                 .hasNext(celebPage.hasNext())
-                .content(Stream.concat(childCelebDtoStream, parentCelebDtoStream).sorted(Comparator.comparing(CelebSearchResDto::getCelebNameKr)).toList())
+                .content(Stream.concat(childCelebDtoStream, parentCelebDtoStream).sorted(Comparator.comparing(CelebSearchResDto::getCelebTotalNameKr)).toList())
                 .build();
 
     }
@@ -74,21 +58,32 @@ public class CelebService {
         List<RecentSelectCeleb> recentSelectCelebList = recentSearchCelebRepository.getRecentSelectCelebTop20(user);
 
         return recentSelectCelebList.stream().map(recentSelectCeleb -> {
-            Long celebId;
-            String celebName;
+            Long celebChildId;
+            Long celebParentId;
+            String celebChildName;
+            String celebParentName;
+
             String flag = recentSelectCeleb.getCeleb() != null ? "Y" :"N";
             if(flag.equals("Y")){
-                celebId = recentSelectCeleb.getCeleb().getId();
-                celebName = recentSelectCeleb.getCeleb().getParent() != null?
-                        recentSelectCeleb.getCeleb().getParent().getCelebNameKr() + " " + recentSelectCeleb.getCeleb().getCelebNameKr()
-                        : recentSelectCeleb.getCeleb().getCelebNameKr();
+                celebChildId = recentSelectCeleb.getCeleb().getId();
+                celebParentId = recentSelectCeleb.getCeleb().getParent() != null
+                        ? recentSelectCeleb.getCeleb().getParent().getId()
+                        : null;
+                celebChildName = recentSelectCeleb.getCeleb().getCelebNameKr();
+                celebParentName = recentSelectCeleb.getCeleb().getParent() != null
+                        ? recentSelectCeleb.getCeleb().getParent().getCelebNameKr()
+                        : null;
             }else{
-                celebId = recentSelectCeleb.getNewCeleb().getId();
-                celebName = recentSelectCeleb.getNewCeleb().getCelebName();
+                celebChildId = recentSelectCeleb.getNewCeleb().getId();
+                celebParentId = null;
+                celebChildName = recentSelectCeleb.getNewCeleb().getCelebName();
+                celebParentName = null;
             }
             return RecentSelectCelebResDto.builder()
-                    .id(celebId)
-                    .celebName(celebName)
+                    .id(celebChildId)
+                    .parentId(celebParentId)
+                    .childCelebName(celebChildName)
+                    .parentCelebName(celebParentName)
                     .flag(flag)
                     .build();
         }).toList();
@@ -105,24 +100,31 @@ public class CelebService {
      */
     private List<CelebSearchResDto> changeCelebSearchResDto(List<Celeb> celebList){
         return celebList.stream()
-                .map(celeb -> {
-                            String celebNameKr = celeb.getCelebNameKr();
-                            String celebNameEn = celeb.getCelebNameEn();
-
-                            if (celeb.getParent() != null){
-                                celebNameKr = celeb.getParent().getCelebNameKr() + " " + celeb.getCelebNameKr();
-                                celebNameEn = celeb.getParent().getCelebNameEn() + " " + celeb.getCelebNameEn();
-                            }
-
-
-                            return CelebSearchResDto.builder()
-                                    .id(celeb.getId())
-                                    .parentId(celeb.getParent().getId())
-                                    .category(celeb.getCelebCategory().getParent().getName())
-                                    .celebNameKr(celebNameKr)
-                                    .celebNameEn(celebNameEn)
-                                    .build();
-                        }
+                .map(celeb ->
+                         CelebSearchResDto.builder()
+                                .id(celeb.getId())
+                                .parentId(celeb.getParent().getId())
+                                .category(celeb.getCelebCategory().getParent() != null
+                                        ? celeb.getCelebCategory().getParent().getName()
+                                        : celeb.getCelebCategory().getName()
+                                        )
+                                .celebParentNameKr(
+                                        celeb.getParent() != null
+                                        ? celeb.getParent().getCelebNameKr()
+                                        :null
+                                        )
+                                .celebChildNameKr(celeb.getCelebNameKr())
+                                .celebTotalNameKr(
+                                        celeb.getParent() != null
+                                        ? celeb.getParent().getCelebNameKr() + " " + celeb.getCelebNameKr()
+                                        : celeb.getCelebNameKr()
+                                        )
+                                .celebTotalNameEn(
+                                        celeb.getParent() != null
+                                                ? celeb.getParent().getCelebNameEn() + " " + celeb.getCelebNameEn()
+                                                : celeb.getCelebNameEn()
+                                )
+                                .build()
 
                 ).toList();
     }

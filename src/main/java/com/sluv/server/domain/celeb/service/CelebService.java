@@ -9,8 +9,11 @@ import com.sluv.server.domain.celeb.repository.CelebCategoryRepository;
 import com.sluv.server.domain.celeb.repository.CelebRepository;
 import com.sluv.server.domain.celeb.repository.RecentSelectCelebRepository;
 import com.sluv.server.domain.user.entity.User;
+import com.sluv.server.global.common.response.PaginationResDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
 import java.util.Comparator;
@@ -26,86 +29,44 @@ public class CelebService {
     private final RecentSelectCelebRepository recentSearchCelebRepository;
     private final CelebCategoryRepository celebCategoryRepository;
 
-    public List<CelebSearchResDto> searchCeleb(String celebName, Pageable pageable) {
+    public PaginationResDto<CelebSearchResDto> searchCeleb(String celebName, Pageable pageable) {
 
-        return celebRepository.searchCeleb(celebName, pageable).stream()
-                .collect(Collectors.partitioningBy(c -> c.getParent() == null))
-                .entrySet().stream()
-                .flatMap(entry -> {
-                    if (entry.getKey()) {
-                        // 검색어가 parent Celeb 일 때
-                        return entry.getValue().stream()
-                                .collect(Collectors.partitioningBy(c -> c.getSubCelebList() == null || c.getSubCelebList().size() == 0))
-                                .entrySet().stream()
-                                .flatMap(parentEntry -> {
-                                    // Celeb이 솔로일 경우
-                                    if(parentEntry.getKey()){
-                                        return parentEntry.getValue().stream()
-                                                        .map(data -> {
-                                                            String category;
-                                                            if(data.getCelebCategory().getParent() != null){
-                                                                category = data.getCelebCategory().getParent().getName();
-                                                            }else {
-                                                                category = data.getCelebCategory().getName();
-                                                            }
+        Page<Celeb> celebPage = celebRepository.searchCeleb(celebName, pageable);
 
-                                                            return CelebSearchResDto.builder()
-                                                                            .id(data.getId())
-                                                                            .parentId(null)
-                                                                            .category(category)
-                                                                            .celebNameKr(data.getCelebNameKr())
-                                                                            .celebNameEn(data.getCelebNameEn())
-                                                                            .build();
-                                                                }
+        Stream<CelebSearchResDto> childCelebDtoStream = celebPage.stream()
+                .filter(celeb -> celeb.getParent() != null)
+                .map(celeb -> CelebSearchResDto.builder()
+                        .id(celeb.getId())
+                        .parentId(celeb.getParent().getId())
+                        .category(celeb.getCelebCategory().getParent() != null
+                                ? celeb.getCelebCategory().getParent().getName()
+                                : celeb.getCelebCategory().getName()
+                        )
+                        .celebNameKr(celeb.getParent().getCelebNameKr() + " " + celeb.getCelebNameKr())
+                        .celebNameEn(celeb.getParent().getCelebNameEn() + " " + celeb.getCelebNameEn())
+                        .build()
+                );
 
-                                                        );
+        Stream<CelebSearchResDto> parentCelebDtoStream = celebPage.stream()
+                .filter(celeb -> celeb.getParent() == null)
+                .map(celeb -> CelebSearchResDto.builder()
+                        .id(celeb.getId())
+                        .parentId(null)
+                        .category(celeb.getCelebCategory().getParent() != null
+                                ? celeb.getCelebCategory().getParent().getName()
+                                : celeb.getCelebCategory().getName()
+                        )
+                        .celebNameKr(celeb.getCelebNameKr())
+                        .celebNameEn(celeb.getCelebNameEn())
+                        .build()
 
-                                    }else{
-                                        // Celeb이 그룹명일 경우
-                                        return parentEntry.getValue().stream()
-                                                .flatMap(parent -> parent.getSubCelebList().stream()
-                                                        .map(child -> {
-                                                            String category;
-                                                            if(child.getCelebCategory().getParent() != null){
-                                                                category = child.getCelebCategory().getParent().getName();
-                                                            }else {
-                                                                category = child.getCelebCategory().getName();
-                                                            }
-                                                            return CelebSearchResDto.builder()
-                                                                            .id(child.getId())
-                                                                            .parentId(parent.getId())
-                                                                            .category(category)
-                                                                            .celebNameKr(parent.getCelebNameKr() + " " + child.getCelebNameKr())
-                                                                            .celebNameEn(parent.getCelebNameEn() + " " + child.getCelebNameEn())
-                                                                            .build();
-                                                                }
-                                                        )
-                                                );
-                                    }
-                                });
+                );
 
-                    } else {
-                        // 검색어가 child Celeb 일 때
-                        return entry.getValue().stream()
-                                .map(child -> {
-                                        String category;
-                                        if(child.getCelebCategory().getParent() != null){
-                                            category = child.getCelebCategory().getParent().getName();
-                                        }else{
-                                            category = child.getCelebCategory().getName();
-                                        }
-                                        return CelebSearchResDto.builder()
-                                                .id(child.getId())
-                                                .parentId(child.getParent().getId())
-                                                .category(category)
-                                                .celebNameKr(child.getParent().getCelebNameKr() + " " + child.getCelebNameKr())
-                                                .celebNameEn(child.getParent().getCelebNameEn() + " " + child.getCelebNameEn())
-                                                .build();
-                                    }
-                                );
-                    }
-
-                }).toList();
+        return PaginationResDto.<CelebSearchResDto>builder()
+                .page(celebPage.getNumber())
+                .hasNext(celebPage.hasNext())
+                .content(Stream.concat(childCelebDtoStream, parentCelebDtoStream).sorted(Comparator.comparing(CelebSearchResDto::getCelebNameKr)).toList())
+                .build();
 
     }
 

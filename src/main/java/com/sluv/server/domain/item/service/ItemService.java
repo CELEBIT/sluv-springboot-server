@@ -218,8 +218,8 @@ public class ItemService {
                 CelebSearchResDto.builder()
                                 .id(item.getCeleb().getId())
                                 .category(null)
-                                .celebNameKr(item.getCeleb().getCelebNameKr())
-                                .celebNameEn(item.getCeleb().getCelebNameEn())
+                                .celebTotalNameKr(item.getCeleb().getCelebNameKr())
+                                .celebTotalNameEn(item.getCeleb().getCelebNameEn())
                                 .build()
                 : null;
 

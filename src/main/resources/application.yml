@@ -41,3 +41,11 @@ apple:
   clientId: Sluv.sluv-ios-renew
   openKey: https://appleid.apple.com/auth/keys
   iss: https://appleid.apple.com
+
+aws:
+  s3:
+    accessKey: AKIA5R23H6YS2FVCHYQK
+    secretKey: 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
+    region: ap-northeast-2
+    bucketName: sluv-dev-img-bucket
+    baseUrl: https://sluv-dev-img-bucket.s3.ap-northeast-2.amazonaws.com

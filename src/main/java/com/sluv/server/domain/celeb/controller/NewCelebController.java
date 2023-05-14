@@ -1,6 +1,7 @@
 package com.sluv.server.domain.celeb.controller;
 
 import com.sluv.server.domain.celeb.dto.NewCelebPostReqDto;
+import com.sluv.server.domain.celeb.dto.NewCelebPostResDto;
 import com.sluv.server.domain.celeb.service.NewCelebService;
 import com.sluv.server.global.common.response.SuccessDataResponse;
 import lombok.RequiredArgsConstructor;
@@ -18,9 +19,9 @@ public class NewCelebController {
 
 
     @PostMapping("")
-    public ResponseEntity<SuccessDataResponse<Long>> postNewCeleb(@RequestBody NewCelebPostReqDto dto){
+    public ResponseEntity<SuccessDataResponse<NewCelebPostResDto>> postNewCeleb(@RequestBody NewCelebPostReqDto dto){
         return ResponseEntity.ok().body(
-                SuccessDataResponse.<Long>builder()
+                SuccessDataResponse.<NewCelebPostResDto>builder()
                         .result(newCelebService.postNewCeleb(dto))
                         .build()
         );

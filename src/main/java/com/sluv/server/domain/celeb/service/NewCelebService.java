@@ -23,6 +23,7 @@ public class NewCelebService {
 
         return NewCelebPostResDto.builder()
                                 .newCelebId(newCeleb.getId())
+                                .newCelebName(newCeleb.getCelebName())
                                 .build();
     }
 }

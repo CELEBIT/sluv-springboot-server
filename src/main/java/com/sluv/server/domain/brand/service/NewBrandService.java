@@ -24,6 +24,7 @@ public class NewBrandService {
 
         return NewBrandPostResDto.builder()
                                 .newBrandId(newBrand.getId())
+                                .newBrandName(newBrand.getBrandName())
                                 .build();
     }
 

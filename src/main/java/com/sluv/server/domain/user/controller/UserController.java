@@ -86,6 +86,8 @@ public class UserController {
     @Operation(
             summary = "*유저의 관심 셀럽 업데이트",
             description = "유저의 관심 셀럽 목록을 업데이트" +
+                    "\n 1. User Id를 기준으로 InterestedCeleb 테이블의 모든 데이터 삭제" +
+                    "\n 2. User Id와 Dto의 정보를 바탕으로 정보 push" +
                     "\n (User Id Token 필요)"
     )
     @ApiResponses(value = {

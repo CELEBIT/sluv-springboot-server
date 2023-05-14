@@ -5,6 +5,7 @@ import com.sluv.server.domain.item.dto.HashtagRequestDto;
 import com.sluv.server.domain.item.dto.HashtagResponseDto;
 import com.sluv.server.domain.item.service.HashtagService;
 import com.sluv.server.global.common.response.ErrorResponse;
+import com.sluv.server.global.common.response.PaginationResDto;
 import com.sluv.server.global.common.response.SuccessDataResponse;
 import com.sluv.server.global.common.response.SuccessResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -36,10 +37,10 @@ public class HashtagController {
             @ApiResponse(responseCode = "5001", description = "DB 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @GetMapping("")
-    public ResponseEntity<SuccessDataResponse<List<HashtagResponseDto>>> getHashtag(@RequestParam String name, Pageable pageable){
+    public ResponseEntity<SuccessDataResponse<PaginationResDto<HashtagResponseDto>>> getHashtag(@RequestParam String name, Pageable pageable){
 
         return ResponseEntity.ok().body(
-                SuccessDataResponse.<List<HashtagResponseDto>>builder()
+                SuccessDataResponse.<PaginationResDto<HashtagResponseDto>>builder()
                         .result(hashtagService.getHashtag(name, pageable))
                         .build()
 

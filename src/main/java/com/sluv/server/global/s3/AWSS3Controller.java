@@ -22,7 +22,6 @@ public class AWSS3Controller {
     @Operation(
             summary = "user 프로필 이미지 업로드",
             description = "user 프로필 이미지 업로드" +
-                    "\n (User Id Token 필요)" +
                     "\n imgExtension: 이미지 확장자"
     )
     @ApiResponses(value = {
@@ -31,11 +30,11 @@ public class AWSS3Controller {
             @ApiResponse(responseCode = "5001", description = "DB 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @PostMapping("/user")
-    public ResponseEntity<SuccessDataResponse<PreSingedUrlResDto>> getUserProfileUrl(@AuthenticationPrincipal User user, @RequestParam ImgExtension imgExtension){
+    public ResponseEntity<SuccessDataResponse<PreSingedUrlResDto>> getUserProfileUrl(@RequestParam ImgExtension imgExtension){
         return ResponseEntity.ok().body(
                 SuccessDataResponse.<PreSingedUrlResDto>builder()
                         .result(
-                                awss3Service.forUserProfile(user, imgExtension)
+                                awss3Service.forUserProfile(imgExtension)
                         )
                         .build()
         );
@@ -44,7 +43,6 @@ public class AWSS3Controller {
     @Operation(
             summary = "아이템 이미지 업로드",
             description = "아이템 이미지 업로드" +
-                    "\n Item Id 필요" +
                     "\n imgExtension: 이미지 확장자"
     )
     @ApiResponses(value = {
@@ -52,12 +50,12 @@ public class AWSS3Controller {
             @ApiResponse(responseCode = "5000", description = "서버내부 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "5001", description = "DB 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
-    @PostMapping("/item/{itemId}")
-    public ResponseEntity<SuccessDataResponse<PreSingedUrlResDto>> getItemImgUrl(@PathVariable("itemId") Long itemId, @RequestParam ImgExtension imgExtension){
+    @PostMapping("/item")
+    public ResponseEntity<SuccessDataResponse<PreSingedUrlResDto>> getItemImgUrl(@RequestParam ImgExtension imgExtension){
         return ResponseEntity.ok().body(
                 SuccessDataResponse.<PreSingedUrlResDto>builder()
                         .result(
-                                awss3Service.forItem(itemId, imgExtension)
+                                awss3Service.forItem(imgExtension)
                         )
                         .build()
         );
@@ -66,7 +64,6 @@ public class AWSS3Controller {
     @Operation(
             summary = "커뮤니티 게시글 이미지 업로드",
             description = "커뮤니티 게시글 이미지 업로드" +
-                    "\n Question Id 필요" +
                     "\n imgExtension: 이미지 확장자"
     )
     @ApiResponses(value = {
@@ -74,12 +71,12 @@ public class AWSS3Controller {
             @ApiResponse(responseCode = "5000", description = "서버내부 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "5001", description = "DB 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
-    @PostMapping("/question/{questionId}")
-    public ResponseEntity<SuccessDataResponse<PreSingedUrlResDto>> getQuestionImgUrl(@PathVariable("questionId") Long questionId, @RequestParam ImgExtension imgExtension){
+    @PostMapping("/question")
+    public ResponseEntity<SuccessDataResponse<PreSingedUrlResDto>> getQuestionImgUrl(@RequestParam ImgExtension imgExtension){
         return ResponseEntity.ok().body(
                 SuccessDataResponse.<PreSingedUrlResDto>builder()
                         .result(
-                                awss3Service.forCommunityPost(questionId, imgExtension)
+                                awss3Service.forCommunityPost(imgExtension)
                         )
                         .build()
         );
@@ -88,7 +85,6 @@ public class AWSS3Controller {
     @Operation(
             summary = "커뮤니티 댓글 이미지 업로드",
             description = "커뮤니티 댓글 이미지 업로드" +
-                    "\n Comment Id 필요" +
                     "\n imgExtension: 이미지 확장자"
     )
     @ApiResponses(value = {
@@ -96,12 +92,12 @@ public class AWSS3Controller {
             @ApiResponse(responseCode = "5000", description = "서버내부 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "5001", description = "DB 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
-    @PostMapping("/comment/{commentId}")
-    public ResponseEntity<SuccessDataResponse<PreSingedUrlResDto>> getCommentImgUrl(@PathVariable("commentId") Long commentId, @RequestParam ImgExtension imgExtension){
+    @PostMapping("/comment")
+    public ResponseEntity<SuccessDataResponse<PreSingedUrlResDto>> getCommentImgUrl(@RequestParam ImgExtension imgExtension){
         return ResponseEntity.ok().body(
                 SuccessDataResponse.<PreSingedUrlResDto>builder()
                         .result(
-                                awss3Service.forCommunityComment(commentId, imgExtension)
+                                awss3Service.forCommunityComment(imgExtension)
                         )
                         .build()
         );
@@ -110,7 +106,6 @@ public class AWSS3Controller {
     @Operation(
             summary = "옷장 이미지 업로드",
             description = "옷장 이미지 업로드" +
-                    "\n Closet Id 필요" +
                     "\n imgExtension: 이미지 확장자"
     )
     @ApiResponses(value = {
@@ -118,12 +113,12 @@ public class AWSS3Controller {
             @ApiResponse(responseCode = "5000", description = "서버내부 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "5001", description = "DB 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
-    @PostMapping("/closet/{closetId}")
-    public ResponseEntity<SuccessDataResponse<PreSingedUrlResDto>> getClosetImgUrl(@PathVariable("closetId") Long closetId, @RequestParam ImgExtension imgExtension){
+    @PostMapping("/closet")
+    public ResponseEntity<SuccessDataResponse<PreSingedUrlResDto>> getClosetImgUrl(@RequestParam ImgExtension imgExtension){
         return ResponseEntity.ok().body(
                 SuccessDataResponse.<PreSingedUrlResDto>builder()
                         .result(
-                                awss3Service.forCloset(closetId, imgExtension)
+                                awss3Service.forCloset(imgExtension)
                         )
                         .build()
         );

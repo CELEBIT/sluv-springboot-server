@@ -35,9 +35,9 @@ public class AWSS3Service {
      * 커뮤니티 이미지
      * 클로젯 커버
      */
-    public PreSingedUrlResDto forUserProfile(User user, ImgExtension imgExtension) {
+    public PreSingedUrlResDto forUserProfile(ImgExtension imgExtension) {
         String fixedExtension = imgExtension.getUploadExtension();
-        String fileName = getForUserProfileFileName(user.getId(), fixedExtension);
+        String fileName = getForUserProfileFileName(fixedExtension);
         log.info(fileName);
         URL url =
                 amazonS3.generatePresignedUrl(
@@ -47,9 +47,9 @@ public class AWSS3Service {
                 .key(fileName)
                 .build();
     }
-    public PreSingedUrlResDto forItem(Long itemId, ImgExtension imgExtension) {
+    public PreSingedUrlResDto forItem(ImgExtension imgExtension) {
         String fixedExtension = imgExtension.getUploadExtension();
-        String fileName = getForItemFileName(itemId, fixedExtension);
+        String fileName = getForItemFileName(fixedExtension);
         log.info(fileName);
         URL url =
                 amazonS3.generatePresignedUrl(
@@ -59,9 +59,9 @@ public class AWSS3Service {
                 .key(fileName)
                 .build();
     }
-    public PreSingedUrlResDto forCommunityPost(Long qId, ImgExtension imgExtension) {
+    public PreSingedUrlResDto forCommunityPost(ImgExtension imgExtension) {
         String fixedExtension = imgExtension.getUploadExtension();
-        String fileName = getForCommunityPostFileName(qId, fixedExtension);
+        String fileName = getForCommunityPostFileName(fixedExtension);
         log.info(fileName);
         URL url =
                 amazonS3.generatePresignedUrl(
@@ -71,9 +71,9 @@ public class AWSS3Service {
                 .key(fileName)
                 .build();
     }
-    public PreSingedUrlResDto forCommunityComment(Long cId, ImgExtension imgExtension) {
+    public PreSingedUrlResDto forCommunityComment(ImgExtension imgExtension) {
         String fixedExtension = imgExtension.getUploadExtension();
-        String fileName = getForCommunityCommentFileName(cId, fixedExtension);
+        String fileName = getForCommunityCommentFileName(fixedExtension);
         log.info(fileName);
         URL url =
                 amazonS3.generatePresignedUrl(
@@ -84,9 +84,9 @@ public class AWSS3Service {
                 .build();
     }
 
-    public PreSingedUrlResDto forCloset(Long closetId, ImgExtension imgExtension) {
+    public PreSingedUrlResDto forCloset(ImgExtension imgExtension) {
         String fixedExtension = imgExtension.getUploadExtension();
-        String fileName = getForClosetFileName(closetId, fixedExtension);
+        String fileName = getForClosetFileName(fixedExtension);
         log.info(fileName);
         URL url =
                 amazonS3.generatePresignedUrl(
@@ -97,28 +97,28 @@ public class AWSS3Service {
                 .build();
     }
     // 유저 프로필
-    private String getForUserProfileFileName(Long userId, String imgExtension) {
-        return baseUrl + "/user/profile/" + userId.toString() + "/" + UUID.randomUUID() + "." + imgExtension;
+    private String getForUserProfileFileName(String imgExtension) {
+        return baseUrl + "/user/profile/" + UUID.randomUUID() + "." + imgExtension;
     }
 
     // 아이템 이미지
-    private String getForItemFileName(Long itemId, String imgExtension) {
-        return baseUrl + "/item/" + itemId.toString() + "/" + UUID.randomUUID() + "." + imgExtension;
+    private String getForItemFileName(String imgExtension) {
+        return baseUrl + "/item/" + UUID.randomUUID() + "." + imgExtension;
     }
 
     // 커뮤니티 게시글 이미지
-    private String getForCommunityPostFileName(Long qId, String imgExtension) {
-        return baseUrl + "/community/post/" + qId.toString() + "/" + UUID.randomUUID() + "." + imgExtension;
+    private String getForCommunityPostFileName(String imgExtension) {
+        return baseUrl + "/community/post/" + UUID.randomUUID() + "." + imgExtension;
     }
 
     // 커뮤니티 댓글 이미지
-    private String getForCommunityCommentFileName(Long cId, String imgExtension) {
-        return baseUrl + "/community/comment/" + cId.toString() + "/" + UUID.randomUUID() + "." + imgExtension;
+    private String getForCommunityCommentFileName(String imgExtension) {
+        return baseUrl + "/community/comment/" + UUID.randomUUID() + "." + imgExtension;
     }
 
     //클로젯 커버
-    private String getForClosetFileName(Long closetId, String imgExtension) {
-        return baseUrl + "/closet/" + closetId.toString() + "/" + UUID.randomUUID() + "." + imgExtension;
+    private String getForClosetFileName(String imgExtension) {
+        return baseUrl + "/closet/" + UUID.randomUUID() + "." + imgExtension;
     }
 
     private GeneratePresignedUrlRequest getGeneratePreSignedUrlRequest(String bucket, String fileName, String imgExtension) {

@@ -65,17 +65,21 @@ public class BrandService {
         return recentSelectBrandList.stream().map(recentSelectBrand -> {
             Long brandId;
             String brandName;
+            String brandImgUrl;
             String flag = recentSelectBrand.getBrand() != null ? "Y" :"N";
             if(flag.equals("Y")){
                 brandId = recentSelectBrand.getBrand().getId();
                 brandName = recentSelectBrand.getBrand().getBrandKr();
+                brandImgUrl = recentSelectBrand.getBrand().getBrandImgUrl();
             }else{
                 brandId = recentSelectBrand.getNewBrand().getId();
                 brandName = recentSelectBrand.getNewBrand().getBrandName();
+                brandImgUrl = null;
             }
             return RecentSelectBrandResDto.builder()
                     .id(brandId)
                     .brandName(brandName)
+                    .brandImgUrl(brandImgUrl)
                     .flag(flag)
                     .build();
         }).toList();

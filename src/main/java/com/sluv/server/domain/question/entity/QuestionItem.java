@@ -39,11 +39,12 @@ public class QuestionItem extends BaseEntity {
     private Boolean representFlag;
 
     @Builder
-    public QuestionItem(Long id, Question question, Item item, String description, Long vote) {
+    public QuestionItem(Long id, Question question, Item item, String description, Long vote, Boolean representFlag) {
         this.id = id;
         this.question = question;
         this.item = item;
         this.description = description;
         this.vote = vote;
+        this.representFlag = representFlag;
     }
 }

@@ -1,5 +1,6 @@
 package com.sluv.server.domain.question.entity;
 
+import com.sluv.server.domain.question.enums.QuestionStatus;
 import com.sluv.server.domain.user.entity.User;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;

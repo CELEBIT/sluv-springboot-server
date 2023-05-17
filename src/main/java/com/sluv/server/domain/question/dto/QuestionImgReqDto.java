@@ -13,6 +13,10 @@ import lombok.NoArgsConstructor;
 public class QuestionImgReqDto {
     @Schema(description = "Question img Url")
     private String imgUrl;
+    @Schema(description = "Question img 설명")
+    private String description;
+    @Schema(description = "Question img 투표수")
+    private Long vote;
     @Schema(description = "대표 여부")
     private Boolean representFlag;
 }

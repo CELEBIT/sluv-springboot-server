@@ -23,11 +23,4 @@ public class QuestionBuy extends Question{
         super(id, user, title, content, searchNum, questionStatus);
         this.voteEndTime = voteEndTime;
     }
-
-    public static QuestionBuilder questionBuyBuilder(Question question){
-        return Question.builder()
-                .title(question.getTitle())
-                .content(question.getContent());
-
-    }
 }

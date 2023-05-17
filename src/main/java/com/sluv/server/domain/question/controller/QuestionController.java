@@ -2,6 +2,7 @@ package com.sluv.server.domain.question.controller;
 
 import com.sluv.server.domain.question.dto.QuestionBuyPostReqDto;
 import com.sluv.server.domain.question.dto.QuestionFindPostReqDto;
+import com.sluv.server.domain.question.dto.QuestionHowaboutPostReqDto;
 import com.sluv.server.domain.question.dto.QuestionPostResDto;
 import com.sluv.server.domain.question.service.QuestionService;
 import com.sluv.server.domain.user.entity.User;
@@ -62,6 +63,26 @@ public class QuestionController {
         return ResponseEntity.ok().body(
                 SuccessDataResponse.<QuestionPostResDto>builder()
                         .result(questionService.postQuestionBuy(user, dto))
+                        .build()
+        );
+    }
+
+    @Operation(
+            summary = "*이거어때 게시글 등록",
+            description = "이거어때 게시글을 등록하는 기능" +
+                    "\n - User Id Token 필요"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "1000", description = "요청성공"),
+            @ApiResponse(responseCode = "5000", description = "서버내부 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "5001", description = "DB 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @PostMapping("/how-about")
+    public ResponseEntity<SuccessDataResponse<QuestionPostResDto>> postHowabout(@AuthenticationPrincipal User user, @RequestBody QuestionHowaboutPostReqDto dto){
+
+        return ResponseEntity.ok().body(
+                SuccessDataResponse.<QuestionPostResDto>builder()
+                        .result(questionService.postQuestionHowabout(user, dto))
                         .build()
         );
     }

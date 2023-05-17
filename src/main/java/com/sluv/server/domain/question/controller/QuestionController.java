@@ -1,12 +1,12 @@
 package com.sluv.server.domain.question.controller;
 
+import com.sluv.server.domain.question.dto.QuestionBuyPostReqDto;
 import com.sluv.server.domain.question.dto.QuestionFindPostReqDto;
-import com.sluv.server.domain.question.dto.QuestionFindPostResDto;
+import com.sluv.server.domain.question.dto.QuestionPostResDto;
 import com.sluv.server.domain.question.service.QuestionService;
 import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.global.common.response.ErrorResponse;
 import com.sluv.server.global.common.response.SuccessDataResponse;
-import com.sluv.server.global.common.response.SuccessResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -37,11 +37,31 @@ public class QuestionController {
             @ApiResponse(responseCode = "5001", description = "DB 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @PostMapping("/find")
-    public ResponseEntity<SuccessDataResponse<QuestionFindPostResDto>> postFind(@AuthenticationPrincipal User user, @RequestBody QuestionFindPostReqDto dto){
+    public ResponseEntity<SuccessDataResponse<QuestionPostResDto>> postFind(@AuthenticationPrincipal User user, @RequestBody QuestionFindPostReqDto dto){
 
         return ResponseEntity.ok().body(
-                SuccessDataResponse.<QuestionFindPostResDto>builder()
+                SuccessDataResponse.<QuestionPostResDto>builder()
                         .result(questionService.postQuestionFind(user, dto))
+                        .build()
+        );
+    }
+
+    @Operation(
+            summary = "*이중에뭐살까 게시글 등록",
+            description = "이중에뭐살까 게시글을 등록하는 기능" +
+                    "\n - User Id Token 필요"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "1000", description = "요청성공"),
+            @ApiResponse(responseCode = "5000", description = "서버내부 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "5001", description = "DB 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @PostMapping("/buy")
+    public ResponseEntity<SuccessDataResponse<QuestionPostResDto>> postBuy(@AuthenticationPrincipal User user, @RequestBody QuestionBuyPostReqDto dto){
+
+        return ResponseEntity.ok().body(
+                SuccessDataResponse.<QuestionPostResDto>builder()
+                        .result(questionService.postQuestionBuy(user, dto))
                         .build()
         );
     }

@@ -36,7 +36,6 @@ public class Question{
     @Size(max = 255)
     private String title;
 
-    @NotNull
     @Size(max = 1001)
     private String content;
 
@@ -56,15 +55,6 @@ public class Question{
 
     public Question(Long id, User user, String title, String content, Long searchNum, QuestionStatus questionStatus) {
         this.id = id;
-        this.user = user;
-        this.title = title;
-        this.content = content;
-        this.searchNum = searchNum;
-        this.questionStatus = questionStatus;
-    }
-
-    @Builder
-    public Question(User user, String title, String content, Long searchNum, QuestionStatus questionStatus) {
         this.user = user;
         this.title = title;
         this.content = content;

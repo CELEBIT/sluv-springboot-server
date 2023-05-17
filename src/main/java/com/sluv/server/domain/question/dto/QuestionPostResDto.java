@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class QuestionFindPostResDto {
-    @Schema(description = "생성된 QuestionFind의 Id")
+public class QuestionPostResDto {
+    @Schema(description = "생성된 Question의 Id")
     private Long id;
 }

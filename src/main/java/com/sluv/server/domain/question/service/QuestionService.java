@@ -89,6 +89,36 @@ public class QuestionService {
                 .build();
     }
 
+    @Transactional
+    public QuestionPostResDto postQuestionHowabout(User user, QuestionHowaboutPostReqDto dto) {
+        /**
+         * 1. QuestionHowabout 저장
+         * 2. QuestionImg 저장
+         * 3. QuestionItem 저장
+         */
+
+        // 1. QuestionHotabout 저장
+        QuestionHowabout questionHowabout = QuestionHowabout.builder()
+                .user(user)
+                .title(dto.getTitle())
+                .content(dto.getContent())
+                .searchNum(0L)
+                .questionStatus(QuestionStatus.ACTIVE)
+                .build();
+
+        QuestionHowabout newQuestionHowabout = questionRepository.save(questionHowabout);
+
+        // 2. QuestionImg 저장
+        postQuestionImgs(dto.getImgList().stream(), newQuestionHowabout);
+
+        // 3. QuestionItem 저장
+        postQuestionItems(dto.getItemList().stream(), newQuestionHowabout);
+
+        return QuestionPostResDto.builder()
+                .id(newQuestionHowabout.getId())
+                .build();
+    }
+
     /**
      * Question Img 저장 메소드
      * @param dtoStream
@@ -128,5 +158,6 @@ public class QuestionService {
 
         questionItemRepository.saveAll(itemList);
     }
+
 
 }

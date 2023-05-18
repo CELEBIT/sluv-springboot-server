@@ -1,9 +1,6 @@
 package com.sluv.server.domain.question.controller;
 
-import com.sluv.server.domain.question.dto.QuestionBuyPostReqDto;
-import com.sluv.server.domain.question.dto.QuestionFindPostReqDto;
-import com.sluv.server.domain.question.dto.QuestionHowaboutPostReqDto;
-import com.sluv.server.domain.question.dto.QuestionPostResDto;
+import com.sluv.server.domain.question.dto.*;
 import com.sluv.server.domain.question.service.QuestionService;
 import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.global.common.response.ErrorResponse;
@@ -83,6 +80,25 @@ public class QuestionController {
         return ResponseEntity.ok().body(
                 SuccessDataResponse.<QuestionPostResDto>builder()
                         .result(questionService.postQuestionHowabout(user, dto))
+                        .build()
+        );
+    }
+    @Operation(
+            summary = "*추천해 줘 게시글 등록",
+            description = "추천해 줘 게시글을 등록하는 기능" +
+                    "\n - User Id Token 필요"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "1000", description = "요청성공"),
+            @ApiResponse(responseCode = "5000", description = "서버내부 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "5001", description = "DB 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @PostMapping("/recommend")
+    public ResponseEntity<SuccessDataResponse<QuestionPostResDto>> postRecommend(@AuthenticationPrincipal User user, @RequestBody QuestionRecommendPostReqDto dto){
+
+        return ResponseEntity.ok().body(
+                SuccessDataResponse.<QuestionPostResDto>builder()
+                        .result(questionService.postQuestionRecommend(user, dto))
                         .build()
         );
     }

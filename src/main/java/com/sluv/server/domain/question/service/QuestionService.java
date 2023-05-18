@@ -8,6 +8,7 @@ import com.sluv.server.domain.question.entity.*;
 import com.sluv.server.domain.question.enums.QuestionStatus;
 import com.sluv.server.domain.question.repository.QuestionImgRepository;
 import com.sluv.server.domain.question.repository.QuestionItemRepository;
+import com.sluv.server.domain.question.repository.QuestionRecommendCategoryRepository;
 import com.sluv.server.domain.question.repository.QuestionRepository;
 import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.global.common.enums.ItemImgOrLinkStatus;
@@ -24,6 +25,7 @@ public class QuestionService {
     private final QuestionRepository questionRepository;
     private final QuestionImgRepository questionImgRepository;
     private final QuestionItemRepository questionItemRepository;
+    private final QuestionRecommendCategoryRepository questionRecommendCategoryRepository;
     private final ItemRepository itemRepository;
 
     @Transactional
@@ -119,6 +121,48 @@ public class QuestionService {
                 .build();
     }
 
+    @Transactional
+    public QuestionPostResDto postQuestionRecommend(User user, QuestionRecommendPostReqDto dto) {
+        /**
+         * 1. QuestionRecommend 저장
+         * 2. Recommend Category 저장
+         * 3. QuestionImg 저장
+         * 4. QuestionItem 저장
+         */
+
+        // 1. QuestionRecommend 저장
+        QuestionRecommend questionRecommend = QuestionRecommend.builder()
+                .user(user)
+                .title(dto.getTitle())
+                .content(dto.getContent())
+                .searchNum(0L)
+                .questionStatus(QuestionStatus.ACTIVE)
+                .build();
+
+        QuestionRecommend newQuestionRecommend = questionRepository.save(questionRecommend);
+
+        // 2. Recommend Category 저장
+        List<QuestionRecommendCategory> recommendCategoryList = dto.getCategoryNameList().stream()
+                        .map(categoryName ->
+                                QuestionRecommendCategory.builder()
+                                .question(newQuestionRecommend)
+                                .name(categoryName)
+                                .build()
+                        ).toList();
+
+        questionRecommendCategoryRepository.saveAll(recommendCategoryList);
+
+        // 3. QuestionImg 저장
+        postQuestionImgs(dto.getImgList().stream(), newQuestionRecommend);
+
+        // 4. QuestionItem 저장
+        postQuestionItems(dto.getItemList().stream(), newQuestionRecommend);
+
+        return QuestionPostResDto.builder()
+                .id(newQuestionRecommend.getId())
+                .build();
+    }
+
     /**
      * Question Img 저장 메소드
      * @param dtoStream
@@ -158,6 +202,7 @@ public class QuestionService {
 
         questionItemRepository.saveAll(itemList);
     }
+
 
 
 }

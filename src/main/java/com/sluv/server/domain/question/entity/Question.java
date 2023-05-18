@@ -5,6 +5,8 @@ import com.sluv.server.domain.user.entity.User;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import org.springframework.data.annotation.CreatedDate;
@@ -14,6 +16,7 @@ import java.time.LocalDateTime;
 
 
 @Entity
+@Getter
 @NoArgsConstructor
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "QTYPE")
@@ -33,7 +36,6 @@ public class Question{
     @Size(max = 255)
     private String title;
 
-    @NotNull
     @Size(max = 1001)
     private String content;
 
@@ -51,11 +53,12 @@ public class Question{
     @LastModifiedDate
     private LocalDateTime updatedAt = LocalDateTime.now();
 
-    public Question(Long id, User user, String title, String content, Long searchNum) {
+    public Question(Long id, User user, String title, String content, Long searchNum, QuestionStatus questionStatus) {
         this.id = id;
         this.user = user;
         this.title = title;
         this.content = content;
         this.searchNum = searchNum;
+        this.questionStatus = questionStatus;
     }
 }

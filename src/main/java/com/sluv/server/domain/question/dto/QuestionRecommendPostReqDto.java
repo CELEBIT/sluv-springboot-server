@@ -14,6 +14,8 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class QuestionRecommendPostReqDto {
+    @Schema(description = "Question Id (생성: null, 수정: <해당Id>")
+    private Long id;
     @Schema(description = "Question 제목")
     private String title;
     @Schema(description = "Question 카테고리의 이름")

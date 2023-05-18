@@ -13,6 +13,8 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class QuestionFindPostReqDto {
+    @Schema(description = "Question Id (생성: null, 수정: <해당Id>")
+    private Long id;
     @Schema(description = "Celeb Id")
     private Long celebId;
     @Schema(description = "Question 제목")

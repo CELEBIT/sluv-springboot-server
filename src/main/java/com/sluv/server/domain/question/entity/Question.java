@@ -61,4 +61,8 @@ public class Question{
         this.searchNum = searchNum;
         this.questionStatus = questionStatus;
     }
+
+    public void changeQuestionStatus(QuestionStatus questionStatus){
+        this.questionStatus = questionStatus;
+    }
 }

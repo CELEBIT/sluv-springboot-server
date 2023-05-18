@@ -7,9 +7,11 @@ import com.sluv.server.domain.question.dto.*;
 import com.sluv.server.domain.question.entity.*;
 import com.sluv.server.domain.question.enums.QuestionStatus;
 import com.sluv.server.domain.question.exception.QuestionNotFoundException;
+import com.sluv.server.domain.question.exception.QuestionReportDuplicateException;
 import com.sluv.server.domain.question.repository.*;
 import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.global.common.enums.ItemImgOrLinkStatus;
+import com.sluv.server.global.common.enums.ReportStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,6 +27,7 @@ public class QuestionService {
     private final QuestionItemRepository questionItemRepository;
     private final QuestionRecommendCategoryRepository questionRecommendCategoryRepository;
     private final QuestionLikeRepository questionLikeRepository;
+    private final QuestionReportRepository questionReportRepository;
     private final ItemRepository itemRepository;
 
     @Transactional
@@ -267,6 +270,29 @@ public class QuestionService {
                             .question(question)
                             .build()
             );
+        }
+    }
+
+    public void postQuestionReport(User user, Long questionId, QuestionReportReqDto dto) {
+        Boolean reportExist = questionReportRepository.existsByQuestionIdAndReporterId(questionId, user.getId());
+
+        if(!reportExist) {
+            // 신고 내역이 없다면 신고 등록.
+            Question question = questionRepository.findById(questionId).orElseThrow(QuestionNotFoundException::new);
+
+            questionReportRepository.save(
+                    QuestionReport.builder()
+                            .reporter(user)
+                            .question(question)
+                            .questionReportReason(dto.getReportReason())
+                            .content(dto.getContent())
+                            .reportStatus(ReportStatus.WAITING)
+                            .build()
+            );
+
+        }else{
+            // 신고 내역이 있다면 중복 신고 방지.
+            throw new QuestionReportDuplicateException();
         }
     }
 }

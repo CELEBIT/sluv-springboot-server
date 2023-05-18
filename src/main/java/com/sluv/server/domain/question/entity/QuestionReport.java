@@ -34,7 +34,6 @@ public class QuestionReport extends BaseEntity {
 
     @NotNull
     @Enumerated(EnumType.STRING)
-    @Size(max = 45)
     private QuestionReportReason questionReportReason;
 
     @Size(max = 1002)
@@ -45,11 +44,12 @@ public class QuestionReport extends BaseEntity {
     private ReportStatus reportStatus;
 
     @Builder
-    public QuestionReport(Long id, User reporter, Question question, QuestionReportReason questionReportReason, String content) {
+    public QuestionReport(Long id, User reporter, Question question, QuestionReportReason questionReportReason, String content, ReportStatus reportStatus) {
         this.id = id;
         this.reporter = reporter;
         this.question = question;
         this.questionReportReason = questionReportReason;
         this.content = content;
+        this.reportStatus = reportStatus;
     }
 }

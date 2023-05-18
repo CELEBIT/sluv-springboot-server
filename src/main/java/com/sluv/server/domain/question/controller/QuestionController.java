@@ -145,4 +145,23 @@ public class QuestionController {
                 new SuccessResponse()
         );
     }
+
+    @Operation(
+            summary = "*Question 게시글 신고",
+            description = "Question 게시글 신고 기능" +
+                    "\n User Id Token 필요" +
+                    "\n 중복 신고 시 [QuestionReportDuplicate] 예외 발생"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "1000", description = "요청성공"),
+            @ApiResponse(responseCode = "5000", description = "서버내부 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "5001", description = "DB 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @PostMapping("/{questionId}/report")
+    public ResponseEntity<SuccessResponse> postQuestionReport(@AuthenticationPrincipal User user, @PathVariable("questionId") Long questionId, @RequestBody QuestionReportReqDto dto){
+        questionService.postQuestionReport(user, questionId, dto);
+        return ResponseEntity.ok().body(
+                new SuccessResponse()
+        );
+    }
 }

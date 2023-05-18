@@ -7,10 +7,7 @@ import com.sluv.server.domain.question.dto.*;
 import com.sluv.server.domain.question.entity.*;
 import com.sluv.server.domain.question.enums.QuestionStatus;
 import com.sluv.server.domain.question.exception.QuestionNotFoundException;
-import com.sluv.server.domain.question.repository.QuestionImgRepository;
-import com.sluv.server.domain.question.repository.QuestionItemRepository;
-import com.sluv.server.domain.question.repository.QuestionRecommendCategoryRepository;
-import com.sluv.server.domain.question.repository.QuestionRepository;
+import com.sluv.server.domain.question.repository.*;
 import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.global.common.enums.ItemImgOrLinkStatus;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +24,7 @@ public class QuestionService {
     private final QuestionImgRepository questionImgRepository;
     private final QuestionItemRepository questionItemRepository;
     private final QuestionRecommendCategoryRepository questionRecommendCategoryRepository;
+    private final QuestionLikeRepository questionLikeRepository;
     private final ItemRepository itemRepository;
 
     @Transactional
@@ -248,5 +246,27 @@ public class QuestionService {
         Question question = questionRepository.findById(questionId).orElseThrow(QuestionNotFoundException::new);
 
         question.changeQuestionStatus(QuestionStatus.DELETED);
+    }
+
+    @Transactional
+    public void postQuestionLike(User user, Long questionId) {
+        // 해당 유저의 Question 게시물 like 여부 검색
+        Boolean likeStatus = questionLikeRepository.existsByQuestionIdAndUserId(questionId, user.getId());
+
+
+        if(likeStatus) {
+            // like가 있다면 삭제
+            questionLikeRepository.deleteByQuestionIdAndUserId(questionId, user.getId());
+        }else {
+            // like가 없다면 등록
+            Question question = questionRepository.findById(questionId).orElseThrow(QuestionNotFoundException::new);
+
+            questionLikeRepository.save(
+                    QuestionLike.builder()
+                            .user(user)
+                            .question(question)
+                            .build()
+            );
+        }
     }
 }

@@ -110,7 +110,7 @@ public class QuestionController {
     }
 
     @Operation(
-            summary = "*Question 게시글 삭제",
+            summary = "Question 게시글 삭제",
             description = "Question 게시글 삭제" +
                     "\n 관련된 데이터를 삭제하는 것이 아닌 Question의 상태만 변경" +
                     "\n ACTIVE -> DELETE"
@@ -125,6 +125,24 @@ public class QuestionController {
         questionService.deleteQuestion(questionId);
         return ResponseEntity.ok().body(
                new SuccessResponse()
+        );
+    }
+
+    @Operation(
+            summary = "*Question 게시글 좋아요",
+            description = "Question 게시글 좋아요 기능" +
+                    "\n User Id Token 필요"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "1000", description = "요청성공"),
+            @ApiResponse(responseCode = "5000", description = "서버내부 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "5001", description = "DB 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @PostMapping("/{questionId}/like")
+    public ResponseEntity<SuccessResponse> postQuestionLike(@AuthenticationPrincipal User user, @PathVariable("questionId") Long questionId){
+        questionService.postQuestionLike(user, questionId);
+        return ResponseEntity.ok().body(
+                new SuccessResponse()
         );
     }
 }

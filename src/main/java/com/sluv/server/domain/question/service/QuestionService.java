@@ -31,13 +31,19 @@ public class QuestionService {
     @Transactional
     public QuestionPostResDto postQuestionFind(User user, QuestionFindPostReqDto dto) {
         /**
-         * 1. QuestionFind 저장
-         * 2. QuestionImg 저장
-         * 3. QuestionItem 저장
+         * 1. 생성 or 수정
+         * 2. QuestionFind 저장
+         * 3. QuestionImg 저장
+         * 4. QuestionItem 저장
          */
+        // 1. 생성 or 수정
+        QuestionFind.QuestionFindBuilder questionFindBuilder = QuestionFind.builder();
+        if(dto.getId() != null){
+            questionFindBuilder.id(dto.getId());
+        }
 
-        // 1. QuestionFind 저장
-        QuestionFind questionFind = QuestionFind.builder()
+        // 2. QuestionFind 저장
+        QuestionFind questionFind = questionFindBuilder
                 .user(user)
                 .title(dto.getTitle())
                 .content(dto.getContent())
@@ -48,11 +54,11 @@ public class QuestionService {
 
         QuestionFind newQuestionFind = questionRepository.save(questionFind);
 
-        // 2. QuestionImg 저장
+        // 3. QuestionImg 저장
         postQuestionImgs(dto.getImgList().stream(), questionFind);
 
 
-        // 3. QuestionItem 저장
+        // 4. QuestionItem 저장
         postQuestionItems(dto.getItemList().stream(), questionFind);
 
         return QuestionPostResDto.builder()
@@ -64,13 +70,20 @@ public class QuestionService {
     @Transactional
     public QuestionPostResDto postQuestionBuy(User user, QuestionBuyPostReqDto dto) {
         /**
-         * 1. QuestionBuy 저장
-         * 2. QuestionImg 저장
-         * 3. QuestionItem 저장
+         * 1. 생성 or 수정
+         * 2. QuestionBuy 저장
+         * 3. QuestionImg 저장
+         * 4. QuestionItem 저장
          */
 
-        // 1. QuestionBuy 저장
-        QuestionBuy questionBuy = QuestionBuy.builder()
+        // 1. 생성 or 수정
+        QuestionBuy.QuestionBuyBuilder questionBuyBuilder = QuestionBuy.builder();
+        if(dto.getId() != null){
+            questionBuyBuilder.id(dto.getId());
+        }
+
+        // 2. QuestionBuy 저장
+        QuestionBuy questionBuy = questionBuyBuilder
                 .user(user)
                 .title(dto.getTitle())
                 .searchNum(0L)
@@ -80,10 +93,10 @@ public class QuestionService {
 
         QuestionBuy newQuestionBuy = questionRepository.save(questionBuy);
 
-        // 2. QuestionImg 저장
+        // 3. QuestionImg 저장
         postQuestionImgs(dto.getImgList().stream(), questionBuy);
 
-        // 3. QuestionItem 저장
+        // 4. QuestionItem 저장
         postQuestionItems(dto.getItemList().stream(), questionBuy);
 
         return QuestionPostResDto.builder()
@@ -94,13 +107,20 @@ public class QuestionService {
     @Transactional
     public QuestionPostResDto postQuestionHowabout(User user, QuestionHowaboutPostReqDto dto) {
         /**
-         * 1. QuestionHowabout 저장
-         * 2. QuestionImg 저장
-         * 3. QuestionItem 저장
+         * 1. 생성 or 수정
+         * 2. QuestionHowabout 저장
+         * 3. QuestionImg 저장
+         * 4. QuestionItem 저장
          */
 
-        // 1. QuestionHotabout 저장
-        QuestionHowabout questionHowabout = QuestionHowabout.builder()
+        // 1. 생성 or 수정
+        QuestionHowabout.QuestionHowaboutBuilder questionHowaboutBuilder = QuestionHowabout.builder();
+        if(dto.getId() != null){
+            questionHowaboutBuilder.id(dto.getId());
+        }
+
+        // 2. QuestionHotabout 저장
+        QuestionHowabout questionHowabout = questionHowaboutBuilder
                 .user(user)
                 .title(dto.getTitle())
                 .content(dto.getContent())
@@ -110,10 +130,10 @@ public class QuestionService {
 
         QuestionHowabout newQuestionHowabout = questionRepository.save(questionHowabout);
 
-        // 2. QuestionImg 저장
+        // 3. QuestionImg 저장
         postQuestionImgs(dto.getImgList().stream(), newQuestionHowabout);
 
-        // 3. QuestionItem 저장
+        // 4. QuestionItem 저장
         postQuestionItems(dto.getItemList().stream(), newQuestionHowabout);
 
         return QuestionPostResDto.builder()
@@ -124,14 +144,21 @@ public class QuestionService {
     @Transactional
     public QuestionPostResDto postQuestionRecommend(User user, QuestionRecommendPostReqDto dto) {
         /**
+         * 1. 생성 or 수정
          * 1. QuestionRecommend 저장
          * 2. Recommend Category 저장
          * 3. QuestionImg 저장
          * 4. QuestionItem 저장
          */
 
-        // 1. QuestionRecommend 저장
-        QuestionRecommend questionRecommend = QuestionRecommend.builder()
+        // 1. 생성 or 수정
+        QuestionRecommend.QuestionRecommendBuilder questionRecommendBuilder = QuestionRecommend.builder();
+        if(dto.getId() != null){
+            questionRecommendBuilder.id(dto.getId());
+        }
+
+        // 2. QuestionRecommend 저장
+        QuestionRecommend questionRecommend = questionRecommendBuilder
                 .user(user)
                 .title(dto.getTitle())
                 .content(dto.getContent())
@@ -141,7 +168,10 @@ public class QuestionService {
 
         QuestionRecommend newQuestionRecommend = questionRepository.save(questionRecommend);
 
-        // 2. Recommend Category 저장
+        // 3. Recommend Category 저장
+        // Question에 대한 RecommendCategory 초기화
+        questionRecommendCategoryRepository.deleteAllByQuestionId(newQuestionRecommend.getId());
+
         List<QuestionRecommendCategory> recommendCategoryList = dto.getCategoryNameList().stream()
                         .map(categoryName ->
                                 QuestionRecommendCategory.builder()
@@ -152,7 +182,7 @@ public class QuestionService {
 
         questionRecommendCategoryRepository.saveAll(recommendCategoryList);
 
-        // 3. QuestionImg 저장
+        // 4. QuestionImg 저장
         postQuestionImgs(dto.getImgList().stream(), newQuestionRecommend);
 
         // 4. QuestionItem 저장
@@ -169,6 +199,10 @@ public class QuestionService {
      * @param question
      */
     private void postQuestionImgs(Stream<QuestionImgReqDto> dtoStream, Question question){
+        // Question에 대한 Img 초기화
+        questionImgRepository.deleteAllByQuestionId(question.getId());
+
+        // Question Img들 추가
         List<QuestionImg> imgList = dtoStream.map(imgDto -> QuestionImg.builder()
                 .question(question)
                 .imgUrl(imgDto.getImgUrl())
@@ -188,6 +222,10 @@ public class QuestionService {
      * @param question
      */
     private void postQuestionItems(Stream<QuestionItemReqDto> dtoStream, Question question){
+        // Question에 대한 Item 초기화
+        questionItemRepository.deleteAllByQuestionId(question.getId());
+
+        // Question Item들 추가
         List<QuestionItem> itemList = dtoStream.map(itemDto -> {
                     Item item = itemRepository.findById(itemDto.getItemId()).orElseThrow(ItemNotFoundException::new);
                     return QuestionItem.builder()

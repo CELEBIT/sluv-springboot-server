@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -37,7 +38,7 @@ public class HashtagController {
             @ApiResponse(responseCode = "5001", description = "DB 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @GetMapping("")
-    public ResponseEntity<SuccessDataResponse<PaginationResDto<HashtagResponseDto>>> getHashtag(@RequestParam String name, Pageable pageable){
+    public ResponseEntity<SuccessDataResponse<PaginationResDto<HashtagResponseDto>>> getHashtag(@Nullable @RequestParam String name, Pageable pageable){
 
         return ResponseEntity.ok().body(
                 SuccessDataResponse.<PaginationResDto<HashtagResponseDto>>builder()

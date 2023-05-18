@@ -27,7 +27,9 @@ public class QuestionController {
     @Operation(
             summary = "*찾아주세요 게시글 등록",
             description = "찾아주세요 게시글을 등록하는 기능" +
-                    "\n - User Id Token 필요"
+                    "\n - User Id Token 필요" +
+                    "\n 생성: id -> null" +
+                    "\n 수정: id -> 해당 Question Id"
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "1000", description = "요청성공"),
@@ -47,7 +49,9 @@ public class QuestionController {
     @Operation(
             summary = "*이중에뭐살까 게시글 등록",
             description = "이중에뭐살까 게시글을 등록하는 기능" +
-                    "\n - User Id Token 필요"
+                    "\n - User Id Token 필요" +
+                    "\n 생성: id -> null" +
+                    "\n 수정: id -> 해당 Question Id"
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "1000", description = "요청성공"),
@@ -67,7 +71,9 @@ public class QuestionController {
     @Operation(
             summary = "*이거어때 게시글 등록",
             description = "이거어때 게시글을 등록하는 기능" +
-                    "\n - User Id Token 필요"
+                    "\n - User Id Token 필요" +
+                    "\n 생성: id -> null" +
+                    "\n 수정: id -> 해당 Question Id"
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "1000", description = "요청성공"),
@@ -86,7 +92,9 @@ public class QuestionController {
     @Operation(
             summary = "*추천해 줘 게시글 등록",
             description = "추천해 줘 게시글을 등록하는 기능" +
-                    "\n - User Id Token 필요"
+                    "\n - User Id Token 필요" +
+                    "\n 생성: id -> null" +
+                    "\n 수정: id -> 해당 Question Id"
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "1000", description = "요청성공"),

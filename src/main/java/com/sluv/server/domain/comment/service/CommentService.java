@@ -5,6 +5,7 @@ import com.sluv.server.domain.comment.entity.Comment;
 import com.sluv.server.domain.comment.entity.CommentImg;
 import com.sluv.server.domain.comment.entity.CommentItem;
 import com.sluv.server.domain.comment.enums.CommentStatus;
+import com.sluv.server.domain.comment.exception.CommentNotFoundException;
 import com.sluv.server.domain.comment.repository.CommentImgRepository;
 import com.sluv.server.domain.comment.repository.CommentItemRepository;
 import com.sluv.server.domain.comment.repository.CommentRepository;
@@ -50,16 +51,43 @@ public class CommentService {
         );
 
         // 2. CommentImg 등록
-        List<CommentImg> imgList = dto.getImgList().stream().map(imgUrl ->
-                CommentImg.builder()
-                        .comment(comment)
-                        .imgUrl(imgUrl)
-                        .build()
-        ).toList();
-
-        commentImgRepository.saveAll(imgList);
+        saveCommentImg(dto, comment);
 
         // 3. CommentItem 등록
+        saveCommentItem(dto, comment);
+
+    }
+
+    public void postNestedComment(User user, Long questionId, Long commentId, CommentPostReqDto dto) {
+        /**
+         *  1. Comment 등록
+         *  2. CommentImg 등록
+         *  3. CommentItem 등록
+         */
+        Question question = questionRepository.findById(questionId).orElseThrow(QuestionNotFoundException::new);
+
+        // 1. Comment 등록
+        // Parent Comment 조회
+        Comment parentComment = commentRepository.findById(commentId).orElseThrow(CommentNotFoundException::new);
+
+        Comment comment = commentRepository.save(
+                Comment.builder()
+                        .user(user)
+                        .question(question)
+                        .content(dto.getContent())
+                        .parent(parentComment)
+                        .commentStatus(CommentStatus.ACTIVE)
+                        .build()
+        );
+
+        // 2. CommentImg 등록
+        saveCommentImg(dto, comment);
+
+        // 3. CommentItem 등록
+        saveCommentItem(dto, comment);
+    }
+
+    private void saveCommentItem(CommentPostReqDto dto, Comment comment) {
         List<CommentItem> itemList = dto.getItemList().stream().map(itemId -> {
                     Item item = itemRepository.findById(itemId).orElseThrow(ItemNotFoundException::new);
                     return CommentItem.builder()
@@ -70,6 +98,16 @@ public class CommentService {
         ).toList();
 
         commentItemRepository.saveAll(itemList);
+    }
 
+    private void saveCommentImg(CommentPostReqDto dto, Comment comment) {
+        List<CommentImg> imgList = dto.getImgList().stream().map(imgUrl ->
+                CommentImg.builder()
+                        .comment(comment)
+                        .imgUrl(imgUrl)
+                        .build()
+        ).toList();
+
+        commentImgRepository.saveAll(imgList);
     }
 }

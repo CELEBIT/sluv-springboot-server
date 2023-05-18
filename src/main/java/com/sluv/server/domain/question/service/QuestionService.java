@@ -6,6 +6,7 @@ import com.sluv.server.domain.item.repository.ItemRepository;
 import com.sluv.server.domain.question.dto.*;
 import com.sluv.server.domain.question.entity.*;
 import com.sluv.server.domain.question.enums.QuestionStatus;
+import com.sluv.server.domain.question.exception.QuestionNotFoundException;
 import com.sluv.server.domain.question.repository.QuestionImgRepository;
 import com.sluv.server.domain.question.repository.QuestionItemRepository;
 import com.sluv.server.domain.question.repository.QuestionRecommendCategoryRepository;
@@ -242,5 +243,10 @@ public class QuestionService {
     }
 
 
+    @Transactional
+    public void deleteQuestion(Long questionId) {
+        Question question = questionRepository.findById(questionId).orElseThrow(QuestionNotFoundException::new);
 
+        question.changeQuestionStatus(QuestionStatus.DELETED);
+    }
 }

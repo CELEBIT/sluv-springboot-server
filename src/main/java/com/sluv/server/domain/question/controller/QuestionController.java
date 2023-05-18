@@ -5,6 +5,7 @@ import com.sluv.server.domain.question.service.QuestionService;
 import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.global.common.response.ErrorResponse;
 import com.sluv.server.global.common.response.SuccessDataResponse;
+import com.sluv.server.global.common.response.SuccessResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -13,10 +14,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -108,6 +106,25 @@ public class QuestionController {
                 SuccessDataResponse.<QuestionPostResDto>builder()
                         .result(questionService.postQuestionRecommend(user, dto))
                         .build()
+        );
+    }
+
+    @Operation(
+            summary = "*Question 게시글 삭제",
+            description = "Question 게시글 삭제" +
+                    "\n 관련된 데이터를 삭제하는 것이 아닌 Question의 상태만 변경" +
+                    "\n ACTIVE -> DELETE"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "1000", description = "요청성공"),
+            @ApiResponse(responseCode = "5000", description = "서버내부 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "5001", description = "DB 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @DeleteMapping("/{questionId}")
+    public ResponseEntity<SuccessResponse> deleteQuestion(@PathVariable("questionId") Long questionId){
+        questionService.deleteQuestion(questionId);
+        return ResponseEntity.ok().body(
+               new SuccessResponse()
         );
     }
 }

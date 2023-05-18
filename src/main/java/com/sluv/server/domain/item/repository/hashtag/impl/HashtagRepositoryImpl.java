@@ -21,16 +21,30 @@ public class HashtagRepositoryImpl implements HashtagRepositoryCustom{
 
     @Override
     public Page<Tuple> findAllByContent(String name, Pageable pageable) {
-        List<Tuple> content = jpaQueryFactory.select(itemHashtag.hashtag, itemHashtag.hashtag.count())
-                .from(itemHashtag)
-                .where(itemHashtag.hashtag.content.like(name+"%")
-                        .and(itemHashtag.hashtag.hashtagStatus.eq(HashtagStatus.ACTIVE))
-                )
-                .groupBy(itemHashtag.hashtag)
-                .orderBy(itemHashtag.hashtag.count().desc())
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
-                .fetch();
+        List<Tuple> content;
+
+        // 미입력 시
+        if(name == null){
+            content = jpaQueryFactory.select(itemHashtag.hashtag, itemHashtag.hashtag.count())
+                    .from(itemHashtag)
+                    .where(itemHashtag.hashtag.hashtagStatus.eq(HashtagStatus.ACTIVE))
+                    .groupBy(itemHashtag.hashtag)
+                    .orderBy(itemHashtag.hashtag.count().desc())
+                    .offset(pageable.getOffset())
+                    .limit(pageable.getPageSize())
+                    .fetch();
+        }else{ // name 입력 시
+            content = jpaQueryFactory.select(itemHashtag.hashtag, itemHashtag.hashtag.count())
+                    .from(itemHashtag)
+                    .where(itemHashtag.hashtag.content.like(name+"%")
+                            .and(itemHashtag.hashtag.hashtagStatus.eq(HashtagStatus.ACTIVE))
+                    )
+                    .groupBy(itemHashtag.hashtag)
+                    .orderBy(itemHashtag.hashtag.count().desc())
+                    .offset(pageable.getOffset())
+                    .limit(pageable.getPageSize())
+                    .fetch();
+        }
 
         JPAQuery<Tuple> countContent = jpaQueryFactory.select(itemHashtag.hashtag, itemHashtag.hashtag.count())
                 .from(itemHashtag)

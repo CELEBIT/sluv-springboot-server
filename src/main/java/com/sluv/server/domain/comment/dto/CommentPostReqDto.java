@@ -1,5 +1,6 @@
 package com.sluv.server.domain.comment.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -12,7 +13,10 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class CommentPostReqDto {
+    @Schema(description = "Comment 내용")
     private String content;
+    @Schema(description = "Comment Img List")
     private List<String> imgList;
+    @Schema(description = "Comment Item List")
     private List<Long> itemList;
 }

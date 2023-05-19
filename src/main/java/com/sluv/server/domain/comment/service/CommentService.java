@@ -16,11 +16,13 @@ import com.sluv.server.domain.question.entity.Question;
 import com.sluv.server.domain.question.exception.QuestionNotFoundException;
 import com.sluv.server.domain.question.repository.QuestionRepository;
 import com.sluv.server.domain.user.entity.User;
+import com.sluv.server.domain.user.exception.UserNotMatchedException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -40,6 +42,7 @@ public class CommentService {
          */
         Question question = questionRepository.findById(questionId).orElseThrow(QuestionNotFoundException::new);
 
+
         // 1. Comment 등록
         Comment comment = commentRepository.save(
                 Comment.builder()
@@ -58,6 +61,7 @@ public class CommentService {
 
     }
 
+    @Transactional
     public void postNestedComment(User user, Long questionId, Long commentId, CommentPostReqDto dto) {
         /**
          *  1. Comment 등록
@@ -87,7 +91,35 @@ public class CommentService {
         saveCommentItem(dto, comment);
     }
 
+    @Transactional
+    public void putComment(User user, Long commentId, CommentPostReqDto dto) {
+        /**
+         * 1. Comment의 content 수정
+         * 2. Comment와 관련된 img 초기화 후 재등록
+         * 3. Comment와 관련된 item 초기화 후 재등록
+         */
+        Comment comment = commentRepository.findById(commentId).orElseThrow(CommentNotFoundException::new);
+
+        if(!Objects.equals(comment.getUser().getId(), user.getId())) {
+            throw new UserNotMatchedException();
+        }
+            // content 변경
+            comment.changeContent(dto.getContent());
+
+            // img 변경
+            saveCommentImg(dto, comment);
+
+            // item 변경
+            saveCommentItem(dto, comment);
+
+
+    }
+
     private void saveCommentItem(CommentPostReqDto dto, Comment comment) {
+        // 초기화
+        commentItemRepository.deleteAllByCommentId(comment.getId());
+
+        // dto로 부터 새로운 CommentItem 생성
         List<CommentItem> itemList = dto.getItemList().stream().map(itemId -> {
                     Item item = itemRepository.findById(itemId).orElseThrow(ItemNotFoundException::new);
                     return CommentItem.builder()
@@ -97,10 +129,15 @@ public class CommentService {
                 }
         ).toList();
 
+        // 저장
         commentItemRepository.saveAll(itemList);
     }
 
     private void saveCommentImg(CommentPostReqDto dto, Comment comment) {
+        // 초기화
+        commentImgRepository.deleteAllByCommentId(comment.getId());
+
+        // dto로 부터 새로운 CommentImg 생성
         List<CommentImg> imgList = dto.getImgList().stream().map(imgUrl ->
                 CommentImg.builder()
                         .comment(comment)
@@ -108,6 +145,9 @@ public class CommentService {
                         .build()
         ).toList();
 
+        // 저장
         commentImgRepository.saveAll(imgList);
     }
+
+
 }

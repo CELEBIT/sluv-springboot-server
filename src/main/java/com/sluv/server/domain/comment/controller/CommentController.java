@@ -59,4 +59,24 @@ public class CommentController {
                 new SuccessResponse()
         );
     }
+
+    @Operation(
+            summary = "*댓글 수정",
+            description = "Question 게시글에 대댓글 작성" +
+                    "\n User Id Token 필요"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "1000", description = "요청성공"),
+            @ApiResponse(responseCode = "5000", description = "서버내부 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "5001", description = "DB 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @PutMapping("/{commentId}")
+    public ResponseEntity<SuccessResponse> putComment(@AuthenticationPrincipal User user,
+                                                             @PathVariable("commentId") Long commentId,
+                                                             @RequestBody CommentPostReqDto dto){
+        commentService.putComment(user, commentId, dto);
+        return ResponseEntity.ok().body(
+                new SuccessResponse()
+        );
+    }
 }

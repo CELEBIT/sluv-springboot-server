@@ -79,4 +79,24 @@ public class CommentController {
                 new SuccessResponse()
         );
     }
+
+    @Operation(
+            summary = "*댓글 좋아요",
+            description = "댓글의 좋아요 기능" +
+                    "\n User Id Token 필요" +
+                    "\n 없다면 -> 생성, 있다면 -> 삭제"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "1000", description = "요청성공"),
+            @ApiResponse(responseCode = "5000", description = "서버내부 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "5001", description = "DB 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @PostMapping("/{commentId}/like")
+    public ResponseEntity<SuccessResponse> postCommentLike(@AuthenticationPrincipal User user,
+                                                      @PathVariable("commentId") Long commentId ){
+        commentService.postCommentLike(user, commentId);
+        return ResponseEntity.ok().body(
+                new SuccessResponse()
+        );
+    }
 }

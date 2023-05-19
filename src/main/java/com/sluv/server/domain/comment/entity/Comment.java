@@ -9,12 +9,14 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
 
 @Entity
 @NoArgsConstructor
+@Getter
 @Table(name = "comment")
 public class Comment extends BaseEntity {
 
@@ -52,5 +54,9 @@ public class Comment extends BaseEntity {
         this.question = question;
         this.content = content;
         this.commentStatus = commentStatus;
+    }
+
+    public void changeContent(String content){
+        this.content = content;
     }
 }

@@ -4,10 +4,12 @@ import com.sluv.server.domain.comment.dto.CommentPostReqDto;
 import com.sluv.server.domain.comment.entity.Comment;
 import com.sluv.server.domain.comment.entity.CommentImg;
 import com.sluv.server.domain.comment.entity.CommentItem;
+import com.sluv.server.domain.comment.entity.CommentLike;
 import com.sluv.server.domain.comment.enums.CommentStatus;
 import com.sluv.server.domain.comment.exception.CommentNotFoundException;
 import com.sluv.server.domain.comment.repository.CommentImgRepository;
 import com.sluv.server.domain.comment.repository.CommentItemRepository;
+import com.sluv.server.domain.comment.repository.CommentLikeRepository;
 import com.sluv.server.domain.comment.repository.CommentRepository;
 import com.sluv.server.domain.item.entity.Item;
 import com.sluv.server.domain.item.exception.ItemNotFoundException;
@@ -30,6 +32,7 @@ public class CommentService {
     private final CommentRepository commentRepository;
     private final CommentImgRepository commentImgRepository;
     private final CommentItemRepository commentItemRepository;
+    private final CommentLikeRepository commentLikeRepository;
     private final QuestionRepository questionRepository;
     private final ItemRepository itemRepository;
 
@@ -150,4 +153,20 @@ public class CommentService {
     }
 
 
+    @Transactional
+    public void postCommentLike(User user, Long commentId) {
+        Boolean commentListStatus = commentLikeRepository.existsByUserIdAndCommentId(user.getId(), commentId);
+
+        if(!commentListStatus){
+            Comment comment = commentRepository.findById(commentId).orElseThrow(CommentNotFoundException::new);
+            commentLikeRepository.save(
+                    CommentLike.builder()
+                            .user(user)
+                            .comment(comment)
+                            .build()
+            );
+        }else{
+            commentLikeRepository.deleteByUserIdAndCommentId(user.getId(), commentId);
+        }
+    }
 }

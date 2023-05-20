@@ -1,7 +1,11 @@
 package com.sluv.server.domain.question.service;
 
+import com.sluv.server.domain.comment.repository.CommentRepository;
+import com.sluv.server.domain.item.dto.ItemSameResDto;
 import com.sluv.server.domain.item.entity.Item;
+import com.sluv.server.domain.item.entity.ItemImg;
 import com.sluv.server.domain.item.exception.ItemNotFoundException;
+import com.sluv.server.domain.item.repository.ItemImgRepository;
 import com.sluv.server.domain.item.repository.ItemRepository;
 import com.sluv.server.domain.question.dto.*;
 import com.sluv.server.domain.question.entity.*;
@@ -9,9 +13,11 @@ import com.sluv.server.domain.question.enums.QuestionStatus;
 import com.sluv.server.domain.question.exception.QuestionNotFoundException;
 import com.sluv.server.domain.question.exception.QuestionReportDuplicateException;
 import com.sluv.server.domain.question.repository.*;
+import com.sluv.server.domain.user.dto.UserInfoDto;
 import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.global.common.enums.ItemImgOrLinkStatus;
 import com.sluv.server.global.common.enums.ReportStatus;
+import jakarta.persistence.DiscriminatorColumn;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,7 +34,9 @@ public class QuestionService {
     private final QuestionRecommendCategoryRepository questionRecommendCategoryRepository;
     private final QuestionLikeRepository questionLikeRepository;
     private final QuestionReportRepository questionReportRepository;
+    private final CommentRepository commentRepository;
     private final ItemRepository itemRepository;
+    private final ItemImgRepository itemImgRepository;
 
     @Transactional
     public QuestionPostResDto postQuestionFind(User user, QuestionFindPostReqDto dto) {
@@ -294,5 +302,82 @@ public class QuestionService {
             // 신고 내역이 있다면 중복 신고 방지.
             throw new QuestionReportDuplicateException();
         }
+    }
+
+    public QuestionGetDetailResDto getQuestionDetail(User user, Long questionId) {
+        Question question = questionRepository.findById(questionId).orElseThrow(QuestionNotFoundException::new);
+
+        // Question Type 분류
+        String qType = null;
+        if(question != null){
+            if (question instanceof QuestionFind){
+                qType = "Find";
+            }else if(question instanceof QuestionBuy){
+                qType = "Buy";
+            }else if(question instanceof QuestionHowabout){
+                qType = "How";
+            }else if(question instanceof QuestionRecommend){
+                qType = "Recommend";
+            }
+        }
+
+        // 작성자
+        User writer = question.getUser();
+
+        // Question img List
+        List<String> questionImgList= questionImgRepository.findAllByQuestionId(questionId).
+                                                            stream()
+                                                            .map(QuestionImg::getImgUrl).toList();
+
+        // Question Item List
+        List<ItemSameResDto> questionItemList = questionItemRepository.findAllByQuestionId(questionId)
+                                            .stream()
+                                            .map(questionItem ->
+                                                    ItemSameResDto.builder()
+                                                                .itemId(questionItem.getItem().getId())
+                                                                .itemName(questionItem.getItem().getName())
+                                                                .celebName(questionItem.getItem().getBrand() != null
+                                                                                ? questionItem.getItem().getBrand().getBrandKr()
+                                                                                : questionItem.getItem().getNewBrand().getBrandName()
+                                                                )
+                                                                .brandName(questionItem.getItem().getBrand() != null
+                                                                                ? questionItem.getItem().getBrand().getBrandKr()
+                                                                                : questionItem.getItem().getNewBrand().getBrandName()
+                                                                )
+                                                                .imgUrl(itemImgRepository.findMainImg(questionItem.getItem().getId()).getItemImgUrl())
+                                                                .scrapStatus(null) // 추후 작성 (23.05.20)
+                                                        .build()
+                                            ).toList();
+
+        // Question Like Num Count
+        Long questionLikeNum = questionLikeRepository.countByQuestionId(questionId);
+
+        // Question Comment Num Count
+        Long questionSearchNum = commentRepository.countByQuestionId(questionId);
+
+        // hasLike 검색
+        Boolean currentUserLike = questionLikeRepository.existsByQuestionIdAndUserId(questionId, user.getId());
+
+
+        return QuestionGetDetailResDto.builder()
+                .qType(qType)
+                .user(
+                        UserInfoDto.builder()
+                        .id(writer.getId())
+                        .nickName(writer.getNickname())
+                        .profileImgUrl(writer.getProfileImgUrl())
+                        .build()
+                )
+                .title(question.getTitle())
+                .content(question.getContent())
+                .imgList(questionImgList)
+                .itemList(questionItemList)
+                .searchNum(question.getSearchNum())
+                .likeNum(questionLikeNum)
+                .commentNum(questionSearchNum)
+                .createdAt(question.getCreatedAt())
+                .hasLike(currentUserLike)
+                .hasMine(user.getId().equals(writer.getId()))
+                .build();
     }
 }

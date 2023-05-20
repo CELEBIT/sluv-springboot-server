@@ -164,4 +164,26 @@ public class QuestionController {
                 new SuccessResponse()
         );
     }
+
+    @Operation(
+            summary = "*Question 게시글 상세조회",
+            description = "Question 게시글을 상세조회하는 기능" +
+                    "\n User Id Token 필요 -> 현재 유저가 작성한 게시글인지 판단하기 위함"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "1000", description = "요청성공"),
+            @ApiResponse(responseCode = "5000", description = "서버내부 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "5001", description = "DB 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @GetMapping("/{questionId}")
+    public ResponseEntity<SuccessDataResponse<QuestionGetDetailResDto>> postQuestionReport(@AuthenticationPrincipal User user, @PathVariable("questionId") Long questionId){
+
+        return ResponseEntity.ok().body(
+                SuccessDataResponse.<QuestionGetDetailResDto>builder()
+                        .result(
+                            questionService.getQuestionDetail(user, questionId)
+                        )
+                        .build()
+        );
+    }
 }

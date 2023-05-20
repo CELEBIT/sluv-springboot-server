@@ -1,16 +1,12 @@
 package com.sluv.server.domain.comment.service;
 
 import com.sluv.server.domain.comment.dto.CommentPostReqDto;
-import com.sluv.server.domain.comment.entity.Comment;
-import com.sluv.server.domain.comment.entity.CommentImg;
-import com.sluv.server.domain.comment.entity.CommentItem;
-import com.sluv.server.domain.comment.entity.CommentLike;
+import com.sluv.server.domain.comment.dto.CommentReportPostReqDto;
+import com.sluv.server.domain.comment.entity.*;
 import com.sluv.server.domain.comment.enums.CommentStatus;
 import com.sluv.server.domain.comment.exception.CommentNotFoundException;
-import com.sluv.server.domain.comment.repository.CommentImgRepository;
-import com.sluv.server.domain.comment.repository.CommentItemRepository;
-import com.sluv.server.domain.comment.repository.CommentLikeRepository;
-import com.sluv.server.domain.comment.repository.CommentRepository;
+import com.sluv.server.domain.comment.exception.CommentReportDuplicateException;
+import com.sluv.server.domain.comment.repository.*;
 import com.sluv.server.domain.item.entity.Item;
 import com.sluv.server.domain.item.exception.ItemNotFoundException;
 import com.sluv.server.domain.item.repository.ItemRepository;
@@ -19,6 +15,7 @@ import com.sluv.server.domain.question.exception.QuestionNotFoundException;
 import com.sluv.server.domain.question.repository.QuestionRepository;
 import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.domain.user.exception.UserNotMatchedException;
+import com.sluv.server.global.common.enums.ReportStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,6 +30,7 @@ public class CommentService {
     private final CommentImgRepository commentImgRepository;
     private final CommentItemRepository commentItemRepository;
     private final CommentLikeRepository commentLikeRepository;
+    private final CommentReportRepository commentReportRepository;
     private final QuestionRepository questionRepository;
     private final ItemRepository itemRepository;
 
@@ -168,5 +166,24 @@ public class CommentService {
         }else{
             commentLikeRepository.deleteByUserIdAndCommentId(user.getId(), commentId);
         }
+    }
+
+    public void postCommentReport(User user, Long commentId, CommentReportPostReqDto dto) {
+        Boolean reportStatus = commentReportRepository.existsByReporterIdAndCommentId(user.getId(), commentId);
+
+        if(reportStatus) {
+          throw new CommentReportDuplicateException();
+        }
+
+        Comment comment = commentRepository.findById(commentId).orElseThrow(CommentNotFoundException::new);
+        commentReportRepository.save(
+                CommentReport.builder()
+                        .reporter(user)
+                        .comment(comment)
+                        .commentReportReason(dto.getReportReason())
+                        .content(dto.getContent())
+                        .reportStatus(ReportStatus.WAITING)
+                        .build()
+        );
     }
 }

@@ -1,6 +1,7 @@
 package com.sluv.server.domain.comment.controller;
 
 import com.sluv.server.domain.comment.dto.CommentPostReqDto;
+import com.sluv.server.domain.comment.dto.CommentReportPostReqDto;
 import com.sluv.server.domain.comment.service.CommentService;
 import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.global.common.response.ErrorResponse;
@@ -95,6 +96,27 @@ public class CommentController {
     public ResponseEntity<SuccessResponse> postCommentLike(@AuthenticationPrincipal User user,
                                                       @PathVariable("commentId") Long commentId ){
         commentService.postCommentLike(user, commentId);
+        return ResponseEntity.ok().body(
+                new SuccessResponse()
+        );
+    }
+
+    @Operation(
+            summary = "*댓글 신고",
+            description = "댓글 신고하기 기능" +
+                    "\n User Id Token 필요" +
+                    "\n 한 유저가 하나의 댓글 중복 신고 불가."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "1000", description = "요청성공"),
+            @ApiResponse(responseCode = "5000", description = "서버내부 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "5001", description = "DB 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @PostMapping("/{commentId}/report")
+    public ResponseEntity<SuccessResponse> postCommentReport(@AuthenticationPrincipal User user,
+                                                      @PathVariable("commentId") Long commentId,
+                                                      @RequestBody CommentReportPostReqDto dto){
+        commentService.postCommentReport(user, commentId, dto);
         return ResponseEntity.ok().body(
                 new SuccessResponse()
         );

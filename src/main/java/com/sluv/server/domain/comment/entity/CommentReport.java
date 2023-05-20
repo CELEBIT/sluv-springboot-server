@@ -8,10 +8,12 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @NoArgsConstructor
+@Getter
 @Table(name = "comment_report")
 public class CommentReport extends BaseEntity {
 
@@ -25,13 +27,12 @@ public class CommentReport extends BaseEntity {
     private Comment comment;
 
     @ManyToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "reporter_id")
     @NotNull
     private User reporter;
 
     @NotNull
     @Enumerated(EnumType.STRING)
-    @Size(max = 45)
     private CommentReportReason commentReportReason;
 
     @Size(max = 1002)

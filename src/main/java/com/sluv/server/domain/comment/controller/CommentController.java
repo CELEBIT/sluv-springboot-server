@@ -121,4 +121,20 @@ public class CommentController {
                 new SuccessResponse()
         );
     }
+
+    @Operation(
+            summary = "*댓글 삭제",
+            description = "댓글 삭제 기능" +
+                    "\n 삭제 시 Comment Status를 변경하는 것이 아닌 DB에서 삭제." +
+                    "\n User Id Token 필요" +
+                    "\n -> 댓글 작성자가 맞는지 확인하기 위해 필요"
+    )
+    @DeleteMapping("/{commentId}")
+    public ResponseEntity<SuccessResponse> deleteComment(@AuthenticationPrincipal User user,
+                                                             @PathVariable("commentId") Long commentId ){
+        commentService.deleteComment(user, commentId);
+        return ResponseEntity.ok().body(
+                new SuccessResponse()
+        );
+    }
 }

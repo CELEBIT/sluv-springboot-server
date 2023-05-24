@@ -1,9 +1,10 @@
 package com.sluv.server.domain.question.enums;
 
 public enum QuestionReportReason {
-    SALES_ACTIVITY,
-    BAD_MANNERS,
-    BLAME,
+    SPAM_OR_AD,
+    ANNOY_CELEB,
+    OFF_TOPIC,
+    COPY_PASTE,
     SEXUAL_HARASSMENT,
     ETC
 }

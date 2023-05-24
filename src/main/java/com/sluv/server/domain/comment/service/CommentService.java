@@ -101,7 +101,7 @@ public class CommentService {
          */
         Comment comment = commentRepository.findById(commentId).orElseThrow(CommentNotFoundException::new);
 
-        if(!Objects.equals(comment.getUser().getId(), user.getId())) {
+        if(!comment.getUser().getId().equals(user.getId())) {
             throw new UserNotMatchedException();
         }
             // content 변경
@@ -185,5 +185,22 @@ public class CommentService {
                         .reportStatus(ReportStatus.WAITING)
                         .build()
         );
+    }
+
+    @Transactional
+    public void deleteComment(User user, Long commentId) {
+        Comment comment = commentRepository.findById(commentId).orElseThrow(CommentNotFoundException::new);
+
+        // comment 작성자와 현재 User가 불일치 시 예외 처리
+        if(!comment.getUser().getId().equals(user.getId())){
+            throw new UserNotMatchedException();
+        }
+
+        // Target Comment 제거
+        commentRepository.deleteById(commentId);
+
+        // Target의 대댓글 제거
+        commentRepository.deleteAllByParentId(commentId);
+
     }
 }

@@ -375,6 +375,7 @@ public class ItemService {
 //                .sameClosetItemList(sameClosetItemList)
                 .color(item.getColor())
                 .followStatus(followStatus)
+                .hasMine(item.getUser().getId().equals(user.getId()))
                 .build();
     }
 

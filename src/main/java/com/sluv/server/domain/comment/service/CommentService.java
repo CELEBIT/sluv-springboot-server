@@ -2,13 +2,17 @@ package com.sluv.server.domain.comment.service;
 
 import com.sluv.server.domain.comment.dto.CommentPostReqDto;
 import com.sluv.server.domain.comment.dto.CommentReportPostReqDto;
+import com.sluv.server.domain.comment.dto.CommentResDto;
 import com.sluv.server.domain.comment.entity.*;
 import com.sluv.server.domain.comment.enums.CommentStatus;
 import com.sluv.server.domain.comment.exception.CommentNotFoundException;
 import com.sluv.server.domain.comment.exception.CommentReportDuplicateException;
 import com.sluv.server.domain.comment.repository.*;
+import com.sluv.server.domain.item.dto.ItemSameResDto;
 import com.sluv.server.domain.item.entity.Item;
+import com.sluv.server.domain.item.entity.ItemImg;
 import com.sluv.server.domain.item.exception.ItemNotFoundException;
+import com.sluv.server.domain.item.repository.ItemImgRepository;
 import com.sluv.server.domain.item.repository.ItemRepository;
 import com.sluv.server.domain.question.entity.Question;
 import com.sluv.server.domain.question.exception.QuestionNotFoundException;
@@ -16,12 +20,14 @@ import com.sluv.server.domain.question.repository.QuestionRepository;
 import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.domain.user.exception.UserNotMatchedException;
 import com.sluv.server.global.common.enums.ReportStatus;
+import com.sluv.server.global.common.response.PaginationResDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -33,6 +39,7 @@ public class CommentService {
     private final CommentReportRepository commentReportRepository;
     private final QuestionRepository questionRepository;
     private final ItemRepository itemRepository;
+    private final ItemImgRepository itemImgRepository;
 
     @Transactional
     public void postComment(User user, Long questionId, CommentPostReqDto dto){
@@ -202,5 +209,75 @@ public class CommentService {
         // Target의 대댓글 제거
         commentRepository.deleteAllByParentId(commentId);
 
+    }
+
+    public PaginationResDto<CommentResDto> getComment(User user, Long questionId, Pageable pageable) {
+        // 해당 페이지 검색
+        Page<Comment> commentPage = commentRepository.getAllQuestionComment(questionId, pageable);
+
+        // Content 제작
+        List<CommentResDto> content = commentPage
+                .stream()
+                .map(comment -> {
+
+                    // 해당 Comment에 해당하는 이미지 조회
+                    List<String> imgList = commentImgRepository.findAllByCommentId(comment.getId())
+                            .stream().map(CommentImg::getImgUrl).toList();
+                    // 해당 Comment에 해당하는 아이템 조회
+                    List<ItemSameResDto> itemList = commentItemRepository.findAllByCommentId(comment.getId())
+                            .stream().map(commentItem -> getItemSameResDto(commentItem.getItem())).toList();
+                    // 해당 Comment의 좋아요 수
+                    Integer likeNum = commentLikeRepository.countByCommentId(comment.getId());
+                    // 현재 유저의 해당 Comment 좋아요 여부
+                    Boolean likeStatus = commentLikeRepository.existsByUserIdAndCommentId(user.getId(), comment.getId());
+
+
+                    return CommentResDto.builder()
+                            .id(comment.getId())
+                            .userId(comment.getUser().getId())
+                            .userNickname(comment.getUser().getNickname())
+                            .userProfileUrl(comment.getUser().getProfileImgUrl())
+                            .content(comment.getContent())
+                            .imgUrlList(imgList)
+                            .itemList(itemList)
+                            .createdAt(comment.getCreatedAt())
+                            .likeNum(likeNum)
+                            .likeStatus(likeStatus)
+                            .hasMine(comment.getUser().getId().equals(user.getId()))
+                            .build();
+                }).toList();
+
+
+        return PaginationResDto.<CommentResDto>builder()
+                .page(commentPage.getNumber())
+                .hasNext(commentPage.hasNext())
+                .content(content)
+                .build();
+    }
+
+    /**
+     * Item -> ItemSameResDto로 변경하는 메소드
+     * @param item
+     * @return
+     */
+    private ItemSameResDto getItemSameResDto(Item item) {
+        ItemImg mainImg = itemImgRepository.findMainImg(item.getId());
+
+        return ItemSameResDto.builder()
+                .itemId(item.getId())
+                .imgUrl(mainImg.getItemImgUrl())
+                .brandName(
+                        item.getBrand() != null
+                                ? item.getBrand().getBrandKr()
+                                : item.getNewBrand().getBrandName()
+                )
+                .celebName(
+                        item.getCeleb() != null
+                                ? item.getCeleb().getCelebNameKr()
+                                : item.getNewCeleb().getCelebName()
+                )
+                .itemName(item.getName())
+                .scrapStatus(null) // scrap 구현 후 추가
+                .build();
     }
 }

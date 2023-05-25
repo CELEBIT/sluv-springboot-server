@@ -2,9 +2,12 @@ package com.sluv.server.domain.comment.controller;
 
 import com.sluv.server.domain.comment.dto.CommentPostReqDto;
 import com.sluv.server.domain.comment.dto.CommentReportPostReqDto;
+import com.sluv.server.domain.comment.dto.CommentResDto;
 import com.sluv.server.domain.comment.service.CommentService;
 import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.global.common.response.ErrorResponse;
+import com.sluv.server.global.common.response.PaginationResDto;
+import com.sluv.server.global.common.response.SuccessDataResponse;
 import com.sluv.server.global.common.response.SuccessResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -12,9 +15,12 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -135,6 +141,22 @@ public class CommentController {
         commentService.deleteComment(user, commentId);
         return ResponseEntity.ok().body(
                 new SuccessResponse()
+        );
+    }
+
+    @Operation(
+            summary = "*Question 게시글의 댓글 검색",
+            description = "댓글 조회 기능" +
+                    "\n Pagination 적용"
+    )
+    @GetMapping("/{questionId}")
+    public ResponseEntity<SuccessDataResponse<PaginationResDto<CommentResDto>>> getComment(@AuthenticationPrincipal User user,
+                                                                                           @PathVariable("questionId") Long questionId,
+                                                                                           Pageable pageable){
+        return ResponseEntity.ok().body(
+                SuccessDataResponse.<PaginationResDto<CommentResDto>>builder()
+                        .result(commentService.getComment(user, questionId, pageable))
+                        .build()
         );
     }
 }

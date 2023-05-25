@@ -72,8 +72,8 @@ public class ItemDetailResDto {
     @Schema(description = "같은 브랜드 아이템 리스트")
     private List<ItemSameResDto> sameBrandItemList;
 
-//    @Schema(description = "다른 스러버들이 함께 보관한 아이템 리스트")
-//    private List<ItemSameResDto> otherSluverItemList;
+    @Schema(description = "다른 스러버들이 함께 보관한 아이템 리스트")
+    private List<ItemSameResDto> otherSluverItemList;
 
     @Schema(description = "색")
     private String color;
@@ -81,6 +81,8 @@ public class ItemDetailResDto {
     @Schema(description = "팔로우 여부")
     private Boolean followStatus;
 
+    @Schema(description = "현재 유저가 작성한 글인지 판단")
+    private Boolean hasMine;
 
 
 

@@ -6,4 +6,6 @@ import org.springframework.data.domain.Pageable;
 
 public interface CommentRepositoryCustom {
     Page<Comment> getAllQuestionComment(Long questionId, Pageable pageable);
+
+    Page<Comment> getAllSubComment(Long commentId, Pageable pageable);
 }

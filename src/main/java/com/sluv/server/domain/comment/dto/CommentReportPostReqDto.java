@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @Builder
 public class CommentReportPostReqDto {
     @Schema(description = "신고 이유")
-    private CommentReportReason reportReason;
+    private CommentReportReason reason;
     @Schema(description = "신고 내용")
     private String content;
 }

@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @Builder
 public class ItemEditReqDto {
     @Schema(description = "수정요청 이유")
-    private ItemEditReqReason editReqReason;
+    private ItemEditReqReason reason;
     @Schema(description = "수정요청 내용")
     private String content;
 }

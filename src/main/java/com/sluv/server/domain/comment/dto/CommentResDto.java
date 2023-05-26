@@ -26,4 +26,5 @@ public class CommentResDto {
     private Integer likeNum;
     private Boolean likeStatus;
     private Boolean hasMine;
+    private Long restCommentNum;
 }

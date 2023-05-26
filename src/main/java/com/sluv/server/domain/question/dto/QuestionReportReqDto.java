@@ -11,6 +11,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class QuestionReportReqDto {
-    private QuestionReportReason reportReason;
+    private QuestionReportReason reason;
     private String content;
 }

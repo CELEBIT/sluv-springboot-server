@@ -31,4 +31,20 @@ public class CommentRepositoryImpl implements CommentRepositoryCustom{
 
         return PageableExecutionUtils.getPage(content, pageable, () -> countQuery.fetch().size());
     }
+
+    @Override
+    public Page<Comment> getAllSubComment(Long commentId, Pageable pageable) {
+        List<Comment> content = jpaQueryFactory.selectFrom(comment)
+                .where(comment.parent.id.eq(commentId))
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        // count Query
+        JPAQuery<Comment> countQuery = jpaQueryFactory.selectFrom(comment)
+                .where(comment.parent.id.eq(commentId));
+
+
+        return PageableExecutionUtils.getPage(content, pageable, () -> countQuery.fetch().size());
+    }
 }

@@ -20,8 +20,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/app/comment")
@@ -57,11 +55,11 @@ public class CommentController {
             @ApiResponse(responseCode = "5001", description = "DB 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @PostMapping("/{questionId}/{commentId}")
-    public ResponseEntity<SuccessResponse> postNestedComment(@AuthenticationPrincipal User user,
-                                                       @PathVariable("questionId") Long questionId,
-                                                       @PathVariable("commentId") Long commentId,
-                                                       @RequestBody CommentPostReqDto dto){
-        commentService.postNestedComment(user, questionId, commentId, dto);
+    public ResponseEntity<SuccessResponse> postSubComment(@AuthenticationPrincipal User user,
+                                                          @PathVariable("questionId") Long questionId,
+                                                          @PathVariable("commentId") Long commentId,
+                                                          @RequestBody CommentPostReqDto dto){
+        commentService.postSubComment(user, questionId, commentId, dto);
         return ResponseEntity.ok().body(
                 new SuccessResponse()
         );
@@ -156,6 +154,23 @@ public class CommentController {
         return ResponseEntity.ok().body(
                 SuccessDataResponse.<PaginationResDto<CommentResDto>>builder()
                         .result(commentService.getComment(user, questionId, pageable))
+                        .build()
+        );
+    }
+
+    @Operation(
+            summary = "*Question 게시글의 댓글의 대댓글 검색",
+            description = "대댓글 조회 기능" +
+                    "\n Pagination 적용" +
+                    "\n restCommentNum으로 남은 댓글의 수를 전달"
+    )
+    @GetMapping("/{commentId}/subcomment")
+    public ResponseEntity<SuccessDataResponse<PaginationResDto<CommentResDto>>> getSubComment(@AuthenticationPrincipal User user,
+                                                                                              @PathVariable("commentId") Long commentId,
+                                                                                              Pageable pageable){
+        return ResponseEntity.ok().body(
+                SuccessDataResponse.<PaginationResDto<CommentResDto>>builder()
+                        .result(commentService.getSubComment(user, commentId, pageable))
                         .build()
         );
     }

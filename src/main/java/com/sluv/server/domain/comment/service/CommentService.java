@@ -70,7 +70,7 @@ public class CommentService {
     }
 
     @Transactional
-    public void postNestedComment(User user, Long questionId, Long commentId, CommentPostReqDto dto) {
+    public void postSubComment(User user, Long questionId, Long commentId, CommentPostReqDto dto) {
         /**
          *  1. Comment 등록
          *  2. CommentImg 등록
@@ -216,7 +216,33 @@ public class CommentService {
         Page<Comment> commentPage = commentRepository.getAllQuestionComment(questionId, pageable);
 
         // Content 제작
-        List<CommentResDto> content = commentPage
+        List<CommentResDto> content = getCommentResDtos(user, commentPage);
+
+
+        return PaginationResDto.<CommentResDto>builder()
+                .page(commentPage.getNumber())
+                .hasNext(commentPage.hasNext())
+                .content(content)
+                .build();
+    }
+
+    public PaginationResDto<CommentResDto> getSubComment(User user, Long commentId, Pageable pageable) {
+        // 대댓글 페이지 검색
+        Page<Comment> commentPage = commentRepository.getAllSubComment(commentId, pageable);
+
+        // Content 제작
+        List<CommentResDto> content = getCommentResDtos(user, commentPage);
+
+
+        return PaginationResDto.<CommentResDto>builder()
+                .page(commentPage.getNumber())
+                .hasNext(commentPage.hasNext())
+                .content(content)
+                .build();
+    }
+
+    private List<CommentResDto> getCommentResDtos(User user, Page<Comment> commentPage) {
+        return commentPage
                 .stream()
                 .map(comment -> {
 
@@ -231,6 +257,10 @@ public class CommentService {
                     // 현재 유저의 해당 Comment 좋아요 여부
                     Boolean likeStatus = commentLikeRepository.existsByUserIdAndCommentId(user.getId(), comment.getId());
 
+                    // 남은 댓글 수. 총 댓글 수 - ((현재 페이지 +1)*페이지당 size)가 0보다 작으면 0, 아닐 경우 해당 값
+                    long restCommentNum = commentPage.getTotalElements() - ((long) (commentPage.getNumber() + 1) * commentPage.getSize()) >= 0
+                            ? commentPage.getTotalElements() - ((long) (commentPage.getNumber() + 1) * commentPage.getSize())
+                            : 0;
 
                     return CommentResDto.builder()
                             .id(comment.getId())
@@ -244,19 +274,13 @@ public class CommentService {
                             .likeNum(likeNum)
                             .likeStatus(likeStatus)
                             .hasMine(comment.getUser().getId().equals(user.getId()))
+                            .restCommentNum(restCommentNum)
                             .build();
                 }).toList();
-
-
-        return PaginationResDto.<CommentResDto>builder()
-                .page(commentPage.getNumber())
-                .hasNext(commentPage.hasNext())
-                .content(content)
-                .build();
     }
 
     /**
-     * Item -> ItemSameResDto로 변경하는 메소드
+     * Item -> ItemSameResDto로 변경하는 메소
      * @param item
      * @return
      */
@@ -280,4 +304,6 @@ public class CommentService {
                 .scrapStatus(null) // scrap 구현 후 추가
                 .build();
     }
+
+
 }

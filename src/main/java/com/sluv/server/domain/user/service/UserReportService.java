@@ -33,7 +33,7 @@ public class UserReportService {
                     UserReport.builder()
                             .reporter(user)
                             .reported(target)
-                            .userReportReason(dto.getReportReason())
+                            .userReportReason(dto.getReason())
                             .content(dto.getContent())
                             .reportStatus(ReportStatus.WAITING)
                             .build()

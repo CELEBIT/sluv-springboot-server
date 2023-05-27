@@ -35,7 +35,7 @@ public class ItemReportService {
                     ItemReport.builder()
                             .reporter(user)
                             .item(target)
-                            .itemReportReason(dto.getReportReason())
+                            .itemReportReason(dto.getReason())
                             .content(dto.getContent())
                             .reportStatus(ReportStatus.WAITING)
                             .build()

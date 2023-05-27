@@ -292,7 +292,7 @@ public class QuestionService {
                     QuestionReport.builder()
                             .reporter(user)
                             .question(question)
-                            .questionReportReason(dto.getReportReason())
+                            .questionReportReason(dto.getReason())
                             .content(dto.getContent())
                             .reportStatus(ReportStatus.WAITING)
                             .build()

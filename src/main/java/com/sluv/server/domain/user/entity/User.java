@@ -65,6 +65,17 @@ public class User extends BaseEntity implements UserDetails {
 
     }
 
+    public void changeProfileImgUrl(String profileImgUrl){
+        this.profileImgUrl = profileImgUrl;
+    }
+
+    public void changeNickname(String nickname){
+        this.nickname = nickname;
+    }
+    public void changeUserStatus(UserStatus userStatus){
+        this.userStatus = userStatus;
+    }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return null;

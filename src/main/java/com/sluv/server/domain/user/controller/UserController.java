@@ -5,6 +5,7 @@ import com.sluv.server.domain.celeb.dto.InterestedCelebParentResDto;
 import com.sluv.server.domain.celeb.dto.InterestedCelebPostReqDto;
 import com.sluv.server.domain.item.dto.ItemEditReqDto;
 import com.sluv.server.domain.item.service.ItemEditReqService;
+import com.sluv.server.domain.user.dto.UserProfileReqDto;
 import com.sluv.server.domain.user.dto.UserReportReqDto;
 import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.domain.user.service.UserReportService;
@@ -102,5 +103,22 @@ public class UserController {
                 new SuccessResponse()
         );
     }
+
+    @Operation(
+            summary = "*유저의 프로필 설정 및 수정",
+            description = "최초 회원 가입 시 유저의 프로필 설정 및 추후 유저의 프로필 수정" +
+                    "\n User의 Status가 \"PENDING_PROFILE\" 일 경우 설정 후 Status를 \"PENDING_CELEB\"로 변경" +
+                    "\n User의 Status가 \"ACTIVE\" 일 경우 프로필 정보만 수정" +
+                    "\n (User Id Token 필요)" +
+                    "\n \"PENDING_PROFILE\"로 등록 후 User Id Token이 발급되기 때문에 "
+    )
+    @PostMapping("/profile")
+    public ResponseEntity<SuccessResponse> postUserProfile(@AuthenticationPrincipal User user, @RequestBody UserProfileReqDto dto){
+        userService.postUserProfile(user, dto);
+        return ResponseEntity.ok().body(
+                new SuccessResponse()
+        );
+    }
+
 
 }

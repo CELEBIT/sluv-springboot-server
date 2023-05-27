@@ -46,7 +46,8 @@ public class SpringSecurityConfig {
             "/app/item/temp/{tempItemId}",
 
             // user
-            "/app/user/celeb"
+            "/app/user/celeb",
+            "/app/user/profile"
 
     };
 

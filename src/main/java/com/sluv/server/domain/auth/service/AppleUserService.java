@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sluv.server.domain.auth.dto.AuthRequestDto;
 import com.sluv.server.domain.auth.dto.AuthResponseDto;
 import com.sluv.server.domain.auth.dto.SocialUserInfoDto;
+import com.sluv.server.domain.closet.service.ClosetService;
 import com.sluv.server.domain.user.dto.UserDto;
 import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.domain.user.exception.UserNotFoundException;
@@ -37,6 +38,7 @@ import static com.sluv.server.domain.auth.enums.SnsType.APPLE;
 @RequiredArgsConstructor
 public class AppleUserService {
     private final UserRepository userRepository;
+    private final ClosetService closetService;
     private final JwtProvider jwtProvider;
     private final ObjectMapper objectMapper = new ObjectMapper();
     @Value("${apple.clientId}")
@@ -265,6 +267,9 @@ public class AppleUserService {
             user = userRepository.findByEmail(userInfoDto.getEmail())
                     .orElseThrow(UserNotFoundException::new);
         }
+
+        // 생성과 동시에 기본 Closet 생성
+        closetService.postBasicCloset(user);
         return user;
     }
 }

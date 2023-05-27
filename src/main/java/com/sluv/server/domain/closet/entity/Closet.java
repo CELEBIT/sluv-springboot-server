@@ -38,6 +38,8 @@ public class Closet extends BaseEntity {
     @Column(columnDefinition = "TEXT")
     private String coverImgUrl;
 
+    private String color;
+
     @NotNull
     @ColumnDefault("0")
     private Boolean basicFlag;
@@ -47,11 +49,12 @@ public class Closet extends BaseEntity {
     private ClosetStatus closetStatus;
 
     @Builder
-    public Closet(Long id, User user, String name, String coverImgUrl, Boolean basicFlag, ClosetStatus closetStatus) {
+    public Closet(Long id, User user, String name, String coverImgUrl, String color, Boolean basicFlag, ClosetStatus closetStatus) {
         this.id = id;
         this.user = user;
         this.name = name;
         this.coverImgUrl = coverImgUrl;
+        this.color = color;
         this.basicFlag = basicFlag;
         this.closetStatus = closetStatus;
     }

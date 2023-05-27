@@ -7,6 +7,7 @@ import com.google.api.client.json.gson.GsonFactory;
 import com.sluv.server.domain.auth.dto.AuthRequestDto;
 import com.sluv.server.domain.auth.dto.AuthResponseDto;
 import com.sluv.server.domain.auth.dto.SocialUserInfoDto;
+import com.sluv.server.domain.closet.service.ClosetService;
 import com.sluv.server.domain.user.dto.UserDto;
 import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.domain.user.exception.UserNotFoundException;
@@ -26,6 +27,7 @@ import static com.sluv.server.domain.auth.enums.SnsType.GOOGLE;
 @RequiredArgsConstructor
 public class GoogleUserService {
     private final UserRepository userRepository;
+    private final ClosetService closetService;
     private final JwtProvider jwtProvider;
 
     @Value("${spring.security.oauth2.client.android}")
@@ -117,6 +119,10 @@ public class GoogleUserService {
             user = userRepository.findByEmail(googleUserInfoDto.getEmail())
                                             .orElseThrow(UserNotFoundException::new);
         }
+
+        // 생성과 동시에 기본 Closet 생성
+        closetService.postBasicCloset(user);
+
         return user;
     }
 

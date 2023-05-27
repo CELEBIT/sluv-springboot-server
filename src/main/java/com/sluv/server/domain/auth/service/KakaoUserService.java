@@ -138,10 +138,11 @@ public class KakaoUserService {
 
             user = userRepository.findByEmail(UserInfo.getEmail())
                                             .orElseThrow(UserNotFoundException::new);
+
+            // 생성과 동시에 기본 Closet 생성
+            closetService.postBasicCloset(user);
         }
 
-        // 생성과 동시에 기본 Closet 생성
-        closetService.postBasicCloset(user);
         return user;
     }
 

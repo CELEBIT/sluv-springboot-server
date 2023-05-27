@@ -23,7 +23,7 @@ public class ItemEditReqService {
                 ItemEditReq.builder()
                             .requester(user)
                             .item(item)
-                            .itemEditReqReason(dto.getEditReqReason())
+                            .itemEditReqReason(dto.getReason())
                             .content(dto.getContent())
                             .build()
         );

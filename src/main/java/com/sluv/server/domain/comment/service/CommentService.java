@@ -187,7 +187,7 @@ public class CommentService {
                 CommentReport.builder()
                         .reporter(user)
                         .comment(comment)
-                        .commentReportReason(dto.getReportReason())
+                        .commentReportReason(dto.getReason())
                         .content(dto.getContent())
                         .reportStatus(ReportStatus.WAITING)
                         .build()

@@ -47,7 +47,10 @@ public class SpringSecurityConfig {
 
             // user
             "/app/user/celeb",
-            "/app/user/profile"
+            "/app/user/profile",
+
+            // closet
+            "/app/closet"
 
     };
 

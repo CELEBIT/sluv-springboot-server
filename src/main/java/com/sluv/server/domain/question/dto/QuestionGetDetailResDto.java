@@ -1,5 +1,6 @@
 package com.sluv.server.domain.question.dto;
 
+import com.sluv.server.domain.celeb.dto.CelebChipResDto;
 import com.sluv.server.domain.item.dto.ItemSameResDto;
 import com.sluv.server.domain.user.dto.UserInfoDto;
 import lombok.AllArgsConstructor;
@@ -28,6 +29,13 @@ public class QuestionGetDetailResDto {
 
     private Boolean hasLike;
     private Boolean hasMine;
+
+    // Question Buy
+    private LocalDateTime voteEndTime;
+
+    // Question Find
+    private CelebChipResDto celeb;
+    private CelebChipResDto newCeleb;
 
 
 

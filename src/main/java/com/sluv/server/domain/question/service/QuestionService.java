@@ -1,5 +1,10 @@
 package com.sluv.server.domain.question.service;
 
+import com.sluv.server.domain.celeb.dto.CelebChipResDto;
+import com.sluv.server.domain.celeb.entity.Celeb;
+import com.sluv.server.domain.celeb.entity.NewCeleb;
+import com.sluv.server.domain.celeb.repository.CelebRepository;
+import com.sluv.server.domain.celeb.repository.NewCelebRepository;
 import com.sluv.server.domain.comment.repository.CommentRepository;
 import com.sluv.server.domain.item.dto.ItemSameResDto;
 import com.sluv.server.domain.item.entity.Item;
@@ -37,6 +42,8 @@ public class QuestionService {
     private final CommentRepository commentRepository;
     private final ItemRepository itemRepository;
     private final ItemImgRepository itemImgRepository;
+    private final CelebRepository celebRepository;
+    private final NewCelebRepository newCelebRepository;
 
     @Transactional
     public QuestionPostResDto postQuestionFind(User user, QuestionFindPostReqDto dto) {
@@ -53,12 +60,16 @@ public class QuestionService {
         }
 
         // 2. QuestionFind 저장
+        Celeb celeb = celebRepository.findById(dto.getCelebId()).orElse(null);
+        NewCeleb newCeleb = newCelebRepository.findById(dto.getNewCelebId()).orElse(null);
+
         QuestionFind questionFind = questionFindBuilder
                 .user(user)
                 .title(dto.getTitle())
                 .content(dto.getContent())
                 .searchNum(0L)
-                .celebId(dto.getCelebId())
+                .celeb(celeb)
+                .newCeleb(newCeleb)
                 .questionStatus(QuestionStatus.ACTIVE)
                 .build();
 
@@ -358,8 +369,40 @@ public class QuestionService {
         // hasLike 검색
         Boolean currentUserLike = questionLikeRepository.existsByQuestionIdAndUserId(questionId, user.getId());
 
+        QuestionGetDetailResDto.QuestionGetDetailResDtoBuilder builder = QuestionGetDetailResDto.builder();
+        if(qType.equals("Find")){
+            QuestionFind questionFind = (QuestionFind) question;
+            CelebChipResDto.CelebChipResDtoBuilder builder1 = CelebChipResDto.builder();
+            if(questionFind.getCeleb() != null){
+                CelebChipResDto dto = builder1.celebId(questionFind.getCeleb().getId()).celebName(questionFind.getCeleb().getCelebNameKr())
+                        .build();
+                builder
+                        .celeb(dto)
+                        .newCeleb(null);
+            }else {
+                CelebChipResDto dto = builder1.celebId(questionFind.getNewCeleb().getId()).celebName(questionFind.getNewCeleb().getCelebName())
+                        .build();
+                builder
+                        .celeb(null)
+                        .newCeleb(dto);
+            }
 
-        return QuestionGetDetailResDto.builder()
+            builder
+                .voteEndTime(null);
+        }else if(qType.equals("Buy")) {
+            QuestionBuy questionBuy = (QuestionBuy) question;
+
+            builder
+                .celeb(null)
+                .newCeleb(null)
+                .voteEndTime(questionBuy.getVoteEndTime());
+        }else{
+            builder.celeb(null)
+                    .newCeleb(null)
+                    .voteEndTime(null);
+        }
+
+        return builder
                 .qType(qType)
                 .user(
                         UserInfoDto.builder()
@@ -378,6 +421,7 @@ public class QuestionService {
                 .createdAt(question.getCreatedAt())
                 .hasLike(currentUserLike)
                 .hasMine(user.getId().equals(writer.getId()))
+
                 .build();
     }
 }

@@ -163,7 +163,7 @@ public class TempItemService {
 
                     CelebDto celebDto = tempItem.getCeleb() != null ?
                             CelebDto.builder()
-                                    .id(tempItem.getId())
+                                    .id(tempItem.getCeleb().getId())
                                     .celebNameKr(tempItem.getCeleb().getCelebNameKr())
                                     .celebNameEn(tempItem.getCeleb().getCelebNameEn())
                                     .categoryChild(tempItem.getCeleb().getCelebCategory().getName())
@@ -190,10 +190,15 @@ public class TempItemService {
                                     .build()
                             : null;
 
+                    Brand brand = tempItem.getBrand() != null
+                            ? tempItem.getBrand()
+                            : null;
+
                     return TempItemResDto.builder()
                             .id(tempItem.getId())
                             .imgList(tempImgList)
                             .celeb(celebDto)
+                            .brand(brand)
                             .whenDiscovery(tempItem.getWhenDiscovery())
                             .whereDiscovery(tempItem.getWhereDiscovery())
                             .category(itemCategoryDto)
@@ -203,8 +208,16 @@ public class TempItemService {
                             .hashTagList(tempHashtagList)
                             .linkList(tempLinkList)
                             .infoSource(tempItem.getInfoSource())
-                            .newCelebId(tempItem.getNewCeleb().getId())
-                            .newBrandId(tempItem.getNewBrand().getId())
+                            .newCelebId(
+                                    tempItem.getNewCeleb() != null
+                                    ? tempItem.getNewCeleb().getId()
+                                    :null
+                            )
+                            .newBrandId(
+                                    tempItem.getNewBrand() != null
+                                    ? tempItem.getNewBrand().getId()
+                                    :null
+                                    )
                             .updatedAt(tempItem.getUpdatedAt())
                             .build();
 

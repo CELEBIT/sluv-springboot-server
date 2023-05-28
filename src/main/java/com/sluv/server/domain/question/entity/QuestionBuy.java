@@ -5,12 +5,14 @@ import com.sluv.server.domain.user.entity.User;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
 @Entity
 @NoArgsConstructor
+@Getter
 //@SuperBuilder
 @DiscriminatorValue("Buy")
 public class QuestionBuy extends Question{

@@ -17,6 +17,8 @@ public class QuestionFindPostReqDto {
     private Long id;
     @Schema(description = "Celeb Id")
     private Long celebId;
+    @Schema(description = "NewCeleb Id")
+    private Long newCelebId;
     @Schema(description = "Question 제목")
     private String title;
     @Schema(description = "Question 내용")

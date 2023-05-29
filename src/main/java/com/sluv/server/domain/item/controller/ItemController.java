@@ -83,10 +83,10 @@ public class ItemController {
             @ApiResponse(responseCode = "5001", description = "DB 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @GetMapping("/temp")
-    public ResponseEntity<SuccessDataResponse<PaginationResDto<TempItemResDto>>> getTempItemList(@AuthenticationPrincipal User user, Pageable pageable){
+    public ResponseEntity<SuccessDataResponse<TempItemPageDto<TempItemResDto>>> getTempItemList(@AuthenticationPrincipal User user, Pageable pageable){
 
         return ResponseEntity.ok().body(
-                SuccessDataResponse.<PaginationResDto<TempItemResDto>>builder()
+                SuccessDataResponse.<TempItemPageDto<TempItemResDto>>builder()
                         .result(tempItemService.getTempItemList(user, pageable))
                         .build()
         );

@@ -1,7 +1,9 @@
 package com.sluv.server.domain.item.dto;
 
+import com.sluv.server.domain.brand.dto.NewBrandPostResDto;
 import com.sluv.server.domain.brand.entity.Brand;
 import com.sluv.server.domain.celeb.dto.CelebDto;
+import com.sluv.server.domain.celeb.dto.NewCelebPostResDto;
 import com.sluv.server.domain.celeb.entity.Celeb;
 import com.sluv.server.domain.item.entity.ItemCategory;
 import com.sluv.server.domain.item.entity.hashtag.Hashtag;
@@ -52,10 +54,10 @@ public class TempItemResDto {
     @Schema(description = "추가정보를 발견한 출처")
     private String infoSource;
 
-    @Schema(description = "새로운 Celeb id")
-    private Long newCelebId;
-    @Schema(description = "새로운 Brand id")
-    private Long newBrandId;
+    @Schema(description = "새로운 Celeb")
+    private NewCelebPostResDto newCeleb;
+    @Schema(description = "새로운 Brand")
+    private NewBrandPostResDto newBrand;
 
     @Schema(description = "최신 update 시점")
     private LocalDateTime updatedAt;

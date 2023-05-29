@@ -1,5 +1,6 @@
 package com.sluv.server.domain.item.service;
 
+import com.sluv.server.domain.brand.dto.NewBrandPostResDto;
 import com.sluv.server.domain.brand.entity.Brand;
 import com.sluv.server.domain.brand.entity.NewBrand;
 import com.sluv.server.domain.brand.exception.BrandNotFoundException;
@@ -7,6 +8,7 @@ import com.sluv.server.domain.brand.exception.NewBrandNotFoundException;
 import com.sluv.server.domain.brand.repository.BrandRepository;
 import com.sluv.server.domain.brand.repository.NewBrandRepository;
 import com.sluv.server.domain.celeb.dto.CelebDto;
+import com.sluv.server.domain.celeb.dto.NewCelebPostResDto;
 import com.sluv.server.domain.celeb.entity.Celeb;
 import com.sluv.server.domain.celeb.entity.NewCeleb;
 import com.sluv.server.domain.celeb.exception.CelebNotFoundException;
@@ -138,7 +140,7 @@ public class TempItemService {
         return saveTempItem.getId();
     }
 
-    public PaginationResDto<TempItemResDto> getTempItemList(User user, Pageable pageable){
+    public TempItemPageDto<TempItemResDto> getTempItemList(User user, Pageable pageable){
 
         Page<TempItem> contentPage = tempItemRepository.getTempItemList(user, pageable);
 
@@ -208,14 +210,20 @@ public class TempItemService {
                             .hashTagList(tempHashtagList)
                             .linkList(tempLinkList)
                             .infoSource(tempItem.getInfoSource())
-                            .newCelebId(
+                            .newCeleb(
                                     tempItem.getNewCeleb() != null
-                                    ? tempItem.getNewCeleb().getId()
+                                    ? NewCelebPostResDto.builder()
+                                            .newCelebId(tempItem.getNewCeleb().getId())
+                                            .newCelebName(tempItem.getNewCeleb().getCelebName())
+                                            .build()
                                     :null
                             )
-                            .newBrandId(
+                            .newBrand(
                                     tempItem.getNewBrand() != null
-                                    ? tempItem.getNewBrand().getId()
+                                    ? NewBrandPostResDto.builder()
+                                            .newBrandId(tempItem.getNewBrand().getId())
+                                            .newBrandName(tempItem.getNewBrand().getBrandName())
+                                            .build()
                                     :null
                                     )
                             .updatedAt(tempItem.getUpdatedAt())
@@ -224,11 +232,12 @@ public class TempItemService {
                 }
         ).toList();
 
-        return PaginationResDto.<TempItemResDto>builder()
-                .hasNext(contentPage.hasNext())
-                .page(contentPage.getNumber())
-                .content(dtoList)
-                .build();
+        return new TempItemPageDto<TempItemResDto>(
+                contentPage.hasNext(),
+                contentPage.getNumber(),
+                dtoList,
+                contentPage.getTotalElements());
+
 
     }
 

@@ -3,8 +3,10 @@ package com.sluv.server.domain.closet.service;
 import com.sluv.server.domain.closet.dto.ClosetReqDto;
 import com.sluv.server.domain.closet.entity.Closet;
 import com.sluv.server.domain.closet.enums.ClosetStatus;
+import com.sluv.server.domain.closet.exception.BasicClosetDeleteException;
 import com.sluv.server.domain.closet.exception.ClosetNotFoundException;
 import com.sluv.server.domain.closet.repository.ClosetRepository;
+import com.sluv.server.domain.item.repository.ItemScrapRepository;
 import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.domain.user.exception.UserNotMatchedException;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class ClosetService {
     private final ClosetRepository closetRepository;
+    private final ItemScrapRepository itemScrapRepository;
 
     public void postBasicCloset(User user){
 
@@ -60,5 +63,27 @@ public class ClosetService {
 
         closet.changeClosetCover(dto.getName(), dto.getCoverImgUrl(), dto.getColor(), dto.getClosetStatus());
 
+    }
+
+    @Transactional
+    public void deleteCloset(User user, Long closetId) {
+        Closet closet = closetRepository.findById(closetId).orElseThrow(ClosetNotFoundException::new);
+
+        // 현재 유저와 Closet Owner 비교
+        if(!closet.getUser().getId().equals(user.getId())){
+            log.info( "User did Not Matched. User Id: {}, Closet Owner Id : {}",user.getId(), closet.getUser().getId());
+            throw new UserNotMatchedException();
+        }
+        // 기본 Closet 여부 확인
+        if(closet.getBasicFlag()){
+            log.info("Closet Id {} is Basic Closet", closet.getId());
+            throw new BasicClosetDeleteException();
+        }
+
+        log.info("ItemScrap Delete By Closet Id: {}", closet.getId());
+        itemScrapRepository.deleteAllByClosetId(closet.getId());
+
+        log.info("Delete Closet Id: {}", closet.getId());
+        closetRepository.deleteById(closet.getId());
     }
 }

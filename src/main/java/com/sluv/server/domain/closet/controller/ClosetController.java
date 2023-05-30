@@ -1,5 +1,6 @@
 package com.sluv.server.domain.closet.controller;
 
+import com.sluv.server.domain.closet.dto.ClosetItemDeleteReqDto;
 import com.sluv.server.domain.closet.dto.ClosetReqDto;
 import com.sluv.server.domain.closet.service.ClosetService;
 import com.sluv.server.domain.user.entity.User;
@@ -67,6 +68,20 @@ public class ClosetController {
     @PostMapping("/{itemId}/scrap/{closetId}")
     public ResponseEntity<SuccessResponse> postItemScrapToCloset(@AuthenticationPrincipal User user, @PathVariable("itemId") Long itemId, @PathVariable("closetId") Long closetId){
         closetService.postItemScrapToCloset(user, itemId, closetId);
+        return ResponseEntity.ok().body(
+                new SuccessResponse()
+        );
+    }
+    @Operation(
+            summary = "*옷장에 편집하기로 선택한 Item들을 삭제",
+            description = """ 
+                    옷장 편집하기에서 선택한 Item들을 한번애 삭제하는 기능
+                    User Id Token 필요
+                    """
+    )
+    @PatchMapping("/{closetId}/items")
+    public ResponseEntity<SuccessResponse> patchItems(@AuthenticationPrincipal User user, @PathVariable("closetId") Long closetId, @RequestBody ClosetItemDeleteReqDto dto){
+        closetService.patchItems(user, closetId, dto);
         return ResponseEntity.ok().body(
                 new SuccessResponse()
         );

@@ -1,5 +1,6 @@
 package com.sluv.server.domain.closet.service;
 
+import com.sluv.server.domain.closet.dto.ClosetItemDeleteReqDto;
 import com.sluv.server.domain.closet.dto.ClosetReqDto;
 import com.sluv.server.domain.closet.entity.Closet;
 import com.sluv.server.domain.closet.enums.ClosetStatus;
@@ -110,6 +111,22 @@ public class ClosetService {
                         .build()
         );
         log.info("Save Success with ItemScrap Id: {}", saveItemScrap.getId());
+
+    }
+
+    @Transactional
+    public void patchItems(User user, Long closetId, ClosetItemDeleteReqDto dto) {
+        Closet closet = closetRepository.findById(closetId).orElseThrow(ClosetNotFoundException::new);
+
+        if(!closet.getUser().getId().equals(user.getId())){
+            log.info( "User did Not Matched. User Id: {}, Closet Owner Id : {}",user.getId(), closet.getUser().getId());
+            throw new UserNotMatchedException();
+        }
+
+        dto.getItemList().forEach(itemId -> {
+            log.info("Delete Item {}, from Closet {}", itemId, closet.getId());
+            itemScrapRepository.deleteByClosetIdAndItemId(closet.getId(), itemId);
+        });
 
     }
 }

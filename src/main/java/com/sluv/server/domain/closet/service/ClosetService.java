@@ -6,6 +6,10 @@ import com.sluv.server.domain.closet.enums.ClosetStatus;
 import com.sluv.server.domain.closet.exception.BasicClosetDeleteException;
 import com.sluv.server.domain.closet.exception.ClosetNotFoundException;
 import com.sluv.server.domain.closet.repository.ClosetRepository;
+import com.sluv.server.domain.item.entity.Item;
+import com.sluv.server.domain.item.entity.ItemScrap;
+import com.sluv.server.domain.item.exception.ItemNotFoundException;
+import com.sluv.server.domain.item.repository.ItemRepository;
 import com.sluv.server.domain.item.repository.ItemScrapRepository;
 import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.domain.user.exception.UserNotMatchedException;
@@ -20,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class ClosetService {
     private final ClosetRepository closetRepository;
     private final ItemScrapRepository itemScrapRepository;
+    private final ItemRepository itemRepository;
 
     public void postBasicCloset(User user){
 
@@ -85,5 +90,26 @@ public class ClosetService {
 
         log.info("Delete Closet Id: {}", closet.getId());
         closetRepository.deleteById(closet.getId());
+    }
+
+    @Transactional
+    public void postItemScrapToCloset(User user, Long itemId, Long closetId) {
+        Item item = itemRepository.findById(itemId).orElseThrow(ItemNotFoundException::new);
+        Closet closet = closetRepository.findById(closetId).orElseThrow(ClosetNotFoundException::new);
+
+        if(!closet.getUser().getId().equals(user.getId())){
+            log.info( "User did Not Matched. User Id: {}, Closet Owner Id : {}",user.getId(), closet.getUser().getId());
+            throw new UserNotMatchedException();
+        }
+
+        log.info("Save ItemScrap with item Id: {}, Closet Id {}", item.getId(), closet.getId());
+        ItemScrap saveItemScrap = itemScrapRepository.save(
+                ItemScrap.builder()
+                        .item(item)
+                        .closet(closet)
+                        .build()
+        );
+        log.info("Save Success with ItemScrap Id: {}", saveItemScrap.getId());
+
     }
 }

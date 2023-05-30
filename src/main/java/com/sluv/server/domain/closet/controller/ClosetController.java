@@ -55,4 +55,20 @@ public class ClosetController {
                 new SuccessResponse()
         );
     }
+    @Operation(
+            summary = "*옷장에 아이템 스크랩(저장하기)",
+            description = """ 
+                    사용자 옷장에 아이템을 스크랩(저장하기)
+                    User Id Token 필요 -> 해당 옷장의 소유자인지 확인
+                    ** 일단 1개의 아이템은 유저당 1개의 옷장에만 저장 가능**
+                    A유저가 가지고 있는 1번 2번 옷장에 저장 불가. 1번 혹은 2번에만 저장 가능.
+                    """
+    )
+    @PostMapping("/{itemId}/scrap/{closetId}")
+    public ResponseEntity<SuccessResponse> postItemScrapToCloset(@AuthenticationPrincipal User user, @PathVariable("itemId") Long itemId, @PathVariable("closetId") Long closetId){
+        closetService.postItemScrapToCloset(user, itemId, closetId);
+        return ResponseEntity.ok().body(
+                new SuccessResponse()
+        );
+    }
 }

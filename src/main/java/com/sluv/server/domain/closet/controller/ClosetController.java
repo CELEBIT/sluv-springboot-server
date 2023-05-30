@@ -86,4 +86,18 @@ public class ClosetController {
                 new SuccessResponse()
         );
     }
+    @Operation(
+            summary = "*옷장에 편집하기로 선택한 Item들을 삭제",
+            description = """ 
+                    옷장 편집하기에서 선택한 Item들을 한번애 삭제하는 기능
+                    User Id Token 필요
+                    """
+    )
+    @DeleteMapping("/{itemId}/scrap")
+    public ResponseEntity<SuccessResponse> deleteItemScrapFromCloset(@AuthenticationPrincipal User user, @PathVariable("itemId") Long itemId){
+        closetService.deleteItemScrapFromCloset(user, itemId);
+        return ResponseEntity.ok().body(
+                new SuccessResponse()
+        );
+    }
 }

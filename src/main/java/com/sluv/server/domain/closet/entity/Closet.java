@@ -58,4 +58,11 @@ public class Closet extends BaseEntity {
         this.basicFlag = basicFlag;
         this.closetStatus = closetStatus;
     }
+
+    public void changeClosetCover(String name, String coverImgUrl, String color, ClosetStatus closetStatus){
+        this.name = name;
+        this.coverImgUrl = coverImgUrl;
+        this.color = color;
+        this.closetStatus = closetStatus;
+    }
 }

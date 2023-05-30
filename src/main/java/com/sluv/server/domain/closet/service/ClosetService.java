@@ -1,15 +1,19 @@
 package com.sluv.server.domain.closet.service;
 
-import com.sluv.server.domain.closet.dto.ClosetPostReqDto;
+import com.sluv.server.domain.closet.dto.ClosetReqDto;
 import com.sluv.server.domain.closet.entity.Closet;
 import com.sluv.server.domain.closet.enums.ClosetStatus;
+import com.sluv.server.domain.closet.exception.ClosetNotFoundException;
 import com.sluv.server.domain.closet.repository.ClosetRepository;
 import com.sluv.server.domain.user.entity.User;
+import com.sluv.server.domain.user.exception.UserNotMatchedException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class ClosetService {
     private final ClosetRepository closetRepository;
@@ -31,7 +35,7 @@ public class ClosetService {
     }
 
     @Transactional
-    public void postCloset(User user, ClosetPostReqDto dto) {
+    public void postCloset(User user, ClosetReqDto dto) {
 
         Closet newCloset = Closet.builder()
                 .user(user)
@@ -43,5 +47,18 @@ public class ClosetService {
                 .build();
 
         closetRepository.save(newCloset);
+    }
+
+    @Transactional
+    public void patchCloset(User user, Long closetId, ClosetReqDto dto) {
+        Closet closet = closetRepository.findById(closetId).orElseThrow(ClosetNotFoundException::new);
+
+        if(!closet.getUser().getId().equals(user.getId())){
+            log.info( "User Id: {}, Closet Owner Id : {}",user.getId(), closet.getUser().getId());
+            throw new UserNotMatchedException();
+        }
+
+        closet.changeClosetCover(dto.getName(), dto.getCoverImgUrl(), dto.getColor(), dto.getClosetStatus());
+
     }
 }

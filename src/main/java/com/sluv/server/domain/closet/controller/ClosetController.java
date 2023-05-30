@@ -41,4 +41,18 @@ public class ClosetController {
                 new SuccessResponse()
         );
     }
+    @Operation(
+            summary = "*옷장 삭제",
+            description = "사용자 옷장을 삭제" +
+                    "\n User Id Token 필요 -> 소유자인지 확인" +
+                    "\n 기본 Closet이라면 삭제 불가." +
+                    "\n 삭제 시 Closet 데이터를 을 DB에서 제거"
+    )
+    @DeleteMapping("/{closetId}")
+    public ResponseEntity<SuccessResponse> deleteCloset(@AuthenticationPrincipal User user, @PathVariable("closetId") Long closetId){
+        closetService.deleteCloset(user, closetId);
+        return ResponseEntity.ok().body(
+                new SuccessResponse()
+        );
+    }
 }

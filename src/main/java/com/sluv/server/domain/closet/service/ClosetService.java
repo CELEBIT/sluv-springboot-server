@@ -19,6 +19,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -125,6 +127,17 @@ public class ClosetService {
 
         dto.getItemList().forEach(itemId -> {
             log.info("Delete Item {}, from Closet {}", itemId, closet.getId());
+            itemScrapRepository.deleteByClosetIdAndItemId(closet.getId(), itemId);
+        });
+
+    }
+
+    @Transactional
+    public void deleteItemScrapFromCloset(User user, Long itemId) {
+        List<Closet> closetList = closetRepository.findAllByUserId(user.getId());
+
+        log.info("DELETE ItemScrap {}", itemId);
+        closetList.forEach(closet -> {
             itemScrapRepository.deleteByClosetIdAndItemId(closet.getId(), itemId);
         });
 

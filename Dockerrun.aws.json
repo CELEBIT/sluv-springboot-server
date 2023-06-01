@@ -1,7 +1,7 @@
 {
   "AWSEBDockerrunVersion": "1",
   "Image": {
-    "Name": "sluv2323/sluv-springboot-prod-image:latest",
+    "Name": "sluv2323/sluv-springboot-main-cicd:latest",
     "Update": "true"
   },
   "Ports": [

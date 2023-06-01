@@ -1,9 +1,9 @@
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: ENC(MZ1NRkPbEBN/oQQi60v16ct680Wq55C7N47uB09rbAz47AcWSLLlUv2bcmDkXRTFd9GxyUYfE9cjn4+wQfvuiTCid5SYI5zmqXYxB98NADs+x3JfoJdhmIibtnbCa1CDZJn0Amq43P5yGk+g0NQMCxCMptGhVGHXygS0LQ6m/j7pMTUa/DfAxQ==)
-    username: ENC(6kQyjjYoAYUcL6M84Ti5gQ==)
-    password: ENC(/2YZEObRWVpEfIFU/1GP6qVZx1feNvkh)
+    url: ENC(umIPYOdrigHivpZxQUaBn+1360z+xy13Hb4gHcoDY16JKXGxOF2jx4F+KkoFv9RKiIu7nXxn7tv/PoUCRVEYxqf96mTuqV007F1N8C45mpzyBg+tCBbRyNW66k7k4E0o)
+    username: ENC(gh46WFclECYl96UilXt8Lw==)
+    password: ENC(2HaAZ8j7cAaYFkIcemnUifSA0UAtPFLt)
   jpa:
     properties:
       hibernate:
@@ -11,17 +11,20 @@ spring:
 
   security:
     user:
-      name: ${SECURITY_USER_NAME}
-      password: ${SECURITY_USER_PASSWORD}
+      name: user
+      password: 1234
     oauth2:
       client:
-        android: ${SECURITY_OAUTH2_CLIENT_ANDROID}
-        apple: ${SECURITY_OAUTH2_CLIENT_APPLE}
+        android: 924373234165-adalqufkonkljl23qk6vv4g3bnc9imfr.apps.googleusercontent.com
+        apple: 924373234165-hfd08tk9pt36g4e9r54hqhpe9ircrv4q.apps.googleusercontent.com
+
+
+
 
 jasypt:
   encryptor:
     bean: jasyptStringEncryptor
-    password: ${JASYPT_ENCRYPTOR_PASSWORD}
+    password: celebit-sluv-mvp2
 
 logging:
   level:
@@ -29,20 +32,20 @@ logging:
 
 jwt:
   header: Authorization
-  secret: ${JWT_SECRET}
-  expiration-seconds: ${JWT_EXPIRATION_SECONDS}
+  secret: and0LXRlc3QtYWxqamFiYWVnaS1qd3QtdGVzdC1hbGpqYWJhZWdpLWp3dC10ZXN0LWFsamphYmFlZ2ktand0LXRlc3QtYWxqamFiYWVnaS1qd3QtdGVzdC1hbGpqYWJhZWdpLWp3dC10ZXN0LWFsamphYmFlZ2ktand0LXRlc3QtYWxqamFiYWVnaS1qd3QtdGVzdC1hbGpqYWJhZWdp
+  expiration-seconds: 31536000000
   type: Bearer
 
 apple:
   #  nonce: 1
-  clientId: ${APPLE_CLIENT_ID}
+  clientId: Sluv.sluv-ios-renew
   openKey: https://appleid.apple.com/auth/keys
   iss: https://appleid.apple.com
 
 aws:
   s3:
-    accessKey: ${AWS_S3_ACCESS_KEY}
-    secretKey: ${AWS_S3_SECRET_KEY}
+    accessKey: AKIA5R23H6YS2FVCHYQK
+    secretKey: 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
     region: ap-northeast-2
-    bucketName: ${AWS_S3_BUCKET_NAME}
-    baseUrl: ${AWS_S3_BASE_URL}
+    bucketName: sluv-dev-img-bucket
+    baseUrl: https://sluv-dev-img-bucket.s3.ap-northeast-2.amazonaws.com

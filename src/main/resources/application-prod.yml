@@ -1,0 +1,48 @@
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: ENC(nq9/0nzoRvDWXnUYTQXfsPJxr/NGv99bPT1c82utEq2gN3U6KC6+cTflZLXTbEYqPmRwfpLWqz1KmvlGXTTLaHTv3E9O15uJHKI5GKKN76DX51QS3RPhBuCfuT+NomV0S8ufthZv4GjFmJFBSMhD8Q==)
+    username: ENC(6kQyjjYoAYUcL6M84Ti5gQ==)
+    password: ENC(/2YZEObRWVpEfIFU/1GP6qVZx1feNvkh)
+  jpa:
+    properties:
+      hibernate:
+        format_sql: true
+
+  security:
+    user:
+      name: ${SECURITY_USER_NAME}
+      password: ${SECURITY_USER_PASSWORD}
+    oauth2:
+      client:
+        android: ${SECURITY_OAUTH2_CLIENT_ANDROID}
+        apple: ${SECURITY_OAUTH2_CLIENT_APPLE}
+
+jasypt:
+  encryptor:
+    bean: jasyptStringEncryptor
+    password: ${JASYPT_ENCRYPTOR_PASSWORD}
+
+logging:
+  level:
+    org.hibernate.SQL: debug
+
+jwt:
+  header: Authorization
+  secret: ${JWT_SECRET}
+  expiration-seconds: ${JWT_EXPIRATION_SECONDS}
+  type: Bearer
+
+apple:
+  #  nonce: 1
+  clientId: ${APPLE_CLIENT_ID}
+  openKey: https://appleid.apple.com/auth/keys
+  iss: https://appleid.apple.com
+
+aws:
+  s3:
+    accessKey: ${AWS_S3_ACCESS_KEY}
+    secretKey: ${AWS_S3_SECRET_KEY}
+    region: ap-northeast-2
+    bucketName: ${AWS_S3_BUCKET_NAME}
+    baseUrl: ${AWS_S3_BASE_URL}

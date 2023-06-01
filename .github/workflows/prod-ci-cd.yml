@@ -46,8 +46,8 @@ jobs:
         with:
           aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID_PROD }}
           aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY_PROD }}
-          application_name: sluv-dev
-          environment_name: Sluvdev-env
+          application_name: sluv-prod
+          environment_name: Sluv-prod-env-1
           version_label: "github-action--${{ steps.format-time.outputs.replaced }}"
           region: ap-northeast-2
           deployment_package: Dockerrun.aws.json

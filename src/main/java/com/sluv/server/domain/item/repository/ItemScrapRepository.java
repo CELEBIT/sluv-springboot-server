@@ -9,4 +9,6 @@ public interface ItemScrapRepository extends JpaRepository<ItemScrap, Long> {
     void deleteAllByClosetId(Long id);
 
     void deleteByClosetIdAndItemId(Long closet_id, Long item_id);
+
+    ItemScrap findByClosetIdAndItemId(Long fromClosetId, Long itemId);
 }

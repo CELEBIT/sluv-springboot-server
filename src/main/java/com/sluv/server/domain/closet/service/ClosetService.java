@@ -1,6 +1,6 @@
 package com.sluv.server.domain.closet.service;
 
-import com.sluv.server.domain.closet.dto.ClosetItemDeleteReqDto;
+import com.sluv.server.domain.closet.dto.ClosetItemSelectReqDto;
 import com.sluv.server.domain.closet.dto.ClosetReqDto;
 import com.sluv.server.domain.closet.entity.Closet;
 import com.sluv.server.domain.closet.enums.ClosetStatus;
@@ -117,7 +117,7 @@ public class ClosetService {
     }
 
     @Transactional
-    public void patchItems(User user, Long closetId, ClosetItemDeleteReqDto dto) {
+    public void patchItems(User user, Long closetId, ClosetItemSelectReqDto dto) {
         Closet closet = closetRepository.findById(closetId).orElseThrow(ClosetNotFoundException::new);
 
         if(!closet.getUser().getId().equals(user.getId())){
@@ -140,6 +140,37 @@ public class ClosetService {
         closetList.forEach(closet -> {
             itemScrapRepository.deleteByClosetIdAndItemId(closet.getId(), itemId);
         });
+
+    }
+
+    @Transactional
+    public void patchSaveCloset(User user, Long fromClosetId, Long toClosetId, ClosetItemSelectReqDto dto) {
+        Closet fromCloset = closetRepository.findById(fromClosetId).orElseThrow(ClosetNotFoundException::new);
+        Closet toCloset = closetRepository.findById(toClosetId).orElseThrow(ClosetNotFoundException::new);
+
+        // fromCloset과 현재 유저 일치 비교
+        if(!fromCloset.getUser().getId().equals(user.getId())){
+            log.info( "User did Not Matched. User Id: {}, fromCloset Owner Id : {}",user.getId(), fromCloset.getUser().getId());
+            throw new UserNotMatchedException();
+        }
+
+        // toCloset과 현재 유저 일치 비교
+        if(!toCloset.getUser().getId().equals(user.getId())){
+            log.info( "User did Not Matched. User Id: {}, toCloset Owner Id : {}",user.getId(), toCloset.getUser().getId());
+            throw new UserNotMatchedException();
+        }
+
+        // Target ItemScrap 모두 조회
+        List<ItemScrap> itemScrapList = dto.getItemList()
+                                            .stream()
+                                            .map(itemId ->
+                                                    itemScrapRepository.findByClosetIdAndItemId(fromClosetId, itemId)
+                                            ).toList();
+
+        // Target ItemScrap의 Closet을 toCloset으로 모두 변경
+        itemScrapList.forEach(itemScrap ->
+            itemScrap.changeCloset(toCloset)
+        );
 
     }
 }

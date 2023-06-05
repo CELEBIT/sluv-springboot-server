@@ -1,6 +1,6 @@
 package com.sluv.server.domain.closet.controller;
 
-import com.sluv.server.domain.closet.dto.ClosetItemDeleteReqDto;
+import com.sluv.server.domain.closet.dto.ClosetItemSelectReqDto;
 import com.sluv.server.domain.closet.dto.ClosetReqDto;
 import com.sluv.server.domain.closet.service.ClosetService;
 import com.sluv.server.domain.user.entity.User;
@@ -75,27 +75,46 @@ public class ClosetController {
     @Operation(
             summary = "*옷장에 편집하기로 선택한 Item들을 삭제",
             description = """ 
-                    옷장 편집하기에서 선택한 Item들을 한번애 삭제하는 기능
+                    옷장 편집하기에서 선택한 Item들을 한번에 삭제하는 기능
                     User Id Token 필요
                     """
     )
     @PatchMapping("/{closetId}/items")
-    public ResponseEntity<SuccessResponse> patchItems(@AuthenticationPrincipal User user, @PathVariable("closetId") Long closetId, @RequestBody ClosetItemDeleteReqDto dto){
+    public ResponseEntity<SuccessResponse> patchItems(@AuthenticationPrincipal User user, @PathVariable("closetId") Long closetId, @RequestBody ClosetItemSelectReqDto dto){
         closetService.patchItems(user, closetId, dto);
         return ResponseEntity.ok().body(
                 new SuccessResponse()
         );
     }
     @Operation(
-            summary = "*옷장에 편집하기로 선택한 Item들을 삭제",
+            summary = "*아이템 게시글에서 북마크 버튼으로 삭제 시",
             description = """ 
-                    옷장 편집하기에서 선택한 Item들을 한번애 삭제하는 기능
+                    아이템 게시글에서 북마크를 한번 더 눌러 삭제 시 사용되는 기능.
                     User Id Token 필요
                     """
     )
     @DeleteMapping("/{itemId}/scrap")
     public ResponseEntity<SuccessResponse> deleteItemScrapFromCloset(@AuthenticationPrincipal User user, @PathVariable("itemId") Long itemId){
         closetService.deleteItemScrapFromCloset(user, itemId);
+        return ResponseEntity.ok().body(
+                new SuccessResponse()
+        );
+    }
+
+    @Operation(
+            summary = "*옷장에 편집하기로 선택한 Item들을 다른 옷장으로 이동",
+            description = """ 
+                    옷장 편집하기에서 선택한 Item들을 한번에 다른 옷장으로 이동시키는 기능
+                    User Id Token 필요
+                    -> 옷장의 소유자가 현재 유저인지 판단.
+                    """
+    )
+    @PatchMapping("/{fromClosetId}/{toClosetId}/items")
+    public ResponseEntity<SuccessResponse> patchSaveCloset(@AuthenticationPrincipal User user,
+                                                           @PathVariable("fromClosetId") Long fromClosetId,
+                                                           @PathVariable("toClosetId") Long toClosetId,
+                                                           @RequestBody ClosetItemSelectReqDto dto){
+        closetService.patchSaveCloset(user, fromClosetId, toClosetId, dto);
         return ResponseEntity.ok().body(
                 new SuccessResponse()
         );

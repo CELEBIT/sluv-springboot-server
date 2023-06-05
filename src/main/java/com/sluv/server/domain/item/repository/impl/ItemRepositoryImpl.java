@@ -3,11 +3,16 @@ package com.sluv.server.domain.item.repository.impl;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sluv.server.domain.item.entity.Item;
+import com.sluv.server.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.support.PageableExecutionUtils;
 
 import java.util.List;
 
 import static com.sluv.server.domain.item.entity.QItem.item;
+import static com.sluv.server.domain.item.entity.QRecentItem.recentItem;
 
 @RequiredArgsConstructor
 public class ItemRepositoryImpl implements ItemRepositoryCustom{
@@ -65,5 +70,31 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom{
                 .limit(10)
                 .orderBy(item.createdAt.desc())
                 .fetch();
+    }
+
+    @Override
+    public Page<Item> getRecentItem(User user, Pageable pageable) {
+
+        // content Query
+        List<Item> content = jpaQueryFactory.select(item)
+                .from(recentItem)
+                .leftJoin(recentItem.item, item)
+                .where(recentItem.user.eq(user))
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .groupBy(item)
+                .orderBy(recentItem.createdAt.max().desc())
+                .fetch();
+
+        // count Query
+        JPAQuery<Item> countJPAQuery = jpaQueryFactory.select(item)
+                .from(recentItem)
+                .leftJoin(recentItem.item, item)
+                .where(recentItem.user.eq(user))
+                .groupBy(item)
+                .orderBy(recentItem.createdAt.max().desc());
+
+        return PageableExecutionUtils.getPage(content, pageable, () -> countJPAQuery.fetch().size());
+
     }
 }

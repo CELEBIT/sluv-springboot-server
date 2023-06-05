@@ -7,7 +7,6 @@ import com.sluv.server.domain.brand.exception.BrandNotFoundException;
 import com.sluv.server.domain.brand.exception.NewBrandNotFoundException;
 import com.sluv.server.domain.brand.repository.BrandRepository;
 import com.sluv.server.domain.brand.repository.NewBrandRepository;
-import com.sluv.server.domain.brand.repository.RecentSelectBrandRepository;
 import com.sluv.server.domain.celeb.dto.CelebSearchResDto;
 import com.sluv.server.domain.celeb.entity.Celeb;
 import com.sluv.server.domain.celeb.entity.NewCeleb;
@@ -15,10 +14,10 @@ import com.sluv.server.domain.celeb.exception.CelebNotFoundException;
 import com.sluv.server.domain.celeb.exception.NewCelebNotFoundException;
 import com.sluv.server.domain.celeb.repository.CelebRepository;
 import com.sluv.server.domain.celeb.repository.NewCelebRepository;
-import com.sluv.server.domain.celeb.repository.RecentSelectCelebRepository;
+import com.sluv.server.domain.closet.entity.Closet;
+import com.sluv.server.domain.closet.repository.ClosetRepository;
 import com.sluv.server.domain.item.dto.*;
 import com.sluv.server.domain.item.entity.*;
-import com.sluv.server.domain.item.entity.hashtag.Hashtag;
 import com.sluv.server.domain.item.entity.hashtag.ItemHashtag;
 import com.sluv.server.domain.item.enums.ItemStatus;
 import com.sluv.server.domain.item.exception.ItemCategoryNotFoundException;
@@ -33,7 +32,10 @@ import com.sluv.server.domain.user.exception.UserNotFoundException;
 import com.sluv.server.domain.user.repository.FollowRepository;
 import com.sluv.server.domain.user.repository.UserRepository;
 import com.sluv.server.global.common.enums.ItemImgOrLinkStatus;
+import com.sluv.server.global.common.response.PaginationResDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -57,10 +59,8 @@ public class ItemService {
 
     private final ItemLikeRepository itemLikeRepository;
     private final FollowRepository followRepository;
-
-    private final PlaceRankRepository placeRankRepository;
-    private final RecentSelectCelebRepository recentSearchCelebRepository;
-    private final RecentSelectBrandRepository recentSelectBrandRepository;
+    private final ClosetRepository closetRepository;
+    private final ItemScrapRepository itemScrapRepository;
 
     @Transactional
     public ItemPostResDto postItem(User user, ItemPostReqDto reqDto) {
@@ -415,5 +415,48 @@ public class ItemService {
 
         item.changeStatus(ItemStatus.DELETED);
         itemRepository.save(item);
+    }
+
+    public PaginationResDto<ItemSameResDto> getRecentItem(User user, Pageable pageable) {
+        Page<Item> recentItemPage = itemRepository.getRecentItem(user, pageable);
+        List<Closet> closetList = closetRepository.findAllByUserId(user.getId());
+
+        List<ItemSameResDto> itemList = recentItemPage.getContent()
+                .stream()
+                .map(item -> {
+                    ItemImg mainImg = itemImgRepository.findMainImg(item.getId());
+                    List<Boolean> scrapCheckList = closetList.stream()
+                                        .map(closet ->
+                                                itemScrapRepository.existsByClosetIdAndItemId(closet.getId(),
+                                                                                            item.getId()
+                                                )
+                                        ).toList();
+                    return ItemSameResDto.builder()
+                                    .itemId(item.getId())
+                                    .imgUrl(mainImg.getItemImgUrl())
+                                    .brandName(
+                                            item.getBrand() != null
+                                            ?item.getBrand().getBrandKr()
+                                            :item.getNewBrand().getBrandName()
+                                    )
+                                    .itemName(item.getName())
+                                    .celebName(
+                                            item.getCeleb() != null
+                                            ?item.getCeleb().getCelebNameKr()
+                                            :item.getNewCeleb().getCelebName()
+                                    )
+                                    .scrapStatus(scrapCheckList.contains(true))
+                                    .build();
+                        }
+                ).toList();
+
+
+        return PaginationResDto.<ItemSameResDto>builder()
+                        .page(recentItemPage.getNumber())
+                        .hasNext(recentItemPage.hasNext())
+                        .content(itemList)
+                .build();
+
+
     }
 }

@@ -124,8 +124,14 @@ public class ItemController {
 
     @Operation(
             summary = "*특정 아이템 게시글 상세조회",
-            description = "특정 아이템 게시글의 상세조회를 하는 API." +
-                    " (User Token 필요)"
+            description = """
+                    특정 아이템 게시글의 상세조회를 하는 API.
+                    (User Token 필요)
+                    같은 셀럽 아이템 리스트 -> 10개
+                    같은 브랜드 아이템 리스트 -> 10개
+                    다른 스러버들이 함께 보관한 아이템 리스트 -> 10개
+                    """
+
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "1000", description = "요청성공"),
@@ -209,6 +215,24 @@ public class ItemController {
         itemReportService.postItemReport(user, itemId, dto);
         return ResponseEntity.ok().body(
                 new SuccessResponse()
+        );
+    }
+
+    @Operation(
+            summary = "*최근 본 아이템 조회 ",
+            description = """
+                    유저가 최근 본 아이템을 조회
+                    - (User Id 필요)
+                    - Pagination 적용
+                    """
+    )
+    @GetMapping("/recent")
+    public ResponseEntity<SuccessDataResponse<PaginationResDto<ItemSameResDto>>> getRecentItem(@AuthenticationPrincipal User user, Pageable pageable) {
+
+        return ResponseEntity.ok().body(
+                SuccessDataResponse.<PaginationResDto<ItemSameResDto>>builder()
+                        .result(itemService.getRecentItem(user, pageable))
+                        .build()
         );
     }
 }

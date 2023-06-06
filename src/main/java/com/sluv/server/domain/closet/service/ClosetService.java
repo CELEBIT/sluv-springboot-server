@@ -185,6 +185,7 @@ public class ClosetService {
         Closet closet = closetRepository.findById(closetId).orElseThrow(ClosetNotFoundException::new);
 
         if(!closet.getUser().getId().equals(user.getId())){
+            log.info( "User did Not Matched. User Id: {}, Closet Owner Id : {}", user.getId(), closet.getUser().getId());
             throw new UserNotMatchedException();
         }
 

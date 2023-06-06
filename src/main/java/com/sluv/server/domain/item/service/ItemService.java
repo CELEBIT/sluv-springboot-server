@@ -459,4 +459,36 @@ public class ItemService {
 
 
     }
+
+    public PaginationResDto<ItemSameResDto> getScrapItem(User user, Pageable pageable) {
+        // User, Closet, Item 조인하여 ItemPage 조회
+        Page<Item> itemPage = itemRepository.getAllScrapItem(user, pageable);
+
+        // ItemPage에서 ItemSameResDto 생성
+        List<ItemSameResDto> content = itemPage.stream().map(item -> {
+            ItemImg mainImg = itemImgRepository.findMainImg(item.getId());
+            return ItemSameResDto.builder()
+                    .itemId(item.getId())
+                    .imgUrl(mainImg.getItemImgUrl())
+                    .brandName(
+                            item.getBrand() != null
+                                    ? item.getBrand().getBrandKr()
+                                    : item.getNewBrand().getBrandName()
+                    )
+                    .itemName(item.getName())
+                    .celebName(
+                            item.getCeleb() != null
+                                    ? item.getCeleb().getCelebNameKr()
+                                    : item.getNewCeleb().getCelebName()
+                    )
+                    .scrapStatus(true)
+                    .build();
+        }).toList();
+
+        return PaginationResDto.<ItemSameResDto>builder()
+                .page(itemPage.getNumber())
+                .hasNext(itemPage.hasNext())
+                .content(content)
+                .build();
+    }
 }

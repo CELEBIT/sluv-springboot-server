@@ -1,12 +1,15 @@
 package com.sluv.server.domain.closet.controller;
 
+import com.sluv.server.domain.closet.dto.ClosetDetailResDto;
 import com.sluv.server.domain.closet.dto.ClosetItemSelectReqDto;
 import com.sluv.server.domain.closet.dto.ClosetReqDto;
 import com.sluv.server.domain.closet.service.ClosetService;
+import com.sluv.server.domain.item.dto.ItemSameResDto;
 import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.global.common.response.SuccessResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -117,6 +120,25 @@ public class ClosetController {
         closetService.patchSaveCloset(user, fromClosetId, toClosetId, dto);
         return ResponseEntity.ok().body(
                 new SuccessResponse()
+        );
+    }
+    @Operation(
+            summary = "*현재 유저의 특정 옷장 상세조회",
+            description = """ 
+                    유저가 선택한 옷장 상세조
+                    User Id Token 필요
+                    -> 옷장의 소유자가 현재 유저인지 판단.
+                    Pagination 적용.
+                    가장 최근 Scrap 한 순서대로 정렬.
+                    """
+    )
+    @GetMapping("/{closetId}")
+    public ResponseEntity<ClosetDetailResDto<ItemSameResDto>> getClosetDetails(@AuthenticationPrincipal User user,
+                                                                                 @PathVariable("closetId") Long closetId,
+                                                                                 Pageable pageable){
+
+        return ResponseEntity.ok().body(
+                closetService.getClosetDetails(user, closetId, pageable)
         );
     }
 }

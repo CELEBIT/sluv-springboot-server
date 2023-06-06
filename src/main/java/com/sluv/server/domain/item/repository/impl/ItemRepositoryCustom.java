@@ -1,5 +1,6 @@
 package com.sluv.server.domain.item.repository.impl;
 
+import com.sluv.server.domain.closet.entity.Closet;
 import com.sluv.server.domain.item.entity.Item;
 import com.sluv.server.domain.item.entity.RecentItem;
 import com.sluv.server.domain.user.entity.User;
@@ -17,4 +18,6 @@ public interface ItemRepositoryCustom {
     Page<Item> getRecentItem(User user, Pageable pageable);
 
     Page<Item> getAllScrapItem(User user, Pageable pageable);
+
+    Page<Item> getClosetItems(Closet closet, Pageable pageable);
 }

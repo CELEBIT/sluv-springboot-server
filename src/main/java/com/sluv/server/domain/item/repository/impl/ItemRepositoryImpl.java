@@ -2,6 +2,7 @@ package com.sluv.server.domain.item.repository.impl;
 
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.sluv.server.domain.closet.entity.Closet;
 import com.sluv.server.domain.item.entity.Item;
 import com.sluv.server.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
@@ -120,6 +121,27 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom{
                 .leftJoin(itemScrap.closet, closet)
                 .leftJoin(closet.user, user)
                 .where(closet.user.eq(_user))
+                .orderBy(itemScrap.createdAt.desc());
+
+        return PageableExecutionUtils.getPage(content, pageable, () -> countJPAQuery.fetch().size());
+    }
+
+    @Override
+    public Page<Item> getClosetItems(Closet _closet, Pageable pageable) {
+        List<Item> content = jpaQueryFactory.select(item)
+                .from(itemScrap)
+                .leftJoin(itemScrap.item, item)
+                .where(itemScrap.closet.eq(_closet))
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .orderBy(itemScrap.createdAt.desc())
+                .fetch();
+
+        // Count Query
+        JPAQuery<Item> countJPAQuery = jpaQueryFactory.select(item)
+                .from(itemScrap)
+                .leftJoin(itemScrap.item, item)
+                .where(itemScrap.closet.eq(_closet))
                 .orderBy(itemScrap.createdAt.desc());
 
         return PageableExecutionUtils.getPage(content, pageable, () -> countJPAQuery.fetch().size());

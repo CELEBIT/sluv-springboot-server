@@ -1,5 +1,6 @@
 package com.sluv.server.domain.closet.service;
 
+import com.sluv.server.domain.closet.dto.ClosetDetailResDto;
 import com.sluv.server.domain.closet.dto.ClosetItemSelectReqDto;
 import com.sluv.server.domain.closet.dto.ClosetReqDto;
 import com.sluv.server.domain.closet.entity.Closet;
@@ -7,15 +8,20 @@ import com.sluv.server.domain.closet.enums.ClosetStatus;
 import com.sluv.server.domain.closet.exception.BasicClosetDeleteException;
 import com.sluv.server.domain.closet.exception.ClosetNotFoundException;
 import com.sluv.server.domain.closet.repository.ClosetRepository;
+import com.sluv.server.domain.item.dto.ItemSameResDto;
 import com.sluv.server.domain.item.entity.Item;
+import com.sluv.server.domain.item.entity.ItemImg;
 import com.sluv.server.domain.item.entity.ItemScrap;
 import com.sluv.server.domain.item.exception.ItemNotFoundException;
+import com.sluv.server.domain.item.repository.ItemImgRepository;
 import com.sluv.server.domain.item.repository.ItemRepository;
 import com.sluv.server.domain.item.repository.ItemScrapRepository;
 import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.domain.user.exception.UserNotMatchedException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,6 +34,7 @@ public class ClosetService {
     private final ClosetRepository closetRepository;
     private final ItemScrapRepository itemScrapRepository;
     private final ItemRepository itemRepository;
+    private final ItemImgRepository itemImgRepository;
 
     public void postBasicCloset(User user){
 
@@ -172,5 +179,43 @@ public class ClosetService {
             itemScrap.changeCloset(toCloset)
         );
 
+    }
+
+    public ClosetDetailResDto<ItemSameResDto> getClosetDetails(User user, Long closetId, Pageable pageable) {
+        Closet closet = closetRepository.findById(closetId).orElseThrow(ClosetNotFoundException::new);
+
+        if(!closet.getUser().getId().equals(user.getId())){
+            throw new UserNotMatchedException();
+        }
+
+        Page<Item> itemPage = itemRepository.getClosetItems(closet, pageable);
+
+        List<ItemSameResDto> content = getItemContent(itemPage);
+
+        return new ClosetDetailResDto<>(itemPage.hasNext(), itemPage.getNumber(), content, closet.getCoverImgUrl(), closet.getName(), closet.getClosetStatus(), itemPage.getTotalElements());
+
+    }
+
+    private List<ItemSameResDto> getItemContent(Page<Item> itemPage) {
+        return itemPage.stream().map(item -> {
+                    ItemImg mainImg = itemImgRepository.findMainImg(item.getId());
+                    return ItemSameResDto.builder()
+                            .itemId(item.getId())
+                            .imgUrl(mainImg.getItemImgUrl())
+                            .brandName(
+                                    item.getBrand() != null
+                                            ? item.getBrand().getBrandKr()
+                                            : item.getNewBrand().getBrandName()
+                            )
+                            .itemName(item.getName())
+                            .celebName(
+                                    item.getCeleb() != null
+                                            ? item.getCeleb().getCelebNameKr()
+                                            : item.getNewCeleb().getCelebName()
+                            )
+                            .scrapStatus(true)
+                            .build();
+                }
+        ).toList();
     }
 }

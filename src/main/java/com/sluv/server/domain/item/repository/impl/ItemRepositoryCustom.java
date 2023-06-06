@@ -15,4 +15,6 @@ public interface ItemRepositoryCustom {
     List<Item> findSameBrandItem(Item item, boolean brandJudge);
 
     Page<Item> getRecentItem(User user, Pageable pageable);
+
+    Page<Item> getAllScrapItem(User user, Pageable pageable);
 }

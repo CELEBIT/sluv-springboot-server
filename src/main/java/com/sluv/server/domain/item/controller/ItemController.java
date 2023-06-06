@@ -224,6 +224,7 @@ public class ItemController {
                     유저가 최근 본 아이템을 조회
                     - (User Id 필요)
                     - Pagination 적용
+                    - 최근 본 순서로 정렬
                     """
     )
     @GetMapping("/recent")
@@ -232,6 +233,24 @@ public class ItemController {
         return ResponseEntity.ok().body(
                 SuccessDataResponse.<PaginationResDto<ItemSameResDto>>builder()
                         .result(itemService.getRecentItem(user, pageable))
+                        .build()
+        );
+    }
+    @Operation(
+            summary = "*찜한 아이템 조회",
+            description = """
+                    유저가 찜한 아이템 조회
+                    - (User Id 필요)
+                    - Pagination 적용
+                    - 스크랩한 최신순으로 정렬
+                    """
+    )
+    @GetMapping("/scrap")
+    public ResponseEntity<SuccessDataResponse<PaginationResDto<ItemSameResDto>>> getScrapItem(@AuthenticationPrincipal User user, Pageable pageable) {
+
+        return ResponseEntity.ok().body(
+                SuccessDataResponse.<PaginationResDto<ItemSameResDto>>builder()
+                        .result(itemService.getScrapItem(user, pageable))
                         .build()
         );
     }

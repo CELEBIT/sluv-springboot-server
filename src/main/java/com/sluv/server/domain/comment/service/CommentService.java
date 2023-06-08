@@ -17,6 +17,7 @@ import com.sluv.server.domain.item.repository.ItemRepository;
 import com.sluv.server.domain.question.entity.Question;
 import com.sluv.server.domain.question.exception.QuestionNotFoundException;
 import com.sluv.server.domain.question.repository.QuestionRepository;
+import com.sluv.server.domain.user.dto.UserInfoDto;
 import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.domain.user.exception.UserNotMatchedException;
 import com.sluv.server.global.common.enums.ReportStatus;
@@ -264,9 +265,12 @@ public class CommentService {
 
                     return CommentResDto.builder()
                             .id(comment.getId())
-                            .userId(comment.getUser().getId())
-                            .userNickname(comment.getUser().getNickname())
-                            .userProfileUrl(comment.getUser().getProfileImgUrl())
+                            .user(UserInfoDto.builder()
+                                    .id(comment.getUser().getId())
+                                    .nickName(comment.getUser().getNickname())
+                                    .profileImgUrl(comment.getUser().getProfileImgUrl())
+                                    .build()
+                            )
                             .content(comment.getContent())
                             .imgUrlList(imgList)
                             .itemList(itemList)

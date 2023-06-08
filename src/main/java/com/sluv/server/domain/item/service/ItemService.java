@@ -275,8 +275,9 @@ public class ItemService {
         Integer likeNum = itemLikeRepository.countByItemId(item.getId());
 
         // 6. 스크랩 수
+        Integer scrapNum = itemScrapRepository.countByItemId(item.getId());
 
-        // 7. 조회수
+        // 7. 조회수 TODO : Redis를 사용한 IP:PostId 저장으로 조회수 중복방지 기능
 //        Long viewNum = item.getViewNum();
 
         // 8. Item 링크들 조회
@@ -314,47 +315,20 @@ public class ItemService {
 
         // 11. 같은 셀럽 아이템 리스트
         boolean celebJudge = item.getCeleb() != null;
-        String celebName = celebJudge ? item.getCeleb().getCelebNameKr() : item.getNewCeleb().getCelebName();
-
-        List<ItemSameResDto> sameCelebItemList = itemRepository.findSameCelebItem(item, celebJudge)
-                        .stream().map(celebItem -> {
-                           ItemImg itemImg = itemImgRepository.findMainImg(celebItem.getId());
-                            return ItemSameResDto.builder()
-                                    .itemId(celebItem.getId())
-                                    .itemName(celebItem.getName())
-                                    .brandName(
-                                            celebItem.getBrand() != null
-                                            ?celebItem.getBrand().getBrandKr()
-                                            : celebItem.getNewBrand().getBrandName()
-                                    )
-                                    .celebName(celebName)
-                                    .imgUrl(itemImg.getItemImgUrl())
-                                    .build();
-                        }).toList();
-
+        List<ItemSameResDto> sameCelebItemList = convertItemToItemSameResDto(
+                                                                user , itemRepository.findSameCelebItem(item, celebJudge)
+                                                );
 
         // 12. 같은 브랜드 아이템 리스트
         boolean brandJudge = item.getBrand() != null;
-        String brandName = brandJudge ? item.getBrand().getBrandKr() : item.getNewBrand().getBrandName();
+        List<ItemSameResDto> sameBrandItemList = convertItemToItemSameResDto(
+                                                            user, itemRepository.findSameBrandItem(item, brandJudge)
+                                                    );
 
-        List<ItemSameResDto> sameBrandItemList = itemRepository.findSameBrandItem(item, brandJudge)
-                        .stream()
-                        .map(brandItem ->{
-                            ItemImg itemImg = itemImgRepository.findMainImg(brandItem.getId());
-                            return ItemSameResDto.builder()
-                                    .itemId(brandItem.getId())
-                                    .itemName(brandItem.getName())
-                                    .brandName(brandName)
-                                    .celebName(
-                                            brandItem.getCeleb() != null
-                                            ? brandItem.getCeleb().getCelebNameKr()
-                                            : brandItem.getNewCeleb().getCelebName()
-                                    )
-                                    .imgUrl(itemImg.getItemImgUrl())
-                                    .build();
-                        })
-                        .toList();
         // 13. 다른 스러버들이 함께 보관한 아이템 리스트
+        List<ItemSameResDto> sameClosetItemList = convertItemToItemSameResDto(
+                                                            user, getClosetItemList(item)
+                                                    );
 
 
         // 14. 좋아요 여부
@@ -372,9 +346,9 @@ public class ItemService {
                 .itemName(item.getName())
                 .brand(brand)
                 .newBrandName(newBrand)
-                .likeNum(likeNum) // like 완성 후 변경 예정
+                .likeNum(likeNum)
                 .likeStatus(likeStatus)
-                .scrapNum(null) // closet 완성 후 변경 예정
+                .scrapNum(scrapNum)
                 .viewNum(item.getViewNum())
                 .linkList(linkList)
                 .writer(writerInfo)
@@ -386,7 +360,7 @@ public class ItemService {
                 .infoSource(item.getInfoSource())
                 .sameCelebItemList(sameCelebItemList)
                 .sameBrandItemList(sameBrandItemList)
-//                .sameClosetItemList(sameClosetItemList)
+                .otherSluverItemList(sameClosetItemList)
                 .color(item.getColor())
                 .followStatus(followStatus)
                 .hasMine(item.getUser().getId().equals(user.getId()))
@@ -419,43 +393,8 @@ public class ItemService {
 
     public PaginationResDto<ItemSameResDto> getRecentItem(User user, Pageable pageable) {
         Page<Item> recentItemPage = itemRepository.getRecentItem(user, pageable);
-        List<Closet> closetList = closetRepository.findAllByUserId(user.getId());
 
-        List<ItemSameResDto> itemList = recentItemPage.getContent()
-                .stream()
-                .map(item -> {
-                    ItemImg mainImg = itemImgRepository.findMainImg(item.getId());
-                    List<Boolean> scrapCheckList = closetList.stream()
-                                        .map(closet ->
-                                                itemScrapRepository.existsByClosetIdAndItemId(closet.getId(),
-                                                                                            item.getId()
-                                                )
-                                        ).toList();
-                    return ItemSameResDto.builder()
-                                    .itemId(item.getId())
-                                    .imgUrl(mainImg.getItemImgUrl())
-                                    .brandName(
-                                            item.getBrand() != null
-                                            ?item.getBrand().getBrandKr()
-                                            :item.getNewBrand().getBrandName()
-                                    )
-                                    .itemName(item.getName())
-                                    .celebName(
-                                            item.getCeleb() != null
-                                            ?item.getCeleb().getCelebNameKr()
-                                            :item.getNewCeleb().getCelebName()
-                                    )
-                                    .scrapStatus(scrapCheckList.contains(true))
-                                    .build();
-                        }
-                ).toList();
-
-
-        return PaginationResDto.<ItemSameResDto>builder()
-                        .page(recentItemPage.getNumber())
-                        .hasNext(recentItemPage.hasNext())
-                        .content(itemList)
-                .build();
+        return convertItemSamePageDto(user, pageable, recentItemPage);
 
 
     }
@@ -464,31 +403,53 @@ public class ItemService {
         // User, Closet, Item 조인하여 ItemPage 조회
         Page<Item> itemPage = itemRepository.getAllScrapItem(user, pageable);
 
+        return convertItemSamePageDto(user, pageable, itemPage);
+    }
+
+    private PaginationResDto<ItemSameResDto> convertItemSamePageDto(User user, Pageable pageable, Page<Item> page) {
         // ItemPage에서 ItemSameResDto 생성
-        List<ItemSameResDto> content = itemPage.stream().map(item -> {
-            ItemImg mainImg = itemImgRepository.findMainImg(item.getId());
-            return ItemSameResDto.builder()
-                    .itemId(item.getId())
-                    .imgUrl(mainImg.getItemImgUrl())
-                    .brandName(
-                            item.getBrand() != null
-                                    ? item.getBrand().getBrandKr()
-                                    : item.getNewBrand().getBrandName()
-                    )
-                    .itemName(item.getName())
-                    .celebName(
-                            item.getCeleb() != null
-                                    ? item.getCeleb().getCelebNameKr()
-                                    : item.getNewCeleb().getCelebName()
-                    )
-                    .scrapStatus(true)
-                    .build();
-        }).toList();
+        List<ItemSameResDto> content = convertItemToItemSameResDto(user, page.getContent());
 
         return PaginationResDto.<ItemSameResDto>builder()
-                .page(itemPage.getNumber())
-                .hasNext(itemPage.hasNext())
+                .page(page.getNumber())
+                .hasNext(page.hasNext())
                 .content(content)
                 .build();
+    }
+
+    private List<Item> getClosetItemList(Item item) {
+        // 가장 최근에 해당 item을 추가한 상위 20개의 Closet을 검색
+        List<Closet> recentAddClosetList = closetRepository.getRecentAddCloset(item);
+
+        // 해당 Closet에 해당하는 아이템들을 최신순으로 정렬후 10개 추출.
+        return itemRepository.getSameClosetItems(item, recentAddClosetList);
+    }
+
+    private List<ItemSameResDto> convertItemToItemSameResDto(User user, List<Item> itemList){
+        // User의 모든 Closet 조회
+        List<Closet> closetList = closetRepository.findAllByUserId(user.getId());
+
+        return itemList.stream()
+                .map(item ->{
+                    ItemImg itemImg = itemImgRepository.findMainImg(item.getId());
+                    Boolean scrapStatus = itemScrapRepository.getItemScrapStatus(item, closetList);
+                    return ItemSameResDto.builder()
+                            .itemId(item.getId())
+                            .itemName(item.getName())
+                            .brandName(
+                                    item.getBrand() != null
+                                    ?item.getBrand().getBrandKr()
+                                    :item.getNewBrand().getBrandName()
+                            )
+                            .celebName(
+                                    item.getCeleb() != null
+                                            ? item.getCeleb().getCelebNameKr()
+                                            : item.getNewCeleb().getCelebName()
+                            )
+                            .imgUrl(itemImg.getItemImgUrl())
+                            .scrapStatus(scrapStatus)
+                            .build();
+                })
+                .toList();
     }
 }

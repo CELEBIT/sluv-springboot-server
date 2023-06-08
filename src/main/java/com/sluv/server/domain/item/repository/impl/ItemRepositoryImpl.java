@@ -146,4 +146,16 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom{
 
         return PageableExecutionUtils.getPage(content, pageable, () -> countJPAQuery.fetch().size());
     }
+
+    @Override
+    public List<Item> getSameClosetItems(Item _item, List<Closet> closetList) {
+        return jpaQueryFactory.select(item)
+                .from(itemScrap)
+                .leftJoin(itemScrap.item, item)
+                .where(itemScrap.closet.in(closetList).and(item.ne(_item)))
+                .groupBy(item)
+                .orderBy(itemScrap.createdAt.max().desc())
+                .limit(10)
+                .fetch();
+    }
 }

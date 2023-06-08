@@ -35,6 +35,4 @@ public class CommentResDto {
     private Boolean likeStatus;
     @Schema(description = "현재 유저가 작성한 Comment 인지 판단")
     private Boolean hasMine;
-    @Schema(description = "현재 Comment의 대댓글 중 로딩 되지 않은 수")
-    private Long restCommentNum;
 }

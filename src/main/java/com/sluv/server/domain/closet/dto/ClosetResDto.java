@@ -11,8 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class
-ClosetReqDto {
+public class ClosetResDto {
     @Schema(description = "Closet 이름")
     private String name;
     @Schema(description = "Closet 커버 사진 URL")
@@ -21,5 +20,7 @@ ClosetReqDto {
     private ClosetStatus closetStatus;
     @Schema(description = "Closet 커버 색상")
     private String color;
+    @Schema(description = "해당 Closet의 Item 개수")
+    private Long itemNum;
 
 }

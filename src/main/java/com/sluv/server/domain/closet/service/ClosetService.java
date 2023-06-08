@@ -3,6 +3,7 @@ package com.sluv.server.domain.closet.service;
 import com.sluv.server.domain.closet.dto.ClosetDetailResDto;
 import com.sluv.server.domain.closet.dto.ClosetItemSelectReqDto;
 import com.sluv.server.domain.closet.dto.ClosetReqDto;
+import com.sluv.server.domain.closet.dto.ClosetResDto;
 import com.sluv.server.domain.closet.entity.Closet;
 import com.sluv.server.domain.closet.enums.ClosetStatus;
 import com.sluv.server.domain.closet.exception.BasicClosetDeleteException;
@@ -185,6 +186,7 @@ public class ClosetService {
         Closet closet = closetRepository.findById(closetId).orElseThrow(ClosetNotFoundException::new);
 
         if(!closet.getUser().getId().equals(user.getId())){
+            log.info( "User did Not Matched. User Id: {}, Closet Owner Id : {}", user.getId(), closet.getUser().getId());
             throw new UserNotMatchedException();
         }
 
@@ -217,5 +219,19 @@ public class ClosetService {
                             .build();
                 }
         ).toList();
+    }
+
+    public List<ClosetResDto> getClosetList(User user) {
+        List<Closet> closetList = closetRepository.findAllByUserId(user.getId());
+
+
+        return closetList.stream().map(closet -> ClosetResDto.builder()
+                                            .name(closet.getName())
+                                            .coverImgUrl(closet.getCoverImgUrl())
+                                            .closetStatus(closet.getClosetStatus())
+                                            .color(closet.getColor())
+                                            .itemNum(itemScrapRepository.countByClosetId(closet.getId()))
+                                            .build()
+                ).toList();
     }
 }

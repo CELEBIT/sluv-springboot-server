@@ -3,6 +3,7 @@ package com.sluv.server.domain.comment.service;
 import com.sluv.server.domain.comment.dto.CommentPostReqDto;
 import com.sluv.server.domain.comment.dto.CommentReportPostReqDto;
 import com.sluv.server.domain.comment.dto.CommentResDto;
+import com.sluv.server.domain.comment.dto.SubCommentPageResDto;
 import com.sluv.server.domain.comment.entity.*;
 import com.sluv.server.domain.comment.enums.CommentStatus;
 import com.sluv.server.domain.comment.exception.CommentNotFoundException;
@@ -227,19 +228,20 @@ public class CommentService {
                 .build();
     }
 
-    public PaginationResDto<CommentResDto> getSubComment(User user, Long commentId, Pageable pageable) {
+    public SubCommentPageResDto<CommentResDto> getSubComment(User user, Long commentId, Pageable pageable) {
         // 대댓글 페이지 검색
         Page<Comment> commentPage = commentRepository.getAllSubComment(commentId, pageable);
 
         // Content 제작
         List<CommentResDto> content = getCommentResDtos(user, commentPage);
 
+        // 남은 댓글 수. 총 댓글 수 - ((현재 페이지 +1)*페이지당 size)가 0보다 작으면 0, 아닐 경우 해당 값
+        long restCommentNum = commentPage.getTotalElements() - ((long) (commentPage.getNumber() + 1) * commentPage.getSize()) >= 0
+                ? commentPage.getTotalElements() - ((long) (commentPage.getNumber() + 1) * commentPage.getSize())
+                : 0;
 
-        return PaginationResDto.<CommentResDto>builder()
-                .page(commentPage.getNumber())
-                .hasNext(commentPage.hasNext())
-                .content(content)
-                .build();
+        return new SubCommentPageResDto<CommentResDto>(commentPage.hasNext(), commentPage.getNumber(), content, restCommentNum);
+
     }
 
     private List<CommentResDto> getCommentResDtos(User user, Page<Comment> commentPage) {
@@ -258,11 +260,6 @@ public class CommentService {
                     // 현재 유저의 해당 Comment 좋아요 여부
                     Boolean likeStatus = commentLikeRepository.existsByUserIdAndCommentId(user.getId(), comment.getId());
 
-                    // 남은 댓글 수. 총 댓글 수 - ((현재 페이지 +1)*페이지당 size)가 0보다 작으면 0, 아닐 경우 해당 값
-                    long restCommentNum = commentPage.getTotalElements() - ((long) (commentPage.getNumber() + 1) * commentPage.getSize()) >= 0
-                            ? commentPage.getTotalElements() - ((long) (commentPage.getNumber() + 1) * commentPage.getSize())
-                            : 0;
-
                     return CommentResDto.builder()
                             .id(comment.getId())
                             .user(UserInfoDto.builder()
@@ -278,7 +275,6 @@ public class CommentService {
                             .likeNum(likeNum)
                             .likeStatus(likeStatus)
                             .hasMine(comment.getUser().getId().equals(user.getId()))
-                            .restCommentNum(restCommentNum)
                             .build();
                 }).toList();
     }

@@ -3,6 +3,7 @@ package com.sluv.server.domain.comment.controller;
 import com.sluv.server.domain.comment.dto.CommentPostReqDto;
 import com.sluv.server.domain.comment.dto.CommentReportPostReqDto;
 import com.sluv.server.domain.comment.dto.CommentResDto;
+import com.sluv.server.domain.comment.dto.SubCommentPageResDto;
 import com.sluv.server.domain.comment.service.CommentService;
 import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.global.common.response.ErrorResponse;
@@ -165,11 +166,11 @@ public class CommentController {
                     "\n restCommentNum으로 남은 댓글의 수를 전달"
     )
     @GetMapping("/{commentId}/subcomment")
-    public ResponseEntity<SuccessDataResponse<PaginationResDto<CommentResDto>>> getSubComment(@AuthenticationPrincipal User user,
-                                                                                              @PathVariable("commentId") Long commentId,
-                                                                                              Pageable pageable){
+    public ResponseEntity<SuccessDataResponse<SubCommentPageResDto<CommentResDto>>> getSubComment(@AuthenticationPrincipal User user,
+                                                                                                  @PathVariable("commentId") Long commentId,
+                                                                                                  Pageable pageable){
         return ResponseEntity.ok().body(
-                SuccessDataResponse.<PaginationResDto<CommentResDto>>builder()
+                SuccessDataResponse.<SubCommentPageResDto<CommentResDto>>builder()
                         .result(commentService.getSubComment(user, commentId, pageable))
                         .build()
         );

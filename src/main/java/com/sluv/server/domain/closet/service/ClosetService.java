@@ -3,6 +3,7 @@ package com.sluv.server.domain.closet.service;
 import com.sluv.server.domain.closet.dto.ClosetDetailResDto;
 import com.sluv.server.domain.closet.dto.ClosetItemSelectReqDto;
 import com.sluv.server.domain.closet.dto.ClosetReqDto;
+import com.sluv.server.domain.closet.dto.ClosetResDto;
 import com.sluv.server.domain.closet.entity.Closet;
 import com.sluv.server.domain.closet.enums.ClosetStatus;
 import com.sluv.server.domain.closet.exception.BasicClosetDeleteException;
@@ -218,5 +219,19 @@ public class ClosetService {
                             .build();
                 }
         ).toList();
+    }
+
+    public List<ClosetResDto> getClosetList(User user) {
+        List<Closet> closetList = closetRepository.findAllByUserId(user.getId());
+
+
+        return closetList.stream().map(closet -> ClosetResDto.builder()
+                                            .name(closet.getName())
+                                            .coverImgUrl(closet.getCoverImgUrl())
+                                            .closetStatus(closet.getClosetStatus())
+                                            .color(closet.getColor())
+                                            .itemNum(itemScrapRepository.countByClosetId(closet.getId()))
+                                            .build()
+                ).toList();
     }
 }

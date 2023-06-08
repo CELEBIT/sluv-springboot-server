@@ -3,9 +3,11 @@ package com.sluv.server.domain.closet.controller;
 import com.sluv.server.domain.closet.dto.ClosetDetailResDto;
 import com.sluv.server.domain.closet.dto.ClosetItemSelectReqDto;
 import com.sluv.server.domain.closet.dto.ClosetReqDto;
+import com.sluv.server.domain.closet.dto.ClosetResDto;
 import com.sluv.server.domain.closet.service.ClosetService;
 import com.sluv.server.domain.item.dto.ItemSameResDto;
 import com.sluv.server.domain.user.entity.User;
+import com.sluv.server.global.common.response.SuccessDataResponse;
 import com.sluv.server.global.common.response.SuccessResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +15,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/app/closet")
@@ -139,6 +143,23 @@ public class ClosetController {
 
         return ResponseEntity.ok().body(
                 closetService.getClosetDetails(user, closetId, pageable)
+        );
+    }
+    @Operation(
+            summary = "*현재 유저의 옷장 리스트 조회",
+            description = """ 
+                    현재 유저의 옷장 리스트 조회
+                    User Id Token 필요
+                    -> Uset Id를 기준으로 Closet을 조회
+                    """
+    )
+    @GetMapping("/list")
+    public ResponseEntity<SuccessDataResponse<List<ClosetResDto>>> getClosetList(@AuthenticationPrincipal User user){
+
+        return ResponseEntity.ok().body(
+                SuccessDataResponse.<List<ClosetResDto>>builder()
+                                .result(closetService.getClosetList(user))
+                                .build()
         );
     }
 }

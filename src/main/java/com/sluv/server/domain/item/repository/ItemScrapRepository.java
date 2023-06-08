@@ -13,4 +13,6 @@ public interface ItemScrapRepository extends JpaRepository<ItemScrap, Long> {
     ItemScrap findByClosetIdAndItemId(Long fromClosetId, Long itemId);
 
     Boolean existsByClosetIdAndItemId(Long closet_id, Long item_id);
+
+    Long countByClosetId(Long id);
 }

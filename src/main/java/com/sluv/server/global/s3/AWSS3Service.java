@@ -126,11 +126,11 @@ public class AWSS3Service {
                 new GeneratePresignedUrlRequest(bucket, fileName)
                         .withMethod(HttpMethod.PUT)
 //                        .withKey(fileName)
-//                        .withContentType("image/" + imgExtension)
+                        .withContentType("image/" + imgExtension)
                         .withExpiration(getPreSignedUrlExpiration());
         generatePresignedUrlRequest.addRequestParameter(
                 Headers.S3_CANNED_ACL,
-                CannedAccessControlList.PublicReadWrite.toString());
+                CannedAccessControlList.PublicRead.toString());
         return generatePresignedUrlRequest;
     }
 

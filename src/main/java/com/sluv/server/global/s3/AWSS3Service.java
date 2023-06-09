@@ -125,7 +125,7 @@ public class AWSS3Service {
         GeneratePresignedUrlRequest generatePresignedUrlRequest =
                 new GeneratePresignedUrlRequest(bucket, fileName)
                         .withMethod(HttpMethod.PUT)
-//                        .withKey(fileName)
+                        .withKey(fileName)
                         .withContentType("image/" + imgExtension)
                         .withExpiration(getPreSignedUrlExpiration());
         generatePresignedUrlRequest.addRequestParameter(

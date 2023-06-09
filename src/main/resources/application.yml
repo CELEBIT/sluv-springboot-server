@@ -44,8 +44,8 @@ apple:
 
 aws:
   s3:
-    accessKey: AKIA5R23H6YS2FVCHYQK
-    secretKey: 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
+    accessKey: AKIATZCONJHNNUYC4SMT
+    secretKey: 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
     region: ap-northeast-2
     bucketName: sluv-dev-img-bucket
     baseUrl: https://sluv-dev-img-bucket.s3.ap-northeast-2.amazonaws.com

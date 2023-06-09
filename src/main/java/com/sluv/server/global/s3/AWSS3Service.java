@@ -98,27 +98,27 @@ public class AWSS3Service {
     }
     // 유저 프로필
     private String getForUserProfileFileName(String imgExtension) {
-        return baseUrl + "/user/profile/" + UUID.randomUUID() + "." + imgExtension;
+        return baseUrl + "user/profile/" + UUID.randomUUID() + "." + imgExtension;
     }
 
     // 아이템 이미지
     private String getForItemFileName(String imgExtension) {
-        return baseUrl + "/item/" + UUID.randomUUID() + "." + imgExtension;
+        return baseUrl + "item/" + UUID.randomUUID() + "." + imgExtension;
     }
 
     // 커뮤니티 게시글 이미지
     private String getForCommunityPostFileName(String imgExtension) {
-        return baseUrl + "/community/post/" + UUID.randomUUID() + "." + imgExtension;
+        return baseUrl + "community/post/" + UUID.randomUUID() + "." + imgExtension;
     }
 
     // 커뮤니티 댓글 이미지
     private String getForCommunityCommentFileName(String imgExtension) {
-        return baseUrl + "/community/comment/" + UUID.randomUUID() + "." + imgExtension;
+        return baseUrl + "community/comment/" + UUID.randomUUID() + "." + imgExtension;
     }
 
     //클로젯 커버
     private String getForClosetFileName(String imgExtension) {
-        return baseUrl + "/closet/" + UUID.randomUUID() + "." + imgExtension;
+        return baseUrl + "closet/" + UUID.randomUUID() + "." + imgExtension;
     }
 
     private GeneratePresignedUrlRequest getGeneratePreSignedUrlRequest(String bucket, String fileName, String imgExtension) {

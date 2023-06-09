@@ -47,5 +47,5 @@ aws:
     accessKey: AKIATZCONJHNNUYC4SMT
     secretKey: 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
     region: ap-northeast-2
-    bucketName: sluv-dev-img-bucket
-    baseUrl: https://sluv-dev-img-bucket.s3.ap-northeast-2.amazonaws.com
+    bucketName: elasticbeanstalk-ap-northeast-2-931662394917
+    baseUrl: asset

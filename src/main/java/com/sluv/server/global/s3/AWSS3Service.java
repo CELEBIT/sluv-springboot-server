@@ -130,7 +130,7 @@ public class AWSS3Service {
                         .withExpiration(getPreSignedUrlExpiration());
         generatePresignedUrlRequest.addRequestParameter(
                 Headers.S3_CANNED_ACL,
-                CannedAccessControlList.PublicRead.toString());
+                CannedAccessControlList.PublicReadWrite.toString());
         return generatePresignedUrlRequest;
     }
 

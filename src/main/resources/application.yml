@@ -44,8 +44,8 @@ apple:
 
 aws:
   s3:
-    accessKey: AKIA5R23H6YS5QJZRKYE
-    secretKey: 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
+    accessKey: AKIA5R23H6YS5ZD6OOCH
+    secretKey: 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
     region: ap-northeast-2
     bucketName: elasticbeanstalk-ap-northeast-2-931662394917
     baseUrl: asset

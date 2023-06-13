@@ -15,6 +15,7 @@ import com.sluv.server.domain.question.repository.QuestionImgRepository;
 import com.sluv.server.domain.question.repository.QuestionItemRepository;
 import com.sluv.server.domain.question.repository.QuestionRecommendCategoryRepository;
 import com.sluv.server.domain.question.repository.QuestionRepository;
+import com.sluv.server.domain.search.dto.SearchTotalResDto;
 import com.sluv.server.domain.search.utils.ElasticSearchConnectUtil;
 import com.sluv.server.domain.user.dto.UserSearchInfoDto;
 import com.sluv.server.domain.user.entity.User;
@@ -23,10 +24,14 @@ import com.sluv.server.domain.user.repository.UserRepository;
 import com.sluv.server.global.common.response.PaginationResDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -227,6 +232,61 @@ public class SearchService {
                 .page(searchUserPage.getNumber())
                 .hasNext(searchUserPage.hasNext())
                 .content(content)
+                .build();
+    }
+
+    /**
+     * 토탈 검색 with ElasticSearch
+     */
+    public SearchTotalResDto getSearchTotal(User user, String keyword) {
+        final int itemSize = 9;
+        final int questionSize = 4;
+        final int userSize = 10;
+
+
+        // Item 검색
+        Pageable itemPageable = PageRequest.of(0, itemSize);
+
+        List<ItemSimpleResDto> searchItem = this.getSearchItem(user, keyword, itemPageable).getContent();
+
+        // Question 검색 -> 찾아주세요 -> 이거 어때 -> 이 중에 뭐 살까 -> 추천해 줘 순서
+        Pageable questionPageable = PageRequest.of(0, questionSize);
+        Stream<QuestionSimpleResDto> resultStream;
+
+        Stream<QuestionSimpleResDto> streamFind =
+                this.getSearchQuestion(user, keyword, "Find", questionPageable).getContent().stream();
+
+        resultStream = streamFind;
+        if(resultStream.toList().size() < 4){
+            List<QuestionSimpleResDto> temp =
+                    this.getSearchQuestion(user, keyword, "Find", questionPageable).getContent();
+            resultStream = Stream.concat(streamFind, temp.stream());
+
+        }
+
+        if(resultStream.toList().size() < 4){
+            List<QuestionSimpleResDto> temp =
+                    this.getSearchQuestion(user, keyword, "How", questionPageable).getContent();
+            resultStream = Stream.concat(streamFind, temp.stream());
+
+        }
+        if(resultStream.toList().size() < 4){
+            List<QuestionSimpleResDto> temp =
+                    this.getSearchQuestion(user, keyword, "Recommend", questionPageable).getContent();
+            resultStream = Stream.concat(streamFind, temp.stream());
+        }
+
+        List<QuestionSimpleResDto> searchQuestion = resultStream.toList();
+        // User 검색
+        Pageable userPageable = PageRequest.of(0, userSize);
+
+        List<UserSearchInfoDto> searchUser = this.getSearchUser(user, keyword, userPageable).getContent();
+
+
+        return SearchTotalResDto.builder()
+                .itemList(searchItem)
+                .questionList(searchQuestion)
+                .userList(searchUser)
                 .build();
     }
 }

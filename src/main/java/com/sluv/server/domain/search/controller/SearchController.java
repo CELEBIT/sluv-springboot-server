@@ -2,10 +2,12 @@ package com.sluv.server.domain.search.controller;
 
 import com.sluv.server.domain.item.dto.ItemSimpleResDto;
 import com.sluv.server.domain.question.dto.QuestionSimpleResDto;
+import com.sluv.server.domain.search.dto.SearchTotalResDto;
 import com.sluv.server.domain.search.service.SearchService;
 import com.sluv.server.domain.user.dto.UserSearchInfoDto;
 import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.global.common.response.PaginationResDto;
+import com.sluv.server.global.common.response.SuccessDataResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -77,4 +79,22 @@ public class SearchController {
         );
     }
 
+    @Operation(
+            summary = "*Total 검색",
+            description = """
+                    Keyword로 Total 검색 with ElasticSearch \n
+                    - Pagination 적용
+                    - User Id Token 필요
+                      -> Item Scrap 여부, User 팔로우 여부를 판단하기 위해 필요
+                    """
+    )
+    @GetMapping("/total")
+    public ResponseEntity<SuccessDataResponse<SearchTotalResDto>> searchTotal(@AuthenticationPrincipal User user,
+                                                                              @RequestParam("keyword") String keyword){
+        return ResponseEntity.ok().body(
+                SuccessDataResponse.<SearchTotalResDto>builder()
+                        .result(searchService.getSearchTotal(user, keyword))
+                        .build()
+        );
+    }
 }

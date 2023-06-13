@@ -16,7 +16,10 @@ import com.sluv.server.domain.question.repository.QuestionItemRepository;
 import com.sluv.server.domain.question.repository.QuestionRecommendCategoryRepository;
 import com.sluv.server.domain.question.repository.QuestionRepository;
 import com.sluv.server.domain.search.utils.ElasticSearchConnectUtil;
+import com.sluv.server.domain.user.dto.UserSearchInfoDto;
 import com.sluv.server.domain.user.entity.User;
+import com.sluv.server.domain.user.repository.FollowRepository;
+import com.sluv.server.domain.user.repository.UserRepository;
 import com.sluv.server.global.common.response.PaginationResDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -36,6 +39,8 @@ public class SearchService {
     private final QuestionItemRepository questionItemRepository;
     private final QuestionImgRepository questionImgRepository;
     private final QuestionRecommendCategoryRepository questionRecommendCategoryRepository;
+    private final UserRepository userRepository;
+    private final FollowRepository followRepository;
 
     private final ClosetRepository closetRepository;
     private final ElasticSearchConnectUtil elasticSearchConnectUtil;
@@ -191,5 +196,37 @@ public class SearchService {
         }
 
         throw new QuestionTypeNotFoundException();
+    }
+
+    /**
+     * User 검색 with ElasticSearch
+     */
+    public PaginationResDto<UserSearchInfoDto> getSearchUser(User user, String keyword, Pageable pageable) {
+        // ElasticSearch API Path
+        String itemPath = "/search/searchUser";
+
+        // ElasticSearch 에서 Keyword에 해당하는 User의 Id 조회
+        List<Long> userIdList = elasticSearchConnectUtil.connectElasticSearch(keyword, itemPath);
+
+        // 조건에 맞는 User Page 조회
+        Page<User> searchUserPage = userRepository.getSearchUser(userIdList, pageable);
+
+
+        // Cotent 조립
+        List<UserSearchInfoDto> content = searchUserPage.stream().map(searchUser ->
+                UserSearchInfoDto.builder()
+                        .id(searchUser.getId())
+                        .nickName(searchUser.getNickname())
+                        .profileImgUrl(searchUser.getProfileImgUrl())
+                        .followStatus(followRepository.getFollowStatus(user, searchUser))
+                        .build()
+        ).toList();
+
+
+        return PaginationResDto.<UserSearchInfoDto>builder()
+                .page(searchUserPage.getNumber())
+                .hasNext(searchUserPage.hasNext())
+                .content(content)
+                .build();
     }
 }

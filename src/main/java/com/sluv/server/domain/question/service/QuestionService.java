@@ -6,9 +6,8 @@ import com.sluv.server.domain.celeb.entity.NewCeleb;
 import com.sluv.server.domain.celeb.repository.CelebRepository;
 import com.sluv.server.domain.celeb.repository.NewCelebRepository;
 import com.sluv.server.domain.comment.repository.CommentRepository;
-import com.sluv.server.domain.item.dto.ItemSameResDto;
+import com.sluv.server.domain.item.dto.ItemSimpleResDto;
 import com.sluv.server.domain.item.entity.Item;
-import com.sluv.server.domain.item.entity.ItemImg;
 import com.sluv.server.domain.item.exception.ItemNotFoundException;
 import com.sluv.server.domain.item.repository.ItemImgRepository;
 import com.sluv.server.domain.item.repository.ItemRepository;
@@ -22,7 +21,6 @@ import com.sluv.server.domain.user.dto.UserInfoDto;
 import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.global.common.enums.ItemImgOrLinkStatus;
 import com.sluv.server.global.common.enums.ReportStatus;
-import jakarta.persistence.DiscriminatorColumn;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -341,10 +339,10 @@ public class QuestionService {
                                                             .map(QuestionImg::getImgUrl).toList();
 
         // Question Item List
-        List<ItemSameResDto> questionItemList = questionItemRepository.findAllByQuestionId(questionId)
+        List<ItemSimpleResDto> questionItemList = questionItemRepository.findAllByQuestionId(questionId)
                                             .stream()
                                             .map(questionItem ->
-                                                    ItemSameResDto.builder()
+                                                    ItemSimpleResDto.builder()
                                                                 .itemId(questionItem.getItem().getId())
                                                                 .itemName(questionItem.getItem().getName())
                                                                 .celebName(questionItem.getItem().getBrand() != null

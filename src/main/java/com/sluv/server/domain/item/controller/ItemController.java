@@ -1,7 +1,6 @@
 package com.sluv.server.domain.item.controller;
 
 import com.sluv.server.domain.item.dto.*;
-import com.sluv.server.domain.item.repository.ItemReportRepository;
 import com.sluv.server.domain.item.service.*;
 import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.global.common.response.ErrorResponse;
@@ -18,8 +17,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -235,10 +232,10 @@ public class ItemController {
                     """
     )
     @GetMapping("/recent")
-    public ResponseEntity<SuccessDataResponse<PaginationResDto<ItemSameResDto>>> getRecentItem(@AuthenticationPrincipal User user, Pageable pageable) {
+    public ResponseEntity<SuccessDataResponse<PaginationResDto<ItemSimpleResDto>>> getRecentItem(@AuthenticationPrincipal User user, Pageable pageable) {
 
         return ResponseEntity.ok().body(
-                SuccessDataResponse.<PaginationResDto<ItemSameResDto>>builder()
+                SuccessDataResponse.<PaginationResDto<ItemSimpleResDto>>builder()
                         .result(itemService.getRecentItem(user, pageable))
                         .build()
         );
@@ -253,10 +250,10 @@ public class ItemController {
                     """
     )
     @GetMapping("/scrap")
-    public ResponseEntity<SuccessDataResponse<PaginationResDto<ItemSameResDto>>> getScrapItem(@AuthenticationPrincipal User user, Pageable pageable) {
+    public ResponseEntity<SuccessDataResponse<PaginationResDto<ItemSimpleResDto>>> getScrapItem(@AuthenticationPrincipal User user, Pageable pageable) {
 
         return ResponseEntity.ok().body(
-                SuccessDataResponse.<PaginationResDto<ItemSameResDto>>builder()
+                SuccessDataResponse.<PaginationResDto<ItemSimpleResDto>>builder()
                         .result(itemService.getScrapItem(user, pageable))
                         .build()
         );

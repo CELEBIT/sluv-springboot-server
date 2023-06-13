@@ -9,7 +9,7 @@ import com.sluv.server.domain.comment.enums.CommentStatus;
 import com.sluv.server.domain.comment.exception.CommentNotFoundException;
 import com.sluv.server.domain.comment.exception.CommentReportDuplicateException;
 import com.sluv.server.domain.comment.repository.*;
-import com.sluv.server.domain.item.dto.ItemSameResDto;
+import com.sluv.server.domain.item.dto.ItemSimpleResDto;
 import com.sluv.server.domain.item.entity.Item;
 import com.sluv.server.domain.item.entity.ItemImg;
 import com.sluv.server.domain.item.exception.ItemNotFoundException;
@@ -253,7 +253,7 @@ public class CommentService {
                     List<String> imgList = commentImgRepository.findAllByCommentId(comment.getId())
                             .stream().map(CommentImg::getImgUrl).toList();
                     // 해당 Comment에 해당하는 아이템 조회
-                    List<ItemSameResDto> itemList = commentItemRepository.findAllByCommentId(comment.getId())
+                    List<ItemSimpleResDto> itemList = commentItemRepository.findAllByCommentId(comment.getId())
                             .stream().map(commentItem -> getItemSameResDto(commentItem.getItem())).toList();
                     // 해당 Comment의 좋아요 수
                     Integer likeNum = commentLikeRepository.countByCommentId(comment.getId());
@@ -284,10 +284,10 @@ public class CommentService {
      * @param item
      * @return
      */
-    private ItemSameResDto getItemSameResDto(Item item) {
+    private ItemSimpleResDto getItemSameResDto(Item item) {
         ItemImg mainImg = itemImgRepository.findMainImg(item.getId());
 
-        return ItemSameResDto.builder()
+        return ItemSimpleResDto.builder()
                 .itemId(item.getId())
                 .imgUrl(mainImg.getItemImgUrl())
                 .brandName(

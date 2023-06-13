@@ -16,6 +16,7 @@ import static com.sluv.server.domain.closet.entity.QCloset.closet;
 import static com.sluv.server.domain.item.entity.QItem.item;
 import static com.sluv.server.domain.item.entity.QItemScrap.itemScrap;
 import static com.sluv.server.domain.item.entity.QRecentItem.recentItem;
+import static com.sluv.server.domain.item.enums.ItemStatus.ACTIVE;
 import static com.sluv.server.domain.user.entity.QUser.user;
 
 @RequiredArgsConstructor
@@ -157,5 +158,29 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom{
                 .orderBy(itemScrap.createdAt.max().desc())
                 .limit(10)
                 .fetch();
+    }
+
+    /**
+     * Search 시 Item 검색
+     */
+    @Override
+    public Page<Item> getSearchItem(List<Long> itemIdList, Pageable pageable) {
+        // TODO 1. Ordering, Filtering
+        List<Item> content = jpaQueryFactory.select(item)
+                .from(item)
+                .where(item.id.in(itemIdList).and(item.itemStatus.eq(ACTIVE)))
+                .orderBy(item.createdAt.desc()) // 추가 예정
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        // Count Query
+        JPAQuery<Item> countJPAQuery = jpaQueryFactory.select(item)
+                .from(item)
+                .where(item.id.in(itemIdList))
+                .orderBy(item.whenDiscovery.desc());// 추가 예정
+
+
+        return PageableExecutionUtils.getPage(content, pageable, () -> countJPAQuery.fetch().size());
     }
 }

@@ -315,18 +315,18 @@ public class ItemService {
 
         // 11. 같은 셀럽 아이템 리스트
         boolean celebJudge = item.getCeleb() != null;
-        List<ItemSameResDto> sameCelebItemList = convertItemToItemSameResDto(
+        List<ItemSimpleResDto> sameCelebItemList = convertItemToItemSameResDto(
                                                                 user , itemRepository.findSameCelebItem(item, celebJudge)
                                                 );
 
         // 12. 같은 브랜드 아이템 리스트
         boolean brandJudge = item.getBrand() != null;
-        List<ItemSameResDto> sameBrandItemList = convertItemToItemSameResDto(
+        List<ItemSimpleResDto> sameBrandItemList = convertItemToItemSameResDto(
                                                             user, itemRepository.findSameBrandItem(item, brandJudge)
                                                     );
 
         // 13. 다른 스러버들이 함께 보관한 아이템 리스트
-        List<ItemSameResDto> sameClosetItemList = convertItemToItemSameResDto(
+        List<ItemSimpleResDto> sameClosetItemList = convertItemToItemSameResDto(
                                                             user, getClosetItemList(item)
                                                     );
 
@@ -391,7 +391,7 @@ public class ItemService {
         itemRepository.save(item);
     }
 
-    public PaginationResDto<ItemSameResDto> getRecentItem(User user, Pageable pageable) {
+    public PaginationResDto<ItemSimpleResDto> getRecentItem(User user, Pageable pageable) {
         Page<Item> recentItemPage = itemRepository.getRecentItem(user, pageable);
 
         return convertItemSamePageDto(user, pageable, recentItemPage);
@@ -399,18 +399,18 @@ public class ItemService {
 
     }
 
-    public PaginationResDto<ItemSameResDto> getScrapItem(User user, Pageable pageable) {
+    public PaginationResDto<ItemSimpleResDto> getScrapItem(User user, Pageable pageable) {
         // User, Closet, Item 조인하여 ItemPage 조회
         Page<Item> itemPage = itemRepository.getAllScrapItem(user, pageable);
 
         return convertItemSamePageDto(user, pageable, itemPage);
     }
 
-    private PaginationResDto<ItemSameResDto> convertItemSamePageDto(User user, Pageable pageable, Page<Item> page) {
+    private PaginationResDto<ItemSimpleResDto> convertItemSamePageDto(User user, Pageable pageable, Page<Item> page) {
         // ItemPage에서 ItemSameResDto 생성
-        List<ItemSameResDto> content = convertItemToItemSameResDto(user, page.getContent());
+        List<ItemSimpleResDto> content = convertItemToItemSameResDto(user, page.getContent());
 
-        return PaginationResDto.<ItemSameResDto>builder()
+        return PaginationResDto.<ItemSimpleResDto>builder()
                 .page(page.getNumber())
                 .hasNext(page.hasNext())
                 .content(content)
@@ -425,7 +425,7 @@ public class ItemService {
         return itemRepository.getSameClosetItems(item, recentAddClosetList);
     }
 
-    private List<ItemSameResDto> convertItemToItemSameResDto(User user, List<Item> itemList){
+    private List<ItemSimpleResDto> convertItemToItemSameResDto(User user, List<Item> itemList){
         // User의 모든 Closet 조회
         List<Closet> closetList = closetRepository.findAllByUserId(user.getId());
 
@@ -433,7 +433,7 @@ public class ItemService {
                 .map(item ->{
                     ItemImg itemImg = itemImgRepository.findMainImg(item.getId());
                     Boolean scrapStatus = itemScrapRepository.getItemScrapStatus(item, closetList);
-                    return ItemSameResDto.builder()
+                    return ItemSimpleResDto.builder()
                             .itemId(item.getId())
                             .itemName(item.getName())
                             .brandName(

@@ -4,7 +4,7 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.sluv.server.domain.user.entity.User;
 
 public interface FollowRepositoryCustom {
-    Boolean getFollowStatus(User user, User writer);
+    Boolean getFollowStatus(User user, User targetUser);
 
     void deleteFollow(User user, User targetUser);
 }

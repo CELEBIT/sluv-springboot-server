@@ -11,11 +11,11 @@ import static com.sluv.server.domain.user.entity.QFollow.follow;
 public class FollowRepositoryImpl implements FollowRepositoryCustom{
     private final JPAQueryFactory jpaQueryFactory;
     @Override
-    public Boolean getFollowStatus(User user, User writer) {
+    public Boolean getFollowStatus(User user, User targetUser) {
 
         return jpaQueryFactory.selectFrom(follow)
                 .where(follow.follower.eq(user)
-                        .and(follow.followee.eq(writer))
+                        .and(follow.followee.eq(targetUser))
                 )
                 .fetchFirst() != null;
     }

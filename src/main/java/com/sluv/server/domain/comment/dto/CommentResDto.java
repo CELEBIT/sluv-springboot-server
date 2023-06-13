@@ -1,6 +1,6 @@
 package com.sluv.server.domain.comment.dto;
 
-import com.sluv.server.domain.item.dto.ItemSameResDto;
+import com.sluv.server.domain.item.dto.ItemSimpleResDto;
 import com.sluv.server.domain.user.dto.UserInfoDto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
@@ -25,7 +25,7 @@ public class CommentResDto {
     @Schema(description = "Comment 이미지 Url 리스트")
     private List<String> imgUrlList;
     @Schema(description = "Comment 아이템 리스트")
-    private List<ItemSameResDto> itemList;
+    private List<ItemSimpleResDto> itemList;
     @Schema(description = "Comment 작성 시간")
     private LocalDateTime createdAt;
 

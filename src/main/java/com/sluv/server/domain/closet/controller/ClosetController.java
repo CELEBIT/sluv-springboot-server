@@ -5,7 +5,7 @@ import com.sluv.server.domain.closet.dto.ClosetItemSelectReqDto;
 import com.sluv.server.domain.closet.dto.ClosetReqDto;
 import com.sluv.server.domain.closet.dto.ClosetResDto;
 import com.sluv.server.domain.closet.service.ClosetService;
-import com.sluv.server.domain.item.dto.ItemSameResDto;
+import com.sluv.server.domain.item.dto.ItemSimpleResDto;
 import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.global.common.response.SuccessDataResponse;
 import com.sluv.server.global.common.response.SuccessResponse;
@@ -137,7 +137,7 @@ public class ClosetController {
                     """
     )
     @GetMapping("/{closetId}")
-    public ResponseEntity<ClosetDetailResDto<ItemSameResDto>> getClosetDetails(@AuthenticationPrincipal User user,
+    public ResponseEntity<ClosetDetailResDto<ItemSimpleResDto>> getClosetDetails(@AuthenticationPrincipal User user,
                                                                                  @PathVariable("closetId") Long closetId,
                                                                                  Pageable pageable){
 

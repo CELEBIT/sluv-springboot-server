@@ -9,7 +9,7 @@ import com.sluv.server.domain.closet.enums.ClosetStatus;
 import com.sluv.server.domain.closet.exception.BasicClosetDeleteException;
 import com.sluv.server.domain.closet.exception.ClosetNotFoundException;
 import com.sluv.server.domain.closet.repository.ClosetRepository;
-import com.sluv.server.domain.item.dto.ItemSameResDto;
+import com.sluv.server.domain.item.dto.ItemSimpleResDto;
 import com.sluv.server.domain.item.entity.Item;
 import com.sluv.server.domain.item.entity.ItemImg;
 import com.sluv.server.domain.item.entity.ItemScrap;
@@ -182,7 +182,7 @@ public class ClosetService {
 
     }
 
-    public ClosetDetailResDto<ItemSameResDto> getClosetDetails(User user, Long closetId, Pageable pageable) {
+    public ClosetDetailResDto<ItemSimpleResDto> getClosetDetails(User user, Long closetId, Pageable pageable) {
         Closet closet = closetRepository.findById(closetId).orElseThrow(ClosetNotFoundException::new);
 
         if(!closet.getUser().getId().equals(user.getId())){
@@ -192,16 +192,16 @@ public class ClosetService {
 
         Page<Item> itemPage = itemRepository.getClosetItems(closet, pageable);
 
-        List<ItemSameResDto> content = getItemContent(itemPage);
+        List<ItemSimpleResDto> content = getItemContent(itemPage);
 
         return new ClosetDetailResDto<>(itemPage.hasNext(), itemPage.getNumber(), content, closet.getCoverImgUrl(), closet.getName(), closet.getClosetStatus(), itemPage.getTotalElements());
 
     }
 
-    private List<ItemSameResDto> getItemContent(Page<Item> itemPage) {
+    private List<ItemSimpleResDto> getItemContent(Page<Item> itemPage) {
         return itemPage.stream().map(item -> {
                     ItemImg mainImg = itemImgRepository.findMainImg(item.getId());
-                    return ItemSameResDto.builder()
+                    return ItemSimpleResDto.builder()
                             .itemId(item.getId())
                             .imgUrl(mainImg.getItemImgUrl())
                             .brandName(

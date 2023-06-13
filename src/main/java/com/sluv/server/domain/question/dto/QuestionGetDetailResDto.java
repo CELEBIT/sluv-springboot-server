@@ -1,7 +1,7 @@
 package com.sluv.server.domain.question.dto;
 
 import com.sluv.server.domain.celeb.dto.CelebChipResDto;
-import com.sluv.server.domain.item.dto.ItemSameResDto;
+import com.sluv.server.domain.item.dto.ItemSimpleResDto;
 import com.sluv.server.domain.user.dto.UserInfoDto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
@@ -28,7 +28,7 @@ public class QuestionGetDetailResDto {
     @Schema(description = "게시글 이미지 Url 리스트")
     private List<String> imgList;
     @Schema(description = "게시글 아이템 리스트")
-    private List<ItemSameResDto> itemList;
+    private List<ItemSimpleResDto> itemList;
     @Schema(description = "게시글 조회수")
     private Long searchNum;
     @Schema(description = "게시글 좋아요 수")

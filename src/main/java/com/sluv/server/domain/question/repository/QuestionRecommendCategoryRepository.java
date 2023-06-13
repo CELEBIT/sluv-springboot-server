@@ -5,4 +5,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface QuestionRecommendCategoryRepository extends JpaRepository<QuestionRecommendCategory, Long> {
     void deleteAllByQuestionId(Long id);
+
+    QuestionRecommendCategory findOneByQuestionId(Long id);
 }

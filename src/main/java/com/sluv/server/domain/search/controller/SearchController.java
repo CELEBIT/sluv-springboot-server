@@ -1,6 +1,7 @@
 package com.sluv.server.domain.search.controller;
 
 import com.sluv.server.domain.item.dto.ItemSimpleResDto;
+import com.sluv.server.domain.question.dto.QuestionSimpleResDto;
 import com.sluv.server.domain.search.service.SearchService;
 import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.global.common.response.PaginationResDto;
@@ -35,6 +36,25 @@ public class SearchController {
                                                                          Pageable pageable){
         return ResponseEntity.ok().body(
                 searchService.getSearchItem(user, keyword, pageable)
+        );
+    }
+
+    @Operation(
+            summary = "*Question 검색",
+            description = """
+                    Keyword로 Question 검색 with ElasticSearch \n
+                    - Pagination 적용
+                    - User Id Token 필요
+                      -> 필요 없지만 일관성을 위해 필요
+                    """
+    )
+    @GetMapping("/question")
+    public ResponseEntity<PaginationResDto<QuestionSimpleResDto>> searchQuestion(@AuthenticationPrincipal User user,
+                                                                                 @RequestParam("keyword") String keyword,
+                                                                                 @RequestParam("qtype") String qType,
+                                                                                 Pageable pageable){
+        return ResponseEntity.ok().body(
+                searchService.getSearchQuestion(user, keyword, qType, pageable)
         );
     }
 

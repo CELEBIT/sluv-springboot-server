@@ -258,4 +258,23 @@ public class ItemController {
                         .build()
         );
     }
+    @Operation(
+            summary = "*유저별 추천 인기 아이템 조회",
+            description = """
+                    유저별로 추천 인기 아이템을 조회
+                    - (User Id 필요)
+                    - Pagination 적용
+                    - 초반: 좋아요 수, 스크랩 수, 조회수를 모두 합산하여 높은 순서 + 착용 최신순으로 정렬
+                      후반: 유저별 검색기록, 관심셀럽을 기준으로 조회 
+                    """
+    )
+    @GetMapping("/recommend")
+    public ResponseEntity<SuccessDataResponse<PaginationResDto<ItemSimpleResDto>>> getRecommendItem(@AuthenticationPrincipal User user, Pageable pageable) {
+
+        return ResponseEntity.ok().body(
+                SuccessDataResponse.<PaginationResDto<ItemSimpleResDto>>builder()
+                        .result(itemService.getRecommendItem(user, pageable))
+                        .build()
+        );
+    }
 }

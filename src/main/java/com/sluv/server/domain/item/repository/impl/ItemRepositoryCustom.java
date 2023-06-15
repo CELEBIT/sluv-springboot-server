@@ -23,4 +23,6 @@ public interface ItemRepositoryCustom {
     List<Item> getSameClosetItems(Item item, List<Closet> closetList);
 
     Page<Item> getSearchItem(List<Long> itemIdList, Pageable pageable);
+
+    Page<Item> getRecommendItemPage(Pageable pageable);
 }

@@ -1,5 +1,7 @@
 package com.sluv.server.domain.item.repository.impl;
 
+import com.querydsl.core.types.Order;
+import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sluv.server.domain.closet.entity.Closet;
@@ -7,13 +9,17 @@ import com.sluv.server.domain.item.entity.Item;
 import com.sluv.server.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static com.sluv.server.domain.closet.entity.QCloset.closet;
 import static com.sluv.server.domain.item.entity.QItem.item;
+import static com.sluv.server.domain.item.entity.QItemLike.itemLike;
 import static com.sluv.server.domain.item.entity.QItemScrap.itemScrap;
 import static com.sluv.server.domain.item.entity.QRecentItem.recentItem;
 import static com.sluv.server.domain.item.enums.ItemStatus.ACTIVE;
@@ -179,6 +185,33 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom{
                 .from(item)
                 .where(item.id.in(itemIdList))
                 .orderBy(item.whenDiscovery.desc());// 추가 예정
+
+
+        return PageableExecutionUtils.getPage(content, pageable, () -> countJPAQuery.fetch().size());
+    }
+
+    @Override
+    public Page<Item> getRecommendItemPage(Pageable pageable) {
+        List<Item> content = jpaQueryFactory.select(item)
+                .from(item)
+                .leftJoin(itemLike).on(itemLike.item.eq(item))
+                .leftJoin(itemScrap).on(itemScrap.item.eq(item))
+                .groupBy(item)
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .orderBy(itemLike.count().add(itemScrap.count()).add(item.viewNum).desc())
+                .orderBy(item.whenDiscovery.desc())
+                .fetch();
+
+
+        // Count Query
+        JPAQuery<Item> countJPAQuery = jpaQueryFactory.select(item)
+                .from(item)
+                .leftJoin(itemLike).on(itemLike.item.eq(item))
+                .leftJoin(itemScrap).on(itemScrap.item.eq(item))
+                .groupBy(item)
+                .orderBy(itemLike.count().add(itemScrap.count()).add(item.viewNum).desc())
+                .orderBy(item.whenDiscovery.desc());
 
 
         return PageableExecutionUtils.getPage(content, pageable, () -> countJPAQuery.fetch().size());

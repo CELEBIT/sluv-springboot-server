@@ -452,4 +452,19 @@ public class ItemService {
                 })
                 .toList();
     }
+
+    public PaginationResDto<ItemSimpleResDto> getRecommendItem(User user, Pageable pageable) {
+        Page<Item> recommendItemPage = itemRepository.getRecommendItemPage(pageable);
+
+        List<ItemSimpleResDto> content =
+                convertItemToItemSameResDto(user, recommendItemPage.getContent());
+
+
+
+        return PaginationResDto.<ItemSimpleResDto>builder()
+                .page(recommendItemPage.getNumber())
+                .hasNext(recommendItemPage.hasNext())
+                .content(content)
+                .build();
+    }
 }

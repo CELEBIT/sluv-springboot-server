@@ -29,10 +29,13 @@ public class CommentItem extends BaseEntity {
     @NotNull
     private Item item;
 
+    private Integer order;
+
     @Builder
-    public CommentItem(Long id, Comment comment, Item item) {
+    public CommentItem(Long id, Comment comment, Item item, Integer order) {
         this.id = id;
         this.comment = comment;
         this.item = item;
+        this.order = order;
     }
 }

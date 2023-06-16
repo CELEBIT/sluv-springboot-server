@@ -38,13 +38,16 @@ public class QuestionItem extends BaseEntity {
     @ColumnDefault("0")
     private Boolean representFlag;
 
+    private Integer order;
+
     @Builder
-    public QuestionItem(Long id, Question question, Item item, String description, Long vote, Boolean representFlag) {
+    public QuestionItem(Long id, Question question, Item item, String description, Long vote, Boolean representFlag, Integer order) {
         this.id = id;
         this.question = question;
         this.item = item;
         this.description = description;
         this.vote = vote;
         this.representFlag = representFlag;
+        this.order = order;
     }
 }

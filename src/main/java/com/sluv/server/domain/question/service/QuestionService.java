@@ -6,6 +6,7 @@ import com.sluv.server.domain.celeb.entity.NewCeleb;
 import com.sluv.server.domain.celeb.repository.CelebRepository;
 import com.sluv.server.domain.celeb.repository.NewCelebRepository;
 import com.sluv.server.domain.comment.repository.CommentRepository;
+import com.sluv.server.domain.item.dto.ItemOrderResDto;
 import com.sluv.server.domain.item.dto.ItemSimpleResDto;
 import com.sluv.server.domain.item.entity.Item;
 import com.sluv.server.domain.item.exception.ItemNotFoundException;
@@ -229,6 +230,7 @@ public class QuestionService {
                 .vote(imgDto.getVote())
                 .representFlag(imgDto.getRepresentFlag())
                 .itemImgOrLinkStatus(ItemImgOrLinkStatus.ACTIVE)
+                .order(imgDto.getOrder())
                 .build()
         ).toList();
 
@@ -253,6 +255,7 @@ public class QuestionService {
                             .description(itemDto.getDescription())
                             .vote(itemDto.getVote())
                             .representFlag(itemDto.getRepresentFlag())
+                            .order(itemDto.getOrder())
                             .build();
                 }
         ).toList();
@@ -334,28 +337,39 @@ public class QuestionService {
         User writer = question.getUser();
 
         // Question img List
-        List<String> questionImgList= questionImgRepository.findAllByQuestionId(questionId).
+        List<QuestionImgResDto> questionImgList= questionImgRepository.findAllByQuestionId(questionId).
                                                             stream()
-                                                            .map(QuestionImg::getImgUrl).toList();
+                                                            .map(questionImg -> QuestionImgResDto.builder()
+                                                                    .imgUrl(questionImg.getImgUrl())
+                                                                    .representFlag(questionImg.getRepresentFlag())
+                                                                    .order(questionImg.getOrder())
+                                                                    .build()
+                                                            ).toList();
 
         // Question Item List
-        List<ItemSimpleResDto> questionItemList = questionItemRepository.findAllByQuestionId(questionId)
+        List<ItemOrderResDto> questionItemList = questionItemRepository.findAllByQuestionId(questionId)
                                             .stream()
-                                            .map(questionItem ->
-                                                    ItemSimpleResDto.builder()
+                                            .map(questionItem -> {
+                                                ItemSimpleResDto dto = ItemSimpleResDto.builder()
                                                                 .itemId(questionItem.getItem().getId())
                                                                 .itemName(questionItem.getItem().getName())
                                                                 .celebName(questionItem.getItem().getBrand() != null
-                                                                                ? questionItem.getItem().getBrand().getBrandKr()
-                                                                                : questionItem.getItem().getNewBrand().getBrandName()
+                                                                        ? questionItem.getItem().getBrand().getBrandKr()
+                                                                        : questionItem.getItem().getNewBrand().getBrandName()
                                                                 )
                                                                 .brandName(questionItem.getItem().getBrand() != null
-                                                                                ? questionItem.getItem().getBrand().getBrandKr()
-                                                                                : questionItem.getItem().getNewBrand().getBrandName()
+                                                                        ? questionItem.getItem().getBrand().getBrandKr()
+                                                                        : questionItem.getItem().getNewBrand().getBrandName()
                                                                 )
                                                                 .imgUrl(itemImgRepository.findMainImg(questionItem.getItem().getId()).getItemImgUrl())
                                                                 .scrapStatus(null) // 추후 작성 (23.05.20)
-                                                        .build()
+                                                                .build();
+                                                return ItemOrderResDto.builder()
+                                                        .item(dto)
+                                                        .representFlag(questionItem.getRepresentFlag())
+                                                        .order(questionItem.getOrder())
+                                                        .build();
+                                                    }
                                             ).toList();
 
         // Question Like Num Count

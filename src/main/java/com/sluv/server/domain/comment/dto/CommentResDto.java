@@ -1,5 +1,6 @@
 package com.sluv.server.domain.comment.dto;
 
+import com.sluv.server.domain.comment.entity.CommentImg;
 import com.sluv.server.domain.item.dto.ItemSimpleResDto;
 import com.sluv.server.domain.user.dto.UserInfoDto;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -23,9 +24,9 @@ public class CommentResDto {
     @Schema(description = "Comment 내용")
     private String content;
     @Schema(description = "Comment 이미지 Url 리스트")
-    private List<String> imgUrlList;
+    private List<CommentImgDto> imgUrlList;
     @Schema(description = "Comment 아이템 리스트")
-    private List<ItemSimpleResDto> itemList;
+    private List<CommentItemResDto> itemList;
     @Schema(description = "Comment 작성 시간")
     private LocalDateTime createdAt;
 

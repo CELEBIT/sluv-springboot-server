@@ -1,9 +1,6 @@
 package com.sluv.server.domain.comment.service;
 
-import com.sluv.server.domain.comment.dto.CommentPostReqDto;
-import com.sluv.server.domain.comment.dto.CommentReportPostReqDto;
-import com.sluv.server.domain.comment.dto.CommentResDto;
-import com.sluv.server.domain.comment.dto.SubCommentPageResDto;
+import com.sluv.server.domain.comment.dto.*;
 import com.sluv.server.domain.comment.entity.*;
 import com.sluv.server.domain.comment.enums.CommentStatus;
 import com.sluv.server.domain.comment.exception.CommentNotFoundException;
@@ -130,8 +127,8 @@ public class CommentService {
         commentItemRepository.deleteAllByCommentId(comment.getId());
 
         // dto로 부터 새로운 CommentItem 생성
-        List<CommentItem> itemList = dto.getItemList().stream().map(itemId -> {
-                    Item item = itemRepository.findById(itemId).orElseThrow(ItemNotFoundException::new);
+        List<CommentItem> itemList = dto.getItemList().stream().map(_item -> {
+                    Item item = itemRepository.findById(_item.getItemId()).orElseThrow(ItemNotFoundException::new);
                     return CommentItem.builder()
                             .comment(comment)
                             .item(item)
@@ -151,7 +148,7 @@ public class CommentService {
         List<CommentImg> imgList = dto.getImgList().stream().map(imgUrl ->
                 CommentImg.builder()
                         .comment(comment)
-                        .imgUrl(imgUrl)
+                        .imgUrl(imgUrl.getImgUrl())
                         .build()
         ).toList();
 
@@ -250,11 +247,21 @@ public class CommentService {
                 .map(comment -> {
 
                     // 해당 Comment에 해당하는 이미지 조회
-                    List<String> imgList = commentImgRepository.findAllByCommentId(comment.getId())
-                            .stream().map(CommentImg::getImgUrl).toList();
+                    List<CommentImgDto> imgList = commentImgRepository.findAllByCommentId(comment.getId())
+                            .stream().map(commentImg -> CommentImgDto.builder()
+                                    .imgUrl(commentImg.getImgUrl())
+                                    .order(commentImg.getOrder())
+                                    .build()
+                            ).toList();
                     // 해당 Comment에 해당하는 아이템 조회
-                    List<ItemSimpleResDto> itemList = commentItemRepository.findAllByCommentId(comment.getId())
-                            .stream().map(commentItem -> getItemSameResDto(commentItem.getItem())).toList();
+                    List<CommentItemResDto> itemList = commentItemRepository.findAllByCommentId(comment.getId())
+                            .stream().map(commentItem -> CommentItemResDto.builder()
+                                            .item(getItemSameResDto(commentItem.getItem()))
+                                            .order(commentItem.getOrder())
+                                            .build()
+                            ).toList();
+
+
                     // 해당 Comment의 좋아요 수
                     Integer likeNum = commentLikeRepository.countByCommentId(comment.getId());
                     // 현재 유저의 해당 Comment 좋아요 여부

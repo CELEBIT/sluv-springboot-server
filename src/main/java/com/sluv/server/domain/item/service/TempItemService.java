@@ -102,6 +102,7 @@ public class TempItemService {
                                         .tempItemImgUrl(tempItemImg.getImgUrl())
                                         .representFlag(tempItemImg.getRepresentFlag())
                                         .itemImgOrLinkStatus(ItemImgOrLinkStatus.ACTIVE)
+                                        .order(tempItemImg.getOrder())
                                         .build()
                             ).forEach(tempItemImgRepository::save);
 
@@ -150,6 +151,7 @@ public class TempItemService {
                             .stream().map(tempItemImg -> ItemImgResDto.builder()
                                     .imgUrl(tempItemImg.getTempItemImgUrl())
                                     .representFlag(tempItemImg.getRepresentFlag())
+                                    .order(tempItemImg.getOrder())
                                     .build()
                             ).collect(Collectors.toList());
 

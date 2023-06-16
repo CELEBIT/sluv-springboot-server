@@ -141,6 +141,7 @@ public class ItemService {
                                     .itemImgUrl(itemImg.getImgUrl())
                                     .representFlag(itemImg.getRepresentFlag())
                                     .itemImgOrLinkStatus(ItemImgOrLinkStatus.ACTIVE)
+                                    .order(itemImg.getOrder())
                                     .build()
                         ).forEach(itemImgRepository::save);
 
@@ -209,6 +210,7 @@ public class ItemService {
                                                         .map(itemImg -> ItemImgResDto.builder()
                                                                 .imgUrl(itemImg.getItemImgUrl())
                                                                 .representFlag(itemImg.getRepresentFlag())
+                                                                .order(itemImg.getOrder())
                                                                 .build()
                                                         ).toList();
 

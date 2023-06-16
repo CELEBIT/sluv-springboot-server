@@ -19,4 +19,6 @@ public class QuestionImgReqDto {
     private Long vote;
     @Schema(description = "대표 여부")
     private Boolean representFlag;
+    @Schema(description = "Img 순서")
+    private Integer order;
 }

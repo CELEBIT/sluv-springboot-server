@@ -35,13 +35,16 @@ public class TempItemImg extends BaseEntity {
     @Column(length = 45, columnDefinition = "varchar(45) default 'ACTIVE'")
     private ItemImgOrLinkStatus itemImgOrLinkStatus = ItemImgOrLinkStatus.ACTIVE;
 
+    private Integer order;
+
 
     @Builder
-    public TempItemImg(Long id, TempItem tempItem, String tempItemImgUrl, Boolean representFlag, ItemImgOrLinkStatus itemImgOrLinkStatus) {
+    public TempItemImg(Long id, TempItem tempItem, String tempItemImgUrl, Boolean representFlag, ItemImgOrLinkStatus itemImgOrLinkStatus, Integer order) {
         this.id = id;
         this.tempItem = tempItem;
         this.tempItemImgUrl = tempItemImgUrl;
         this.representFlag = representFlag;
         this.itemImgOrLinkStatus = itemImgOrLinkStatus;
+        this.order = order;
     }
 }

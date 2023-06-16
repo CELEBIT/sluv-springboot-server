@@ -36,13 +36,16 @@ public class ItemImg extends BaseEntity {
     @Column(length = 45, columnDefinition = "varchar(45) default 'ACTIVE'")
     private ItemImgOrLinkStatus itemImgOrLinkStatus = ItemImgOrLinkStatus.ACTIVE;
 
+    private Integer order;
+
 
     @Builder
-    public ItemImg(Long id, Item item, String itemImgUrl, Boolean representFlag, ItemImgOrLinkStatus itemImgOrLinkStatus) {
+    public ItemImg(Long id, Item item, String itemImgUrl, Boolean representFlag, ItemImgOrLinkStatus itemImgOrLinkStatus, Integer order) {
         this.id = id;
         this.item = item;
         this.itemImgUrl = itemImgUrl;
         this.representFlag = representFlag;
         this.itemImgOrLinkStatus = itemImgOrLinkStatus;
+        this.order = order;
     }
 }

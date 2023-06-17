@@ -2,6 +2,8 @@ package com.sluv.server.domain.search.controller;
 
 import com.sluv.server.domain.item.dto.ItemSimpleResDto;
 import com.sluv.server.domain.question.dto.QuestionSimpleResDto;
+import com.sluv.server.domain.search.dto.SearchFilterReqDto;
+import com.sluv.server.domain.search.dto.SearchItemCountResDto;
 import com.sluv.server.domain.search.dto.SearchTotalResDto;
 import com.sluv.server.domain.search.service.SearchService;
 import com.sluv.server.domain.user.dto.UserSearchInfoDto;
@@ -13,10 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/app/search")
@@ -94,6 +93,21 @@ public class SearchController {
         return ResponseEntity.ok().body(
                 SuccessDataResponse.<SearchTotalResDto>builder()
                         .result(searchService.getSearchTotal(user, keyword))
+                        .build()
+        );
+    }
+
+    @Operation(
+            summary = "필터링 조건에 따른 아이템 개수 조회",
+            description = """
+                    필터링 조건에 맞는 아이템 개수를 조회하는 기능
+                    """
+    )
+    @GetMapping("/item/count")
+    public ResponseEntity<SuccessDataResponse<SearchItemCountResDto>> searchItemCount(@RequestParam("keyword") String keyword, SearchFilterReqDto dto){
+        return ResponseEntity.ok().body(
+                SuccessDataResponse.<SearchItemCountResDto>builder()
+                        .result(searchService.getSearchItemCount(keyword, dto))
                         .build()
         );
     }

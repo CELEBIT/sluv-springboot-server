@@ -15,6 +15,8 @@ import com.sluv.server.domain.question.repository.QuestionImgRepository;
 import com.sluv.server.domain.question.repository.QuestionItemRepository;
 import com.sluv.server.domain.question.repository.QuestionRecommendCategoryRepository;
 import com.sluv.server.domain.question.repository.QuestionRepository;
+import com.sluv.server.domain.search.dto.SearchFilterReqDto;
+import com.sluv.server.domain.search.dto.SearchItemCountResDto;
 import com.sluv.server.domain.search.dto.SearchTotalResDto;
 import com.sluv.server.domain.search.utils.ElasticSearchConnectUtil;
 import com.sluv.server.domain.user.dto.UserSearchInfoDto;
@@ -287,6 +289,18 @@ public class SearchService {
                 .itemList(searchItem)
                 .questionList(searchQuestion)
                 .userList(searchUser)
+                .build();
+    }
+
+    public SearchItemCountResDto getSearchItemCount(String keyword, SearchFilterReqDto dto) {
+        // ElasticSearch API Path
+        String itemPath = "/search/searchItem";
+
+        // ElasticSearch 에서 Keyword에 해당하는 Item의 Id 조회
+        List<Long> itemIdList = elasticSearchConnectUtil.connectElasticSearch(keyword, itemPath);
+
+        return SearchItemCountResDto.builder()
+                .itemCount(itemRepository.getSearchItemCount(itemIdList, dto))
                 .build();
     }
 }

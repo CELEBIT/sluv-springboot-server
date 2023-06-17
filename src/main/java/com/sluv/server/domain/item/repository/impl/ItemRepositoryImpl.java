@@ -1,21 +1,17 @@
 package com.sluv.server.domain.item.repository.impl;
 
-import com.querydsl.core.types.Order;
-import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sluv.server.domain.closet.entity.Closet;
 import com.sluv.server.domain.item.entity.Item;
+import com.sluv.server.domain.search.dto.SearchFilterReqDto;
 import com.sluv.server.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import static com.sluv.server.domain.closet.entity.QCloset.closet;
 import static com.sluv.server.domain.item.entity.QItem.item;
@@ -215,5 +211,36 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom{
 
 
         return PageableExecutionUtils.getPage(content, pageable, () -> countJPAQuery.fetch().size());
+    }
+
+    @Override
+    public Long getSearchItemCount(List<Long> itemIdList, SearchFilterReqDto dto) {
+
+        JPAQuery<Item> query = jpaQueryFactory.selectFrom(item)
+                .where(item.id.in(itemIdList));
+
+        addFilterWhere(query, dto);
+
+        return (long) query.fetch().size();
+    }
+
+    /**
+     * 검색 필터링 쿼리 추가
+     */
+    private void addFilterWhere(JPAQuery<Item> query, SearchFilterReqDto dto){
+        // Category Filtering
+        if (dto.getCategoryId() != null){
+            query.where(item.category.id.eq(dto.getCategoryId()));
+        }
+        // Price Filtering
+        if(dto.getMinPrice() != null && dto.getMaxPrice() != null){
+            query.where(item.price.between(dto.getMinPrice(), dto.getMaxPrice()));
+        }else if(dto.getMinPrice() != null){
+            query.where(item.price.goe(dto.getMinPrice()));
+        }
+        // Color Filtering
+        if(dto.getColor() != null){
+            query.where(item.color.eq(dto.getColor()));
+        }
     }
 }

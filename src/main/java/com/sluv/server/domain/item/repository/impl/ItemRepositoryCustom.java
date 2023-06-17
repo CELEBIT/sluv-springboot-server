@@ -2,6 +2,7 @@ package com.sluv.server.domain.item.repository.impl;
 
 import com.sluv.server.domain.closet.entity.Closet;
 import com.sluv.server.domain.item.entity.Item;
+import com.sluv.server.domain.search.dto.SearchFilterReqDto;
 import com.sluv.server.domain.user.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -25,4 +26,6 @@ public interface ItemRepositoryCustom {
     Page<Item> getSearchItem(List<Long> itemIdList, Pageable pageable);
 
     Page<Item> getRecommendItemPage(Pageable pageable);
+
+    Long getSearchItemCount(List<Long> itemIdList, SearchFilterReqDto dto);
 }

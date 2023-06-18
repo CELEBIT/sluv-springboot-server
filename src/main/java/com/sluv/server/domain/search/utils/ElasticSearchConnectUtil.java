@@ -1,6 +1,8 @@
 package com.sluv.server.domain.search.utils;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
+import net.minidev.json.JSONArray;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -12,6 +14,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 @Component
 @Slf4j
@@ -30,12 +33,7 @@ public class ElasticSearchConnectUtil {
         String requestUrl = ELASTIC_SEARCH_URI + path + "?searchTerm=" + keyword;
 
         // API 호출
-        ResponseEntity<Long[]> elasticSearchResponse = getElasticSearchResponse(requestUrl);
-
-        // 요청 결과 값 반환
-        return elasticSearchResponse.getBody() != null
-                ? Arrays.stream(elasticSearchResponse.getBody()).toList()
-                : null;
+        return getElasticSearchResponse(requestUrl);
     }
 
     /**
@@ -43,7 +41,7 @@ public class ElasticSearchConnectUtil {
      * @param requestUrl
      * @return ResponseEntity<Long[]> 결과 아이디
      */
-    private ResponseEntity<Long[]> getElasticSearchResponse(String requestUrl) {
+    private List<Long> getElasticSearchResponse(String requestUrl) {
         // Header
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Type", "application/json");
@@ -54,11 +52,30 @@ public class ElasticSearchConnectUtil {
         // RestTemplate
         log.info("Request: GET {}", requestUrl);
         RestTemplate rt = new RestTemplate();
-        return rt.exchange(
+        ResponseEntity<JSONArray> response = rt.exchange(
                 requestUrl,
                 HttpMethod.GET,
                 request,
-                Long[].class
+                JSONArray.class
         );
+
+        return jsonArrayToList(Objects.requireNonNull(response.getBody()));
+
+
+    }
+    private List<Long> jsonArrayToList(JSONArray jsonArray) {
+        List<Long> list = null;
+        try {
+            Object innerArray = jsonArray.get(0);
+            ObjectMapper objectMapper = new ObjectMapper();
+            Long[] longArray = objectMapper.readValue(innerArray.toString(), Long[].class);
+            list = Arrays.stream(longArray).toList();
+
+        }catch (Exception e){
+            log.error("JSONArray To Long List Convert Error");
+        }
+
+        return list;
+
     }
 }

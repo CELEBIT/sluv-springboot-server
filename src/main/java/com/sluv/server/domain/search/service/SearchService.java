@@ -55,7 +55,7 @@ public class SearchService {
     /**
      * Item 검색 with ElasticSearch
      */
-    public PaginationResDto<ItemSimpleResDto> getSearchItem(User user, String keyword, Pageable pageable) {
+    public PaginationResDto<ItemSimpleResDto> getSearchItem(User user, String keyword, SearchFilterReqDto dto, Pageable pageable) {
         // ElasticSearch API Path
         String itemPath = "/search/searchItem";
 
@@ -63,7 +63,7 @@ public class SearchService {
         List<Long> itemIdList = elasticSearchConnectUtil.connectElasticSearch(keyword, itemPath);
 
         // 조건에 맞는 Item Page 조회
-        Page<Item> searchItemPage = itemRepository.getSearchItem(itemIdList, pageable);
+        Page<Item> searchItemPage = itemRepository.getSearchItem(itemIdList, dto, pageable);
 
         // 현재 접속한 User의 옷장 목록 조회
         List<Closet> closetList = closetRepository.findAllByUserId(user.getId());
@@ -248,8 +248,9 @@ public class SearchService {
 
         // Item 검색
         Pageable itemPageable = PageRequest.of(0, itemSize);
+        SearchFilterReqDto dto = SearchFilterReqDto.builder().build();
 
-        List<ItemSimpleResDto> searchItem = this.getSearchItem(user, keyword, itemPageable).getContent();
+        List<ItemSimpleResDto> searchItem = this.getSearchItem(user, keyword, dto, itemPageable).getContent();
 
         // Question 검색 -> 찾아주세요 -> 이거 어때 -> 이 중에 뭐 살까 -> 추천해 줘 순서
         Pageable questionPageable = PageRequest.of(0, questionSize);

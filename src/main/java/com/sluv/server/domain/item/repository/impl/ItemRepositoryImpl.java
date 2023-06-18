@@ -1,5 +1,6 @@
 package com.sluv.server.domain.item.repository.impl;
 
+import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sluv.server.domain.closet.entity.Closet;
@@ -9,8 +10,10 @@ import com.sluv.server.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.support.PageableExecutionUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.sluv.server.domain.closet.entity.QCloset.closet;
@@ -166,24 +169,26 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom{
      * Search 시 Item 검색
      */
     @Override
-    public Page<Item> getSearchItem(List<Long> itemIdList, Pageable pageable) {
-        // TODO 1. Ordering, Filtering
-        List<Item> content = jpaQueryFactory.select(item)
+    public Page<Item> getSearchItem(List<Long> itemIdList, SearchFilterReqDto dto, Pageable pageable) {
+
+        JPAQuery<Item> query = jpaQueryFactory.select(item)
                 .from(item)
+                .leftJoin(itemLike).on(itemLike.item.eq(item))
+                .leftJoin(itemScrap).on(itemScrap.item.eq(item))
+                .groupBy(item)
                 .where(item.id.in(itemIdList).and(item.itemStatus.eq(ACTIVE)))
-                .orderBy(item.createdAt.desc()) // 추가 예정
+                .orderBy(getSearchItemOrder(pageable.getSort()));
+
+        // Filter 조건 추가
+        addFilterWhere(query, dto);
+
+
+        List<Item> content = query
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
 
-        // Count Query
-        JPAQuery<Item> countJPAQuery = jpaQueryFactory.select(item)
-                .from(item)
-                .where(item.id.in(itemIdList))
-                .orderBy(item.whenDiscovery.desc());// 추가 예정
-
-
-        return PageableExecutionUtils.getPage(content, pageable, () -> countJPAQuery.fetch().size());
+        return PageableExecutionUtils.getPage(content, pageable, () -> query.fetch().size());
     }
 
     @Override
@@ -242,5 +247,33 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom{
         if(dto.getColor() != null){
             query.where(item.color.eq(dto.getColor()));
         }
+    }
+
+    /**
+     * 정렬 조건 추가
+     */
+    private OrderSpecifier<?> getSearchItemOrder(Sort sort) {
+        List<OrderSpecifier<?>> orderSpecifiers = new ArrayList<>();
+        if (sort.isSorted()) {
+            for (Sort.Order order : sort) {
+
+                // 기본이 최신순
+                OrderSpecifier<?> orderSpecifier = item.whenDiscovery.desc();
+                String property = order.getProperty();
+                switch (property) {
+                    case "최신순" -> orderSpecifier = item.whenDiscovery.desc();
+                    case "인기순" -> orderSpecifier = itemLike.count().add(itemScrap.count()).add(item.viewNum).desc();
+                    case "저가순" -> orderSpecifier = item.price.asc();
+                    case "고가순" -> orderSpecifier = item.price.desc();
+                }
+
+
+                orderSpecifiers.add(orderSpecifier);
+            }
+        }
+
+        return orderSpecifiers.get(0);
+
+
     }
 }

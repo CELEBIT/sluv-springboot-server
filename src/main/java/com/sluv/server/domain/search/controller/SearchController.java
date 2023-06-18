@@ -35,9 +35,10 @@ public class SearchController {
     @GetMapping("/item")
     public ResponseEntity<PaginationResDto<ItemSimpleResDto>> searchItem(@AuthenticationPrincipal User user,
                                                                          @RequestParam("keyword") String keyword,
+                                                                         SearchFilterReqDto dto,
                                                                          Pageable pageable){
         return ResponseEntity.ok().body(
-                searchService.getSearchItem(user, keyword, pageable)
+                searchService.getSearchItem(user, keyword, dto, pageable)
         );
     }
 

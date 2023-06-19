@@ -17,6 +17,8 @@ import com.sluv.server.domain.question.repository.QuestionRepository;
 import com.sluv.server.domain.search.dto.SearchFilterReqDto;
 import com.sluv.server.domain.search.dto.SearchItemCountResDto;
 import com.sluv.server.domain.search.dto.SearchTotalResDto;
+import com.sluv.server.domain.search.entity.RecentSearch;
+import com.sluv.server.domain.search.repository.RecentSearchRepository;
 import com.sluv.server.domain.search.utils.ElasticSearchConnectUtil;
 import com.sluv.server.domain.user.dto.UserSearchInfoDto;
 import com.sluv.server.domain.user.entity.User;
@@ -29,6 +31,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -50,10 +53,12 @@ public class SearchService {
 
     private final ClosetRepository closetRepository;
     private final ElasticSearchConnectUtil elasticSearchConnectUtil;
+    private final RecentSearchRepository recentSearchRepository;
 
     /**
      * Item 검색 with ElasticSearch
      */
+    @Transactional
     public PaginationResDto<ItemSimpleResDto> getSearchItem(User user, String keyword, SearchFilterReqDto dto, Pageable pageable) {
         // ElasticSearch API Path
         String itemPath = "/search/searchItem";
@@ -87,6 +92,8 @@ public class SearchService {
                         .build()
         ).toList();
 
+        // 최근 검색 등록
+        postRecentSearch(user, keyword);
 
         return PaginationResDto.<ItemSimpleResDto>builder()
                 .page(searchItemPage.getNumber())
@@ -98,6 +105,7 @@ public class SearchService {
     /**
      * Question 검색 with ElasticSearch
      */
+    @Transactional
     public PaginationResDto<QuestionSimpleResDto> getSearchQuestion(User user, String keyword, String qType, Pageable pageable) {
         // ElasticSearch API Path
         String itemPath = "/search/searchQuestion";
@@ -194,6 +202,9 @@ public class SearchService {
                         .build()
             ).toList();
 
+            // 최근 검색 등록
+            postRecentSearch(user, keyword);
+
             return PaginationResDto.<QuestionSimpleResDto>builder()
                     .page(searchQuestionPage.getNumber())
                     .hasNext(searchQuestionPage.hasNext())
@@ -207,6 +218,7 @@ public class SearchService {
     /**
      * User 검색 with ElasticSearch
      */
+    @Transactional
     public PaginationResDto<UserSearchInfoDto> getSearchUser(User user, String keyword, Pageable pageable) {
         // ElasticSearch API Path
         String itemPath = "/search/searchUser";
@@ -228,6 +240,8 @@ public class SearchService {
                         .build()
         ).toList();
 
+        // 최근 검색 등록
+        postRecentSearch(user, keyword);
 
         return PaginationResDto.<UserSearchInfoDto>builder()
                 .page(searchUserPage.getNumber())
@@ -239,6 +253,7 @@ public class SearchService {
     /**
      * 토탈 검색 with ElasticSearch
      */
+    @Transactional
     public SearchTotalResDto getSearchTotal(User user, String keyword) {
         final int itemSize = 9;
         final int questionSize = 4;
@@ -284,6 +299,8 @@ public class SearchService {
 
         List<UserSearchInfoDto> searchUser = this.getSearchUser(user, keyword, userPageable).getContent();
 
+        // 최근 검색 등록
+        postRecentSearch(user, keyword);
 
         return SearchTotalResDto.builder()
                 .itemList(searchItem)
@@ -302,5 +319,16 @@ public class SearchService {
         return SearchItemCountResDto.builder()
                 .itemCount(itemRepository.getSearchItemCount(itemIdList, dto))
                 .build();
+    }
+
+    private void postRecentSearch(User user, String keyword){
+        RecentSearch recentSearch = RecentSearch.builder()
+                .user(user)
+                .searchWord(keyword)
+                .build();
+
+        log.info("Post RecentSearch -> User: {}, Keyword: {}", user.getId(), keyword);
+        recentSearchRepository.save(recentSearch);
+
     }
 }

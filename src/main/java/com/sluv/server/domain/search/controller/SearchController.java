@@ -2,6 +2,7 @@ package com.sluv.server.domain.search.controller;
 
 import com.sluv.server.domain.item.dto.ItemSimpleResDto;
 import com.sluv.server.domain.question.dto.QuestionSimpleResDto;
+import com.sluv.server.domain.search.dto.RecentSearchChipResDto;
 import com.sluv.server.domain.search.dto.SearchFilterReqDto;
 import com.sluv.server.domain.search.dto.SearchItemCountResDto;
 import com.sluv.server.domain.search.dto.SearchTotalResDto;
@@ -16,6 +17,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/app/search")
@@ -101,7 +104,8 @@ public class SearchController {
     @Operation(
             summary = "필터링 조건에 따른 아이템 개수 조회",
             description = """
-                    필터링 조건에 맞는 아이템 개수를 조회하는 기능
+                    필터링 조건에 맞는 아이템 개수를 조회하는 기능 \n
+                    User Id Token 필요
                     """
     )
     @GetMapping("/item/count")
@@ -109,6 +113,22 @@ public class SearchController {
         return ResponseEntity.ok().body(
                 SuccessDataResponse.<SearchItemCountResDto>builder()
                         .result(searchService.getSearchItemCount(keyword, dto))
+                        .build()
+        );
+    }
+
+    @Operation(
+            summary = "최근 검색어 조회",
+            description = """
+                    유저에 따른 최근 검색어 조회 API\n
+                    User Id Token 필요
+                    """
+    )
+    @GetMapping("/recentSearch")
+    public ResponseEntity<SuccessDataResponse<List<RecentSearchChipResDto>>> getRecentSearch(@AuthenticationPrincipal User user){
+        return ResponseEntity.ok().body(
+                SuccessDataResponse.<List<RecentSearchChipResDto>>builder()
+                        .result(searchService.getRecentSearch(user))
                         .build()
         );
     }

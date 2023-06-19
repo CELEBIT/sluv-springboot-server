@@ -14,6 +14,7 @@ import com.sluv.server.domain.question.repository.QuestionImgRepository;
 import com.sluv.server.domain.question.repository.QuestionItemRepository;
 import com.sluv.server.domain.question.repository.QuestionRecommendCategoryRepository;
 import com.sluv.server.domain.question.repository.QuestionRepository;
+import com.sluv.server.domain.search.dto.RecentSearchChipResDto;
 import com.sluv.server.domain.search.dto.SearchFilterReqDto;
 import com.sluv.server.domain.search.dto.SearchItemCountResDto;
 import com.sluv.server.domain.search.dto.SearchTotalResDto;
@@ -330,5 +331,17 @@ public class SearchService {
         log.info("Post RecentSearch -> User: {}, Keyword: {}", user.getId(), keyword);
         recentSearchRepository.save(recentSearch);
 
+    }
+
+    public List<RecentSearchChipResDto> getRecentSearch(User user) {
+        List<RecentSearchChipResDto> result
+                = recentSearchRepository.getRecentSearch(user)
+                .stream()
+                .map(recentSearch -> RecentSearchChipResDto.builder()
+                        .keyword(recentSearch.getSearchWord())
+                        .build()
+                ).toList();
+
+        return result;
     }
 }

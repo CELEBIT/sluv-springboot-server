@@ -178,17 +178,16 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom{
                 .groupBy(item)
                 .where(item.id.in(itemIdList).and(item.itemStatus.eq(ACTIVE)))
                 .orderBy(getSearchItemOrder(pageable.getSort()));
-
         // Filter 조건 추가
-        addFilterWhere(query, dto);
+        JPAQuery<Item> newQuery = addFilterWhere(query, dto);
 
 
-        List<Item> content = query
+        List<Item> content = newQuery
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
 
-        return PageableExecutionUtils.getPage(content, pageable, () -> query.fetch().size());
+        return PageableExecutionUtils.getPage(content, pageable, () -> newQuery.fetch().size());
     }
 
     @Override
@@ -224,15 +223,15 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom{
         JPAQuery<Item> query = jpaQueryFactory.selectFrom(item)
                 .where(item.id.in(itemIdList));
 
-        addFilterWhere(query, dto);
+        JPAQuery<Item> newQuery = addFilterWhere(query, dto);
 
-        return (long) query.fetch().size();
+        return (long) newQuery.fetch().size();
     }
 
     /**
      * 검색 필터링 쿼리 추가
      */
-    private void addFilterWhere(JPAQuery<Item> query, SearchFilterReqDto dto){
+    private JPAQuery<Item> addFilterWhere(JPAQuery<Item> query, SearchFilterReqDto dto){
         // Category Filtering
         if (dto.getCategoryId() != null){
             query.where(item.category.id.eq(dto.getCategoryId()));
@@ -247,6 +246,7 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom{
         if(dto.getColor() != null){
             query.where(item.color.eq(dto.getColor()));
         }
+        return query;
     }
 
     /**
@@ -267,9 +267,10 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom{
                     case "고가순" -> orderSpecifier = item.price.desc();
                 }
 
-
                 orderSpecifiers.add(orderSpecifier);
             }
+        }else{
+            orderSpecifiers.add(item.whenDiscovery.desc());
         }
 
         return orderSpecifiers.get(0);

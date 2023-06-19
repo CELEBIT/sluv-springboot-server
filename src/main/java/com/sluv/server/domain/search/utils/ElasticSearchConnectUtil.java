@@ -74,7 +74,6 @@ public class ElasticSearchConnectUtil {
         }catch (Exception e){
             log.error("JSONArray To Long List Convert Error");
         }
-
         return list;
 
     }

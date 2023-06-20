@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class SearchRankResDto {
-    @Schema(description = "SearchRank에 해당하는 키워드")
+public class SearchKeywordResDto {
+    @Schema(description = "키워드")
     private String keyword;
 }

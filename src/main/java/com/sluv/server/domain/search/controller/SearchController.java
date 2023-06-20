@@ -2,10 +2,7 @@ package com.sluv.server.domain.search.controller;
 
 import com.sluv.server.domain.item.dto.ItemSimpleResDto;
 import com.sluv.server.domain.question.dto.QuestionSimpleResDto;
-import com.sluv.server.domain.search.dto.RecentSearchChipResDto;
-import com.sluv.server.domain.search.dto.SearchFilterReqDto;
-import com.sluv.server.domain.search.dto.SearchItemCountResDto;
-import com.sluv.server.domain.search.dto.SearchTotalResDto;
+import com.sluv.server.domain.search.dto.*;
 import com.sluv.server.domain.search.service.SearchService;
 import com.sluv.server.domain.user.dto.UserSearchInfoDto;
 import com.sluv.server.domain.user.entity.User;
@@ -129,6 +126,21 @@ public class SearchController {
         return ResponseEntity.ok().body(
                 SuccessDataResponse.<List<RecentSearchChipResDto>>builder()
                         .result(searchService.getRecentSearch(user))
+                        .build()
+        );
+    }
+    @Operation(
+            summary = "인기 검색어 조회",
+            description = """
+                    인기 검색어 조회\n
+                    한번에 9개를 모두 조회.
+                    """
+    )
+    @GetMapping("/searchRank")
+    public ResponseEntity<SuccessDataResponse<List<SearchRankResDto>>> getRecentSearch(){
+        return ResponseEntity.ok().body(
+                SuccessDataResponse.<List<SearchRankResDto>>builder()
+                        .result(searchService.getSearchRank())
                         .build()
         );
     }

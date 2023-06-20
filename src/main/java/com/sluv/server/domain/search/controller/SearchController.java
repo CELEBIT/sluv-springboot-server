@@ -33,12 +33,14 @@ public class SearchController {
                     """
     )
     @GetMapping("/item")
-    public ResponseEntity<PaginationResDto<ItemSimpleResDto>> searchItem(@AuthenticationPrincipal User user,
+    public ResponseEntity<SuccessDataResponse<PaginationResDto<ItemSimpleResDto>>> searchItem(@AuthenticationPrincipal User user,
                                                                          @RequestParam("keyword") String keyword,
                                                                          SearchFilterReqDto dto,
                                                                          Pageable pageable){
         return ResponseEntity.ok().body(
-                searchService.getSearchItem(user, keyword, dto, pageable)
+                SuccessDataResponse.<PaginationResDto<ItemSimpleResDto>>builder()
+                        .result(searchService.getSearchItem(user, keyword, dto, pageable))
+                        .build()
         );
     }
 
@@ -52,12 +54,14 @@ public class SearchController {
                     """
     )
     @GetMapping("/question")
-    public ResponseEntity<PaginationResDto<QuestionSimpleResDto>> searchQuestion(@AuthenticationPrincipal User user,
+    public ResponseEntity<SuccessDataResponse<PaginationResDto<QuestionSimpleResDto>>> searchQuestion(@AuthenticationPrincipal User user,
                                                                                  @RequestParam("keyword") String keyword,
                                                                                  @RequestParam("qtype") String qType,
                                                                                  Pageable pageable){
         return ResponseEntity.ok().body(
-                searchService.getSearchQuestion(user, keyword, qType, pageable)
+                SuccessDataResponse.<PaginationResDto<QuestionSimpleResDto>>builder()
+                            .result(searchService.getSearchQuestion(user, keyword, qType, pageable))
+                            .build()
         );
     }
 
@@ -71,11 +75,13 @@ public class SearchController {
                     """
     )
     @GetMapping("/user")
-    public ResponseEntity<PaginationResDto<UserSearchInfoDto>> searchUser(@AuthenticationPrincipal User user,
+    public ResponseEntity<SuccessDataResponse<PaginationResDto<UserSearchInfoDto>>> searchUser(@AuthenticationPrincipal User user,
                                                                           @RequestParam("keyword") String keyword,
                                                                           Pageable pageable){
         return ResponseEntity.ok().body(
-                searchService.getSearchUser(user, keyword, pageable)
+                SuccessDataResponse.<PaginationResDto<UserSearchInfoDto>>builder()
+                                .result(searchService.getSearchUser(user, keyword, pageable))
+                                .build()
         );
     }
 

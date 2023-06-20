@@ -14,12 +14,13 @@ import com.sluv.server.domain.question.repository.QuestionImgRepository;
 import com.sluv.server.domain.question.repository.QuestionItemRepository;
 import com.sluv.server.domain.question.repository.QuestionRecommendCategoryRepository;
 import com.sluv.server.domain.question.repository.QuestionRepository;
-import com.sluv.server.domain.search.dto.RecentSearchChipResDto;
-import com.sluv.server.domain.search.dto.SearchFilterReqDto;
-import com.sluv.server.domain.search.dto.SearchItemCountResDto;
-import com.sluv.server.domain.search.dto.SearchTotalResDto;
+import com.sluv.server.domain.search.dto.*;
 import com.sluv.server.domain.search.entity.RecentSearch;
+import com.sluv.server.domain.search.entity.SearchData;
+import com.sluv.server.domain.search.entity.SearchRank;
 import com.sluv.server.domain.search.repository.RecentSearchRepository;
+import com.sluv.server.domain.search.repository.SearchDataRepository;
+import com.sluv.server.domain.search.repository.SearchRankRepository;
 import com.sluv.server.domain.search.utils.ElasticSearchConnectUtil;
 import com.sluv.server.domain.user.dto.UserSearchInfoDto;
 import com.sluv.server.domain.user.entity.User;
@@ -55,6 +56,9 @@ public class SearchService {
     private final ClosetRepository closetRepository;
     private final ElasticSearchConnectUtil elasticSearchConnectUtil;
     private final RecentSearchRepository recentSearchRepository;
+    private final SearchRankRepository searchRankRepository;
+    private final SearchDataRepository searchDataRepository;
+
 
     /**
      * Item 검색 with ElasticSearch
@@ -95,6 +99,9 @@ public class SearchService {
 
         // 최근 검색 등록
         postRecentSearch(user, keyword);
+
+        // 서치 데이터 등록
+        postSearchData(keyword);
 
         return PaginationResDto.<ItemSimpleResDto>builder()
                 .page(searchItemPage.getNumber())
@@ -206,6 +213,9 @@ public class SearchService {
             // 최근 검색 등록
             postRecentSearch(user, keyword);
 
+            // 서치 데이터 등록
+            postSearchData(keyword);
+
             return PaginationResDto.<QuestionSimpleResDto>builder()
                     .page(searchQuestionPage.getNumber())
                     .hasNext(searchQuestionPage.hasNext())
@@ -243,6 +253,9 @@ public class SearchService {
 
         // 최근 검색 등록
         postRecentSearch(user, keyword);
+
+        // 서치 데이터 등록
+        postSearchData(keyword);
 
         return PaginationResDto.<UserSearchInfoDto>builder()
                 .page(searchUserPage.getNumber())
@@ -303,6 +316,9 @@ public class SearchService {
         // 최근 검색 등록
         postRecentSearch(user, keyword);
 
+        // 서치 데이터 등록
+        postSearchData(keyword);
+
         return SearchTotalResDto.builder()
                 .itemList(searchItem)
                 .questionList(searchQuestion)
@@ -343,5 +359,26 @@ public class SearchService {
                 ).toList();
 
         return result;
+    }
+
+    public List<SearchRankResDto> getSearchRank() {
+        List<SearchRank> searchRankList = searchRankRepository.findAllByOrderBySearchCountDesc();
+        return searchRankList
+                .stream()
+                .map(searchRank -> SearchRankResDto.builder()
+                        .keyword(searchRank.getSearchWord())
+                        .build()
+                        ).toList();
+    }
+
+    private void postSearchData(String keyword){
+        SearchData searchData = SearchData.builder()
+                .searchWord(keyword)
+                .build();
+
+
+        log.info("Post SearchData -> Keyword: {}", keyword);
+        searchDataRepository.save(searchData);
+
     }
 }

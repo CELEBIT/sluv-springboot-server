@@ -143,10 +143,27 @@ public class SearchController {
                     """
     )
     @GetMapping("/searchRank")
-    public ResponseEntity<SuccessDataResponse<List<SearchRankResDto>>> getRecentSearch(){
+    public ResponseEntity<SuccessDataResponse<List<SearchKeywordResDto>>> getRecentSearch(){
         return ResponseEntity.ok().body(
-                SuccessDataResponse.<List<SearchRankResDto>>builder()
+                SuccessDataResponse.<List<SearchKeywordResDto>>builder()
                         .result(searchService.getSearchRank())
+                        .build()
+        );
+    }
+
+    @Operation(
+            summary = "Keyword 자동 완성",
+            description = """
+                    Search Data에 있는 것을 기반으로 자동완성 검색.\n
+                    Pagination 적용
+                    """
+    )
+    @GetMapping("/keyword")
+    public ResponseEntity<SuccessDataResponse<PaginationResDto<SearchKeywordResDto>>> getSearchKeyword(@RequestParam("keyword") String keyword,
+                                                                                                       Pageable pageable){
+        return ResponseEntity.ok().body(
+                SuccessDataResponse.<PaginationResDto<SearchKeywordResDto>>builder()
+                        .result(searchService.getSearchKeyword(keyword, pageable))
                         .build()
         );
     }

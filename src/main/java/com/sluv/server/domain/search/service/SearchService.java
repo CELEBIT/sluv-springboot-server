@@ -361,11 +361,11 @@ public class SearchService {
         return result;
     }
 
-    public List<SearchRankResDto> getSearchRank() {
+    public List<SearchKeywordResDto> getSearchRank() {
         List<SearchRank> searchRankList = searchRankRepository.findAllByOrderBySearchCountDesc();
         return searchRankList
                 .stream()
-                .map(searchRank -> SearchRankResDto.builder()
+                .map(searchRank -> SearchKeywordResDto.builder()
                         .keyword(searchRank.getSearchWord())
                         .build()
                         ).toList();
@@ -380,5 +380,20 @@ public class SearchService {
         log.info("Post SearchData -> Keyword: {}", keyword);
         searchDataRepository.save(searchData);
 
+    }
+
+    public PaginationResDto<SearchKeywordResDto> getSearchKeyword(String keyword, Pageable pageable) {
+        Page<SearchData> searchDataPage = searchDataRepository.getSearchKeyword(keyword, pageable);
+
+        List<SearchKeywordResDto> content = searchDataPage.stream().map(searchData -> SearchKeywordResDto.builder()
+                .keyword(searchData.getSearchWord())
+                .build()
+        ).toList();
+
+        return PaginationResDto.<SearchKeywordResDto>builder()
+                .page(searchDataPage.getNumber())
+                .hasNext(searchDataPage.hasNext())
+                .content(content)
+                .build();
     }
 }

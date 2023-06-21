@@ -9,6 +9,7 @@ import com.sluv.server.domain.celeb.repository.CelebRepository;
 import com.sluv.server.domain.celeb.dto.InterestedCelebParentResDto;
 import com.sluv.server.domain.celeb.dto.InterestedCelebChildResDto;
 import com.sluv.server.domain.celeb.repository.InterestedCelebRepository;
+import com.sluv.server.domain.closet.dto.ClosetResDto;
 import com.sluv.server.domain.closet.entity.Closet;
 import com.sluv.server.domain.closet.repository.ClosetRepository;
 import com.sluv.server.domain.comment.repository.CommentRepository;
@@ -229,6 +230,33 @@ public class UserService {
         return PaginationResDto.<ItemSimpleResDto>builder()
                 .page(itemPage.getNumber())
                 .hasNext(itemPage.hasNext())
+                .content(content)
+                .build();
+    }
+
+    public PaginationResDto<ClosetResDto> getUserCloset(User user, Long userId, Pageable pageable) {
+        Page<Closet> closetPage;
+
+        // User 일치 여부에 따라 조회하는 Public Closet만 조회할지 결정
+        if(user.getId().equals(userId)){
+            closetPage = closetRepository.getUserAllCloset(userId, pageable);
+        }else {
+            closetPage = closetRepository.getUserAllPublicCloset(userId, pageable);
+        }
+
+        List<ClosetResDto> content = closetPage.stream().map(closet ->
+                ClosetResDto.builder()
+                        .name(closet.getName())
+                        .coverImgUrl(closet.getCoverImgUrl())
+                        .closetStatus(closet.getClosetStatus())
+                        .color(closet.getColor())
+                        .itemNum(itemScrapRepository.countByClosetId(closet.getId()))
+                        .build()
+        ).toList();
+
+        return PaginationResDto.<ClosetResDto>builder()
+                .page(closetPage.getNumber())
+                .hasNext(closetPage.hasNext())
                 .content(content)
                 .build();
     }

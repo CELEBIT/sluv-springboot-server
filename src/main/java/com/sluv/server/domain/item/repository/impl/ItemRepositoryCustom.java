@@ -30,4 +30,6 @@ public interface ItemRepositoryCustom {
     Long getSearchItemCount(List<Long> itemIdList, SearchFilterReqDto dto);
 
     List<Item> getRecentTop2Item(User targetUser);
+
+    Page<Item> getUserAllItem(Long userId, Pageable pageable);
 }

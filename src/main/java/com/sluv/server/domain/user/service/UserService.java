@@ -9,9 +9,14 @@ import com.sluv.server.domain.celeb.repository.CelebRepository;
 import com.sluv.server.domain.celeb.dto.InterestedCelebParentResDto;
 import com.sluv.server.domain.celeb.dto.InterestedCelebChildResDto;
 import com.sluv.server.domain.celeb.repository.InterestedCelebRepository;
+import com.sluv.server.domain.closet.entity.Closet;
+import com.sluv.server.domain.closet.repository.ClosetRepository;
 import com.sluv.server.domain.comment.repository.CommentRepository;
+import com.sluv.server.domain.item.dto.ItemSimpleResDto;
+import com.sluv.server.domain.item.entity.Item;
 import com.sluv.server.domain.item.repository.ItemImgRepository;
 import com.sluv.server.domain.item.repository.ItemRepository;
+import com.sluv.server.domain.item.repository.ItemScrapRepository;
 import com.sluv.server.domain.question.repository.QuestionRepository;
 import com.sluv.server.domain.user.dto.*;
 import com.sluv.server.domain.user.entity.Follow;
@@ -21,9 +26,12 @@ import com.sluv.server.domain.user.exception.UserNicknameDuplicatedException;
 import com.sluv.server.domain.user.exception.UserNotFoundException;
 import com.sluv.server.domain.user.repository.FollowRepository;
 import com.sluv.server.domain.user.repository.UserRepository;
+import com.sluv.server.global.common.response.PaginationResDto;
 import com.sluv.server.global.jwt.JwtProvider;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,6 +49,8 @@ public class UserService {
     private final QuestionRepository questionRepository;
     private final CommentRepository commentRepository;
     private final ItemImgRepository itemImgRepository;
+    private final ItemScrapRepository itemScrapRepository;
+    private final ClosetRepository closetRepository;
 
 
     private final JwtProvider jwtProvider;
@@ -188,6 +198,38 @@ public class UserService {
                 .followerCount(followRepository.getFollowerCount(targetUser))
                 .followingCount(followRepository.getFollowingCount(targetUser))
                 .interestedCelebList(interestedCelebList)
+                .build();
+    }
+
+    public PaginationResDto<ItemSimpleResDto> getUserItem(User user, Long userId, Pageable pageable) {
+        Page<Item> itemPage = itemRepository.getUserAllItem(userId, pageable);
+
+        List<ItemSimpleResDto> content = itemPage.stream().map(item -> {
+            List<Closet> closetList = closetRepository.findAllByUserId(user.getId());
+            return ItemSimpleResDto.builder()
+                    .itemId(item.getId())
+                    .imgUrl(itemImgRepository.findMainImg(item.getId()).getItemImgUrl())
+                    .brandName(
+                            item.getBrand() != null
+                                    ? item.getBrand().getBrandKr()
+                                    : item.getNewBrand().getBrandName()
+                    )
+                    .itemName(item.getName())
+                    .celebName(
+                            item.getCeleb() != null
+                                    ? item.getCeleb().getParent() != null
+                                        ?item.getCeleb().getParent().getCelebNameKr() + " " +item.getCeleb().getCelebNameKr()
+                                        :item.getCeleb().getCelebNameKr()
+                                    : item.getNewCeleb().getCelebName()
+                    )
+                    .scrapStatus(itemScrapRepository.getItemScrapStatus(item, closetList))
+                    .build();
+        }).toList();
+
+        return PaginationResDto.<ItemSimpleResDto>builder()
+                .page(itemPage.getNumber())
+                .hasNext(itemPage.hasNext())
+                .content(content)
                 .build();
     }
 }

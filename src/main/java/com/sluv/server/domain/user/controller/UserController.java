@@ -3,6 +3,7 @@ package com.sluv.server.domain.user.controller;
 
 import com.sluv.server.domain.celeb.dto.InterestedCelebParentResDto;
 import com.sluv.server.domain.celeb.dto.InterestedCelebPostReqDto;
+import com.sluv.server.domain.item.dto.ItemSimpleResDto;
 import com.sluv.server.domain.user.dto.UserMypageResDto;
 import com.sluv.server.domain.user.dto.UserProfileReqDto;
 import com.sluv.server.domain.user.dto.UserReportReqDto;
@@ -10,6 +11,7 @@ import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.domain.user.service.UserReportService;
 import com.sluv.server.domain.user.service.UserService;
 import com.sluv.server.global.common.response.ErrorResponse;
+import com.sluv.server.global.common.response.PaginationResDto;
 import com.sluv.server.global.common.response.SuccessDataResponse;
 import com.sluv.server.global.common.response.SuccessResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -18,6 +20,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -136,6 +139,23 @@ public class UserController {
                         .build()
         );
     }
+    @Operation(
+            summary = "특정 유저의 아이템 목록 조회",
+            description = """
+                    특정 유저의 아이템 목록 조회\n
+                    User Id Token 필요
+                        -> 특정 유저의 아이템 스크랩 여부 판단
+                    Pagination 적용\n
+                    """
+    )
+    @GetMapping("/{userId}/item")
+    public ResponseEntity<SuccessDataResponse<PaginationResDto<ItemSimpleResDto>>> getUserItem(@AuthenticationPrincipal User user, @PathVariable("userId") Long userId, Pageable pageable){
 
+        return ResponseEntity.ok().body(
+                SuccessDataResponse.<PaginationResDto<ItemSimpleResDto>>builder()
+                        .result(userService.getUserItem(user, userId, pageable))
+                        .build()
+        );
+    }
 
 }

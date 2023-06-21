@@ -287,4 +287,25 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom{
                 .orderBy(item.id.desc())
                 .fetch();
     }
+
+    /**
+     * MyPage 유저가 작성한 모든 아이템 검색
+     */
+    @Override
+    public Page<Item> getUserAllItem(Long userId, Pageable pageable) {
+        List<Item> content = jpaQueryFactory.selectFrom(item)
+                .where(item.user.id.eq(userId).and(item.itemStatus.eq(ACTIVE)))
+                .orderBy(item.id.desc())
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        // Count Query
+        JPAQuery<Item> query = jpaQueryFactory.selectFrom(item)
+                .where(item.user.id.eq(userId).and(item.itemStatus.eq(ACTIVE)))
+                .orderBy(item.id.desc());
+
+
+        return PageableExecutionUtils.getPage(content, pageable, () -> query.fetch().size());
+    }
 }

@@ -11,10 +11,7 @@ import com.sluv.server.domain.user.dto.UserReportReqDto;
 import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.domain.user.service.UserReportService;
 import com.sluv.server.domain.user.service.UserService;
-import com.sluv.server.global.common.response.ErrorResponse;
-import com.sluv.server.global.common.response.PaginationResDto;
-import com.sluv.server.global.common.response.SuccessDataResponse;
-import com.sluv.server.global.common.response.SuccessResponse;
+import com.sluv.server.global.common.response.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -174,6 +171,25 @@ public class UserController {
         return ResponseEntity.ok().body(
                 SuccessDataResponse.<PaginationResDto<ClosetResDto>>builder()
                         .result(userService.getUserCloset(user, userId, pageable))
+                        .build()
+        );
+    }
+
+    @Operation(
+            summary = "유저의 최근 본 아이템 조회",
+            description = """
+                    특정 유저의 옷장 목록 조회\n
+                    User Id Token 필요
+                        -> Id를 기준으로 조회\n
+                    Pagination 적용\n
+                    """
+    )
+    @GetMapping("/recentItem")
+    public ResponseEntity<SuccessDataResponse<PaginationCountResDto<ItemSimpleResDto>>> getUserRecentItem(@AuthenticationPrincipal User user, Pageable pageable){
+
+        return ResponseEntity.ok().body(
+                SuccessDataResponse.<PaginationCountResDto<ItemSimpleResDto>>builder()
+                        .result(userService.getUserRecentItem(user, pageable))
                         .build()
         );
     }

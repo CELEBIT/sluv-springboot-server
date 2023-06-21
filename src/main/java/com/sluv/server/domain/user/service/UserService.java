@@ -15,9 +15,11 @@ import com.sluv.server.domain.closet.repository.ClosetRepository;
 import com.sluv.server.domain.comment.repository.CommentRepository;
 import com.sluv.server.domain.item.dto.ItemSimpleResDto;
 import com.sluv.server.domain.item.entity.Item;
+import com.sluv.server.domain.item.entity.RecentItem;
 import com.sluv.server.domain.item.repository.ItemImgRepository;
 import com.sluv.server.domain.item.repository.ItemRepository;
 import com.sluv.server.domain.item.repository.ItemScrapRepository;
+import com.sluv.server.domain.item.repository.RecentItemRepository;
 import com.sluv.server.domain.question.repository.QuestionRepository;
 import com.sluv.server.domain.user.dto.*;
 import com.sluv.server.domain.user.entity.Follow;
@@ -27,6 +29,7 @@ import com.sluv.server.domain.user.exception.UserNicknameDuplicatedException;
 import com.sluv.server.domain.user.exception.UserNotFoundException;
 import com.sluv.server.domain.user.repository.FollowRepository;
 import com.sluv.server.domain.user.repository.UserRepository;
+import com.sluv.server.global.common.response.PaginationCountResDto;
 import com.sluv.server.global.common.response.PaginationResDto;
 import com.sluv.server.global.jwt.JwtProvider;
 import jakarta.servlet.http.HttpServletRequest;
@@ -51,6 +54,7 @@ public class UserService {
     private final CommentRepository commentRepository;
     private final ItemImgRepository itemImgRepository;
     private final ItemScrapRepository itemScrapRepository;
+    private final RecentItemRepository recentItemRepository;
     private final ClosetRepository closetRepository;
 
 
@@ -207,30 +211,34 @@ public class UserService {
 
         List<ItemSimpleResDto> content = itemPage.stream().map(item -> {
             List<Closet> closetList = closetRepository.findAllByUserId(user.getId());
-            return ItemSimpleResDto.builder()
-                    .itemId(item.getId())
-                    .imgUrl(itemImgRepository.findMainImg(item.getId()).getItemImgUrl())
-                    .brandName(
-                            item.getBrand() != null
-                                    ? item.getBrand().getBrandKr()
-                                    : item.getNewBrand().getBrandName()
-                    )
-                    .itemName(item.getName())
-                    .celebName(
-                            item.getCeleb() != null
-                                    ? item.getCeleb().getParent() != null
-                                        ?item.getCeleb().getParent().getCelebNameKr() + " " +item.getCeleb().getCelebNameKr()
-                                        :item.getCeleb().getCelebNameKr()
-                                    : item.getNewCeleb().getCelebName()
-                    )
-                    .scrapStatus(itemScrapRepository.getItemScrapStatus(item, closetList))
-                    .build();
+            return getItemSimpleResDto(item, closetList);
         }).toList();
 
         return PaginationResDto.<ItemSimpleResDto>builder()
                 .page(itemPage.getNumber())
                 .hasNext(itemPage.hasNext())
                 .content(content)
+                .build();
+    }
+
+    private ItemSimpleResDto getItemSimpleResDto(Item item, List<Closet> closetList) {
+        return ItemSimpleResDto.builder()
+                .itemId(item.getId())
+                .imgUrl(itemImgRepository.findMainImg(item.getId()).getItemImgUrl())
+                .brandName(
+                        item.getBrand() != null
+                                ? item.getBrand().getBrandKr()
+                                : item.getNewBrand().getBrandName()
+                )
+                .itemName(item.getName())
+                .celebName(
+                        item.getCeleb() != null
+                                ? item.getCeleb().getParent() != null
+                                ? item.getCeleb().getParent().getCelebNameKr() + " " + item.getCeleb().getCelebNameKr()
+                                : item.getCeleb().getCelebNameKr()
+                                : item.getNewCeleb().getCelebName()
+                )
+                .scrapStatus(itemScrapRepository.getItemScrapStatus(item, closetList))
                 .build();
     }
 
@@ -259,5 +267,20 @@ public class UserService {
                 .hasNext(closetPage.hasNext())
                 .content(content)
                 .build();
+    }
+
+    public PaginationCountResDto<ItemSimpleResDto> getUserRecentItem(User user, Pageable pageable) {
+
+        Page<RecentItem> recentItemPage = recentItemRepository.getUserAllRecentItem(user, pageable);
+
+        List<Closet> closetList = closetRepository.findAllByUserId(user.getId());
+
+        List<ItemSimpleResDto> content = recentItemPage
+                .stream()
+                .map(recentItem -> getItemSimpleResDto(recentItem.getItem(), closetList))
+                .toList();
+
+        return new PaginationCountResDto<>(recentItemPage.hasNext(), recentItemPage.getNumber(), content, recentItemPage.getTotalElements());
+
     }
 }

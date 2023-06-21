@@ -277,4 +277,14 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom{
 
 
     }
+
+    @Override
+    public List<Item> getRecentTop2Item(User targetUser) {
+
+        return jpaQueryFactory.selectFrom(item)
+                .where(item.user.eq(targetUser))
+                .limit(2)
+                .orderBy(item.id.desc())
+                .fetch();
+    }
 }

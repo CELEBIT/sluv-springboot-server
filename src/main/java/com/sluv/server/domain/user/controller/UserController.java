@@ -3,8 +3,7 @@ package com.sluv.server.domain.user.controller;
 
 import com.sluv.server.domain.celeb.dto.InterestedCelebParentResDto;
 import com.sluv.server.domain.celeb.dto.InterestedCelebPostReqDto;
-import com.sluv.server.domain.item.dto.ItemEditReqDto;
-import com.sluv.server.domain.item.service.ItemEditReqService;
+import com.sluv.server.domain.user.dto.UserMypageResDto;
 import com.sluv.server.domain.user.dto.UserProfileReqDto;
 import com.sluv.server.domain.user.dto.UserReportReqDto;
 import com.sluv.server.domain.user.entity.User;
@@ -117,6 +116,24 @@ public class UserController {
         userService.postUserProfile(user, dto);
         return ResponseEntity.ok().body(
                 new SuccessResponse()
+        );
+    }
+
+    @Operation(
+            summary = "특정 유저의 마이페이지 조회",
+            description = """
+                    특정 유저의 마이페이지 조회
+                    User Id Token 필요
+                     -> 특정 유저가 현재 유저와 일치하는지, 혹은 팔로우 여부를 체크
+                    """
+    )
+    @GetMapping("/{userId}/mypage")
+    public ResponseEntity<SuccessDataResponse<UserMypageResDto>> getUserMypage(@AuthenticationPrincipal User user, @PathVariable("userId") Long userId){
+
+        return ResponseEntity.ok().body(
+                SuccessDataResponse.<UserMypageResDto>builder()
+                        .result(userService.getUserMypage(user, userId))
+                        .build()
         );
     }
 

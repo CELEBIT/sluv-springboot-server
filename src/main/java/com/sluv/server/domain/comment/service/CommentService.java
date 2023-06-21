@@ -259,7 +259,7 @@ public class CommentService {
                     List<CommentItemResDto> itemList = commentItemRepository.findAllByCommentId(comment.getId())
                             .stream().map(commentItem -> CommentItemResDto.builder()
                                             .item(getItemSameResDto(commentItem.getItem()))
-                                            .order(commentItem.getSortOrder())
+                                            .sortOrder(commentItem.getSortOrder())
                                             .build()
                             ).toList();
 

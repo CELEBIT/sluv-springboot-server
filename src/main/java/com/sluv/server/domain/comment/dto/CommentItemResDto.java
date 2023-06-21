@@ -15,5 +15,5 @@ public class CommentItemResDto {
     @Schema(description = "Comment 아이템 정보")
     private ItemSimpleResDto item;
     @Schema(description = "Comment 아이템 순서")
-    private Integer order;
+    private Integer sortOrder;
 }

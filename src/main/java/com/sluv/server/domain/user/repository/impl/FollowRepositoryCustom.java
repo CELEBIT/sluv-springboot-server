@@ -7,4 +7,8 @@ public interface FollowRepositoryCustom {
     Boolean getFollowStatus(User user, User targetUser);
 
     void deleteFollow(User user, User targetUser);
+
+    Long getFollowerCount(User targetUser);
+
+    Long getFollowingCount(User targetUser);
 }

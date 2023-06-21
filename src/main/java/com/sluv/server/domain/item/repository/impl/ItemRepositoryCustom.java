@@ -28,4 +28,6 @@ public interface ItemRepositoryCustom {
     Page<Item> getRecommendItemPage(Pageable pageable);
 
     Long getSearchItemCount(List<Long> itemIdList, SearchFilterReqDto dto);
+
+    List<Item> getRecentTop2Item(User targetUser);
 }

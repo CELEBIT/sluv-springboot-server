@@ -1,6 +1,7 @@
 package com.sluv.server.domain.user.service;
 
 import com.sluv.server.domain.celeb.dto.InterestedCelebPostReqDto;
+import com.sluv.server.domain.celeb.dto.InterestedCelebResDto;
 import com.sluv.server.domain.celeb.entity.Celeb;
 import com.sluv.server.domain.celeb.entity.InterestedCeleb;
 import com.sluv.server.domain.celeb.exception.CelebNotFoundException;
@@ -8,20 +9,18 @@ import com.sluv.server.domain.celeb.repository.CelebRepository;
 import com.sluv.server.domain.celeb.dto.InterestedCelebParentResDto;
 import com.sluv.server.domain.celeb.dto.InterestedCelebChildResDto;
 import com.sluv.server.domain.celeb.repository.InterestedCelebRepository;
-import com.sluv.server.domain.user.dto.UserProfileReqDto;
-import com.sluv.server.domain.user.dto.UserReportReqDto;
+import com.sluv.server.domain.comment.repository.CommentRepository;
+import com.sluv.server.domain.item.repository.ItemImgRepository;
+import com.sluv.server.domain.item.repository.ItemRepository;
+import com.sluv.server.domain.question.repository.QuestionRepository;
+import com.sluv.server.domain.user.dto.*;
 import com.sluv.server.domain.user.entity.Follow;
 import com.sluv.server.domain.user.entity.User;
-import com.sluv.server.domain.user.dto.UserDto;
-import com.sluv.server.domain.user.entity.UserReport;
 import com.sluv.server.domain.user.enums.UserStatus;
 import com.sluv.server.domain.user.exception.UserNicknameDuplicatedException;
-import com.sluv.server.domain.user.exception.UserReportDuplicateException;
 import com.sluv.server.domain.user.exception.UserNotFoundException;
 import com.sluv.server.domain.user.repository.FollowRepository;
-import com.sluv.server.domain.user.repository.UserReportRepository;
 import com.sluv.server.domain.user.repository.UserRepository;
-import com.sluv.server.global.common.enums.ReportStatus;
 import com.sluv.server.global.jwt.JwtProvider;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -37,8 +36,12 @@ public class UserService {
     private final UserRepository userRepository;
     private final CelebRepository celebRepository;
     private final FollowRepository followRepository;
-    private final UserReportRepository userReportRepository;
     private final InterestedCelebRepository interestedCelebRepository;
+    private final ItemRepository itemRepository;
+    private final QuestionRepository questionRepository;
+    private final CommentRepository commentRepository;
+    private final ItemImgRepository itemImgRepository;
+
 
     private final JwtProvider jwtProvider;
 
@@ -134,5 +137,57 @@ public class UserService {
         if(currentUser.getUserStatus().equals(UserStatus.PENDING_PROFILE)){
             currentUser.changeUserStatus(UserStatus.PENDING_CELEB);
         }
+    }
+
+    public UserMypageResDto getUserMypage(User user, Long userId) {
+        UserMypageResDto.UserMypageResDtoBuilder result = UserMypageResDto.builder();
+        User targetUser;
+        if(user.getId().equals(userId)){ // 특정 유저와 현재 유저가 같을 때
+            targetUser = user;
+
+            Long questionNum = questionRepository.countByUserId(targetUser.getId());
+            Long commentNum = commentRepository.countByUserId(targetUser.getId());
+
+            List<String> imgList = itemRepository.getRecentTop2Item(targetUser)
+                    .stream()
+                    .map(item -> itemImgRepository.findMainImg(item.getId()).getItemImgUrl()).toList();
+
+            result
+                .itemCount(itemRepository.countByUserId(targetUser.getId()))
+                .imgList(imgList)
+                .communityCount(questionNum + commentNum);
+
+        }else{ // 특정 유저와 현재 유저가 다를 때
+            targetUser = userRepository.findById(userId)
+                                            .orElseThrow(UserNotFoundException::new);
+        }
+
+
+
+        List<InterestedCelebResDto> interestedCelebList = interestedCelebRepository.findAllByUserId(targetUser.getId())
+                .stream().map(interestedCeleb -> InterestedCelebResDto.builder()
+                        .id(interestedCeleb.getCeleb().getId())
+                        .celebNameKr(interestedCeleb.getCeleb().getCelebNameKr())
+                        .celebCategory(
+                                interestedCeleb.getCeleb().getCelebCategory().getParent() != null
+                                ? interestedCeleb.getCeleb().getCelebCategory().getParent().getName()
+                                : interestedCeleb.getCeleb().getCelebCategory().getName()
+                        )
+                        .build()
+                ).toList();
+
+
+        return result
+                .userInfo(
+                        UserInfoDto.builder()
+                            .id(targetUser.getId())
+                            .nickName(targetUser.getNickname())
+                            .profileImgUrl(targetUser.getProfileImgUrl())
+                            .build()
+                )
+                .followerCount(followRepository.getFollowerCount(targetUser))
+                .followingCount(followRepository.getFollowingCount(targetUser))
+                .interestedCelebList(interestedCelebList)
+                .build();
     }
 }

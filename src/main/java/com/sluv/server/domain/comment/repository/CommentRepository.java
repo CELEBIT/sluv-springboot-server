@@ -8,4 +8,6 @@ public interface CommentRepository extends JpaRepository<Comment, Long>, Comment
     Long countByQuestionId(Long questionId);
 
     void deleteAllByParentId(Long commentId);
+
+    Long countByUserId(Long user_id);
 }

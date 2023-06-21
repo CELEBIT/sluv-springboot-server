@@ -356,7 +356,8 @@ public class QuestionService {
                                                                 QuestionImgResDto.QuestionImgResDtoBuilder builder = QuestionImgResDto.builder()
                                                                                 .imgUrl(questionImg.getImgUrl())
                                                                                 .representFlag(questionImg.getRepresentFlag())
-                                                                                .order(questionImg.getSortOrder());
+                                                                                .order(questionImg.getSortOrder())
+                                                                                .description(questionImg.getDescription());
                                                                 if(qType != null && qType.equals("Buy")){
                                                                     QuestionBuy questionBuy = (QuestionBuy) question;
                                                                     builder.voteNum(questionImg.getVote())
@@ -392,7 +393,8 @@ public class QuestionService {
                                                 QuestionItemResDto.QuestionItemResDtoBuilder builder = QuestionItemResDto.builder()
                                                         .item(dto)
                                                         .representFlag(questionItem.getRepresentFlag())
-                                                        .order(questionItem.getSortOrder());
+                                                        .order(questionItem.getSortOrder())
+                                                        .description(questionItem.getDescription());
 
                                                 if(qType != null & qType.equals("Buy")){
                                                     QuestionBuy questionBuy = (QuestionBuy) question;

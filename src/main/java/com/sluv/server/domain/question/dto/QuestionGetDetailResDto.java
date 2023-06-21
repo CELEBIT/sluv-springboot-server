@@ -1,8 +1,6 @@
 package com.sluv.server.domain.question.dto;
 
 import com.sluv.server.domain.celeb.dto.CelebChipResDto;
-import com.sluv.server.domain.item.dto.ItemOrderResDto;
-import com.sluv.server.domain.item.dto.ItemSimpleResDto;
 import com.sluv.server.domain.user.dto.UserInfoDto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
@@ -29,7 +27,7 @@ public class QuestionGetDetailResDto {
     @Schema(description = "게시글 이미지 Url 리스트")
     private List<QuestionImgResDto> imgList;
     @Schema(description = "게시글 아이템 리스트")
-    private List<ItemOrderResDto> itemList;
+    private List<QuestionItemResDto> itemList;
     @Schema(description = "게시글 조회수")
     private Long searchNum;
     @Schema(description = "게시글 좋아요 수")
@@ -47,6 +45,8 @@ public class QuestionGetDetailResDto {
     // Question Buy
     @Schema(description = "게시글 투표 종료시간")
     private LocalDateTime voteEndTime;
+    @Schema(description = "게시글 투표 총 투표수")
+    private Long totalVoteNum;
 
     // Question Find
     @Schema(description = "게시글에 해당하는 Celeb")

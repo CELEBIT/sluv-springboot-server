@@ -5,8 +5,11 @@ import com.sluv.server.domain.celeb.entity.Celeb;
 import com.sluv.server.domain.celeb.entity.NewCeleb;
 import com.sluv.server.domain.celeb.repository.CelebRepository;
 import com.sluv.server.domain.celeb.repository.NewCelebRepository;
+import com.sluv.server.domain.closet.entity.Closet;
+import com.sluv.server.domain.closet.repository.ClosetRepository;
 import com.sluv.server.domain.comment.repository.CommentRepository;
-import com.sluv.server.domain.item.dto.ItemOrderResDto;
+import com.sluv.server.domain.item.repository.ItemScrapRepository;
+import com.sluv.server.domain.question.dto.QuestionItemResDto;
 import com.sluv.server.domain.item.dto.ItemSimpleResDto;
 import com.sluv.server.domain.item.entity.Item;
 import com.sluv.server.domain.item.exception.ItemNotFoundException;
@@ -44,6 +47,8 @@ public class QuestionService {
     private final CelebRepository celebRepository;
     private final NewCelebRepository newCelebRepository;
     private final RecentQuestionRepository recentQuestionRepository;
+    private final ItemScrapRepository itemScrapRepository;
+    private final ClosetRepository closetRepository;
 
     @Transactional
     public QuestionPostResDto postQuestionFind(User user, QuestionFindPostReqDto dto) {
@@ -108,6 +113,7 @@ public class QuestionService {
                 .user(user)
                 .title(dto.getTitle())
                 .searchNum(0L)
+                .totalVoteNum(0L)
                 .voteEndTime(dto.getVoteEndTime())
                 .questionStatus(QuestionStatus.ACTIVE)
                 .build();
@@ -323,7 +329,7 @@ public class QuestionService {
         Question question = questionRepository.findById(questionId).orElseThrow(QuestionNotFoundException::new);
 
         // Question Type 분류
-        String qType = null;
+        String qType;
         if(question != null){
             if (question instanceof QuestionFind){
                 qType = "Find";
@@ -333,7 +339,11 @@ public class QuestionService {
                 qType = "How";
             }else if(question instanceof QuestionRecommend){
                 qType = "Recommend";
+            } else {
+                qType = null;
             }
+        } else {
+            qType = null;
         }
 
         // 작성자
@@ -342,17 +352,29 @@ public class QuestionService {
         // Question img List
         List<QuestionImgResDto> questionImgList= questionImgRepository.findAllByQuestionId(questionId).
                                                             stream()
-                                                            .map(questionImg -> QuestionImgResDto.builder()
-                                                                    .imgUrl(questionImg.getImgUrl())
-                                                                    .representFlag(questionImg.getRepresentFlag())
-                                                                    .order(questionImg.getSortOrder())
-                                                                    .build()
+                                                            .map(questionImg -> {
+                                                                QuestionImgResDto.QuestionImgResDtoBuilder builder = QuestionImgResDto.builder()
+                                                                                .imgUrl(questionImg.getImgUrl())
+                                                                                .representFlag(questionImg.getRepresentFlag())
+                                                                                .order(questionImg.getSortOrder());
+                                                                if(qType != null && qType.equals("Buy")){
+                                                                    QuestionBuy questionBuy = (QuestionBuy) question;
+                                                                    builder.voteNum(questionImg.getVote())
+                                                                            .votePercent(
+                                                                                    questionBuy.getTotalVoteNum() != 0
+                                                                                    ? Math.round((double) questionImg.getVote() / (double) questionBuy.getTotalVoteNum()* 1000)/10.0
+                                                                                    : 0
+                                                                    );
+                                                                }
+                                                                    return  builder.build();
+                                                            }
                                                             ).toList();
 
         // Question Item List
-        List<ItemOrderResDto> questionItemList = questionItemRepository.findAllByQuestionId(questionId)
+        List<QuestionItemResDto> questionItemList = questionItemRepository.findAllByQuestionId(questionId)
                                             .stream()
                                             .map(questionItem -> {
+                                                List<Closet> closetList = closetRepository.findAllByUserId(user.getId());
                                                 ItemSimpleResDto dto = ItemSimpleResDto.builder()
                                                                 .itemId(questionItem.getItem().getId())
                                                                 .itemName(questionItem.getItem().getName())
@@ -365,15 +387,27 @@ public class QuestionService {
                                                                         : questionItem.getItem().getNewBrand().getBrandName()
                                                                 )
                                                                 .imgUrl(itemImgRepository.findMainImg(questionItem.getItem().getId()).getItemImgUrl())
-                                                                .scrapStatus(null) // 추후 작성 (23.05.20)
+                                                                .scrapStatus(itemScrapRepository.getItemScrapStatus(questionItem.getItem(),closetList))
                                                                 .build();
-                                                return ItemOrderResDto.builder()
+                                                QuestionItemResDto.QuestionItemResDtoBuilder builder = QuestionItemResDto.builder()
                                                         .item(dto)
                                                         .representFlag(questionItem.getRepresentFlag())
-                                                        .order(questionItem.getSortOrder())
-                                                        .build();
+                                                        .order(questionItem.getSortOrder());
+
+                                                if(qType != null & qType.equals("Buy")){
+                                                    QuestionBuy questionBuy = (QuestionBuy) question;
+                                                    double votePercent;
+                                                    if(questionBuy.getTotalVoteNum() != 0 && questionItem.getVote() != 0){
+                                                        votePercent = Math.round((double) questionItem.getVote() / (double) questionBuy.getTotalVoteNum()* 1000)/10.0;
+                                                    }else{
+                                                        votePercent = 0;
                                                     }
-                                            ).toList();
+                                                    builder.voteNum(questionItem.getVote())
+                                                            .votePercent(votePercent);
+                                                }
+
+                                                return builder.build();
+                                            }).toList();
 
         // Question Like Num Count
         Long questionLikeNum = questionLikeRepository.countByQuestionId(questionId);
@@ -410,7 +444,8 @@ public class QuestionService {
             builder
                 .celeb(null)
                 .newCeleb(null)
-                .voteEndTime(questionBuy.getVoteEndTime());
+                .voteEndTime(questionBuy.getVoteEndTime())
+                .totalVoteNum(questionBuy.getTotalVoteNum());
         }else{
             builder.celeb(null)
                     .newCeleb(null)

@@ -20,7 +20,11 @@ import com.sluv.server.domain.item.repository.ItemImgRepository;
 import com.sluv.server.domain.item.repository.ItemRepository;
 import com.sluv.server.domain.item.repository.ItemScrapRepository;
 import com.sluv.server.domain.item.repository.RecentItemRepository;
-import com.sluv.server.domain.question.repository.QuestionRepository;
+import com.sluv.server.domain.question.dto.QuestionSimpleResDto;
+import com.sluv.server.domain.question.entity.*;
+import com.sluv.server.domain.question.exception.QuestionNotFoundException;
+import com.sluv.server.domain.question.exception.QuestionTypeNotFoundException;
+import com.sluv.server.domain.question.repository.*;
 import com.sluv.server.domain.user.dto.*;
 import com.sluv.server.domain.user.entity.Follow;
 import com.sluv.server.domain.user.entity.User;
@@ -57,8 +61,13 @@ public class UserService {
     private final RecentItemRepository recentItemRepository;
     private final ClosetRepository closetRepository;
 
+    private final RecentQuestionRepository recentQuestionRepository;
+    private final QuestionImgRepository questionImgRepository;
+    private final QuestionItemRepository questionItemRepository;
+    private final QuestionRecommendCategoryRepository questionRecommendCategoryRepository;
 
     private final JwtProvider jwtProvider;
+
 
     public UserDto getUserIdByToken(HttpServletRequest request) {
         String token = jwtProvider.resolveToken(request);
@@ -282,5 +291,58 @@ public class UserService {
 
         return new PaginationCountResDto<>(recentItemPage.hasNext(), recentItemPage.getNumber(), content, recentItemPage.getTotalElements());
 
+    }
+
+    public PaginationCountResDto<QuestionSimpleResDto> getUserRecentQuestion(User user, Pageable pageable) {
+
+        Page<RecentQuestion> recentQuestionPage =  recentQuestionRepository.getUserAllRecentQuestion(user, pageable);
+
+        List<QuestionSimpleResDto> content = recentQuestionPage.stream().map(recentQuestion -> {
+            Question question = questionRepository.findById(recentQuestion.getQuestion().getId())
+                    .orElseThrow(QuestionNotFoundException::new);
+
+            QuestionSimpleResDto.QuestionSimpleResDtoBuilder builder = QuestionSimpleResDto.builder()
+                    .qType(recentQuestion.getQType())
+                    .id(question.getId())
+                    .title(question.getTitle())
+                    .content(question.getContent());
+
+            if (recentQuestion.getQType().equals("Buy")) {
+                List<String> imgList = questionImgRepository.findAllByQuestionId(question.getId()).stream().map(questionImg -> questionImg.getImgUrl()).toList();
+                List<String> itemImgList = questionItemRepository.findAllByQuestionId(question.getId()).stream().map(questionItem -> itemImgRepository.findMainImg(questionItem.getItem().getId()).getItemImgUrl()).toList();
+                builder
+                        .imgList(imgList)
+                        .itemImgList(itemImgList);
+
+            } else if (recentQuestion.getQType().equals("How")) {
+
+            } else if (recentQuestion.getQType().equals("Recommend")) {
+                builder
+                        .categoryName(questionRecommendCategoryRepository.findOneByQuestionId(question.getId()).getName());
+            } else if (recentQuestion.getQType().equals("Find")) {
+                QuestionFind questionFind = (QuestionFind) question;
+                builder
+                        .celebName(
+                                questionFind.getCeleb() != null
+                                ?questionFind.getCeleb().getParent() != null
+                                        ?questionFind.getCeleb().getParent().getCelebNameKr() + " " + questionFind.getCeleb().getCelebNameKr()
+                                        :questionFind.getCeleb().getCelebNameKr()
+                                :questionFind.getNewCeleb().getCelebName()
+                        );
+            } else {
+                throw new QuestionTypeNotFoundException();
+            }
+
+            return builder.build();
+
+
+        }).toList();
+
+        return new PaginationCountResDto<>(
+                recentQuestionPage.hasNext(),
+                recentQuestionPage.getNumber(),
+                content,
+                recentQuestionPage.getTotalElements()
+        );
     }
 }

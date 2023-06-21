@@ -5,6 +5,7 @@ import com.sluv.server.domain.celeb.dto.InterestedCelebParentResDto;
 import com.sluv.server.domain.celeb.dto.InterestedCelebPostReqDto;
 import com.sluv.server.domain.closet.dto.ClosetResDto;
 import com.sluv.server.domain.item.dto.ItemSimpleResDto;
+import com.sluv.server.domain.question.dto.QuestionSimpleResDto;
 import com.sluv.server.domain.user.dto.UserMypageResDto;
 import com.sluv.server.domain.user.dto.UserProfileReqDto;
 import com.sluv.server.domain.user.dto.UserReportReqDto;
@@ -178,7 +179,7 @@ public class UserController {
     @Operation(
             summary = "유저의 최근 본 아이템 조회",
             description = """
-                    특정 유저의 옷장 목록 조회\n
+                    유저의 최근 본 아이템 조회\n
                     User Id Token 필요
                         -> Id를 기준으로 조회\n
                     Pagination 적용\n
@@ -190,6 +191,25 @@ public class UserController {
         return ResponseEntity.ok().body(
                 SuccessDataResponse.<PaginationCountResDto<ItemSimpleResDto>>builder()
                         .result(userService.getUserRecentItem(user, pageable))
+                        .build()
+        );
+    }
+
+    @Operation(
+            summary = "유저의 최근 본 Question 조회",
+            description = """
+                    유저의 최근 본 Question 조회\n
+                    User Id Token 필요
+                        -> Id를 기준으로 조회\n
+                    Pagination 적용\n
+                    """
+    )
+    @GetMapping("/recent/question")
+    public ResponseEntity<SuccessDataResponse<PaginationCountResDto<QuestionSimpleResDto>>> getUserRecentQuestion(@AuthenticationPrincipal User user, Pageable pageable){
+
+        return ResponseEntity.ok().body(
+                SuccessDataResponse.<PaginationCountResDto<QuestionSimpleResDto>>builder()
+                        .result(userService.getUserRecentQuestion(user, pageable))
                         .build()
         );
     }

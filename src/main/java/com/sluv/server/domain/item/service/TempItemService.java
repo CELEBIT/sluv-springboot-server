@@ -28,6 +28,7 @@ import com.sluv.server.domain.item.repository.hashtag.HashtagRepository;
 import com.sluv.server.domain.item.repository.hashtag.TempItemHashtagRepository;
 import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.global.common.enums.ItemImgOrLinkStatus;
+import com.sluv.server.global.common.response.PaginationCountResDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -140,7 +141,7 @@ public class TempItemService {
         return saveTempItem.getId();
     }
 
-    public TempItemPageDto<TempItemResDto> getTempItemList(User user, Pageable pageable){
+    public PaginationCountResDto<TempItemResDto> getTempItemList(User user, Pageable pageable){
 
         Page<TempItem> contentPage = tempItemRepository.getTempItemList(user, pageable);
 
@@ -233,7 +234,7 @@ public class TempItemService {
                 }
         ).toList();
 
-        return new TempItemPageDto<TempItemResDto>(
+        return new PaginationCountResDto<>(
                 contentPage.hasNext(),
                 contentPage.getNumber(),
                 dtoList,

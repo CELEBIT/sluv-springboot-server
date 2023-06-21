@@ -8,4 +8,7 @@ import java.util.List;
 
 public interface UserRepositoryCustom {
     Page<User> getSearchUser(List<Long> userIdList, Pageable pageable);
+
+    Page<User> getAllFollower(Long userId, Pageable pageable);
+    Page<User> getAllFollowing(Long userId, Pageable pageable);
 }

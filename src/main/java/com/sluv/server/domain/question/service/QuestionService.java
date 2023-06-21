@@ -230,7 +230,7 @@ public class QuestionService {
                 .vote(imgDto.getVote())
                 .representFlag(imgDto.getRepresentFlag())
                 .itemImgOrLinkStatus(ItemImgOrLinkStatus.ACTIVE)
-                .order(imgDto.getOrder())
+                .sortOrder(imgDto.getSortOrder())
                 .build()
         ).toList();
 
@@ -255,7 +255,7 @@ public class QuestionService {
                             .description(itemDto.getDescription())
                             .vote(itemDto.getVote())
                             .representFlag(itemDto.getRepresentFlag())
-                            .order(itemDto.getOrder())
+                            .sortOrder(itemDto.getSortOrder())
                             .build();
                 }
         ).toList();
@@ -342,7 +342,7 @@ public class QuestionService {
                                                             .map(questionImg -> QuestionImgResDto.builder()
                                                                     .imgUrl(questionImg.getImgUrl())
                                                                     .representFlag(questionImg.getRepresentFlag())
-                                                                    .order(questionImg.getOrder())
+                                                                    .order(questionImg.getSortOrder())
                                                                     .build()
                                                             ).toList();
 
@@ -367,7 +367,7 @@ public class QuestionService {
                                                 return ItemOrderResDto.builder()
                                                         .item(dto)
                                                         .representFlag(questionItem.getRepresentFlag())
-                                                        .order(questionItem.getOrder())
+                                                        .order(questionItem.getSortOrder())
                                                         .build();
                                                     }
                                             ).toList();

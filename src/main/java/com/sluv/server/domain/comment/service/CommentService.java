@@ -132,6 +132,7 @@ public class CommentService {
                     return CommentItem.builder()
                             .comment(comment)
                             .item(item)
+                            .sortOrder(_item.getSortOrder())
                             .build();
                 }
         ).toList();
@@ -149,6 +150,7 @@ public class CommentService {
                 CommentImg.builder()
                         .comment(comment)
                         .imgUrl(imgUrl.getImgUrl())
+                        .sortOrder(imgUrl.getSortOrder())
                         .build()
         ).toList();
 
@@ -250,14 +252,14 @@ public class CommentService {
                     List<CommentImgDto> imgList = commentImgRepository.findAllByCommentId(comment.getId())
                             .stream().map(commentImg -> CommentImgDto.builder()
                                     .imgUrl(commentImg.getImgUrl())
-                                    .order(commentImg.getOrder())
+                                    .sortOrder(commentImg.getSortOrder())
                                     .build()
                             ).toList();
                     // 해당 Comment에 해당하는 아이템 조회
                     List<CommentItemResDto> itemList = commentItemRepository.findAllByCommentId(comment.getId())
                             .stream().map(commentItem -> CommentItemResDto.builder()
                                             .item(getItemSameResDto(commentItem.getItem()))
-                                            .order(commentItem.getOrder())
+                                            .order(commentItem.getSortOrder())
                                             .build()
                             ).toList();
 

@@ -14,5 +14,5 @@ public class CommentItemReqDto {
     @Schema(description = "Comment 아이템 아이디")
     private Long itemId;
     @Schema(description = "Comment 아이템 순서")
-    private Integer order;
+    private Integer sortOrder;
 }

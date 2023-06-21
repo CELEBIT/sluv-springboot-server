@@ -38,21 +38,21 @@ public class QuestionImg extends BaseEntity {
     @ColumnDefault("0")
     private Boolean representFlag;
 
-    private Integer order;
+    private Integer sortOrder;
 
     @Enumerated(EnumType.STRING)
     @Column(columnDefinition = "varchar(45) default 'ACTIVE'")
     private ItemImgOrLinkStatus itemImgOrLinkStatus;
 
     @Builder
-    public QuestionImg(Long id, Question question, String imgUrl, String description, Long vote, Boolean representFlag, Integer order, ItemImgOrLinkStatus itemImgOrLinkStatus) {
+    public QuestionImg(Long id, Question question, String imgUrl, String description, Long vote, Boolean representFlag, Integer sortOrder, ItemImgOrLinkStatus itemImgOrLinkStatus) {
         this.id = id;
         this.question = question;
         this.imgUrl = imgUrl;
         this.description = description;
         this.vote = vote;
         this.representFlag = representFlag;
-        this.order = order;
+        this.sortOrder = sortOrder;
         this.itemImgOrLinkStatus = itemImgOrLinkStatus;
     }
 }

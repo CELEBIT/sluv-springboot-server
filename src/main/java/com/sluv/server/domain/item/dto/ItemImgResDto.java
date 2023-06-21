@@ -14,6 +14,6 @@ public class ItemImgResDto {
     @Schema(description = "대표 이미지 여부(true or false)")
     private Boolean representFlag;
     @Schema(description = "이미지 순서")
-    private Integer order;
+    private Integer sortOrder;
 
 }

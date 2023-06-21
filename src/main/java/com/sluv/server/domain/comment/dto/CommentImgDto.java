@@ -14,5 +14,5 @@ public class CommentImgDto {
     @Schema(description = "Comment 이미지 Url")
     private String imgUrl;
     @Schema(description = "Comment 이미지 순서")
-    private Integer order;
+    private Integer sortOrder;
 }

@@ -26,13 +26,13 @@ public class CommentImg extends BaseEntity {
     @Column(columnDefinition = "TEXT")
     private String imgUrl;
 
-    private Integer order;
+    private Integer sortOrder;
 
     @Builder
-    public CommentImg(Long id, Comment comment, String imgUrl, Integer order) {
+    public CommentImg(Long id, Comment comment, String imgUrl, Integer sortOrder) {
         this.id = id;
         this.comment = comment;
         this.imgUrl = imgUrl;
-        this.order = order;
+        this.sortOrder = sortOrder;
     }
 }

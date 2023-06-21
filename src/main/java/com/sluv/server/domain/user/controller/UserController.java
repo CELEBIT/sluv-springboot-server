@@ -233,9 +233,9 @@ public class UserController {
         );
     }
     @Operation(
-            summary = "특정 유저가 등록한 팔로워들 조회",
+            summary = "특정 유저를 등록한 팔로워들 조회",
             description = """
-                    특정 유저가 좋아요한 아이템 조회\n
+                    특정 유저를 좋아요한 아이템 조회\n
                     User Id Token 필요
                         -> 현재 유저가 팔로워를 팔로잉 했는지 확인\n
                     Pagination 적용\n
@@ -247,6 +247,24 @@ public class UserController {
         return ResponseEntity.ok().body(
                 SuccessDataResponse.<PaginationResDto<UserSearchInfoDto>>builder()
                         .result(userService.getUserFollower(user, userId, pageable))
+                        .build()
+        );
+    }
+    @Operation(
+            summary = "특정 유저가 등록한 팔로잉 조회",
+            description = """
+                    특정 유저가 등록한 팔로잉 조회\n
+                    User Id Token 필요
+                        -> 현재 유저가 팔로워를 팔로잉 했는지 확인\n
+                    Pagination 적용\n
+                    """
+    )
+    @GetMapping("/{userId}/following")
+    public ResponseEntity<SuccessDataResponse<PaginationResDto<UserSearchInfoDto>>> getUserFollowing(@AuthenticationPrincipal User user, @PathVariable("userId") Long userId, Pageable pageable){
+
+        return ResponseEntity.ok().body(
+                SuccessDataResponse.<PaginationResDto<UserSearchInfoDto>>builder()
+                        .result(userService.getUserFollowing(user, userId, pageable))
                         .build()
         );
     }

@@ -374,4 +374,24 @@ public class UserService {
                 .content(content)
                 .build();
     }
+
+    public PaginationResDto<UserSearchInfoDto> getUserFollowing(User user, Long userId, Pageable pageable) {
+        // Following 들 조회
+        Page<User> followerPage = userRepository.getAllFollowing(userId, pageable);
+
+        // UserSearchInfoDto로 가공
+        List<UserSearchInfoDto> content = followerPage.stream().map(follower -> UserSearchInfoDto.builder()
+                .id(follower.getId())
+                .nickName(follower.getNickname())
+                .profileImgUrl(follower.getProfileImgUrl())
+                .followStatus(followRepository.getFollowStatus(user, follower))
+                .build()
+        ).toList();
+
+        return PaginationResDto.<UserSearchInfoDto>builder()
+                .page(followerPage.getNumber())
+                .hasNext(followerPage.hasNext())
+                .content(content)
+                .build();
+    }
 }

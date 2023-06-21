@@ -308,4 +308,26 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom{
 
         return PageableExecutionUtils.getPage(content, pageable, () -> query.fetch().size());
     }
+
+    /**
+     * 유저가 좋아요 누른 Item 조회
+     */
+    @Override
+    public Page<Item> getAllByUserLikeItem(User user, Pageable pageable) {
+        List<Item> content = jpaQueryFactory.select(item)
+                .from(itemLike)
+                .leftJoin(itemLike.item, item)
+                .orderBy(itemLike.id.desc())
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        // Count Query
+        JPAQuery<Item> query = jpaQueryFactory.select(item)
+                .from(itemLike)
+                .leftJoin(itemLike.item, item)
+                .orderBy(itemLike.id.desc());
+
+        return PageableExecutionUtils.getPage(content, pageable, () -> query.fetch().size());
+    }
 }

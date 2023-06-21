@@ -3,10 +3,7 @@ package com.sluv.server.domain.item.controller;
 import com.sluv.server.domain.item.dto.*;
 import com.sluv.server.domain.item.service.*;
 import com.sluv.server.domain.user.entity.User;
-import com.sluv.server.global.common.response.ErrorResponse;
-import com.sluv.server.global.common.response.PaginationResDto;
-import com.sluv.server.global.common.response.SuccessDataResponse;
-import com.sluv.server.global.common.response.SuccessResponse;
+import com.sluv.server.global.common.response.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -80,10 +77,10 @@ public class ItemController {
             @ApiResponse(responseCode = "5001", description = "DB 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @GetMapping("/temp")
-    public ResponseEntity<SuccessDataResponse<TempItemPageDto<TempItemResDto>>> getTempItemList(@AuthenticationPrincipal User user, Pageable pageable){
+    public ResponseEntity<SuccessDataResponse<PaginationCountResDto<TempItemResDto>>> getTempItemList(@AuthenticationPrincipal User user, Pageable pageable){
 
         return ResponseEntity.ok().body(
-                SuccessDataResponse.<TempItemPageDto<TempItemResDto>>builder()
+                SuccessDataResponse.<PaginationCountResDto<TempItemResDto>>builder()
                         .result(tempItemService.getTempItemList(user, pageable))
                         .build()
         );

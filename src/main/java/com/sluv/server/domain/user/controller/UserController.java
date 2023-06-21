@@ -9,6 +9,7 @@ import com.sluv.server.domain.question.dto.QuestionSimpleResDto;
 import com.sluv.server.domain.user.dto.UserMypageResDto;
 import com.sluv.server.domain.user.dto.UserProfileReqDto;
 import com.sluv.server.domain.user.dto.UserReportReqDto;
+import com.sluv.server.domain.user.dto.UserSearchInfoDto;
 import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.domain.user.service.UserReportService;
 import com.sluv.server.domain.user.service.UserService;
@@ -228,6 +229,24 @@ public class UserController {
         return ResponseEntity.ok().body(
                 SuccessDataResponse.<PaginationCountResDto<ItemSimpleResDto>>builder()
                         .result(userService.getUserLikeItem(user, pageable))
+                        .build()
+        );
+    }
+    @Operation(
+            summary = "특정 유저가 등록한 팔로워들 조회",
+            description = """
+                    특정 유저가 좋아요한 아이템 조회\n
+                    User Id Token 필요
+                        -> 현재 유저가 팔로워를 팔로잉 했는지 확인\n
+                    Pagination 적용\n
+                    """
+    )
+    @GetMapping("/{userId}/follower")
+    public ResponseEntity<SuccessDataResponse<PaginationResDto<UserSearchInfoDto>>> getUserFollower(@AuthenticationPrincipal User user, @PathVariable("userId") Long userId, Pageable pageable){
+
+        return ResponseEntity.ok().body(
+                SuccessDataResponse.<PaginationResDto<UserSearchInfoDto>>builder()
+                        .result(userService.getUserFollower(user, userId, pageable))
                         .build()
         );
     }

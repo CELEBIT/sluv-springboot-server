@@ -11,6 +11,7 @@ import org.springframework.data.support.PageableExecutionUtils;
 
 import java.util.List;
 
+import static com.sluv.server.domain.user.entity.QFollow.follow;
 import static com.sluv.server.domain.user.entity.QUser.user;
 import static com.sluv.server.domain.user.enums.UserStatus.ACTIVE;
 
@@ -37,5 +38,55 @@ public class UserRepositoryImpl implements UserRepositoryCustom{
 
 
         return PageableExecutionUtils.getPage(content, pageable, () -> countJPAQuery.fetch().size());
+    }
+
+    /**
+     * 특정 유저의 팔로워 조회
+     *
+     */
+    @Override
+    public Page<User> getAllFollower(Long userId, Pageable pageable) {
+        List<User> content = jpaQueryFactory.select(user)
+                .from(follow)
+                .leftJoin(follow.follower, user)
+                .where(follow.followee.id.eq(userId).and(follow.followee.userStatus.eq(ACTIVE)))
+                .orderBy(follow.id.desc())
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        // Count Query
+        JPAQuery<User> query = jpaQueryFactory.select(user)
+                .from(follow)
+                .leftJoin(follow.follower, user)
+                .where(follow.followee.id.eq(userId).and(follow.followee.userStatus.eq(ACTIVE)))
+                .orderBy(follow.id.desc());
+
+        return PageableExecutionUtils.getPage(content, pageable, () -> query.fetch().size());
+    }
+
+    /**
+     * 특정 유저의 팔로잉 조회
+     *
+     */
+    @Override
+    public Page<User> getAllFollowing(Long userId, Pageable pageable) {
+        List<User> content = jpaQueryFactory.select(user)
+                .from(follow)
+                .leftJoin(follow.followee, user)
+                .where(follow.follower.id.eq(userId).and(follow.follower.userStatus.eq(ACTIVE)))
+                .orderBy(follow.id.desc())
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        // Count Query
+        JPAQuery<User> query = jpaQueryFactory.select(user)
+                .from(follow)
+                .leftJoin(follow.followee, user)
+                .where(follow.follower.id.eq(userId).and(follow.follower.userStatus.eq(ACTIVE)))
+                .orderBy(follow.id.desc());
+
+        return PageableExecutionUtils.getPage(content, pageable, () -> query.fetch().size());
     }
 }

@@ -184,7 +184,7 @@ public class UserController {
                     Pagination 적용\n
                     """
     )
-    @GetMapping("/recentItem")
+    @GetMapping("/recent/item")
     public ResponseEntity<SuccessDataResponse<PaginationCountResDto<ItemSimpleResDto>>> getUserRecentItem(@AuthenticationPrincipal User user, Pageable pageable){
 
         return ResponseEntity.ok().body(

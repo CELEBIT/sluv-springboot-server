@@ -43,6 +43,7 @@ public class QuestionService {
     private final ItemImgRepository itemImgRepository;
     private final CelebRepository celebRepository;
     private final NewCelebRepository newCelebRepository;
+    private final RecentQuestionRepository recentQuestionRepository;
 
     @Transactional
     public QuestionPostResDto postQuestionFind(User user, QuestionFindPostReqDto dto) {
@@ -316,6 +317,7 @@ public class QuestionService {
         }
     }
 
+    @Transactional
     public QuestionGetDetailResDto getQuestionDetail(User user, Long questionId) {
         Question question = questionRepository.findById(questionId).orElseThrow(QuestionNotFoundException::new);
 
@@ -413,6 +415,16 @@ public class QuestionService {
                     .newCeleb(null)
                     .voteEndTime(null);
         }
+
+        // RecentQuestion 등록
+        recentQuestionRepository.save(
+                RecentQuestion.builder()
+                        .user(user)
+                        .qType(qType)
+                        .question(question)
+                        .build()
+        );
+
 
         return builder
                 .qType(qType)

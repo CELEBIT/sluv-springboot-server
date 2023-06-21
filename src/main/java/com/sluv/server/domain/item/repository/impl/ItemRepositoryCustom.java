@@ -32,4 +32,6 @@ public interface ItemRepositoryCustom {
     List<Item> getRecentTop2Item(User targetUser);
 
     Page<Item> getUserAllItem(Long userId, Pageable pageable);
+
+    Page<Item> getAllByUserLikeItem(User user, Pageable pageable);
 }

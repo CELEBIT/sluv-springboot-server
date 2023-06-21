@@ -15,11 +15,9 @@ import com.sluv.server.domain.closet.repository.ClosetRepository;
 import com.sluv.server.domain.comment.repository.CommentRepository;
 import com.sluv.server.domain.item.dto.ItemSimpleResDto;
 import com.sluv.server.domain.item.entity.Item;
+import com.sluv.server.domain.item.entity.ItemLike;
 import com.sluv.server.domain.item.entity.RecentItem;
-import com.sluv.server.domain.item.repository.ItemImgRepository;
-import com.sluv.server.domain.item.repository.ItemRepository;
-import com.sluv.server.domain.item.repository.ItemScrapRepository;
-import com.sluv.server.domain.item.repository.RecentItemRepository;
+import com.sluv.server.domain.item.repository.*;
 import com.sluv.server.domain.question.dto.QuestionSimpleResDto;
 import com.sluv.server.domain.question.entity.*;
 import com.sluv.server.domain.question.exception.QuestionNotFoundException;
@@ -60,6 +58,7 @@ public class UserService {
     private final ItemScrapRepository itemScrapRepository;
     private final RecentItemRepository recentItemRepository;
     private final ClosetRepository closetRepository;
+    private final ItemLikeRepository itemLikeRepository;
 
     private final RecentQuestionRepository recentQuestionRepository;
     private final QuestionImgRepository questionImgRepository;
@@ -344,5 +343,15 @@ public class UserService {
                 content,
                 recentQuestionPage.getTotalElements()
         );
+    }
+
+    public PaginationCountResDto<ItemSimpleResDto> getUserLikeItem(User user, Pageable pageable) {
+        Page<Item> itemPage = itemRepository.getAllByUserLikeItem(user, pageable);
+
+        List<Closet> closetList = closetRepository.findAllByUserId(user.getId());
+
+        List<ItemSimpleResDto> content = itemPage.stream().map(item -> getItemSimpleResDto(item, closetList)).toList();
+
+        return new PaginationCountResDto<>(itemPage.hasNext(), itemPage.getNumber(), content, itemPage.getTotalElements());
     }
 }

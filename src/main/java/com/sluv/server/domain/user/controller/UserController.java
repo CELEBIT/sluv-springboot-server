@@ -3,6 +3,7 @@ package com.sluv.server.domain.user.controller;
 
 import com.sluv.server.domain.celeb.dto.InterestedCelebParentResDto;
 import com.sluv.server.domain.celeb.dto.InterestedCelebPostReqDto;
+import com.sluv.server.domain.closet.dto.ClosetResDto;
 import com.sluv.server.domain.item.dto.ItemSimpleResDto;
 import com.sluv.server.domain.user.dto.UserMypageResDto;
 import com.sluv.server.domain.user.dto.UserProfileReqDto;
@@ -154,6 +155,25 @@ public class UserController {
         return ResponseEntity.ok().body(
                 SuccessDataResponse.<PaginationResDto<ItemSimpleResDto>>builder()
                         .result(userService.getUserItem(user, userId, pageable))
+                        .build()
+        );
+    }
+
+    @Operation(
+            summary = "특정 유저의 옷장 목록 조회",
+            description = """
+                    특정 유저의 옷장 목록 조회\n
+                    User Id Token 필요
+                        -> 불일치 시 Public 상태의 옷장만 조회
+                    Pagination 적용\n
+                    """
+    )
+    @GetMapping("/{userId}/closet")
+    public ResponseEntity<SuccessDataResponse<PaginationResDto<ClosetResDto>>> getUserCloset(@AuthenticationPrincipal User user, @PathVariable("userId") Long userId, Pageable pageable){
+
+        return ResponseEntity.ok().body(
+                SuccessDataResponse.<PaginationResDto<ClosetResDto>>builder()
+                        .result(userService.getUserCloset(user, userId, pageable))
                         .build()
         );
     }

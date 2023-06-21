@@ -276,14 +276,13 @@ public class QuestionService {
     public void postQuestionLike(User user, Long questionId) {
         // 해당 유저의 Question 게시물 like 여부 검색
         Boolean likeStatus = questionLikeRepository.existsByQuestionIdAndUserId(questionId, user.getId());
-
+        Question question = questionRepository.findById(questionId).orElseThrow(QuestionNotFoundException::new);
 
         if(likeStatus) {
             // like가 있다면 삭제
             questionLikeRepository.deleteByQuestionIdAndUserId(questionId, user.getId());
         }else {
             // like가 없다면 등록
-            Question question = questionRepository.findById(questionId).orElseThrow(QuestionNotFoundException::new);
 
             questionLikeRepository.save(
                     QuestionLike.builder()
@@ -292,6 +291,8 @@ public class QuestionService {
                             .build()
             );
         }
+        question.decreaseSearchNum();
+
     }
 
     public void postQuestionReport(User user, Long questionId, QuestionReportReqDto dto) {
@@ -425,6 +426,8 @@ public class QuestionService {
                         .build()
         );
 
+        // SearchNum 증가
+        question.increaseSearchNum();
 
         return builder
                 .qType(qType)

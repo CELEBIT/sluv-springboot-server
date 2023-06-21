@@ -65,4 +65,12 @@ public class Question{
     public void changeQuestionStatus(QuestionStatus questionStatus){
         this.questionStatus = questionStatus;
     }
+
+    public void increaseSearchNum(){
+        this.searchNum++;
+    }
+    public void decreaseSearchNum(){
+        this.searchNum--;
+    }
+
 }

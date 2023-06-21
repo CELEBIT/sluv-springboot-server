@@ -21,7 +21,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/app/closet")
 @RequiredArgsConstructor
-public class ClosetController {
+public class    ClosetController {
     private final ClosetService closetService;
 
     @Operation(

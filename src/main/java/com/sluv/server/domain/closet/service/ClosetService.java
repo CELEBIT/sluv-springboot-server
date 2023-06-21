@@ -122,6 +122,8 @@ public class ClosetService {
         );
         log.info("Save Success with ItemScrap Id: {}", saveItemScrap.getId());
 
+        item.decreaseViewNum();
+
     }
 
     @Transactional

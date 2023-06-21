@@ -280,7 +280,7 @@ public class ItemService {
         Integer scrapNum = itemScrapRepository.countByItemId(item.getId());
 
         // 7. 조회수 TODO : Redis를 사용한 IP:PostId 저장으로 조회수 중복방지 기능
-//        Long viewNum = item.getViewNum();
+        Long viewNum = item.getViewNum();
 
         // 8. Item 링크들 조회
 
@@ -351,7 +351,7 @@ public class ItemService {
                 .likeNum(likeNum)
                 .likeStatus(likeStatus)
                 .scrapNum(scrapNum)
-                .viewNum(item.getViewNum())
+                .viewNum(viewNum)
                 .linkList(linkList)
                 .writer(writerInfo)
                 .whenDiscovery(item.getWhenDiscovery())
@@ -384,6 +384,8 @@ public class ItemService {
         }else{
             itemLikeRepository.deleteByUserIdAndItemId(user.getId(), itemId);
         }
+
+        item.decreaseViewNum();
     }
 
     public void deleteItem(Long itemId) {

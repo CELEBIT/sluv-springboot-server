@@ -123,8 +123,23 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom{
                         .and(questionBuy.voteEndTime.gt(nowTime))
                         .and(questionBuy.user.ne(user))
                 )
-                .groupBy(questionBuy)
                 .orderBy(questionBuy.voteEndTime.asc())
+                .limit(4)
+                .fetch();
+    }
+    /**
+     * Wait QuestionRecommend 조회
+     */
+    @Override
+    public List<QuestionRecommend> getWaitQuestionRecommend(User user, Long questionId) {
+        return jpaQueryFactory.select(questionRecommend)
+                .from(questionRecommend)
+                .where(questionRecommend.id.ne(questionId)
+                        .and(questionRecommend.questionStatus.eq(ACTIVE))
+                        .and(questionRecommend.user.ne(user))
+                        .and(questionRecommend.commentList.size().eq(0))
+                )
+                .orderBy(questionRecommend.createdAt.desc())
                 .limit(4)
                 .fetch();
     }

@@ -29,6 +29,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -572,25 +573,13 @@ public class QuestionService {
 
         return questionRepository.getWaitQuestionBuy(user, questionId, interestedCeleb)
                 .stream()
-                .map(questionBuy -> {
-                    // 이미지 URL
-                    List<String> imgList = questionImgRepository.findAllByQuestionId(questionBuy.getId())
-                            .stream().map(QuestionImg::getImgUrl).toList();
-                    // 아이템 이미지 URL
-                    List<String> itemImgList = questionItemRepository.findAllByQuestionId(questionBuy.getId())
-                            .stream().map(questionItem ->
-                                    itemImgRepository.findMainImg(questionItem.getItem().getId()).getItemImgUrl()
-                            ).toList();
-
-                    return QuestionSimpleResDto.builder()
-                            .qType("Buy")
-                            .id(questionBuy.getId())
-                            .title(questionBuy.getTitle())
-                            .content(questionBuy.getContent())
-                            .imgList(imgList)
-                            .itemImgList(itemImgList)
-                            .build();
-                }).toList();
+                .map(questionBuy ->
+                    getQuestionSimpleResDto(questionBuy.getId(),
+                            "Buy",
+                            questionBuy.getTitle(),
+                            questionBuy.getContent()
+                    )
+                ).toList();
     }
 
     /**
@@ -600,25 +589,13 @@ public class QuestionService {
     public List<QuestionSimpleResDto> getWaitQuestionRecommend(User user, Long questionId) {
         return questionRepository.getWaitQuestionRecommend(user, questionId)
                 .stream()
-                .map(questionBuy -> {
-                    // 이미지 URL
-                    List<String> imgList = questionImgRepository.findAllByQuestionId(questionBuy.getId())
-                            .stream().map(QuestionImg::getImgUrl).toList();
-                    // 아이템 이미지 URL
-                    List<String> itemImgList = questionItemRepository.findAllByQuestionId(questionBuy.getId())
-                            .stream().map(questionItem ->
-                                    itemImgRepository.findMainImg(questionItem.getItem().getId()).getItemImgUrl()
-                            ).toList();
-
-                    return QuestionSimpleResDto.builder()
-                            .qType("Recommend")
-                            .id(questionBuy.getId())
-                            .title(questionBuy.getTitle())
-                            .content(questionBuy.getContent())
-                            .imgList(imgList)
-                            .itemImgList(itemImgList)
-                            .build();
-                }).toList();
+                .map(questionRecommend ->
+                    getQuestionSimpleResDto(questionRecommend.getId(),
+                            "Recommend",
+                            questionRecommend.getTitle(),
+                            questionRecommend.getContent()
+                    )
+                ).toList();
     }
 
     /**
@@ -628,25 +605,13 @@ public class QuestionService {
     public List<QuestionSimpleResDto> getWaitQuestionHowabout(User user, Long questionId) {
         return questionRepository.getWaitQuestionHowabout(user, questionId)
                 .stream()
-                .map(questionBuy -> {
-                    // 이미지 URL
-                    List<String> imgList = questionImgRepository.findAllByQuestionId(questionBuy.getId())
-                            .stream().map(QuestionImg::getImgUrl).toList();
-                    // 아이템 이미지 URL
-                    List<String> itemImgList = questionItemRepository.findAllByQuestionId(questionBuy.getId())
-                            .stream().map(questionItem ->
-                                    itemImgRepository.findMainImg(questionItem.getItem().getId()).getItemImgUrl()
-                            ).toList();
-
-                    return QuestionSimpleResDto.builder()
-                            .qType("How")
-                            .id(questionBuy.getId())
-                            .title(questionBuy.getTitle())
-                            .content(questionBuy.getContent())
-                            .imgList(imgList)
-                            .itemImgList(itemImgList)
-                            .build();
-                }).toList();
+                .map(questionHowabout ->
+                    getQuestionSimpleResDto(questionHowabout.getId(),
+                            "How",
+                            questionHowabout.getTitle(),
+                            questionHowabout.getContent()
+                    )
+                ).toList();
     }
 
     /**
@@ -658,25 +623,39 @@ public class QuestionService {
 
         return questionRepository.getWaitQuestionFind(user, questionId, interestedCeleb)
                 .stream()
-                .map(questionBuy -> {
-                    // 이미지 URL
-                    List<String> imgList = questionImgRepository.findAllByQuestionId(questionBuy.getId())
-                            .stream().map(QuestionImg::getImgUrl).toList();
-                    // 아이템 이미지 URL
-                    List<String> itemImgList = questionItemRepository.findAllByQuestionId(questionBuy.getId())
-                            .stream().map(questionItem ->
-                                    itemImgRepository.findMainImg(questionItem.getItem().getId()).getItemImgUrl()
-                            ).toList();
+                .map(questionFind ->
+                        getQuestionSimpleResDto(questionFind.getId(),
+                                "Find",
+                                questionFind.getTitle(),
+                                questionFind.getContent()
+                                )
+                  ).toList();
+    }
 
-                    return QuestionSimpleResDto.builder()
-                            .qType("Find")
-                            .id(questionBuy.getId())
-                            .title(questionBuy.getTitle())
-                            .content(questionBuy.getContent())
-                            .imgList(imgList)
-                            .itemImgList(itemImgList)
-                            .build();
-                }).toList();
+    private QuestionSimpleResDto getQuestionSimpleResDto(Long questionId, String qType, String title, String content) {
+        // 이미지 URL
+        QuestionImg questionImg = questionImgRepository.findByQuestionIdAndRepresentFlag(questionId, true);
+
+        // 아이템 이미지 URL
+        QuestionItem questionItem = questionItemRepository.findByQuestionIdAndRepresentFlag(questionId, true);
+
+
+        return QuestionSimpleResDto.builder()
+                .qType(qType)
+                .id(questionId)
+                .title(title)
+                .content(content)
+                .imgList(
+                        questionImg != null
+                        ? Collections.singletonList(questionImg.getImgUrl())
+                        : null
+                )
+                .itemImgList(
+                        questionItem != null
+                        ? Collections.singletonList(itemImgRepository.findMainImg(questionItem.getItem().getId()).getItemImgUrl())
+                        : null
+                )
+                .build();
     }
 }
 

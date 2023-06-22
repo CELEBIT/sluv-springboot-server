@@ -61,10 +61,14 @@ public class CommentService {
         );
 
         // 2. CommentImg 등록
-        saveCommentImg(dto, comment);
+        if(dto.getImgList() != null) {
+            saveCommentImg(dto, comment);
+        }
 
         // 3. CommentItem 등록
-        saveCommentItem(dto, comment);
+        if(dto.getItemList() != null) {
+            saveCommentItem(dto, comment);
+        }
 
     }
 
@@ -92,10 +96,14 @@ public class CommentService {
         );
 
         // 2. CommentImg 등록
-        saveCommentImg(dto, comment);
+        if(dto.getImgList() != null) {
+            saveCommentImg(dto, comment);
+        }
 
         // 3. CommentItem 등록
-        saveCommentItem(dto, comment);
+        if(dto.getItemList() != null) {
+            saveCommentItem(dto, comment);
+        }
     }
 
     @Transactional

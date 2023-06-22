@@ -22,5 +22,5 @@ public class QuestionImgResDto {
     @Schema(description = "대표여부")
     private Boolean representFlag;
     @Schema(description = "순서")
-    private Integer order;
+    private Integer sortOrder;
 }

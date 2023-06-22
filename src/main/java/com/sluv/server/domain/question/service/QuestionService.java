@@ -354,7 +354,7 @@ public class QuestionService {
                                                                 QuestionImgResDto.QuestionImgResDtoBuilder builder = QuestionImgResDto.builder()
                                                                                 .imgUrl(questionImg.getImgUrl())
                                                                                 .representFlag(questionImg.getRepresentFlag())
-                                                                                .order(questionImg.getSortOrder())
+                                                                                .sortOrder(questionImg.getSortOrder())
                                                                                 .description(questionImg.getDescription());
 
                                                                 // QuestionBuy 라면
@@ -387,7 +387,7 @@ public class QuestionService {
                                                 QuestionItemResDto.QuestionItemResDtoBuilder builder = QuestionItemResDto.builder()
                                                         .item(dto)
                                                         .representFlag(questionItem.getRepresentFlag())
-                                                        .order(questionItem.getSortOrder())
+                                                        .sortOrder(questionItem.getSortOrder())
                                                         .description(questionItem.getDescription());
 
                                                 // QuestionBuy일 경우 투표수 추가.

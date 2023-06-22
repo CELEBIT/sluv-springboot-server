@@ -19,12 +19,10 @@ public class QuestionBuy extends Question{
 
 
     private LocalDateTime voteEndTime;
-    private Long totalVoteNum;
 
     @Builder
-    public QuestionBuy(Long id, User user, String title, String content, Long searchNum, QuestionStatus questionStatus, LocalDateTime voteEndTime, Long totalVoteNum) {
+    public QuestionBuy(Long id, User user, String title, String content, Long searchNum, QuestionStatus questionStatus, LocalDateTime voteEndTime) {
         super(id, user, title, content, searchNum, questionStatus);
         this.voteEndTime = voteEndTime;
-        this.totalVoteNum = totalVoteNum;
     }
 }

@@ -616,5 +616,29 @@ public class QuestionService {
                             .build();
                 }).toList();
     }
+
+    public List<QuestionSimpleResDto> getWaitQuestionHowabout(User user, Long questionId) {
+        return questionRepository.getWaitQuestionHowabout(user, questionId)
+                .stream()
+                .map(questionBuy -> {
+                    // 이미지 URL
+                    List<String> imgList = questionImgRepository.findAllByQuestionId(questionBuy.getId())
+                            .stream().map(QuestionImg::getImgUrl).toList();
+                    // 아이템 이미지 URL
+                    List<String> itemImgList = questionItemRepository.findAllByQuestionId(questionBuy.getId())
+                            .stream().map(questionItem ->
+                                    itemImgRepository.findMainImg(questionItem.getItem().getId()).getItemImgUrl()
+                            ).toList();
+
+                    return QuestionSimpleResDto.builder()
+                            .qType("How")
+                            .id(questionBuy.getId())
+                            .title(questionBuy.getTitle())
+                            .content(questionBuy.getContent())
+                            .imgList(imgList)
+                            .itemImgList(itemImgList)
+                            .build();
+                }).toList();
+    }
 }
 

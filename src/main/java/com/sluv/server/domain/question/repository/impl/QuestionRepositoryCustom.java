@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface QuestionRepositoryCustom {
     Page<QuestionBuy> getSearchQuestionBuy(List<Long> questionIdList, Pageable pageable);
@@ -20,4 +21,6 @@ public interface QuestionRepositoryCustom {
     List<QuestionBuy> getWaitQuestionBuy(User user, Long questionId, List<Celeb> interestedCeleb);
 
     List<QuestionRecommend> getWaitQuestionRecommend(User user, Long questionId);
+
+    List<QuestionHowabout> getWaitQuestionHowabout(User user, Long questionId);
 }

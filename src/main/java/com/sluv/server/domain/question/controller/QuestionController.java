@@ -252,4 +252,25 @@ public class QuestionController {
         );
     }
 
+    @Operation(
+            summary = "*Question Howabout 기다리고 있어요",
+            description = """
+                    유저를 기다리고 있는 Howabout 조회\n
+                    1. 현재 Question과 불일치 \n
+                    2. 현재 유저가 작성하지 않은 Question \n
+                    3. 정적으로 4개 조회
+                    4. 댓글이 0개인 것들만 조회
+                    """
+    )
+    @GetMapping("/wait/questionHowabout")
+    public ResponseEntity<SuccessDataResponse<List<QuestionSimpleResDto>>> getWaitQuestionHowabout(@AuthenticationPrincipal User user,
+                                                                                                    @RequestParam("questionId") Long questionId){
+
+        return ResponseEntity.ok().body(
+                SuccessDataResponse.<List<QuestionSimpleResDto>>builder()
+                        .result(questionService.getWaitQuestionHowabout(user, questionId))
+                        .build()
+        );
+    }
+
 }

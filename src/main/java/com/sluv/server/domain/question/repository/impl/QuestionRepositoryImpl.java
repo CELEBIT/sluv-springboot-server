@@ -143,4 +143,21 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom{
                 .limit(4)
                 .fetch();
     }
+
+    /**
+     * Wait QuestionHowabout 조회
+     */
+    @Override
+    public List<QuestionHowabout> getWaitQuestionHowabout(User user, Long questionId) {
+        return jpaQueryFactory.select(questionHowabout)
+                .from(questionHowabout)
+                .where(questionHowabout.id.ne(questionId)
+                        .and(questionHowabout.questionStatus.eq(ACTIVE))
+                        .and(questionHowabout.user.ne(user))
+                        .and(questionHowabout.commentList.size().eq(0))
+                )
+                .orderBy(questionHowabout.createdAt.desc())
+                .limit(4)
+                .fetch();
+    }
 }

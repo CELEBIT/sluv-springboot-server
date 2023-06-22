@@ -55,6 +55,7 @@ public class TempItemService {
     private final NewCelebRepository newCelebRepository;
 
 
+    @Transactional
     public Long postTempItem(User user, TempItemPostReqDto reqDto) {
         Celeb celeb = reqDto.getCelebId() != null ? celebRepository.findById(reqDto.getCelebId())
                 .orElseThrow(CelebNotFoundException::new)

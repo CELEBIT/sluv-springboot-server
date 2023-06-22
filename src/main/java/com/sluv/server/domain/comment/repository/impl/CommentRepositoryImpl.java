@@ -24,13 +24,18 @@ public class CommentRepositoryImpl implements CommentRepositoryCustom{
                         .and(comment.parent.isNull())
                         .and(comment.commentStatus.eq(CommentStatus.ACTIVE))
                 )
+                .orderBy(comment.createdAt.asc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
 
         // count Query
         JPAQuery<Comment> countQuery = jpaQueryFactory.selectFrom(comment)
-                .where(comment.question.id.eq(questionId));
+                .where(comment.question.id.eq(questionId)
+                        .and(comment.parent.isNull())
+                        .and(comment.commentStatus.eq(CommentStatus.ACTIVE))
+                )
+                .orderBy(comment.createdAt.asc());
 
 
         return PageableExecutionUtils.getPage(content, pageable, () -> countQuery.fetch().size());
@@ -42,13 +47,17 @@ public class CommentRepositoryImpl implements CommentRepositoryCustom{
                 .where(comment.parent.id.eq(commentId)
                         .and(comment.commentStatus.eq(CommentStatus.ACTIVE))
                 )
+                .orderBy(comment.createdAt.asc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
 
         // count Query
         JPAQuery<Comment> countQuery = jpaQueryFactory.selectFrom(comment)
-                .where(comment.parent.id.eq(commentId));
+                .where(comment.parent.id.eq(commentId)
+                        .and(comment.commentStatus.eq(CommentStatus.ACTIVE))
+                )
+                .orderBy(comment.createdAt.asc());
 
 
         return PageableExecutionUtils.getPage(content, pageable, () -> countQuery.fetch().size());

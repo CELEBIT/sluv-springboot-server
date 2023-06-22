@@ -8,6 +8,7 @@ import com.sluv.server.domain.celeb.repository.NewCelebRepository;
 import com.sluv.server.domain.closet.entity.Closet;
 import com.sluv.server.domain.closet.repository.ClosetRepository;
 import com.sluv.server.domain.comment.repository.CommentRepository;
+import com.sluv.server.domain.item.entity.ItemImg;
 import com.sluv.server.domain.item.repository.ItemScrapRepository;
 import com.sluv.server.domain.question.dto.QuestionItemResDto;
 import com.sluv.server.domain.item.dto.ItemSimpleResDto;
@@ -560,6 +561,37 @@ public class QuestionService {
             // 해당 QuestionVote 삭제.
             questionVoteRepository.deleteById(questionVote.getId());
         }
+    }
+
+    /**
+     * Question 상세보기 하단의 추천 게시글
+     * TODO 게시글과 같은 셀럽/같은 그룹 로직 추가해야함 (23.06.22)
+     */
+
+    public List<QuestionSimpleResDto> getWaitQuestionBuy(User user, Long questionId) {
+        List<Celeb> interestedCeleb = celebRepository.findInterestedCeleb(user);
+
+        return questionRepository.getWaitQuestionBuy(user, questionId, interestedCeleb)
+                .stream()
+                .map(questionBuy -> {
+                    // 이미지 URL
+                    List<String> imgList = questionImgRepository.findAllByQuestionId(questionBuy.getId())
+                            .stream().map(QuestionImg::getImgUrl).toList();
+                    // 아이템 이미지 URL
+                    List<String> itemImgList = questionItemRepository.findAllByQuestionId(questionBuy.getId())
+                            .stream().map(questionItem ->
+                                    itemImgRepository.findMainImg(questionItem.getItem().getId()).getItemImgUrl()
+                            ).toList();
+
+                    return QuestionSimpleResDto.builder()
+                            .qType("Buy")
+                            .id(questionBuy.getId())
+                            .title(questionBuy.getTitle())
+                            .content(questionBuy.getContent())
+                            .imgList(imgList)
+                            .itemImgList(itemImgList)
+                            .build();
+                }).toList();
     }
 }
 

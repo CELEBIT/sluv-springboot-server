@@ -1,13 +1,17 @@
 package com.sluv.server.domain.question.repository.impl;
 
+import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.sluv.server.domain.celeb.entity.Celeb;
 import com.sluv.server.domain.question.entity.*;
+import com.sluv.server.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static com.sluv.server.domain.question.entity.QQuestionBuy.questionBuy;
@@ -105,5 +109,23 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom{
 
 
         return PageableExecutionUtils.getPage(content, pageable, () -> countJPAQuery.fetch().size());
+    }
+
+    /**
+     * Wait QuestionBuy 조회
+     */
+    @Override
+    public List<QuestionBuy> getWaitQuestionBuy(User user, Long questionId, List<Celeb> interestedCeleb) {
+        LocalDateTime nowTime = LocalDateTime.now();
+        return jpaQueryFactory.selectFrom(questionBuy)
+                .where(questionBuy.id.ne(questionId)
+                        .and(questionBuy.questionStatus.eq(ACTIVE))
+                        .and(questionBuy.voteEndTime.gt(nowTime))
+                        .and(questionBuy.user.ne(user))
+                )
+                .groupBy(questionBuy)
+                .orderBy(questionBuy.voteEndTime.asc())
+                .limit(4)
+                .fetch();
     }
 }

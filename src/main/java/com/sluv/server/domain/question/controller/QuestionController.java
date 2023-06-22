@@ -16,6 +16,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/app/question")
@@ -206,4 +208,26 @@ public class QuestionController {
                 new SuccessResponse()
         );
     }
+
+    @Operation(
+            summary = "*Question Buy 기다리고 있어요",
+            description = """
+                    유저를 기다리고 있는 QuestionBuy 조회\n
+                    1. 현재 Question과 불일치 \n
+                    2 현재 유저가 댓글 혹은 투표에 참여하지 않은 Question \n
+                    3. 최신순
+                    4. 정적으로 4개 조회
+                    """
+    )
+    @GetMapping("/wait/questionBuy")
+    public ResponseEntity<SuccessDataResponse<List<QuestionSimpleResDto>>> getWaitQuestionBuy(@AuthenticationPrincipal User user,
+                                                                                              @RequestParam("questionId") Long questionId){
+
+        return ResponseEntity.ok().body(
+                SuccessDataResponse.<List<QuestionSimpleResDto>>builder()
+                        .result(questionService.getWaitQuestionBuy(user, questionId))
+                        .build()
+        );
+    }
+
 }

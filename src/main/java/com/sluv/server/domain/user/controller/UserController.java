@@ -6,10 +6,7 @@ import com.sluv.server.domain.celeb.dto.InterestedCelebPostReqDto;
 import com.sluv.server.domain.closet.dto.ClosetResDto;
 import com.sluv.server.domain.item.dto.ItemSimpleResDto;
 import com.sluv.server.domain.question.dto.QuestionSimpleResDto;
-import com.sluv.server.domain.user.dto.UserMypageResDto;
-import com.sluv.server.domain.user.dto.UserProfileReqDto;
-import com.sluv.server.domain.user.dto.UserReportReqDto;
-import com.sluv.server.domain.user.dto.UserSearchInfoDto;
+import com.sluv.server.domain.user.dto.*;
 import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.domain.user.service.UserReportService;
 import com.sluv.server.domain.user.service.UserService;
@@ -266,6 +263,43 @@ public class UserController {
                 SuccessDataResponse.<PaginationResDto<UserSearchInfoDto>>builder()
                         .result(userService.getUserFollowing(user, userId, pageable))
                         .build()
+        );
+    }
+
+    @Operation(
+            summary = "유저의 프로필 이미지 수정",
+            description = """
+                    유저의 프로필 이미지 수정\n
+                    User Id Token 필요
+                        -> Token Id를 기준으로 수정\n
+                    """
+    )
+    @PatchMapping("/profileImg")
+    public ResponseEntity<SuccessResponse> patchUserProfileImg(@AuthenticationPrincipal User user, @RequestBody UserProfileImgReqDto dto){
+
+        userService.patchUserProfileImg(user, dto);
+
+        return ResponseEntity.ok().body(
+                new SuccessResponse()
+        );
+    }
+
+    @Operation(
+            summary = "유저의 프로필 이미지 삭제",
+            description = """
+                    유저의 프로필 이미지 삭제\n
+                    null로 변경 \n
+                    User Id Token 필요
+                        -> Token Id를 기준으로 삭제\n
+                    """
+    )
+    @DeleteMapping("/profileImg")
+    public ResponseEntity<SuccessResponse> deleteUserProfileImg(@AuthenticationPrincipal User user){
+
+        userService.deleteUserProfileImg(user);
+
+        return ResponseEntity.ok().body(
+                new SuccessResponse()
         );
     }
 

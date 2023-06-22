@@ -36,6 +36,7 @@ import com.sluv.server.global.common.response.PaginationResDto;
 import com.sluv.server.global.jwt.JwtProvider;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -46,6 +47,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class UserService {
     private final UserRepository userRepository;
     private final CelebRepository celebRepository;
@@ -396,5 +398,18 @@ public class UserService {
                 .hasNext(followerPage.hasNext())
                 .content(content)
                 .build();
+    }
+
+    public void patchUserProfileImg(User user, UserProfileImgReqDto dto) {
+        log.info("User Profile Img Change. User: {}", user.getId());
+        log.info("Change URL: {}", dto.getImgUrl());
+        user.changeProfileImgUrl(dto.getImgUrl());
+        userRepository.save(user);
+    }
+
+    public void deleteUserProfileImg(User user) {
+        log.info("User Profile Img Delete. User: {}", user.getId());
+        user.changeProfileImgUrl(null);
+        userRepository.save(user);
     }
 }

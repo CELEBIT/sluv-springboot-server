@@ -160,4 +160,29 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom{
                 .limit(4)
                 .fetch();
     }
+
+    /**
+     * Wait QuestionFind 조회
+     * TODO: 게시글과 같은 셀럽/같은 그룹 로직 추가
+     */
+    @Override
+    public List<QuestionFind> getWaitQuestionFind(User user, Long questionId, List<Celeb> interestedCeleb) {
+
+        return jpaQueryFactory.select(questionFind)
+                .from(questionFind)
+                .where(questionFind.id.ne(questionId)
+                        .and(questionFind.questionStatus.eq(ACTIVE))
+                        .and(questionFind.user.ne(user))
+                        .and(questionFind.commentList.size().eq(0))
+//                        .and(questionFind.celeb.in(interestedCeleb)
+//                                .or(questionFind.celeb.parent.in(interestedCeleb))
+//                                .or(questionFind.celeb.eq(questionFind.celeb))
+//                                .or(questionFind.celeb.parent.eq(questionFind.celeb.parent))
+//                                .or(null)
+//                        )
+                )
+                .orderBy(questionFind.createdAt.desc())
+                .limit(4)
+                .fetch();
+    }
 }

@@ -215,9 +215,9 @@ public class QuestionController {
                     유저를 기다리고 있는 QuestionBuy 조회\n
                     1. 현재 Question과 불일치 \n
                     2. 현재 유저가 작성하지 않은 Question \n
-                    3. 투표 마감 순
-                    4. 정적으로 4개 조회
-                    ++ 현재 게시글과 같은 셀럽/같은 그룹 로직 X (23.6.22)
+                    3. 투표 마감 순 \n
+                    4. 정적으로 4개 조회 \n
+                    ++ 현재 게시글과 같은 셀럽/같은 그룹 로직 X (23.6.22) \n
                     """
     )
     @GetMapping("/wait/questionBuy")
@@ -237,8 +237,8 @@ public class QuestionController {
                     유저를 기다리고 있는 Recommend 조회\n
                     1. 현재 Question과 불일치 \n
                     2. 현재 유저가 작성하지 않은 Question \n
-                    3. 정적으로 4개 조회
-                    4. 댓글이 0개인 것들만 조회
+                    3. 정적으로 4개 조회 \n
+                    4. 댓글이 0개인 것들만 조회 \n
                     """
     )
     @GetMapping("/wait/questionRecommend")
@@ -258,8 +258,8 @@ public class QuestionController {
                     유저를 기다리고 있는 Howabout 조회\n
                     1. 현재 Question과 불일치 \n
                     2. 현재 유저가 작성하지 않은 Question \n
-                    3. 정적으로 4개 조회
-                    4. 댓글이 0개인 것들만 조회
+                    3. 정적으로 4개 조회 \n
+                    4. 댓글이 0개인 것들만 조회 \n
                     """
     )
     @GetMapping("/wait/questionHowabout")
@@ -269,6 +269,28 @@ public class QuestionController {
         return ResponseEntity.ok().body(
                 SuccessDataResponse.<List<QuestionSimpleResDto>>builder()
                         .result(questionService.getWaitQuestionHowabout(user, questionId))
+                        .build()
+        );
+    }
+
+    @Operation(
+            summary = "*Question Find 기다리고 있어요",
+            description = """
+                    유저를 기다리고 있는 Find 조회\n
+                    1. 현재 Question과 불일치 \n
+                    2. 현재 유저가 작성하지 않은 Question \n
+                    3. 정적으로 4개 조회 \n
+                    4. 댓글이 0개인 것들만 조회 \n
+                    TODO 현재 유저의 관심셀럽과 관련있는 셀럽을 우선 타겟
+                    """
+    )
+    @GetMapping("/wait/questionFind")
+    public ResponseEntity<SuccessDataResponse<List<QuestionSimpleResDto>>> getWaitQuestionFind(@AuthenticationPrincipal User user,
+                                                                                                   @RequestParam("questionId") Long questionId){
+
+        return ResponseEntity.ok().body(
+                SuccessDataResponse.<List<QuestionSimpleResDto>>builder()
+                        .result(questionService.getWaitQuestionFind(user, questionId))
                         .build()
         );
     }

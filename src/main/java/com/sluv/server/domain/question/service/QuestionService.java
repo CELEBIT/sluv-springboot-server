@@ -593,6 +593,10 @@ public class QuestionService {
                 }).toList();
     }
 
+    /**
+     * Wait QuestionRecommend 조회
+     */
+
     public List<QuestionSimpleResDto> getWaitQuestionRecommend(User user, Long questionId) {
         return questionRepository.getWaitQuestionRecommend(user, questionId)
                 .stream()
@@ -617,6 +621,10 @@ public class QuestionService {
                 }).toList();
     }
 
+    /**
+     * Wait QuestionHowabout 조회
+     */
+
     public List<QuestionSimpleResDto> getWaitQuestionHowabout(User user, Long questionId) {
         return questionRepository.getWaitQuestionHowabout(user, questionId)
                 .stream()
@@ -632,6 +640,36 @@ public class QuestionService {
 
                     return QuestionSimpleResDto.builder()
                             .qType("How")
+                            .id(questionBuy.getId())
+                            .title(questionBuy.getTitle())
+                            .content(questionBuy.getContent())
+                            .imgList(imgList)
+                            .itemImgList(itemImgList)
+                            .build();
+                }).toList();
+    }
+
+    /**
+     * Wait QuestionFind 조회
+     */
+
+    public List<QuestionSimpleResDto> getWaitQuestionFind(User user, Long questionId) {
+        List<Celeb> interestedCeleb = celebRepository.findInterestedCeleb(user);
+
+        return questionRepository.getWaitQuestionFind(user, questionId, interestedCeleb)
+                .stream()
+                .map(questionBuy -> {
+                    // 이미지 URL
+                    List<String> imgList = questionImgRepository.findAllByQuestionId(questionBuy.getId())
+                            .stream().map(QuestionImg::getImgUrl).toList();
+                    // 아이템 이미지 URL
+                    List<String> itemImgList = questionItemRepository.findAllByQuestionId(questionBuy.getId())
+                            .stream().map(questionItem ->
+                                    itemImgRepository.findMainImg(questionItem.getItem().getId()).getItemImgUrl()
+                            ).toList();
+
+                    return QuestionSimpleResDto.builder()
+                            .qType("Find")
                             .id(questionBuy.getId())
                             .title(questionBuy.getTitle())
                             .content(questionBuy.getContent())

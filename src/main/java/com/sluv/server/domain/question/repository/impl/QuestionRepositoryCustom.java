@@ -23,4 +23,6 @@ public interface QuestionRepositoryCustom {
     List<QuestionRecommend> getWaitQuestionRecommend(User user, Long questionId);
 
     List<QuestionHowabout> getWaitQuestionHowabout(User user, Long questionId);
+
+    List<QuestionFind> getWaitQuestionFind(User user, Long questionId, List<Celeb> interestedCeleb);
 }

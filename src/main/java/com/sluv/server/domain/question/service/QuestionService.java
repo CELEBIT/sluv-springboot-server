@@ -29,6 +29,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -560,6 +561,101 @@ public class QuestionService {
             // 해당 QuestionVote 삭제.
             questionVoteRepository.deleteById(questionVote.getId());
         }
+    }
+
+    /**
+     * Question 상세보기 하단의 추천 게시글
+     * TODO 게시글과 같은 셀럽/같은 그룹 로직 추가해야함 (23.06.22)
+     */
+
+    public List<QuestionSimpleResDto> getWaitQuestionBuy(User user, Long questionId) {
+        List<Celeb> interestedCeleb = celebRepository.findInterestedCeleb(user);
+
+        return questionRepository.getWaitQuestionBuy(user, questionId, interestedCeleb)
+                .stream()
+                .map(questionBuy ->
+                    getQuestionSimpleResDto(questionBuy.getId(),
+                            "Buy",
+                            questionBuy.getTitle(),
+                            questionBuy.getContent()
+                    )
+                ).toList();
+    }
+
+    /**
+     * Wait QuestionRecommend 조회
+     */
+
+    public List<QuestionSimpleResDto> getWaitQuestionRecommend(User user, Long questionId) {
+        return questionRepository.getWaitQuestionRecommend(user, questionId)
+                .stream()
+                .map(questionRecommend ->
+                    getQuestionSimpleResDto(questionRecommend.getId(),
+                            "Recommend",
+                            questionRecommend.getTitle(),
+                            questionRecommend.getContent()
+                    )
+                ).toList();
+    }
+
+    /**
+     * Wait QuestionHowabout 조회
+     */
+
+    public List<QuestionSimpleResDto> getWaitQuestionHowabout(User user, Long questionId) {
+        return questionRepository.getWaitQuestionHowabout(user, questionId)
+                .stream()
+                .map(questionHowabout ->
+                    getQuestionSimpleResDto(questionHowabout.getId(),
+                            "How",
+                            questionHowabout.getTitle(),
+                            questionHowabout.getContent()
+                    )
+                ).toList();
+    }
+
+    /**
+     * Wait QuestionFind 조회
+     */
+
+    public List<QuestionSimpleResDto> getWaitQuestionFind(User user, Long questionId) {
+        List<Celeb> interestedCeleb = celebRepository.findInterestedCeleb(user);
+
+        return questionRepository.getWaitQuestionFind(user, questionId, interestedCeleb)
+                .stream()
+                .map(questionFind ->
+                        getQuestionSimpleResDto(questionFind.getId(),
+                                "Find",
+                                questionFind.getTitle(),
+                                questionFind.getContent()
+                                )
+                  ).toList();
+    }
+
+    private QuestionSimpleResDto getQuestionSimpleResDto(Long questionId, String qType, String title, String content) {
+        // 이미지 URL
+        QuestionImg questionImg = questionImgRepository.findByQuestionIdAndRepresentFlag(questionId, true);
+
+        // 아이템 이미지 URL
+        QuestionItem questionItem = questionItemRepository.findByQuestionIdAndRepresentFlag(questionId, true);
+
+
+        return QuestionSimpleResDto.builder()
+                .qType(qType)
+                .id(questionId)
+                .title(title)
+                .content(content)
+                .imgList(
+                        questionImg != null
+                        ? Collections.singletonList(questionImg.getImgUrl())
+                        : null
+                )
+                .itemImgList(
+                        questionItem != null
+                        ? Collections.singletonList(itemImgRepository.findMainImg(questionItem.getItem().getId()).getItemImgUrl())
+                        : null
+                )
+                .build();
     }
 }
 

@@ -16,6 +16,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/app/question")
@@ -206,4 +208,91 @@ public class QuestionController {
                 new SuccessResponse()
         );
     }
+
+    @Operation(
+            summary = "*Question Buy 기다리고 있어요",
+            description = """
+                    유저를 기다리고 있는 QuestionBuy 조회\n
+                    1. 현재 Question과 불일치 \n
+                    2. 현재 유저가 작성하지 않은 Question \n
+                    3. 투표 마감 순 \n
+                    4. 정적으로 4개 조회 \n
+                    ++ 현재 게시글과 같은 셀럽/같은 그룹 로직 X (23.6.22) \n
+                    """
+    )
+    @GetMapping("/wait/questionBuy")
+    public ResponseEntity<SuccessDataResponse<List<QuestionSimpleResDto>>> getWaitQuestionBuy(@AuthenticationPrincipal User user,
+                                                                                              @RequestParam("questionId") Long questionId){
+
+        return ResponseEntity.ok().body(
+                SuccessDataResponse.<List<QuestionSimpleResDto>>builder()
+                        .result(questionService.getWaitQuestionBuy(user, questionId))
+                        .build()
+        );
+    }
+
+    @Operation(
+            summary = "*Question Recommend 기다리고 있어요",
+            description = """
+                    유저를 기다리고 있는 Recommend 조회\n
+                    1. 현재 Question과 불일치 \n
+                    2. 현재 유저가 작성하지 않은 Question \n
+                    3. 정적으로 4개 조회 \n
+                    4. 댓글이 0개인 것들만 조회 \n
+                    """
+    )
+    @GetMapping("/wait/questionRecommend")
+    public ResponseEntity<SuccessDataResponse<List<QuestionSimpleResDto>>> getWaitQuestionRecommend(@AuthenticationPrincipal User user,
+                                                                                              @RequestParam("questionId") Long questionId){
+
+        return ResponseEntity.ok().body(
+                SuccessDataResponse.<List<QuestionSimpleResDto>>builder()
+                        .result(questionService.getWaitQuestionRecommend(user, questionId))
+                        .build()
+        );
+    }
+
+    @Operation(
+            summary = "*Question Howabout 기다리고 있어요",
+            description = """
+                    유저를 기다리고 있는 Howabout 조회\n
+                    1. 현재 Question과 불일치 \n
+                    2. 현재 유저가 작성하지 않은 Question \n
+                    3. 정적으로 4개 조회 \n
+                    4. 댓글이 0개인 것들만 조회 \n
+                    """
+    )
+    @GetMapping("/wait/questionHowabout")
+    public ResponseEntity<SuccessDataResponse<List<QuestionSimpleResDto>>> getWaitQuestionHowabout(@AuthenticationPrincipal User user,
+                                                                                                    @RequestParam("questionId") Long questionId){
+
+        return ResponseEntity.ok().body(
+                SuccessDataResponse.<List<QuestionSimpleResDto>>builder()
+                        .result(questionService.getWaitQuestionHowabout(user, questionId))
+                        .build()
+        );
+    }
+
+    @Operation(
+            summary = "*Question Find 기다리고 있어요",
+            description = """
+                    유저를 기다리고 있는 Find 조회\n
+                    1. 현재 Question과 불일치 \n
+                    2. 현재 유저가 작성하지 않은 Question \n
+                    3. 정적으로 4개 조회 \n
+                    4. 댓글이 0개인 것들만 조회 \n
+                    TODO 현재 유저의 관심셀럽과 관련있는 셀럽을 우선 타겟
+                    """
+    )
+    @GetMapping("/wait/questionFind")
+    public ResponseEntity<SuccessDataResponse<List<QuestionSimpleResDto>>> getWaitQuestionFind(@AuthenticationPrincipal User user,
+                                                                                                   @RequestParam("questionId") Long questionId){
+
+        return ResponseEntity.ok().body(
+                SuccessDataResponse.<List<QuestionSimpleResDto>>builder()
+                        .result(questionService.getWaitQuestionFind(user, questionId))
+                        .build()
+        );
+    }
+
 }

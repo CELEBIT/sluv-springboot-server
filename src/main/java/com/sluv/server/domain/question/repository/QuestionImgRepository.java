@@ -9,4 +9,6 @@ public interface QuestionImgRepository extends JpaRepository<QuestionImg, Long> 
     void deleteAllByQuestionId(Long id);
 
     List<QuestionImg> findAllByQuestionId(Long questionId);
+
+    QuestionImg findByQuestionIdAndRepresentFlag(Long questionId, boolean b);
 }

@@ -47,6 +47,8 @@ public class QuestionGetDetailResDto {
     private LocalDateTime voteEndTime;
     @Schema(description = "게시글 투표 총 투표수")
     private Long totalVoteNum;
+    @Schema(description = "현재 유저의 투표 상태, null -> 투표 안함.")
+    private Long voteStatus;
 
     // Question Find
     @Schema(description = "게시글에 해당하는 Celeb")

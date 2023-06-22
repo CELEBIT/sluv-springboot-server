@@ -431,11 +431,19 @@ public class QuestionService {
         }else if(qType.equals("Buy")) {
             QuestionBuy questionBuy = (QuestionBuy) question;
 
+            QuestionVote questionVote = questionVoteRepository.findByQuestionIdAndUserId(questionId, user.getId())
+                                                                .orElse(null);
+
             builder
                 .celeb(null)
                 .newCeleb(null)
                 .voteEndTime(questionBuy.getVoteEndTime())
-                .totalVoteNum(questionVoteRepository.countByQuestionId(questionId));
+                .totalVoteNum(questionVoteRepository.countByQuestionId(questionId))
+                .voteStatus(
+                        questionVote != null
+                        ? questionVote.getVoteSortOrder()
+                        : null
+                );
         }else{
             builder.celeb(null)
                     .newCeleb(null)

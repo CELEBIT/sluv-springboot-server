@@ -214,9 +214,10 @@ public class QuestionController {
             description = """
                     유저를 기다리고 있는 QuestionBuy 조회\n
                     1. 현재 Question과 불일치 \n
-                    2 현재 유저가 댓글 혹은 투표에 참여하지 않은 Question \n
-                    3. 최신순
+                    2. 현재 유저가 작성하지 않은 Question \n
+                    3. 투표 마감 순
                     4. 정적으로 4개 조회
+                    ++ 현재 게시글과 같은 셀럽/같은 그룹 로직 X (23.6.22)
                     """
     )
     @GetMapping("/wait/questionBuy")

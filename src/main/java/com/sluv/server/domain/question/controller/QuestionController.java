@@ -186,4 +186,24 @@ public class QuestionController {
                         .build()
         );
     }
+    @Operation(
+            summary = "*QuestionBuy 게시글 투표",
+            description = """
+                    QuestionBuy 게시글 투표 \n
+                    최초 호출 -> QuestionVote 등록 \n
+                    재호출 -> QuestionVote 삭제 \n
+                    좋아요 시스템과 동일.
+                    """
+    )
+    @PostMapping("/{questionId}/vote")
+    public ResponseEntity<SuccessResponse> postQuestionVote(@AuthenticationPrincipal User user,
+                                                            @PathVariable("questionId") Long questionId,
+                                                            @RequestBody QuestionVoteReqDto dto){
+
+        questionService.postQuestionVote(user, questionId, dto);
+
+        return ResponseEntity.ok().body(
+                new SuccessResponse()
+        );
+    }
 }

@@ -528,5 +528,34 @@ public class QuestionService {
         return Math.round( div * 1000 ) / 10.0;
     }
 
+    /**
+     * QuestionBuy 등록 및 취소
+     */
+    public void postQuestionVote(User user, Long questionId, QuestionVoteReqDto dto) {
+        QuestionVote questionVote = questionVoteRepository.findByQuestionIdAndUserId(questionId, user.getId()).orElse(null);
+
+        if(questionVote == null){
+            // 투표 등록
+
+            // Question 검색
+            Question question = questionRepository.findById(questionId)
+                                                    .orElseThrow(QuestionNotFoundException::new);
+
+            // QuestionVote 생성 및 저장
+            questionVoteRepository.save(
+                    QuestionVote.builder()
+                            .question(question)
+                            .user(user)
+                            .voteSortOrder(dto.getVoteSortOrder())
+                            .build()
+            );
+
+        }else{
+            // 투표 취소
+
+            // 해당 QuestionVote 삭제.
+            questionVoteRepository.deleteById(questionVote.getId());
+        }
+    }
 }
 

@@ -11,4 +11,6 @@ public interface QuestionVoteRepository extends JpaRepository<QuestionVote, Long
     Long countByQuestionId(Long questionId);
 
     Optional<QuestionVote> findByQuestionIdAndUserId(Long questionId, Long userId);
+
+    Boolean existsByQuestionIdAndUserId(Long questionId, Long id);
 }

@@ -32,8 +32,6 @@ public class QuestionImg extends BaseEntity {
     @Size(max = 100)
     private String description;
 
-    private Long vote;
-
     @NotNull
     @ColumnDefault("0")
     private Boolean representFlag;
@@ -45,12 +43,11 @@ public class QuestionImg extends BaseEntity {
     private ItemImgOrLinkStatus itemImgOrLinkStatus;
 
     @Builder
-    public QuestionImg(Long id, Question question, String imgUrl, String description, Long vote, Boolean representFlag, Integer sortOrder, ItemImgOrLinkStatus itemImgOrLinkStatus) {
+    public QuestionImg(Long id, Question question, String imgUrl, String description, Boolean representFlag, Integer sortOrder, ItemImgOrLinkStatus itemImgOrLinkStatus) {
         this.id = id;
         this.question = question;
         this.imgUrl = imgUrl;
         this.description = description;
-        this.vote = vote;
         this.representFlag = representFlag;
         this.sortOrder = sortOrder;
         this.itemImgOrLinkStatus = itemImgOrLinkStatus;

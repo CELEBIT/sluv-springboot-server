@@ -444,6 +444,10 @@ public class QuestionService {
                         ? questionVote.getVoteSortOrder()
                         : null
                 );
+        }else if(qType.equals("Recommend")) {
+            List<String> categoryList = questionRecommendCategoryRepository.findAllByQuestionId(questionId)
+                    .stream().map(QuestionRecommendCategory::getName).toList();
+            builder.recommendCategoryList(categoryList);
         }else{
             builder.celeb(null)
                     .newCeleb(null)

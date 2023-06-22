@@ -33,6 +33,6 @@ public class QuestionSimpleResDto {
     private List<String> itemImgList;
 
     //추천해 줘
-    @Schema(description = "QuestionRecommend 게시글 카테고리")
-    private String categoryName;
+    @Schema(description = "QuestionRecommend 게시글 카테고리 리스트")
+    private List<String> categoryName;
 }

@@ -56,6 +56,9 @@ public class QuestionGetDetailResDto {
     @Schema(description = "게시글에 해당하는 NewCeleb")
     private CelebChipResDto newCeleb;
 
+    // Question Recommend
+    @Schema(description = "QuestionRecommend Category 리스트")
+    private List<String> recommendCategoryList;
 
 
 }

@@ -316,8 +316,11 @@ public class UserService {
             } else if (recentQuestion.getQType().equals("How")) {
 
             } else if (recentQuestion.getQType().equals("Recommend")) {
+                List<String> categoryList = questionRecommendCategoryRepository.findAllByQuestionId(question.getId())
+                        .stream()
+                        .map(QuestionRecommendCategory::getName).toList();
                 builder
-                        .categoryName(questionRecommendCategoryRepository.findOneByQuestionId(question.getId()).getName());
+                        .categoryName(categoryList);
             } else if (recentQuestion.getQType().equals("Find")) {
                 QuestionFind questionFind = (QuestionFind) question;
                 builder

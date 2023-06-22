@@ -201,14 +201,18 @@ public class SearchService {
                     questionRepository.getSearchQuestionRecommend(questionIdList, pageable);
 
             List<QuestionSimpleResDto> content = searchQuestionPage.stream().map(question ->
-                QuestionSimpleResDto.builder()
+            {
+                List<String> categoryList = questionRecommendCategoryRepository.findAllByQuestionId(question.getId())
+                        .stream()
+                        .map(QuestionRecommendCategory::getName).toList();
+                return QuestionSimpleResDto.builder()
                         .qType("Recommend")
                         .id(question.getId())
                         .title(question.getTitle())
                         .content(question.getContent().substring(0, 50) + "...")
-                        .categoryName(questionRecommendCategoryRepository.findOneByQuestionId(question.getId()).getName())
-                        .build()
-            ).toList();
+                        .categoryName(categoryList)
+                        .build();
+            }).toList();
 
             // 최근 검색 등록
             postRecentSearch(user, keyword);

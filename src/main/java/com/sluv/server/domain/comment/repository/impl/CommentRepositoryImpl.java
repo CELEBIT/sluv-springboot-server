@@ -24,7 +24,7 @@ public class CommentRepositoryImpl implements CommentRepositoryCustom{
                         .and(comment.parent.isNull())
                         .and(comment.commentStatus.eq(CommentStatus.ACTIVE))
                 )
-                .orderBy(comment.createdAt.asc())
+                .orderBy(comment.createdAt.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
@@ -35,7 +35,7 @@ public class CommentRepositoryImpl implements CommentRepositoryCustom{
                         .and(comment.parent.isNull())
                         .and(comment.commentStatus.eq(CommentStatus.ACTIVE))
                 )
-                .orderBy(comment.createdAt.asc());
+                .orderBy(comment.createdAt.desc());
 
 
         return PageableExecutionUtils.getPage(content, pageable, () -> countQuery.fetch().size());
@@ -47,7 +47,7 @@ public class CommentRepositoryImpl implements CommentRepositoryCustom{
                 .where(comment.parent.id.eq(commentId)
                         .and(comment.commentStatus.eq(CommentStatus.ACTIVE))
                 )
-                .orderBy(comment.createdAt.asc())
+                .orderBy(comment.createdAt.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
@@ -57,7 +57,7 @@ public class CommentRepositoryImpl implements CommentRepositoryCustom{
                 .where(comment.parent.id.eq(commentId)
                         .and(comment.commentStatus.eq(CommentStatus.ACTIVE))
                 )
-                .orderBy(comment.createdAt.asc());
+                .orderBy(comment.createdAt.desc());
 
 
         return PageableExecutionUtils.getPage(content, pageable, () -> countQuery.fetch().size());

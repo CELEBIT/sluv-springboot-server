@@ -49,6 +49,7 @@ public class QuestionService {
     private final RecentQuestionRepository recentQuestionRepository;
     private final ItemScrapRepository itemScrapRepository;
     private final ClosetRepository closetRepository;
+    private final QuestionVoteRepository questionVoteRepository;
 
     @Transactional
     public QuestionPostResDto postQuestionFind(User user, QuestionFindPostReqDto dto) {
@@ -113,7 +114,6 @@ public class QuestionService {
                 .user(user)
                 .title(dto.getTitle())
                 .searchNum(0L)
-                .totalVoteNum(0L)
                 .voteEndTime(dto.getVoteEndTime())
                 .questionStatus(QuestionStatus.ACTIVE)
                 .build();
@@ -234,7 +234,6 @@ public class QuestionService {
                 .question(question)
                 .imgUrl(imgDto.getImgUrl())
                 .description(imgDto.getDescription())
-                .vote(imgDto.getVote())
                 .representFlag(imgDto.getRepresentFlag())
                 .itemImgOrLinkStatus(ItemImgOrLinkStatus.ACTIVE)
                 .sortOrder(imgDto.getSortOrder())
@@ -260,7 +259,6 @@ public class QuestionService {
                             .question(question)
                             .item(item)
                             .description(itemDto.getDescription())
-                            .vote(itemDto.getVote())
                             .representFlag(itemDto.getRepresentFlag())
                             .sortOrder(itemDto.getSortOrder())
                             .build();
@@ -358,14 +356,10 @@ public class QuestionService {
                                                                                 .representFlag(questionImg.getRepresentFlag())
                                                                                 .order(questionImg.getSortOrder())
                                                                                 .description(questionImg.getDescription());
+
+                                                                // QuestionBuy 라면
                                                                 if(qType != null && qType.equals("Buy")){
-                                                                    QuestionBuy questionBuy = (QuestionBuy) question;
-                                                                    builder.voteNum(questionImg.getVote())
-                                                                            .votePercent(
-                                                                                    questionBuy.getTotalVoteNum() != 0
-                                                                                    ? Math.round((double) questionImg.getVote() / (double) questionBuy.getTotalVoteNum()* 1000)/10.0
-                                                                                    : 0
-                                                                    );
+                                                                    addVoteNum(questionId, (long) questionImg.getSortOrder(), builder, null);
                                                                 }
                                                                     return  builder.build();
                                                             }
@@ -396,16 +390,10 @@ public class QuestionService {
                                                         .order(questionItem.getSortOrder())
                                                         .description(questionItem.getDescription());
 
+                                                // QuestionBuy일 경우 투표수 추가.
+
                                                 if(qType != null & qType.equals("Buy")){
-                                                    QuestionBuy questionBuy = (QuestionBuy) question;
-                                                    double votePercent;
-                                                    if(questionBuy.getTotalVoteNum() != 0 && questionItem.getVote() != 0){
-                                                        votePercent = Math.round((double) questionItem.getVote() / (double) questionBuy.getTotalVoteNum()* 1000)/10.0;
-                                                    }else{
-                                                        votePercent = 0;
-                                                    }
-                                                    builder.voteNum(questionItem.getVote())
-                                                            .votePercent(votePercent);
+                                                    addVoteNum(questionId, (long) questionItem.getSortOrder(), null, builder);
                                                 }
 
                                                 return builder.build();
@@ -447,7 +435,7 @@ public class QuestionService {
                 .celeb(null)
                 .newCeleb(null)
                 .voteEndTime(questionBuy.getVoteEndTime())
-                .totalVoteNum(questionBuy.getTotalVoteNum());
+                .totalVoteNum(questionVoteRepository.countByQuestionId(questionId));
         }else{
             builder.celeb(null)
                     .newCeleb(null)
@@ -488,4 +476,49 @@ public class QuestionService {
 
                 .build();
     }
+
+    /**
+     * builder에 VoteNum, VotePercent 탑재
+     */
+    private void addVoteNum(Long questionId, Long sortOrder, QuestionImgResDto.QuestionImgResDtoBuilder imgBuilder, QuestionItemResDto.QuestionItemResDtoBuilder itemBuilder) {
+
+
+        // 해당 SortOrder의 투표 수
+        Long voteNum = questionVoteRepository.countByQuestionIdAndVoteSortOrder(questionId, sortOrder);
+        // 전체 투표 수
+        Long totalVoteNum = questionVoteRepository.countByQuestionId(questionId);
+
+        // builder 조립
+        if(imgBuilder != null){
+            imgBuilder
+                .voteNum(voteNum)
+                .votePercent(
+                        totalVoteNum != 0
+                                ? getVotePercent(voteNum, totalVoteNum)
+                                : 0
+                );
+        }else if(itemBuilder != null){
+            itemBuilder
+                .voteNum(voteNum)
+                .votePercent(
+                        totalVoteNum != 0
+                                ? getVotePercent(voteNum, totalVoteNum)
+                                : 0
+                );
+        }else {
+            throw new IllegalArgumentException();
+        }
+
+    }
+
+    /**
+     * QuestionVote 퍼센트 계산.
+     */
+    private Double getVotePercent(Long voteNum, Long totalVoteNum){
+        double div = (double) voteNum / (double) totalVoteNum;
+
+        return Math.round( div * 1000 ) / 10.0;
+    }
+
 }
+

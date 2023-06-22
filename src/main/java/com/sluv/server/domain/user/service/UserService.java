@@ -401,8 +401,15 @@ public class UserService {
     }
 
     public void patchUserProfileImg(User user, UserProfileImgReqDto dto) {
-        User targetUser = userRepository.findById(user.getId()).orElseThrow(UserNotFoundException::new);
         log.info("User Profile Img Change. User: {}", user.getId());
-        targetUser.changeProfileImgUrl(dto.getImgUrl());
+        log.info("Change URL: {}", dto.getImgUrl());
+        user.changeProfileImgUrl(dto.getImgUrl());
+        userRepository.save(user);
+    }
+
+    public void deleteUserProfileImg(User user) {
+        log.info("User Profile Img Delete. User: {}", user.getId());
+        user.changeProfileImgUrl(null);
+        userRepository.save(user);
     }
 }

@@ -284,4 +284,23 @@ public class UserController {
         );
     }
 
+    @Operation(
+            summary = "유저의 프로필 이미지 삭제",
+            description = """
+                    유저의 프로필 이미지 삭제\n
+                    null로 변경 \n
+                    User Id Token 필요
+                        -> Token Id를 기준으로 삭제\n
+                    """
+    )
+    @DeleteMapping("/profileImg")
+    public ResponseEntity<SuccessResponse> deleteUserProfileImg(@AuthenticationPrincipal User user){
+
+        userService.deleteUserProfileImg(user);
+
+        return ResponseEntity.ok().body(
+                new SuccessResponse()
+        );
+    }
+
 }

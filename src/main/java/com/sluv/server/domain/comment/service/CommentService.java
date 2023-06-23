@@ -133,20 +133,21 @@ public class CommentService {
     private void saveCommentItem(CommentPostReqDto dto, Comment comment) {
         // 초기화
         commentItemRepository.deleteAllByCommentId(comment.getId());
+        if(dto.getItemList() != null) {
+            // dto로 부터 새로운 CommentItem 생성
+            List<CommentItem> itemList = dto.getItemList().stream().map(_item -> {
+                        Item item = itemRepository.findById(_item.getItemId()).orElseThrow(ItemNotFoundException::new);
+                        return CommentItem.builder()
+                                .comment(comment)
+                                .item(item)
+                                .sortOrder(_item.getSortOrder())
+                                .build();
+                    }
+            ).toList();
 
-        // dto로 부터 새로운 CommentItem 생성
-        List<CommentItem> itemList = dto.getItemList().stream().map(_item -> {
-                    Item item = itemRepository.findById(_item.getItemId()).orElseThrow(ItemNotFoundException::new);
-                    return CommentItem.builder()
-                            .comment(comment)
-                            .item(item)
-                            .sortOrder(_item.getSortOrder())
-                            .build();
-                }
-        ).toList();
-
-        // 저장
-        commentItemRepository.saveAll(itemList);
+            // 저장
+            commentItemRepository.saveAll(itemList);
+        }
     }
 
     private void saveCommentImg(CommentPostReqDto dto, Comment comment) {
@@ -154,16 +155,18 @@ public class CommentService {
         commentImgRepository.deleteAllByCommentId(comment.getId());
 
         // dto로 부터 새로운 CommentImg 생성
-        List<CommentImg> imgList = dto.getImgList().stream().map(imgUrl ->
-                CommentImg.builder()
-                        .comment(comment)
-                        .imgUrl(imgUrl.getImgUrl())
-                        .sortOrder(imgUrl.getSortOrder())
-                        .build()
-        ).toList();
+        if(dto.getImgList() != null) {
+            List<CommentImg> imgList = dto.getImgList().stream().map(imgUrl ->
+                    CommentImg.builder()
+                            .comment(comment)
+                            .imgUrl(imgUrl.getImgUrl())
+                            .sortOrder(imgUrl.getSortOrder())
+                            .build()
+            ).toList();
 
-        // 저장
-        commentImgRepository.saveAll(imgList);
+            // 저장
+            commentImgRepository.saveAll(imgList);
+        }
     }
 
 
@@ -292,6 +295,7 @@ public class CommentService {
                             .likeNum(likeNum)
                             .likeStatus(likeStatus)
                             .hasMine(comment.getUser().getId().equals(user.getId()))
+                            .modifyStatus(!comment.getCreatedAt().equals(comment.getUpdatedAt()))
                             .build();
                 }).toList();
     }

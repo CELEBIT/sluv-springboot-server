@@ -555,6 +555,10 @@ public class UserService {
         );
     }
 
+    /**
+     * 현재 유저가 업로그한 Question 조회
+     */
+
     public PaginationCountResDto<QuestionSimpleResDto> getUserUploadQuestion(User user, Pageable pageable) {
         Page<Question> questionPage = questionRepository.getUserAllQuestion(user, pageable);
 
@@ -565,6 +569,22 @@ public class UserService {
                 questionPage.getNumber(),
                 content,
                 questionPage.getTotalElements()
+        );
+    }
+
+    /**
+     * 현재 유저가 업로그한 Comment 조회
+     */
+    public PaginationCountResDto<CommentSimpleResDto> getUserUploadComment(User user, Pageable pageable) {
+        Page<Comment> commentPage = commentRepository.getUserAllComment(user, pageable);
+
+        List<CommentSimpleResDto> content = commentPage.stream().map(this::convertCommentToCommentSimpleResDto).toList();
+
+        return new PaginationCountResDto<>(
+                commentPage.hasNext(),
+                commentPage.getNumber(),
+                content,
+                commentPage.getTotalElements()
         );
     }
 }

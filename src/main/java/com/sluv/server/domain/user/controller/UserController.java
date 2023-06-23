@@ -371,12 +371,31 @@ public class UserController {
                     Pagination 적용\n
                     """
     )
-    @GetMapping("/item")
+    @GetMapping("/question")
     public ResponseEntity<SuccessDataResponse<PaginationCountResDto<QuestionSimpleResDto>>> getUserUploadQuestion(@AuthenticationPrincipal User user, Pageable pageable){
 
         return ResponseEntity.ok().body(
                 SuccessDataResponse.<PaginationCountResDto<QuestionSimpleResDto>>builder()
                         .result(userService.getUserUploadQuestion(user, pageable))
+                        .build()
+        );
+    }
+
+    @Operation(
+            summary = "유저가 작성한 Comment 게시글 조회",
+            description = """
+                    유저가 작성한 Comment 게시글 조회\n
+                    User Id Token 필요\n
+                        -> Id를 기준으로 조회\n
+                    Pagination 적용\n
+                    """
+    )
+    @GetMapping("/comment")
+    public ResponseEntity<SuccessDataResponse<PaginationCountResDto<CommentSimpleResDto>>> getUserUploadComment(@AuthenticationPrincipal User user, Pageable pageable){
+
+        return ResponseEntity.ok().body(
+                SuccessDataResponse.<PaginationCountResDto<CommentSimpleResDto>>builder()
+                        .result(userService.getUserUploadComment(user, pageable))
                         .build()
         );
     }

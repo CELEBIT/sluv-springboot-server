@@ -11,4 +11,6 @@ public interface CommentRepositoryCustom {
     Page<Comment> getAllSubComment(Long commentId, Pageable pageable);
 
     Page<Comment> getAllUserLikeComment(User user, Pageable pageable);
+
+    Page<Comment> getUserAllComment(User user, Pageable pageable);
 }

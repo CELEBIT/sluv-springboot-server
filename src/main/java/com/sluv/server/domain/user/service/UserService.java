@@ -18,7 +18,6 @@ import com.sluv.server.domain.comment.repository.CommentRepository;
 import com.sluv.server.domain.item.dto.ItemSimpleResDto;
 import com.sluv.server.domain.item.entity.Item;
 import com.sluv.server.domain.item.entity.ItemImg;
-import com.sluv.server.domain.item.entity.ItemLike;
 import com.sluv.server.domain.item.entity.RecentItem;
 import com.sluv.server.domain.item.repository.*;
 import com.sluv.server.domain.question.dto.QuestionImgSimpleResDto;
@@ -47,7 +46,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 
 @Service
@@ -512,7 +510,7 @@ public class UserService {
      */
 
     public PaginationCountResDto<CommentSimpleResDto> getUserLikeComment(User user, Pageable pageable) {
-        Page<Comment> commentPage = commentRepository.getAllUserLikeComment(user, pageable);
+        Page<Comment> commentPage = commentRepository.getUserAllLikeComment(user, pageable);
 
         List<CommentSimpleResDto> content = commentPage.stream().map(this::convertCommentToCommentSimpleResDto).toList();
 

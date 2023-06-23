@@ -8,6 +8,7 @@ import com.sluv.server.domain.celeb.repository.NewCelebRepository;
 import com.sluv.server.domain.closet.entity.Closet;
 import com.sluv.server.domain.closet.repository.ClosetRepository;
 import com.sluv.server.domain.comment.repository.CommentRepository;
+import com.sluv.server.domain.item.entity.ItemImg;
 import com.sluv.server.domain.item.repository.ItemScrapRepository;
 import com.sluv.server.domain.question.dto.QuestionItemResDto;
 import com.sluv.server.domain.item.dto.ItemSimpleResDto;
@@ -635,9 +636,27 @@ public class QuestionService {
     private QuestionSimpleResDto getQuestionSimpleResDto(Long questionId, String qType, String title, String content) {
         // 이미지 URL
         QuestionImg questionImg = questionImgRepository.findByQuestionIdAndRepresentFlag(questionId, true);
+        // 이미지 Dto로 변경
+        QuestionImgSimpleResDto img = null;
+        if(questionImg != null) {
+            img = QuestionImgSimpleResDto.builder()
+                    .imgUrl(questionImg.getImgUrl())
+                    .sortOrder( (long) questionImg.getSortOrder())
+                    .build();
+        }
 
         // 아이템 이미지 URL
         QuestionItem questionItem = questionItemRepository.findByQuestionIdAndRepresentFlag(questionId, true);
+        // 아이템 이미지 Dto로 변경
+        QuestionImgSimpleResDto itemImg = null;
+
+        if(questionItem != null) {
+            ItemImg mainImg = itemImgRepository.findMainImg(questionItem.getItem().getId());
+            img = QuestionImgSimpleResDto.builder()
+                    .imgUrl(mainImg.getItemImgUrl())
+                    .sortOrder( (long) mainImg.getSortOrder())
+                    .build();
+        }
 
 
         return QuestionSimpleResDto.builder()
@@ -646,13 +665,11 @@ public class QuestionService {
                 .title(title)
                 .content(content)
                 .imgList(
-                        questionImg != null
-                        ? Collections.singletonList(questionImg.getImgUrl())
-                        : null
+                        Collections.singletonList(img)
                 )
                 .itemImgList(
                         questionItem != null
-                        ? Collections.singletonList(itemImgRepository.findMainImg(questionItem.getItem().getId()).getItemImgUrl())
+                        ? Collections.singletonList(itemImg)
                         : null
                 )
                 .build();

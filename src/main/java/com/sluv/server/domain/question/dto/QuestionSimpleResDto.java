@@ -28,9 +28,9 @@ public class QuestionSimpleResDto {
 
     //이 중에 뭐 살까
     @Schema(description = "QuestionBuy 게시글 이미지 URL 리스트")
-    private List<String> imgList;
+    private List<QuestionImgSimpleResDto> imgList;
     @Schema(description = "QuestionBuy 게시글 아이템 대표 이미지 URL 리스트")
-    private List<String> itemImgList;
+    private List<QuestionImgSimpleResDto> itemImgList;
 
     //추천해 줘
     @Schema(description = "QuestionRecommend 게시글 카테고리 리스트")

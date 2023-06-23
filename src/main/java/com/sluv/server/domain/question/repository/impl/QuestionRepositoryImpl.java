@@ -14,9 +14,11 @@ import org.springframework.data.support.PageableExecutionUtils;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static com.sluv.server.domain.question.entity.QQuestion.question;
 import static com.sluv.server.domain.question.entity.QQuestionBuy.questionBuy;
 import static com.sluv.server.domain.question.entity.QQuestionFind.questionFind;
 import static com.sluv.server.domain.question.entity.QQuestionHowabout.questionHowabout;
+import static com.sluv.server.domain.question.entity.QQuestionLike.questionLike;
 import static com.sluv.server.domain.question.entity.QQuestionRecommend.questionRecommend;
 import static com.sluv.server.domain.question.enums.QuestionStatus.ACTIVE;
 
@@ -174,15 +176,36 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom{
                         .and(questionFind.questionStatus.eq(ACTIVE))
                         .and(questionFind.user.ne(user))
                         .and(questionFind.commentList.size().eq(0))
-//                        .and(questionFind.celeb.in(interestedCeleb)
-//                                .or(questionFind.celeb.parent.in(interestedCeleb))
-//                                .or(questionFind.celeb.eq(questionFind.celeb))
-//                                .or(questionFind.celeb.parent.eq(questionFind.celeb.parent))
-//                                .or(null)
-//                        )
                 )
                 .orderBy(questionFind.createdAt.desc())
                 .limit(4)
                 .fetch();
+    }
+
+    /**
+     * User Like Question
+     */
+    @Override
+    public Page<Question> getUserLikeQuestion(User user, Pageable pageable) {
+        List<Question> content = jpaQueryFactory.select(question)
+                .from(questionLike)
+                .leftJoin(questionLike.question, question)
+                .where(questionLike.user.eq(user)
+                        .and(question.questionStatus.eq(ACTIVE))
+                )
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .orderBy(questionLike.createdAt.desc())
+                .fetch();
+        //Count Query
+        JPAQuery<Question> query = jpaQueryFactory.select(question)
+                .from(questionLike)
+                .leftJoin(questionLike.question, question)
+                .where(questionLike.user.eq(user)
+                        .and(question.questionStatus.eq(ACTIVE))
+                )
+                .orderBy(questionLike.createdAt.desc());
+
+        return PageableExecutionUtils.getPage(content, pageable, () -> query.fetch().size());
     }
 }

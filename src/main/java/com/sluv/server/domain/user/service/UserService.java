@@ -12,6 +12,8 @@ import com.sluv.server.domain.celeb.repository.InterestedCelebRepository;
 import com.sluv.server.domain.closet.dto.ClosetResDto;
 import com.sluv.server.domain.closet.entity.Closet;
 import com.sluv.server.domain.closet.repository.ClosetRepository;
+import com.sluv.server.domain.comment.dto.CommentSimpleResDto;
+import com.sluv.server.domain.comment.entity.Comment;
 import com.sluv.server.domain.comment.repository.CommentRepository;
 import com.sluv.server.domain.item.dto.ItemSimpleResDto;
 import com.sluv.server.domain.item.entity.Item;
@@ -502,14 +504,14 @@ public class UserService {
         return builder.build();
     }
 
-    public  QuestionImgSimpleResDto convertQuestionImgToQuestionImgSimpleResDto(QuestionImg questionImg){
+    private QuestionImgSimpleResDto convertQuestionImgToQuestionImgSimpleResDto(QuestionImg questionImg){
         return QuestionImgSimpleResDto.builder()
                 .imgUrl(questionImg.getImgUrl())
                 .sortOrder((long)questionImg.getSortOrder())
                 .build();
     }
 
-    public QuestionImgSimpleResDto convertQuestionItemToQuestionImgSimpleResDto(QuestionItem questionItem){
+    private QuestionImgSimpleResDto convertQuestionItemToQuestionImgSimpleResDto(QuestionItem questionItem){
         ItemImg mainImg = itemImgRepository.findMainImg(questionItem.getItem().getId());
         return QuestionImgSimpleResDto.builder()
                 .imgUrl(mainImg.getItemImgUrl())
@@ -517,4 +519,29 @@ public class UserService {
                 .build();
     }
 
+    /**
+     * 유저가 좋아요한 댓글 목록 조회
+     */
+
+    public PaginationCountResDto<CommentSimpleResDto> getUserLikeComment(User user, Pageable pageable) {
+        Page<Comment> commentPage = commentRepository.getAllUserLikeComment(user, pageable);
+
+        List<CommentSimpleResDto> content = commentPage.stream().map(this::convertCommentToCommentSimpleResDto).toList();
+
+        return new PaginationCountResDto<>(
+                commentPage.hasNext(),
+                commentPage.getNumber(),
+                content,
+                commentPage.getTotalElements()
+        );
+    }
+
+    private CommentSimpleResDto convertCommentToCommentSimpleResDto(Comment comment){
+
+        return CommentSimpleResDto.builder()
+                .id(comment.getId())
+                .questionTitle(comment.getQuestion().getTitle())
+                .content(comment.getContent())
+                .build();
+    }
 }

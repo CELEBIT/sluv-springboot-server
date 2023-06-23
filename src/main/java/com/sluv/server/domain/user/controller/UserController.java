@@ -4,6 +4,7 @@ package com.sluv.server.domain.user.controller;
 import com.sluv.server.domain.celeb.dto.InterestedCelebParentResDto;
 import com.sluv.server.domain.celeb.dto.InterestedCelebPostReqDto;
 import com.sluv.server.domain.closet.dto.ClosetResDto;
+import com.sluv.server.domain.comment.dto.CommentSimpleResDto;
 import com.sluv.server.domain.item.dto.ItemSimpleResDto;
 import com.sluv.server.domain.question.dto.QuestionSimpleResDto;
 import com.sluv.server.domain.question.entity.Question;
@@ -319,6 +320,25 @@ public class UserController {
         return ResponseEntity.ok().body(
                 SuccessDataResponse.<PaginationCountResDto<QuestionSimpleResDto>>builder()
                         .result(userService.getUserLikeQuestion(user, pageable))
+                        .build()
+        );
+    }
+
+    @Operation(
+            summary = "유저가 좋아요한 Comment 조회",
+            description = """
+                    유저가 좋아요한 Comment 조회\n
+                    User Id Token 필요\n
+                        -> Id를 기준으로 조회\n
+                    Pagination 적용\n
+                    """
+    )
+    @GetMapping("/like/comment")
+    public ResponseEntity<SuccessDataResponse<PaginationCountResDto<CommentSimpleResDto>>> getUserLikeComment(@AuthenticationPrincipal User user, Pageable pageable){
+
+        return ResponseEntity.ok().body(
+                SuccessDataResponse.<PaginationCountResDto<CommentSimpleResDto>>builder()
+                        .result(userService.getUserLikeComment(user, pageable))
                         .build()
         );
     }

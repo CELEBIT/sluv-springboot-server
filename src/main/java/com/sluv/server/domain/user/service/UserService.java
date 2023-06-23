@@ -47,6 +47,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -543,5 +544,27 @@ public class UserService {
                 .questionTitle(comment.getQuestion().getTitle())
                 .content(comment.getContent())
                 .build();
+    }
+
+    /**
+     * 현재 유저가 업로드한 아이템 조회
+     */
+
+    public PaginationCountResDto<ItemSimpleResDto> getUserUploadItem(User user, Pageable pageable) {
+        // 현재 유저가 업로드한 아이템 조회
+        Page<Item> itemPage = itemRepository.getUserAllItem(user.getId(), pageable);
+        // 현재 유저의 옷장 검색
+        List<Closet> closetList = closetRepository.findAllByUserId(user.getId());
+        // content 제작
+        List<ItemSimpleResDto> content = itemPage.stream().map(item ->
+                getItemSimpleResDto(item, closetList)
+        ).toList();
+
+        return new PaginationCountResDto<>(
+                itemPage.hasNext(),
+                itemPage.getNumber(),
+                content,
+                itemPage.getTotalElements()
+        );
     }
 }

@@ -66,9 +66,8 @@ public class ElasticSearchConnectUtil {
     private List<Long> jsonArrayToList(JSONArray jsonArray) {
         List<Long> list = null;
         try {
-            Object innerArray = jsonArray.get(0);
             ObjectMapper objectMapper = new ObjectMapper();
-            Long[] longArray = objectMapper.readValue(innerArray.toString(), Long[].class);
+            Long[] longArray = objectMapper.readValue(jsonArray.toString(), Long[].class);
             list = Arrays.stream(longArray).toList();
 
         }catch (Exception e){

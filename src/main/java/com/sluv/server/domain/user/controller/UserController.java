@@ -361,4 +361,23 @@ public class UserController {
                         .build()
         );
     }
+
+    @Operation(
+            summary = "유저가 작성한 Question 게시글 조회",
+            description = """
+                    유저가 작성한 Question 게시글 조회\n
+                    User Id Token 필요\n
+                        -> Id를 기준으로 조회\n
+                    Pagination 적용\n
+                    """
+    )
+    @GetMapping("/item")
+    public ResponseEntity<SuccessDataResponse<PaginationCountResDto<QuestionSimpleResDto>>> getUserUploadQuestion(@AuthenticationPrincipal User user, Pageable pageable){
+
+        return ResponseEntity.ok().body(
+                SuccessDataResponse.<PaginationCountResDto<QuestionSimpleResDto>>builder()
+                        .result(userService.getUserUploadQuestion(user, pageable))
+                        .build()
+        );
+    }
 }

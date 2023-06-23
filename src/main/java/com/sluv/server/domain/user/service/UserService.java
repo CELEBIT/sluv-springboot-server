@@ -567,4 +567,17 @@ public class UserService {
                 itemPage.getTotalElements()
         );
     }
+
+    public PaginationCountResDto<QuestionSimpleResDto> getUserUploadQuestion(User user, Pageable pageable) {
+        Page<Question> questionPage = questionRepository.getUserAllQuestion(user, pageable);
+
+        List<QuestionSimpleResDto> content = questionPage.stream().map(this::dtoBuildByQuestionType).toList();
+
+        return new PaginationCountResDto<>(
+                questionPage.hasNext(),
+                questionPage.getNumber(),
+                content,
+                questionPage.getTotalElements()
+        );
+    }
 }

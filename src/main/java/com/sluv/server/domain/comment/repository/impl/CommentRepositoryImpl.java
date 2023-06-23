@@ -4,6 +4,7 @@ import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sluv.server.domain.comment.entity.Comment;
 import com.sluv.server.domain.comment.enums.CommentStatus;
+import com.sluv.server.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -12,6 +13,7 @@ import org.springframework.data.support.PageableExecutionUtils;
 import java.util.List;
 
 import static com.sluv.server.domain.comment.entity.QComment.comment;
+import static com.sluv.server.domain.comment.entity.QCommentLike.commentLike;
 
 @RequiredArgsConstructor
 public class CommentRepositoryImpl implements CommentRepositoryCustom{
@@ -61,5 +63,28 @@ public class CommentRepositoryImpl implements CommentRepositoryCustom{
 
 
         return PageableExecutionUtils.getPage(content, pageable, () -> countQuery.fetch().size());
+    }
+
+    @Override
+    public Page<Comment> getAllUserLikeComment(User user, Pageable pageable) {
+        List<Comment> content = jpaQueryFactory.select(comment)
+                .from(commentLike)
+                .where(commentLike.user.eq(user)
+                        .and(comment.commentStatus.eq(CommentStatus.ACTIVE))
+                )
+                .orderBy(commentLike.createdAt.desc())
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        // CountQuery
+        JPAQuery<Comment> query = jpaQueryFactory.select(comment)
+                .from(commentLike)
+                .where(commentLike.user.eq(user)
+                        .and(comment.commentStatus.eq(CommentStatus.ACTIVE))
+                )
+                .orderBy(commentLike.createdAt.desc());
+
+        return PageableExecutionUtils.getPage(content, pageable, () -> query.fetch().size());
     }
 }

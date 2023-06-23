@@ -1,12 +1,15 @@
 package com.sluv.server.domain.search.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sluv.server.domain.closet.entity.Closet;
 import com.sluv.server.domain.closet.repository.ClosetRepository;
 import com.sluv.server.domain.item.dto.ItemSimpleResDto;
 import com.sluv.server.domain.item.entity.Item;
+import com.sluv.server.domain.item.entity.ItemImg;
 import com.sluv.server.domain.item.repository.ItemImgRepository;
 import com.sluv.server.domain.item.repository.ItemRepository;
 import com.sluv.server.domain.item.repository.ItemScrapRepository;
+import com.sluv.server.domain.question.dto.QuestionImgSimpleResDto;
 import com.sluv.server.domain.question.dto.QuestionSimpleResDto;
 import com.sluv.server.domain.question.entity.*;
 import com.sluv.server.domain.question.exception.QuestionTypeNotFoundException;
@@ -35,6 +38,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -130,16 +134,18 @@ public class SearchService {
             {
                 // 해당 Question의 item 이미지 리스트 구하기
                 List<QuestionItem> questionItemList = questionItemRepository.findAllByQuestionId(question.getId());
-                List<String> itemImgList = questionItemList.stream().map(questionItem -> itemImgRepository.findMainImg(questionItem.getId()).getItemImgUrl()).toList();
+                List<QuestionImgSimpleResDto> itemImgList = questionItemList.stream().map(this::convertQuestionItemToQuestionImgSimpleResDto).toList();
 
                 // 해당 Question의 이미지 리스트 구하기
-                List<String> imgList = questionImgRepository.findAllByQuestionId(question.getId()).stream().map(QuestionImg::getImgUrl).toList();
+                List<QuestionImgSimpleResDto> imgList = questionImgRepository.findAllByQuestionId(question.getId())
+                        .stream()
+                        .map(this::convertQuestionImgToQuestionImgSimpleResDto).toList();
 
                 return QuestionSimpleResDto.builder()
                         .qType("Buy")
                         .id(question.getId())
                         .title(question.getTitle())
-                        .content(question.getContent().substring(0, 50) + "...")
+                        .content(question.getContent())
                         .imgList(imgList)
                         .itemImgList(itemImgList)
                         .build();
@@ -161,7 +167,7 @@ public class SearchService {
                         .qType("Find")
                         .id(question.getId())
                         .title(question.getTitle())
-                        .content(question.getContent().substring(0, 50) + "...")
+                        .content(question.getContent())
                         .celebName(
                                 question.getCeleb() != null
                                 ?question.getCeleb().getCelebNameKr()
@@ -186,7 +192,7 @@ public class SearchService {
                         .qType("How")
                         .id(question.getId())
                         .title(question.getTitle())
-                        .content(question.getContent().substring(0, 50) + "...")
+                        .content(question.getContent())
                         .build()
             ).toList();
 
@@ -209,7 +215,7 @@ public class SearchService {
                         .qType("Recommend")
                         .id(question.getId())
                         .title(question.getTitle())
-                        .content(question.getContent().substring(0, 50) + "...")
+                        .content(question.getContent())
                         .categoryName(categoryList)
                         .build();
             }).toList();
@@ -398,6 +404,21 @@ public class SearchService {
                 .page(searchDataPage.getNumber())
                 .hasNext(searchDataPage.hasNext())
                 .content(content)
+                .build();
+    }
+
+    public QuestionImgSimpleResDto convertQuestionImgToQuestionImgSimpleResDto(QuestionImg questionImg){
+        return QuestionImgSimpleResDto.builder()
+                .imgUrl(questionImg.getImgUrl())
+                .sortOrder((long)questionImg.getSortOrder())
+                .build();
+    }
+
+    public QuestionImgSimpleResDto convertQuestionItemToQuestionImgSimpleResDto(QuestionItem questionItem){
+        ItemImg mainImg = itemImgRepository.findMainImg(questionItem.getItem().getId());
+        return QuestionImgSimpleResDto.builder()
+                .imgUrl(mainImg.getItemImgUrl())
+                .sortOrder((long) mainImg.getSortOrder())
                 .build();
     }
 }

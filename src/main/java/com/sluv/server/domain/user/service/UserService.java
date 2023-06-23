@@ -12,12 +12,16 @@ import com.sluv.server.domain.celeb.repository.InterestedCelebRepository;
 import com.sluv.server.domain.closet.dto.ClosetResDto;
 import com.sluv.server.domain.closet.entity.Closet;
 import com.sluv.server.domain.closet.repository.ClosetRepository;
+import com.sluv.server.domain.comment.dto.CommentSimpleResDto;
+import com.sluv.server.domain.comment.entity.Comment;
 import com.sluv.server.domain.comment.repository.CommentRepository;
 import com.sluv.server.domain.item.dto.ItemSimpleResDto;
 import com.sluv.server.domain.item.entity.Item;
+import com.sluv.server.domain.item.entity.ItemImg;
 import com.sluv.server.domain.item.entity.ItemLike;
 import com.sluv.server.domain.item.entity.RecentItem;
 import com.sluv.server.domain.item.repository.*;
+import com.sluv.server.domain.question.dto.QuestionImgSimpleResDto;
 import com.sluv.server.domain.question.dto.QuestionSimpleResDto;
 import com.sluv.server.domain.question.entity.*;
 import com.sluv.server.domain.question.exception.QuestionNotFoundException;
@@ -66,6 +70,7 @@ public class UserService {
     private final QuestionImgRepository questionImgRepository;
     private final QuestionItemRepository questionItemRepository;
     private final QuestionRecommendCategoryRepository questionRecommendCategoryRepository;
+    private final QuestionLikeRepository questionLikeRepository;
 
     private final JwtProvider jwtProvider;
 
@@ -309,20 +314,27 @@ public class UserService {
                     .content(question.getContent());
 
             if (recentQuestion.getQType().equals("Buy")) {
-                List<String> imgList = questionImgRepository.findAllByQuestionId(question.getId()).stream().map(questionImg -> questionImg.getImgUrl()).toList();
-                List<String> itemImgList = questionItemRepository.findAllByQuestionId(question.getId()).stream().map(questionItem -> itemImgRepository.findMainImg(questionItem.getItem().getId()).getItemImgUrl()).toList();
+                // 이미지 Dto 생성
+                List<QuestionImgSimpleResDto> imgList = questionImgRepository.findAllByQuestionId(question.getId())
+                        .stream()
+                        .map(this::convertQuestionImgToQuestionImgSimpleResDto).toList();
+                // 아이템 이미지 Dto 생성
+                List<QuestionImgSimpleResDto> itemImgList = questionItemRepository.findAllByQuestionId(question.getId())
+                        .stream()
+                        .map(this::convertQuestionItemToQuestionImgSimpleResDto).toList();
                 builder
-                        .imgList(imgList)
-                        .itemImgList(itemImgList);
+                    .imgList(imgList)
+                    .itemImgList(itemImgList);
 
             } else if (recentQuestion.getQType().equals("How")) {
 
             } else if (recentQuestion.getQType().equals("Recommend")) {
+                // Question 카테고리
                 List<String> categoryList = questionRecommendCategoryRepository.findAllByQuestionId(question.getId())
                         .stream()
                         .map(QuestionRecommendCategory::getName).toList();
                 builder
-                        .categoryName(categoryList);
+                    .categoryName(categoryList);
             } else if (recentQuestion.getQType().equals("Find")) {
                 QuestionFind questionFind = (QuestionFind) question;
                 builder
@@ -411,5 +423,125 @@ public class UserService {
         log.info("User Profile Img Delete. User: {}", user.getId());
         user.changeProfileImgUrl(null);
         userRepository.save(user);
+    }
+
+    /**
+     * 유저가 좋아요한 Question 게시글 조회
+     */
+
+    public PaginationCountResDto<QuestionSimpleResDto> getUserLikeQuestion(User user, Pageable pageable) {
+        Page<Question> questionPage = questionRepository.getUserLikeQuestion(user, pageable);
+
+        List<QuestionSimpleResDto> content = questionPage.stream().map(this::dtoBuildByQuestionType).toList();
+
+
+        return new PaginationCountResDto<>(
+                questionPage.hasNext(),
+                questionPage.getNumber(),
+                content,
+                questionPage.getTotalElements()
+        );
+    }
+
+    private QuestionSimpleResDto dtoBuildByQuestionType(Question question) {
+        String qType;
+        if(question instanceof QuestionBuy){
+            qType = "Buy";
+        }else if(question instanceof QuestionFind){
+            qType = "Find";
+        }else if(question instanceof QuestionHowabout){
+            qType = "How";
+        }else if(question instanceof QuestionRecommend){
+            qType = "Recommend";
+        }else{
+            throw new QuestionTypeNotFoundException();
+        }
+        return getQuestionSimpleResDto(qType, question);
+    }
+
+    private QuestionSimpleResDto getQuestionSimpleResDto(String qType, Question question) {
+        QuestionSimpleResDto.QuestionSimpleResDtoBuilder builder = QuestionSimpleResDto.builder()
+                .qType(qType)
+                .id(question.getId())
+                .title(question.getTitle())
+                .content(question.getContent());
+
+        if(qType.equals("Buy")){
+            // 이미지 DTO 생성
+            List<QuestionImgSimpleResDto> imgList = questionImgRepository.findAllByQuestionId(question.getId())
+                    .stream()
+                    .map(this::convertQuestionImgToQuestionImgSimpleResDto).toList();
+            // 아이템 이미지 DTO 생성
+            List<QuestionImgSimpleResDto> itemImgList = questionItemRepository.findAllByQuestionId(question.getId())
+                    .stream()
+                    .map(this::convertQuestionItemToQuestionImgSimpleResDto).toList();
+
+            builder
+                .imgList(imgList)
+                .itemImgList(itemImgList);
+
+        } else if (qType.equals("Find")) {
+            QuestionFind questionFind = (QuestionFind) question;
+            builder
+                    .celebName(questionFind.getCeleb() != null
+                    ?questionFind.getCeleb().getParent() != null
+                            ? questionFind.getCeleb().getParent().getCelebNameKr() + " " + questionFind.getCeleb().getCelebNameKr()
+                            : questionFind.getCeleb().getCelebNameKr()
+                    : questionFind.getNewCeleb().getCelebName()
+                    );
+        } else if (qType.equals("How")) {
+
+        } else if (qType.equals("Recommend")) {
+            List<String> categoryList = questionRecommendCategoryRepository.findAllByQuestionId(question.getId())
+                    .stream()
+                    .map(QuestionRecommendCategory::getName).toList();
+            builder
+                        .categoryName(categoryList);
+        }else{
+            throw new QuestionTypeNotFoundException();
+        }
+
+        return builder.build();
+    }
+
+    private QuestionImgSimpleResDto convertQuestionImgToQuestionImgSimpleResDto(QuestionImg questionImg){
+        return QuestionImgSimpleResDto.builder()
+                .imgUrl(questionImg.getImgUrl())
+                .sortOrder((long)questionImg.getSortOrder())
+                .build();
+    }
+
+    private QuestionImgSimpleResDto convertQuestionItemToQuestionImgSimpleResDto(QuestionItem questionItem){
+        ItemImg mainImg = itemImgRepository.findMainImg(questionItem.getItem().getId());
+        return QuestionImgSimpleResDto.builder()
+                .imgUrl(mainImg.getItemImgUrl())
+                .sortOrder((long) mainImg.getSortOrder())
+                .build();
+    }
+
+    /**
+     * 유저가 좋아요한 댓글 목록 조회
+     */
+
+    public PaginationCountResDto<CommentSimpleResDto> getUserLikeComment(User user, Pageable pageable) {
+        Page<Comment> commentPage = commentRepository.getAllUserLikeComment(user, pageable);
+
+        List<CommentSimpleResDto> content = commentPage.stream().map(this::convertCommentToCommentSimpleResDto).toList();
+
+        return new PaginationCountResDto<>(
+                commentPage.hasNext(),
+                commentPage.getNumber(),
+                content,
+                commentPage.getTotalElements()
+        );
+    }
+
+    private CommentSimpleResDto convertCommentToCommentSimpleResDto(Comment comment){
+
+        return CommentSimpleResDto.builder()
+                .id(comment.getId())
+                .questionTitle(comment.getQuestion().getTitle())
+                .content(comment.getContent())
+                .build();
     }
 }

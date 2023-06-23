@@ -445,29 +445,12 @@ public class UserService {
     }
 
     private QuestionSimpleResDto dtoBuildByQuestionType(Question question) {
-        String qType;
-        if(question instanceof QuestionBuy){
-            qType = "Buy";
-        }else if(question instanceof QuestionFind){
-            qType = "Find";
-        }else if(question instanceof QuestionHowabout){
-            qType = "How";
-        }else if(question instanceof QuestionRecommend){
-            qType = "Recommend";
-        }else{
-            throw new QuestionTypeNotFoundException();
-        }
-        return getQuestionSimpleResDto(qType, question);
-    }
-
-    private QuestionSimpleResDto getQuestionSimpleResDto(String qType, Question question) {
         QuestionSimpleResDto.QuestionSimpleResDtoBuilder builder = QuestionSimpleResDto.builder()
-                .qType(qType)
                 .id(question.getId())
                 .title(question.getTitle())
                 .content(question.getContent());
 
-        if(qType.equals("Buy")){
+        if(question instanceof QuestionBuy){ // 1. question이 QuestionBuy 일 경우
             // 이미지 DTO 생성
             List<QuestionImgSimpleResDto> imgList = questionImgRepository.findAllByQuestionId(question.getId())
                     .stream()
@@ -478,26 +461,30 @@ public class UserService {
                     .map(this::convertQuestionItemToQuestionImgSimpleResDto).toList();
 
             builder
+                .qType("Buy")
                 .imgList(imgList)
                 .itemImgList(itemImgList);
 
-        } else if (qType.equals("Find")) {
-            QuestionFind questionFind = (QuestionFind) question;
+        } else if (question instanceof QuestionFind questionFind) { // 2. question이 QuestionFind 일 경우
             builder
-                    .celebName(questionFind.getCeleb() != null
-                    ?questionFind.getCeleb().getParent() != null
-                            ? questionFind.getCeleb().getParent().getCelebNameKr() + " " + questionFind.getCeleb().getCelebNameKr()
-                            : questionFind.getCeleb().getCelebNameKr()
-                    : questionFind.getNewCeleb().getCelebName()
-                    );
-        } else if (qType.equals("How")) {
+                .qType("Find")
+                .celebName(questionFind.getCeleb() != null
+                        ?questionFind.getCeleb().getParent() != null
+                                ? questionFind.getCeleb().getParent().getCelebNameKr() + " " + questionFind.getCeleb().getCelebNameKr()
+                                : questionFind.getCeleb().getCelebNameKr()
+                        : questionFind.getNewCeleb().getCelebName()
+                );
+        } else if (question instanceof QuestionHowabout) { // 3. question이 QuestionHowabout 일 경우
+            builder
+                .qType("How");
 
-        } else if (qType.equals("Recommend")) {
+        } else if (question instanceof QuestionRecommend) { // 4. question이 QuestionRecommend 일 경우
             List<String> categoryList = questionRecommendCategoryRepository.findAllByQuestionId(question.getId())
                     .stream()
                     .map(QuestionRecommendCategory::getName).toList();
             builder
-                        .categoryName(categoryList);
+                .qType("Recommend")
+                .categoryName(categoryList);
         }else{
             throw new QuestionTypeNotFoundException();
         }

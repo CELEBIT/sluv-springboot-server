@@ -1,7 +1,5 @@
 package com.sluv.server.domain.comment.dto;
 
-import com.sluv.server.domain.comment.entity.CommentImg;
-import com.sluv.server.domain.item.dto.ItemSimpleResDto;
 import com.sluv.server.domain.user.dto.UserInfoDto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
@@ -36,4 +34,6 @@ public class CommentResDto {
     private Boolean likeStatus;
     @Schema(description = "현재 유저가 작성한 Comment 인지 판단")
     private Boolean hasMine;
+    @Schema(description = "Comment 수정 여부")
+    private Boolean modifyStatus;
 }

@@ -5,6 +5,7 @@ import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sluv.server.domain.celeb.entity.Celeb;
 import com.sluv.server.domain.question.entity.*;
+import com.sluv.server.domain.question.repository.QuestionRepository;
 import com.sluv.server.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -205,6 +206,30 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom{
                         .and(question.questionStatus.eq(ACTIVE))
                 )
                 .orderBy(questionLike.createdAt.desc());
+
+        return PageableExecutionUtils.getPage(content, pageable, () -> query.fetch().size());
+    }
+
+    /**
+     * 현재 유저가 작성한 모든 Question 조회
+     */
+    @Override
+    public Page<Question> getUserAllQuestion(User user, Pageable pageable) {
+        List<Question> content = jpaQueryFactory.selectFrom(question)
+                .where(question.user.eq(user)
+                        .and(question.questionStatus.eq(ACTIVE))
+                )
+                .orderBy(question.createdAt.desc())
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        // Count Query
+        JPAQuery<Question> query = jpaQueryFactory.selectFrom(question)
+                .where(question.user.eq(user)
+                        .and(question.questionStatus.eq(ACTIVE))
+                )
+                .orderBy(question.createdAt.desc());
 
         return PageableExecutionUtils.getPage(content, pageable, () -> query.fetch().size());
     }

@@ -4,6 +4,7 @@ import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sluv.server.domain.comment.entity.Comment;
 import com.sluv.server.domain.comment.enums.CommentStatus;
+import com.sluv.server.domain.question.enums.QuestionStatus;
 import com.sluv.server.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -66,11 +67,12 @@ public class CommentRepositoryImpl implements CommentRepositoryCustom{
     }
 
     @Override
-    public Page<Comment> getAllUserLikeComment(User user, Pageable pageable) {
+    public Page<Comment> getUserAllLikeComment(User user, Pageable pageable) {
         List<Comment> content = jpaQueryFactory.select(comment)
                 .from(commentLike)
                 .where(commentLike.user.eq(user)
                         .and(comment.commentStatus.eq(CommentStatus.ACTIVE))
+                        .and(comment.question.questionStatus.eq(QuestionStatus.ACTIVE))
                 )
                 .orderBy(commentLike.createdAt.desc())
                 .offset(pageable.getOffset())
@@ -82,8 +84,36 @@ public class CommentRepositoryImpl implements CommentRepositoryCustom{
                 .from(commentLike)
                 .where(commentLike.user.eq(user)
                         .and(comment.commentStatus.eq(CommentStatus.ACTIVE))
+                        .and(comment.question.questionStatus.eq(QuestionStatus.ACTIVE))
                 )
                 .orderBy(commentLike.createdAt.desc());
+
+        return PageableExecutionUtils.getPage(content, pageable, () -> query.fetch().size());
+    }
+
+    /**
+     * 현재 유저가 업로드한 Comment 조회
+     */
+    @Override
+    public Page<Comment> getUserAllComment(User user, Pageable pageable) {
+        List<Comment> content = jpaQueryFactory.selectFrom(comment)
+                .where(comment.user.eq(user)
+                        .and(comment.commentStatus.eq(CommentStatus.ACTIVE))
+                        .and(comment.question.questionStatus.eq(QuestionStatus.ACTIVE))
+                )
+                .orderBy(comment.createdAt.desc())
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        // Count Query
+        JPAQuery<Comment> query = jpaQueryFactory.selectFrom(comment)
+                .where(comment.user.eq(user)
+                        .and(comment.commentStatus.eq(CommentStatus.ACTIVE))
+                        .and(comment.question.questionStatus.eq(QuestionStatus.ACTIVE))
+                )
+                .orderBy(comment.createdAt.desc());
+
 
         return PageableExecutionUtils.getPage(content, pageable, () -> query.fetch().size());
     }

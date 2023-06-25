@@ -19,6 +19,7 @@ import java.util.List;
 import static com.sluv.server.domain.closet.entity.QCloset.closet;
 import static com.sluv.server.domain.item.entity.QItem.item;
 import static com.sluv.server.domain.item.entity.QItemLike.itemLike;
+import static com.sluv.server.domain.item.entity.QItemLink.itemLink;
 import static com.sluv.server.domain.item.entity.QItemScrap.itemScrap;
 import static com.sluv.server.domain.item.entity.QRecentItem.recentItem;
 import static com.sluv.server.domain.item.enums.ItemStatus.ACTIVE;
@@ -375,6 +376,40 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom{
                 )
                 .orderBy(getSearchItemOrder(pageable.getSort()));
             // Filter 추가
+        addFilterWhere(countQuery, dto);
+
+
+        return PageableExecutionUtils.getPage(content, pageable, () -> countQuery.fetch().size());
+    }
+
+    /**
+     * 핫한 셀럽들이 선택한 여름나기 아이템
+     */
+    @Override
+    public Page<Item> getNowBuyItem(Pageable pageable, SearchFilterReqDto dto) {
+        JPAQuery<Item> query = jpaQueryFactory.select(item)
+                .from(itemLink)
+                .leftJoin(itemLink.item, item)
+                .where(item.itemStatus.eq(ACTIVE))
+                .groupBy(item)
+                .orderBy(item.whenDiscovery.desc());
+        // Filter 추가
+        addFilterWhere(query, dto);
+
+        // Pagination 추가
+        List<Item> content = query
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        // Count Query
+        JPAQuery<Item> countQuery = jpaQueryFactory.select(item)
+                .from(itemLink)
+                .leftJoin(itemLink.item, item)
+                .where(item.itemStatus.eq(ACTIVE))
+                .groupBy(item)
+                .orderBy(item.whenDiscovery.desc());
+        // Filter 추가
         addFilterWhere(countQuery, dto);
 
 

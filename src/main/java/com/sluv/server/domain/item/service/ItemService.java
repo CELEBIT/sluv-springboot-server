@@ -488,4 +488,22 @@ public class ItemService {
                 .content(content)
                 .build();
     }
+
+    /**
+     * 지금 당장 구매가능한 아이템 조회
+     */
+    public PaginationResDto<ItemSimpleResDto> getNowBuyItem(User user, Pageable pageable, SearchFilterReqDto dto) {
+        // itemPage 조회
+        Page<Item> itemPage = itemRepository.getNowBuyItem(pageable, dto);
+
+        // Content 조립
+        List<ItemSimpleResDto> content = convertItemToItemSameResDto(user, itemPage.getContent());
+
+        return PaginationResDto.<ItemSimpleResDto>builder()
+                .page(itemPage.getNumber())
+                .hasNext(itemPage.hasNext())
+                .content(content)
+                .build();
+
+    }
 }

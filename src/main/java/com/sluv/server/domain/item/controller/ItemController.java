@@ -279,7 +279,7 @@ public class ItemController {
     @Operation(
             summary = "*핫한 셀럽들이 선택한 여름나기 아이템 조회",
             description = """
-                    유저별로 추천 인기 아이템을 조회\n
+                    핫한 셀럽들이 선택한 여름나기 아이템 조회\n
                     - (User Id 필요) -> 스크랩 여부 확인\n
                     - Pagination 적용\n
                     - Ordering -> 최신순, 인기순, 저가순, 고가순\n
@@ -287,11 +287,34 @@ public class ItemController {
                     """
     )
     @GetMapping("/summer")
-    public ResponseEntity<SuccessDataResponse<PaginationResDto<ItemSimpleResDto>>> getSummerItem(@AuthenticationPrincipal User user, Pageable pageable, SearchFilterReqDto dto) {
+    public ResponseEntity<SuccessDataResponse<PaginationResDto<ItemSimpleResDto>>> getSummerItem(@AuthenticationPrincipal User user,
+                                                                                                 Pageable pageable,
+                                                                                                 SearchFilterReqDto dto) {
 
         return ResponseEntity.ok().body(
                 SuccessDataResponse.<PaginationResDto<ItemSimpleResDto>>builder()
                         .result(itemService.getSummerItem(user, pageable, dto))
+                        .build()
+        );
+    }
+
+    @Operation(
+            summary = "*지금 당장 구매가능한 아이템 조회",
+            description = """
+                    지금 당장 구매가능한 아이템 조회\n
+                    - (User Id 필요) -> 스크랩 여부 확인\n
+                    - Pagination 적용\n
+                    - Filtering -> Category, Price, Color
+                    """
+    )
+    @GetMapping("/nowBuy")
+    public ResponseEntity<SuccessDataResponse<PaginationResDto<ItemSimpleResDto>>> getNowBuyItem(@AuthenticationPrincipal User user,
+                                                                                                 Pageable pageable,
+                                                                                                 SearchFilterReqDto dto) {
+
+        return ResponseEntity.ok().body(
+                SuccessDataResponse.<PaginationResDto<ItemSimpleResDto>>builder()
+                        .result(itemService.getNowBuyItem(user, pageable, dto))
                         .build()
         );
     }

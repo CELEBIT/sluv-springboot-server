@@ -13,6 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.support.PageableExecutionUtils;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -412,6 +413,32 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom{
         // Filter 추가
         addFilterWhere(countQuery, dto);
 
+
+        return PageableExecutionUtils.getPage(content, pageable, () -> countQuery.fetch().size());
+    }
+
+    /**
+     * 1시간 기준 최신 아이템 조회
+     */
+    @Override
+    public Page<Item> getNewItem(Pageable pageable) {
+        LocalDateTime nowTime = LocalDateTime.now();
+
+        List<Item> content = jpaQueryFactory.selectFrom(item)
+                .where(item.itemStatus.eq(ACTIVE)
+                        .and(item.createdAt.between(nowTime.minusHours(1L), nowTime))
+                )
+                .orderBy(item.createdAt.desc())
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        // Count Query
+        JPAQuery<Item> countQuery = jpaQueryFactory.selectFrom(item)
+                .where(item.itemStatus.eq(ACTIVE)
+                        .and(item.createdAt.between(nowTime.minusHours(1L), nowTime))
+                )
+                .orderBy(item.createdAt.desc());
 
         return PageableExecutionUtils.getPage(content, pageable, () -> countQuery.fetch().size());
     }

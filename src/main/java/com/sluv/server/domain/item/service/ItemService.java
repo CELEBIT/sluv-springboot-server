@@ -506,4 +506,18 @@ public class ItemService {
                 .build();
 
     }
+
+    public PaginationResDto<ItemSimpleResDto> getNewItem(User user, Pageable pageable) {
+        // itemPage 조회
+        Page<Item> itemPage = itemRepository.getNewItem(pageable);
+
+        // Content 조립
+        List<ItemSimpleResDto> content = convertItemToItemSameResDto(user, itemPage.getContent());
+
+        return PaginationResDto.<ItemSimpleResDto>builder()
+                .page(itemPage.getNumber())
+                .hasNext(itemPage.hasNext())
+                .content(content)
+                .build();
+    }
 }

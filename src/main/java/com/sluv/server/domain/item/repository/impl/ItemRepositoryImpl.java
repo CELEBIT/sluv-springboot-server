@@ -179,15 +179,23 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom{
                 .where(item.id.in(itemIdList).and(item.itemStatus.eq(ACTIVE)))
                 .orderBy(getSearchItemOrder(pageable.getSort()));
         // Filter 조건 추가
-        JPAQuery<Item> newQuery = addFilterWhere(query, dto);
-
-
-        List<Item> content = newQuery
+        addFilterWhere(query, dto);
+        // Pagination 추가
+        List<Item> content = query
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
 
-        return PageableExecutionUtils.getPage(content, pageable, () -> newQuery.fetch().size());
+        // Count Query
+        JPAQuery<Item> countQuery = jpaQueryFactory.select(item)
+                .from(item)
+                .leftJoin(itemLike).on(itemLike.item.eq(item))
+                .leftJoin(itemScrap).on(itemScrap.item.eq(item))
+                .groupBy(item)
+                .where(item.id.in(itemIdList).and(item.itemStatus.eq(ACTIVE)))
+                .orderBy(getSearchItemOrder(pageable.getSort()));
+
+        return PageableExecutionUtils.getPage(content, pageable, () -> countQuery.fetch().size());
     }
 
     @Override
@@ -223,9 +231,9 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom{
         JPAQuery<Item> query = jpaQueryFactory.selectFrom(item)
                 .where(item.id.in(itemIdList));
 
-        JPAQuery<Item> newQuery = addFilterWhere(query, dto);
+        addFilterWhere(query, dto);
 
-        return (long) newQuery.fetch().size();
+        return (long) query.fetch().size();
     }
 
     /**
@@ -329,5 +337,47 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom{
                 .orderBy(itemLike.id.desc());
 
         return PageableExecutionUtils.getPage(content, pageable, () -> query.fetch().size());
+    }
+
+    /**
+     * 핫한 셀럽들이 선택한 여름나기 아이템
+     */
+    @Override
+    public Page<Item> getCelebSummerItem(Pageable pageable, SearchFilterReqDto dto) {
+        List<Long> categortIdList = new ArrayList<>();
+
+        categortIdList.add(10L); // 반소매
+        categortIdList.add(17L); // 민소매
+        categortIdList.add(27L); // 반바지
+        categortIdList.add(33L); // 미니스커트
+        categortIdList.add(37L); // 미니원피스
+        categortIdList.add(42L); // 스킨케어
+        categortIdList.add(44L); // 헤어&바디
+
+
+        JPAQuery<Item> query = jpaQueryFactory.selectFrom(item)
+                .where(item.category.id.in(categortIdList)
+                        .and(item.itemStatus.eq(ACTIVE))
+                )
+                .orderBy(getSearchItemOrder(pageable.getSort()));
+            // Filter 추가
+        addFilterWhere(query, dto);
+            // Pagination 추가
+        List<Item> content = query
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        // Count Query
+        JPAQuery<Item> countQuery = jpaQueryFactory.selectFrom(item)
+                .where(item.category.id.in(categortIdList)
+                        .and(item.itemStatus.eq(ACTIVE))
+                )
+                .orderBy(getSearchItemOrder(pageable.getSort()));
+            // Filter 추가
+        addFilterWhere(countQuery, dto);
+
+
+        return PageableExecutionUtils.getPage(content, pageable, () -> countQuery.fetch().size());
     }
 }

@@ -26,6 +26,7 @@ import com.sluv.server.domain.item.exception.hashtag.HashtagNotFoundException;
 import com.sluv.server.domain.item.repository.*;
 import com.sluv.server.domain.item.repository.hashtag.HashtagRepository;
 import com.sluv.server.domain.item.repository.hashtag.ItemHashtagRepository;
+import com.sluv.server.domain.search.dto.SearchFilterReqDto;
 import com.sluv.server.domain.user.dto.UserInfoDto;
 import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.domain.user.exception.UserNotFoundException;
@@ -468,6 +469,22 @@ public class ItemService {
         return PaginationResDto.<ItemSimpleResDto>builder()
                 .page(recommendItemPage.getNumber())
                 .hasNext(recommendItemPage.hasNext())
+                .content(content)
+                .build();
+    }
+
+    /**
+     * 핫한 셀럽들이 선택한 여름나기 아이템 조회
+     */
+    public PaginationResDto<ItemSimpleResDto> getSummerItem(User user, Pageable pageable, SearchFilterReqDto dto) {
+        // itemPage 조회
+        Page<Item> itemPage = itemRepository.getCelebSummerItem(pageable, dto);
+        // Content 조립
+        List<ItemSimpleResDto> content = convertItemToItemSameResDto(user, itemPage.getContent());
+
+        return PaginationResDto.<ItemSimpleResDto>builder()
+                .page(itemPage.getNumber())
+                .hasNext(itemPage.hasNext())
                 .content(content)
                 .build();
     }

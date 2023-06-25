@@ -1,6 +1,7 @@
 package com.sluv.server.domain.question.controller;
 
 import com.sluv.server.domain.question.dto.*;
+import com.sluv.server.domain.question.exception.QuestionTypeNotFoundException;
 import com.sluv.server.domain.question.service.QuestionService;
 import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.global.common.response.ErrorResponse;
@@ -210,87 +211,28 @@ public class QuestionController {
     }
 
     @Operation(
-            summary = "*Question Buy 기다리고 있어요",
+            summary = "*Question 기다리고 있어요",
             description = """
-                    유저를 기다리고 있는 QuestionBuy 조회\n
-                    1. 현재 Question과 불일치 \n
-                    2. 현재 유저가 작성하지 않은 Question \n
-                    3. 투표 마감 순 \n
-                    4. 정적으로 4개 조회 \n
-                    ++ 현재 게시글과 같은 셀럽/같은 그룹 로직 X (23.6.22) \n
+                    유저를 기다리고 있는 Question 조회\n
+                    qType에 따라 Question 타입 변경\n
+                    questionId는 현재 Question은 제외하고 조회하기 위함.
                     """
     )
-    @GetMapping("/wait/questionBuy")
+    @GetMapping("/wait")
     public ResponseEntity<SuccessDataResponse<List<QuestionSimpleResDto>>> getWaitQuestionBuy(@AuthenticationPrincipal User user,
-                                                                                              @RequestParam("questionId") Long questionId){
+                                                                                              @RequestParam("questionId") Long questionId,
+                                                                                              @RequestParam("qType") String qType){
+        List<QuestionSimpleResDto> result = switch (qType) {
+            case "Buy" -> questionService.getWaitQuestionBuy(user, questionId);
+            case "Find" -> questionService.getWaitQuestionFind(user, questionId);
+            case "How" -> questionService.getWaitQuestionHowabout(user, questionId);
+            case "Recommend" -> questionService.getWaitQuestionRecommend(user, questionId);
+            default -> throw new QuestionTypeNotFoundException();
+        };
 
         return ResponseEntity.ok().body(
                 SuccessDataResponse.<List<QuestionSimpleResDto>>builder()
-                        .result(questionService.getWaitQuestionBuy(user, questionId))
-                        .build()
-        );
-    }
-
-    @Operation(
-            summary = "*Question Recommend 기다리고 있어요",
-            description = """
-                    유저를 기다리고 있는 Recommend 조회\n
-                    1. 현재 Question과 불일치 \n
-                    2. 현재 유저가 작성하지 않은 Question \n
-                    3. 정적으로 4개 조회 \n
-                    4. 댓글이 0개인 것들만 조회 \n
-                    """
-    )
-    @GetMapping("/wait/questionRecommend")
-    public ResponseEntity<SuccessDataResponse<List<QuestionSimpleResDto>>> getWaitQuestionRecommend(@AuthenticationPrincipal User user,
-                                                                                              @RequestParam("questionId") Long questionId){
-
-        return ResponseEntity.ok().body(
-                SuccessDataResponse.<List<QuestionSimpleResDto>>builder()
-                        .result(questionService.getWaitQuestionRecommend(user, questionId))
-                        .build()
-        );
-    }
-
-    @Operation(
-            summary = "*Question Howabout 기다리고 있어요",
-            description = """
-                    유저를 기다리고 있는 Howabout 조회\n
-                    1. 현재 Question과 불일치 \n
-                    2. 현재 유저가 작성하지 않은 Question \n
-                    3. 정적으로 4개 조회 \n
-                    4. 댓글이 0개인 것들만 조회 \n
-                    """
-    )
-    @GetMapping("/wait/questionHowabout")
-    public ResponseEntity<SuccessDataResponse<List<QuestionSimpleResDto>>> getWaitQuestionHowabout(@AuthenticationPrincipal User user,
-                                                                                                    @RequestParam("questionId") Long questionId){
-
-        return ResponseEntity.ok().body(
-                SuccessDataResponse.<List<QuestionSimpleResDto>>builder()
-                        .result(questionService.getWaitQuestionHowabout(user, questionId))
-                        .build()
-        );
-    }
-
-    @Operation(
-            summary = "*Question Find 기다리고 있어요",
-            description = """
-                    유저를 기다리고 있는 Find 조회\n
-                    1. 현재 Question과 불일치 \n
-                    2. 현재 유저가 작성하지 않은 Question \n
-                    3. 정적으로 4개 조회 \n
-                    4. 댓글이 0개인 것들만 조회 \n
-                    TODO 현재 유저의 관심셀럽과 관련있는 셀럽을 우선 타겟
-                    """
-    )
-    @GetMapping("/wait/questionFind")
-    public ResponseEntity<SuccessDataResponse<List<QuestionSimpleResDto>>> getWaitQuestionFind(@AuthenticationPrincipal User user,
-                                                                                                   @RequestParam("questionId") Long questionId){
-
-        return ResponseEntity.ok().body(
-                SuccessDataResponse.<List<QuestionSimpleResDto>>builder()
-                        .result(questionService.getWaitQuestionFind(user, questionId))
+                        .result(result)
                         .build()
         );
     }

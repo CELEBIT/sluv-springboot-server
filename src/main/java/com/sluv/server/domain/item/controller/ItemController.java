@@ -2,6 +2,7 @@ package com.sluv.server.domain.item.controller;
 
 import com.sluv.server.domain.item.dto.*;
 import com.sluv.server.domain.item.service.*;
+import com.sluv.server.domain.search.dto.SearchFilterReqDto;
 import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.global.common.response.*;
 import io.swagger.v3.oas.annotations.Operation;
@@ -271,6 +272,26 @@ public class ItemController {
         return ResponseEntity.ok().body(
                 SuccessDataResponse.<PaginationResDto<ItemSimpleResDto>>builder()
                         .result(itemService.getRecommendItem(user, pageable))
+                        .build()
+        );
+    }
+
+    @Operation(
+            summary = "*핫한 셀럽들이 선택한 여름나기 아이템 조회",
+            description = """
+                    유저별로 추천 인기 아이템을 조회\n
+                    - (User Id 필요) -> 스크랩 여부 확인\n
+                    - Pagination 적용\n
+                    - Ordering -> 최신순, 인기순, 저가순, 고가순\n
+                    - Filtering -> Price, Color
+                    """
+    )
+    @GetMapping("/summer")
+    public ResponseEntity<SuccessDataResponse<PaginationResDto<ItemSimpleResDto>>> getSummerItem(@AuthenticationPrincipal User user, Pageable pageable, SearchFilterReqDto dto) {
+
+        return ResponseEntity.ok().body(
+                SuccessDataResponse.<PaginationResDto<ItemSimpleResDto>>builder()
+                        .result(itemService.getSummerItem(user, pageable, dto))
                         .build()
         );
     }

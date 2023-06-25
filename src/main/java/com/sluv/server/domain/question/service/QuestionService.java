@@ -27,9 +27,11 @@ import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.global.common.enums.ItemImgOrLinkStatus;
 import com.sluv.server.global.common.enums.ReportStatus;
 import lombok.RequiredArgsConstructor;
+import org.checkerframework.checker.units.qual.A;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
@@ -635,40 +637,58 @@ public class QuestionService {
 
     private QuestionSimpleResDto getQuestionSimpleResDto(Long questionId, String qType, String title, String content) {
 
-        QuestionImg questionImg;
-        QuestionItem questionItem;
+        List<QuestionImgSimpleResDto> imgList = new ArrayList<>();
+        List<QuestionImgSimpleResDto> itemImgList = new ArrayList<>();
+
+
         if(!qType.equals("Buy")) {
             // 이미지 URL
-            questionImg = questionImgRepository.findByQuestionIdAndRepresentFlag(questionId, true);
+            QuestionImg questionImg = questionImgRepository.findByQuestionIdAndRepresentFlag(questionId, true);
+            QuestionImgSimpleResDto img = null;
+
+            // 이미지 Dto로 변경
+            if (questionImg != null) {
+                img = QuestionImgSimpleResDto.builder()
+                        .imgUrl(questionImg.getImgUrl())
+                        .sortOrder((long) questionImg.getSortOrder())
+                        .build();
+            }
+            imgList.add(img);
 
             // 아이템 이미지 URL
-            questionItem = questionItemRepository.findByQuestionIdAndRepresentFlag(questionId, true);
+            QuestionItem questionItem = questionItemRepository.findByQuestionIdAndRepresentFlag(questionId, true);
+            QuestionImgSimpleResDto itemImg = null;
+
+            // 아이템 이미지 Dto로 변경
+            if (questionItem != null) {
+                ItemImg mainImg = itemImgRepository.findMainImg(questionItem.getItem().getId());
+                itemImg = QuestionImgSimpleResDto.builder()
+                        .imgUrl(mainImg.getItemImgUrl())
+                        .sortOrder((long) mainImg.getSortOrder())
+                        .build();
+            }
+            imgList.add(itemImg);
 
         }else{
             // 이미지 URL
-            questionImg = questionImgRepository.findOneByQuestionId(questionId);
+            imgList = questionImgRepository.findAllByQuestionId(questionId)
+                    .stream()
+                    .map(img -> QuestionImgSimpleResDto.builder()
+                            .imgUrl(img.getImgUrl())
+                            .sortOrder((long)img.getSortOrder())
+                            .build()
+                    ).toList();
 
             // 아이템 이미지 URL
-            questionItem = questionItemRepository.findOneByQuestionId(questionId);
-        }
-
-        QuestionImgSimpleResDto img = null;
-        QuestionImgSimpleResDto itemImg = null;
-
-        // 이미지 Dto로 변경
-        if (questionImg != null) {
-            img = QuestionImgSimpleResDto.builder()
-                    .imgUrl(questionImg.getImgUrl())
-                    .sortOrder((long) questionImg.getSortOrder())
-                    .build();
-        }
-        // 아이템 이미지 Dto로 변경
-        if (questionItem != null) {
-            ItemImg mainImg = itemImgRepository.findMainImg(questionItem.getItem().getId());
-            itemImg = QuestionImgSimpleResDto.builder()
-                    .imgUrl(mainImg.getItemImgUrl())
-                    .sortOrder((long) mainImg.getSortOrder())
-                    .build();
+            itemImgList = questionItemRepository.findAllByQuestionId(questionId)
+                    .stream()
+                    .map(item -> {
+                        ItemImg mainImg = itemImgRepository.findMainImg(item.getItem().getId());
+                        return QuestionImgSimpleResDto.builder()
+                                .imgUrl(mainImg.getItemImgUrl())
+                                .sortOrder((long) mainImg.getSortOrder())
+                                .build();
+                    }).toList();
         }
 
 
@@ -677,14 +697,8 @@ public class QuestionService {
                 .id(questionId)
                 .title(title)
                 .content(content)
-                .imgList(
-                        Collections.singletonList(img)
-                )
-                .itemImgList(
-                        questionItem != null
-                        ? Collections.singletonList(itemImg)
-                        : null
-                )
+                .imgList(imgList)
+                .itemImgList(itemImgList)
                 .build();
     }
 }

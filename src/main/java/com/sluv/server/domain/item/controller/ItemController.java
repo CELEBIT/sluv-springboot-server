@@ -318,4 +318,23 @@ public class ItemController {
                         .build()
         );
     }
+
+    @Operation(
+            summary = "*최신 등록 아이템 조회",
+            description = """
+                    1시간 동안 최신 등록된 아이템 조회\n
+                    - (User Id 필요) -> 스크랩 여부 확인\n
+                    - Pagination 적용\n
+                    """
+    )
+    @GetMapping("/new")
+    public ResponseEntity<SuccessDataResponse<PaginationResDto<ItemSimpleResDto>>> getNewItem(@AuthenticationPrincipal User user,
+                                                                                                 Pageable pageable) {
+
+        return ResponseEntity.ok().body(
+                SuccessDataResponse.<PaginationResDto<ItemSimpleResDto>>builder()
+                        .result(itemService.getNewItem(user, pageable))
+                        .build()
+        );
+    }
 }

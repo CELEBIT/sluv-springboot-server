@@ -652,7 +652,7 @@ public class QuestionService {
 
         if(questionItem != null) {
             ItemImg mainImg = itemImgRepository.findMainImg(questionItem.getItem().getId());
-            img = QuestionImgSimpleResDto.builder()
+            itemImg = QuestionImgSimpleResDto.builder()
                     .imgUrl(mainImg.getItemImgUrl())
                     .sortOrder( (long) mainImg.getSortOrder())
                     .build();

@@ -634,27 +634,40 @@ public class QuestionService {
     }
 
     private QuestionSimpleResDto getQuestionSimpleResDto(Long questionId, String qType, String title, String content) {
-        // 이미지 URL
-        QuestionImg questionImg = questionImgRepository.findByQuestionIdAndRepresentFlag(questionId, true);
-        // 이미지 Dto로 변경
-        QuestionImgSimpleResDto img = null;
-        if(questionImg != null) {
-            img = QuestionImgSimpleResDto.builder()
-                    .imgUrl(questionImg.getImgUrl())
-                    .sortOrder( (long) questionImg.getSortOrder())
-                    .build();
+
+        QuestionImg questionImg;
+        QuestionItem questionItem;
+        if(!qType.equals("Buy")) {
+            // 이미지 URL
+            questionImg = questionImgRepository.findByQuestionIdAndRepresentFlag(questionId, true);
+
+            // 아이템 이미지 URL
+            questionItem = questionItemRepository.findByQuestionIdAndRepresentFlag(questionId, true);
+
+        }else{
+            // 이미지 URL
+            questionImg = questionImgRepository.findOneByQuestionId(questionId);
+
+            // 아이템 이미지 URL
+            questionItem = questionItemRepository.findOneByQuestionId(questionId);
         }
 
-        // 아이템 이미지 URL
-        QuestionItem questionItem = questionItemRepository.findByQuestionIdAndRepresentFlag(questionId, true);
-        // 아이템 이미지 Dto로 변경
+        QuestionImgSimpleResDto img = null;
         QuestionImgSimpleResDto itemImg = null;
 
-        if(questionItem != null) {
+        // 이미지 Dto로 변경
+        if (questionImg != null) {
+            img = QuestionImgSimpleResDto.builder()
+                    .imgUrl(questionImg.getImgUrl())
+                    .sortOrder((long) questionImg.getSortOrder())
+                    .build();
+        }
+        // 아이템 이미지 Dto로 변경
+        if (questionItem != null) {
             ItemImg mainImg = itemImgRepository.findMainImg(questionItem.getItem().getId());
             itemImg = QuestionImgSimpleResDto.builder()
                     .imgUrl(mainImg.getItemImgUrl())
-                    .sortOrder( (long) mainImg.getSortOrder())
+                    .sortOrder((long) mainImg.getSortOrder())
                     .build();
         }
 

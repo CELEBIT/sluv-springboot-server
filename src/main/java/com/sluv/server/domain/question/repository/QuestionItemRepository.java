@@ -11,4 +11,6 @@ public interface QuestionItemRepository extends JpaRepository<QuestionItem, Long
     List<QuestionItem> findAllByQuestionId(Long questionId);
 
     QuestionItem findByQuestionIdAndRepresentFlag(Long questionId, boolean b);
+
+    QuestionItem findOneByQuestionId(Long questionId);
 }

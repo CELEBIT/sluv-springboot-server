@@ -565,4 +565,19 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom{
                 )
                 .fetch();
     }
+
+    /**
+     * 주간 HOT 셀럽 아이템 업데이트
+     */
+    @Override
+    public List<Item> updateWeekHotItem() {
+        return  jpaQueryFactory.selectFrom(item)
+                .leftJoin(itemLike).on(itemLike.item.eq(item))
+                .leftJoin(itemScrap).on(itemScrap.item.eq(item))
+                .where(item.itemStatus.eq(ACTIVE))
+                .orderBy(itemLike.count().add(itemScrap.count()).add(item.viewNum).desc())
+                .groupBy(item)
+                .limit(21)
+                .fetch();
+    }
 }

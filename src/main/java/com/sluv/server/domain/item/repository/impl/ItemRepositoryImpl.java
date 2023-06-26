@@ -3,11 +3,13 @@ package com.sluv.server.domain.item.repository.impl;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.sluv.server.domain.celeb.entity.Celeb;
 import com.sluv.server.domain.closet.entity.Closet;
 import com.sluv.server.domain.item.entity.Item;
 import com.sluv.server.domain.search.dto.SearchFilterReqDto;
 import com.sluv.server.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cglib.core.Local;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -16,6 +18,7 @@ import org.springframework.data.support.PageableExecutionUtils;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 
 import static com.sluv.server.domain.closet.entity.QCloset.closet;
 import static com.sluv.server.domain.item.entity.QEfficientItem.efficientItem;
@@ -627,7 +630,7 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom{
      * 요즘 핫한 셀럽의 아이템 조회
      */
     @Override
-    public Page<Item> getHoyCelebItem(Long celebId, Pageable pageable, SearchFilterReqDto dto) {
+    public Page<Item> getHotCelebItem(Long celebId, Pageable pageable, SearchFilterReqDto dto) {
         JPAQuery<Item> query = jpaQueryFactory.selectFrom(item)
                 .leftJoin(itemLike).on(itemLike.item.eq(item))
                 .leftJoin(itemScrap).on(itemScrap.item.eq(item))
@@ -664,5 +667,46 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom{
         JPAQuery<Item> newCountQuery = countQuery.orderBy(getSearchItemOrderHot(pageable.getSort()));
 
         return PageableExecutionUtils.getPage(content, pageable, () -> newCountQuery.fetch().size());
+    }
+
+    /**
+     * 큐레이션 아이템 조회
+     */
+    @Override
+    public List<Item> getCurationItem(User user, List<Celeb> interestedCeleb) {
+        LocalDateTime now = LocalDateTime.now();
+
+        List<Item> content = jpaQueryFactory.selectFrom(item)
+                .leftJoin(itemLike).on(itemLike.item.eq(item))
+                .leftJoin(itemScrap).on(itemScrap.item.eq(item))
+                .where(item.itemStatus.eq(ACTIVE)
+                        .and(item.celeb.in(interestedCeleb)
+                                .or(item.celeb.parent.in(interestedCeleb)))
+                        .and(item.createdAt.year().eq(now.getYear()))
+                        .and(item.createdAt.month().eq(now.getMonthValue()))
+                        .and(item.createdAt.dayOfMonth().eq(now.getDayOfMonth()))
+                )
+                .groupBy(item)
+                .orderBy(itemLike.count().add(itemScrap.count()).add(item.viewNum).desc())
+                .limit(10)
+                .fetch();
+
+        List<Item> result = content;
+
+        if(content.size() < 10){
+            System.out.println("dkdkdkkdkkr: " + content.size());
+            List<Item> additionalContent = jpaQueryFactory.selectFrom(item)
+                    .where(item.itemStatus.eq(ACTIVE)
+                            .and(item.notIn(content))
+                    )
+                    .orderBy(item.createdAt.desc())
+                    .limit(10 - content.size())
+                    .fetch();
+
+            result = Stream.concat(content.stream(), additionalContent.stream()).toList();
+        }
+
+
+        return result;
     }
 }

@@ -561,9 +561,9 @@ public class ItemService {
      * 요즘 핫한 셀럽의 Item 조회
      */
     public PaginationResDto<ItemSimpleResDto> getHotCelebItem(User user, Pageable pageable, SearchFilterReqDto dto) {
-        Long celebId = 511L;
+        Long celebId = 510L;
 
-        Page<Item> itemPage = itemRepository.getHoyCelebItem(celebId, pageable, dto);
+        Page<Item> itemPage = itemRepository.getHotCelebItem(celebId, pageable, dto);
 
         List<ItemSimpleResDto> content = convertItemToItemSimpleResDto(user, itemPage.getContent());
 
@@ -572,5 +572,12 @@ public class ItemService {
                 .hasNext(itemPage.hasNext())
                 .content(content)
                 .build();
+    }
+
+    public List<ItemSimpleResDto> getCurationItem(User user) {
+        List<Celeb> interestedCeleb = celebRepository.findInterestedCeleb(user);
+        List<Item> itemList = itemRepository.getCurationItem(user, interestedCeleb);
+
+        return convertItemToItemSimpleResDto(user, itemList);
     }
 }

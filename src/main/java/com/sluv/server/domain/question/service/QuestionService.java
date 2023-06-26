@@ -21,13 +21,17 @@ import com.sluv.server.domain.question.entity.*;
 import com.sluv.server.domain.question.enums.QuestionStatus;
 import com.sluv.server.domain.question.exception.QuestionNotFoundException;
 import com.sluv.server.domain.question.exception.QuestionReportDuplicateException;
+import com.sluv.server.domain.question.exception.QuestionTypeNotFoundException;
 import com.sluv.server.domain.question.repository.*;
 import com.sluv.server.domain.user.dto.UserInfoDto;
 import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.global.common.enums.ItemImgOrLinkStatus;
 import com.sluv.server.global.common.enums.ReportStatus;
+import com.sluv.server.global.common.response.PaginationResDto;
 import lombok.RequiredArgsConstructor;
 import org.checkerframework.checker.units.qual.A;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -699,6 +703,84 @@ public class QuestionService {
                 .content(content)
                 .imgList(imgList)
                 .itemImgList(itemImgList)
+                .build();
+    }
+
+    public PaginationResDto<QuestionSimpleResDto> getTotalQuestionList(Pageable pageable) {
+        Page<Question> questionPage = questionRepository.getTotalQuestionList(pageable);
+        List<QuestionSimpleResDto> content = questionPage.stream().map(question -> {
+            String qType;
+            if (question instanceof QuestionBuy) {
+                qType = "Buy";
+            } else if (question instanceof QuestionFind) {
+                qType = "Find";
+            } else if (question instanceof QuestionHowabout) {
+                qType = "Howabout";
+            } else if (question instanceof QuestionRecommend) {
+                qType = "Recommend";
+            } else {
+                throw new QuestionTypeNotFoundException();
+            }
+            return getQuestionSimpleResDto(question.getId(), qType, question.getTitle(), question.getContent());
+        }).toList();
+
+        return PaginationResDto.<QuestionSimpleResDto>builder()
+                .page(questionPage.getNumber())
+                .hasNext(questionPage.hasNext())
+                .content(content)
+                .build();
+    }
+
+    public PaginationResDto<QuestionSimpleResDto> getQuestionBuyList(Pageable pageable) {
+        Page<QuestionBuy> questionPage = questionRepository.getQuestionBuyList(pageable);
+        List<QuestionSimpleResDto> content = questionPage.stream().map(question ->
+            getQuestionSimpleResDto(question.getId(), "Buy", question.getTitle(), question.getContent())
+        ).toList();
+
+        return PaginationResDto.<QuestionSimpleResDto>builder()
+                .page(questionPage.getNumber())
+                .hasNext(questionPage.hasNext())
+                .content(content)
+                .build();
+    }
+
+    public PaginationResDto<QuestionSimpleResDto> getQuestionFindList(Pageable pageable) {
+        Page<QuestionFind> questionPage = questionRepository.getQuestionFindList(pageable);
+        List<QuestionSimpleResDto> content = questionPage.stream().map(question ->
+            getQuestionSimpleResDto(question.getId(), "Find", question.getTitle(), question.getContent())
+        ).toList();
+
+        return PaginationResDto.<QuestionSimpleResDto>builder()
+                .page(questionPage.getNumber())
+                .hasNext(questionPage.hasNext())
+                .content(content)
+                .build();
+    }
+
+    public PaginationResDto<QuestionSimpleResDto> getQuestionHowaboutList(Pageable pageable) {
+        Page<QuestionHowabout> questionPage = questionRepository.getQuestionHowaboutList(pageable);
+        List<QuestionSimpleResDto> content = questionPage.stream().map(question ->
+                getQuestionSimpleResDto(question.getId(), "How", question.getTitle(), question.getContent())
+        ).toList();
+
+        return PaginationResDto.<QuestionSimpleResDto>builder()
+                .page(questionPage.getNumber())
+                .hasNext(questionPage.hasNext())
+                .content(content)
+                .build();
+    }
+
+
+    public PaginationResDto<QuestionSimpleResDto> getQuestionRecommendList(Pageable pageable) {
+        Page<QuestionRecommend> questionPage = questionRepository.getQuestionRecommendList(pageable);
+        List<QuestionSimpleResDto> content = questionPage.stream().map(question ->
+                getQuestionSimpleResDto(question.getId(), "Recommend", question.getTitle(), question.getContent())
+        ).toList();
+
+        return PaginationResDto.<QuestionSimpleResDto>builder()
+                .page(questionPage.getNumber())
+                .hasNext(questionPage.hasNext())
+                .content(content)
                 .build();
     }
 }

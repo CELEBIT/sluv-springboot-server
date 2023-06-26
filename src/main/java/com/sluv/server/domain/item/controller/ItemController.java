@@ -453,4 +453,27 @@ public class ItemController {
                         .build()
         );
     }
+
+    @Operation(
+            summary = "*이 아이템은 어때요 아이템 조회",
+            description = """
+                    이 아이템은 어때요 아이템 조회\n
+                    - (User Id 필요) -> 스크랩 여부 확인\n
+                    - 정적을 4개\n
+                    - 24시간 기준
+                    - 10개가 안되면 최신순으로 랜덤으로 채우기\n
+                    ===============\n
+                    - 현재 실시간 -> 24시간 기준 추가 예정
+                    """
+    )
+    @GetMapping("/howabout")
+    public ResponseEntity<SuccessDataResponse<List<ItemSimpleResDto>>> getHowAboutItem(@AuthenticationPrincipal User user) {
+
+
+        return ResponseEntity.ok().body(
+                SuccessDataResponse.<List<ItemSimpleResDto>>builder()
+                        .result(itemService.getHowAboutItem(user))
+                        .build()
+        );
+    }
 }

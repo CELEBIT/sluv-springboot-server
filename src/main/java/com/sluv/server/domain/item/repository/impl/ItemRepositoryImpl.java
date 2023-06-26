@@ -522,4 +522,20 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom{
                 )
                 .fetch();
     }
+
+    /**
+     * 가성비 선물 아이템 업데이트
+     */
+    @Override
+    public List<Item> updateEfficientItem() {
+        return  jpaQueryFactory.select(item)
+                .from(item)
+                .leftJoin(itemLike).on(itemLike.item.eq(item))
+                .leftJoin(itemScrap).on(itemScrap.item.eq(item))
+                .groupBy(item)
+                .where(item.itemStatus.eq(ACTIVE)
+                        .and(item.price.loe(100000))
+                )
+                .fetch();
+    }
 }

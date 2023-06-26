@@ -514,9 +514,6 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom{
     public List<Item> updateLuxuryItem() {
         return  jpaQueryFactory.select(item)
                 .from(item)
-                .leftJoin(itemLike).on(itemLike.item.eq(item))
-                .leftJoin(itemScrap).on(itemScrap.item.eq(item))
-                .groupBy(item)
                 .where(item.itemStatus.eq(ACTIVE)
                         .and(item.price.goe(1000000))
                 )
@@ -530,9 +527,6 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom{
     public List<Item> updateEfficientItem() {
         return  jpaQueryFactory.select(item)
                 .from(item)
-                .leftJoin(itemLike).on(itemLike.item.eq(item))
-                .leftJoin(itemScrap).on(itemScrap.item.eq(item))
-                .groupBy(item)
                 .where(item.itemStatus.eq(ACTIVE)
                         .and(item.price.loe(100000))
                 )

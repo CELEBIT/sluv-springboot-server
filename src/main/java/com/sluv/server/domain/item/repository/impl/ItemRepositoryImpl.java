@@ -495,7 +495,7 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom{
                 .limit(pageable.getPageSize())
                 .fetch();
 
-//        // Count Query
+        // Count Query
         JPAQuery<Item> countQuery = jpaQueryFactory.select(item)
                 .from(luxuryItem)
                 .leftJoin(luxuryItem.item, item)
@@ -540,7 +540,7 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom{
                 .limit(pageable.getPageSize())
                 .fetch();
 
-//        // Count Query
+        // Count Query
         JPAQuery<Item> countQuery = jpaQueryFactory.select(item)
                 .from(efficientItem)
                 .leftJoin(efficientItem.item, item)

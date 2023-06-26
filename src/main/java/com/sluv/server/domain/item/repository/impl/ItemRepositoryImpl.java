@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.sluv.server.domain.closet.entity.QCloset.closet;
+import static com.sluv.server.domain.item.entity.QEfficientItem.efficientItem;
 import static com.sluv.server.domain.item.entity.QItem.item;
 import static com.sluv.server.domain.item.entity.QItemLike.itemLike;
 import static com.sluv.server.domain.item.entity.QItemLink.itemLink;
@@ -518,6 +519,38 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom{
                         .and(item.price.goe(1000000))
                 )
                 .fetch();
+    }
+    /**
+     * 가성비 선물 아이템 조회
+     */
+    @Override
+    public Page<Item> getEfficientItem(Pageable pageable, SearchFilterReqDto dto) {
+        JPAQuery<Item> query = jpaQueryFactory.select(item)
+                .from(efficientItem)
+                .leftJoin(efficientItem.item, item)
+                .leftJoin(itemLike).on(itemLike.item.eq(item))
+                .leftJoin(itemScrap).on(itemScrap.item.eq(item))
+                .groupBy(item);
+
+
+        addFilterWhere(query, dto);
+
+        List<Item> content = query.orderBy(getSearchItemOrderHot(pageable.getSort()))
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+//        // Count Query
+        JPAQuery<Item> countQuery = jpaQueryFactory.select(item)
+                .from(efficientItem)
+                .leftJoin(efficientItem.item, item)
+                .leftJoin(itemLike).on(itemLike.item.eq(item))
+                .leftJoin(itemScrap).on(itemScrap.item.eq(item))
+                .groupBy(item);
+
+        addFilterWhere(countQuery, dto);
+
+        return PageableExecutionUtils.getPage(content, pageable, () -> countQuery.fetch().size());
     }
 
     /**

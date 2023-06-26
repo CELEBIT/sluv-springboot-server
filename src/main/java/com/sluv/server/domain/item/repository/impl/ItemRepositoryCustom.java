@@ -1,5 +1,6 @@
 package com.sluv.server.domain.item.repository.impl;
 
+import com.sluv.server.domain.celeb.entity.Celeb;
 import com.sluv.server.domain.closet.entity.Closet;
 import com.sluv.server.domain.item.entity.Item;
 import com.sluv.server.domain.search.dto.SearchFilterReqDto;
@@ -57,5 +58,6 @@ public interface ItemRepositoryCustom {
 
     List<Item> updateDayHotItem();
 
-    Page<Item> getHoyCelebItem(Long celebId, Pageable pageable, SearchFilterReqDto dto);
+    Page<Item> getHotCelebItem(Long celebId, Pageable pageable, SearchFilterReqDto dto);
+    List<Item> getCurationItem(User user, List<Celeb> interestedCeleb);
 }

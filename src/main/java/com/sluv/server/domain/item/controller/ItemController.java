@@ -430,4 +430,27 @@ public class ItemController {
                         .build()
         );
     }
+
+    @Operation(
+            summary = "*큐레이션 아이템 조회",
+            description = """
+                    큐레이션 아이템 조회\n
+                    - (User Id 필요) -> 스크랩 여부 확인\n
+                    - 정적을 10개\n
+                    - 오늘 올라온 관심 셀럽의 아이템을 인기 순으로 검색
+                    - 10개가 안되면 최신순으로 랜덤으로 채우기\n
+                    ===============\n
+                    - 현재 실시간 -> 24시간 기준 추가 예정
+                    """
+    )
+    @GetMapping("/curation")
+    public ResponseEntity<SuccessDataResponse<List<ItemSimpleResDto>>> getCurationItem(@AuthenticationPrincipal User user) {
+
+
+        return ResponseEntity.ok().body(
+                SuccessDataResponse.<List<ItemSimpleResDto>>builder()
+                        .result(itemService.getCurationItem(user))
+                        .build()
+        );
+    }
 }

@@ -50,4 +50,10 @@ public interface ItemRepositoryCustom {
     List<Item> updateEfficientItem();
 
     List<Item> updateWeekHotItem();
+
+    List<Item> getWeekHotItem();
+
+    List<Item> getDayHotItem();
+
+    List<Item> updateDayHotItem();
 }

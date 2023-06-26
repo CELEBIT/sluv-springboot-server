@@ -25,6 +25,8 @@ import static com.sluv.server.domain.item.entity.QItemLink.itemLink;
 import static com.sluv.server.domain.item.entity.QItemScrap.itemScrap;
 import static com.sluv.server.domain.item.entity.QLuxuryItem.luxuryItem;
 import static com.sluv.server.domain.item.entity.QRecentItem.recentItem;
+import static com.sluv.server.domain.item.entity.QWeekHotItem.weekHotItem;
+import static com.sluv.server.domain.item.entity.QDayHotItem.dayHotItem;
 import static com.sluv.server.domain.item.enums.ItemStatus.ACTIVE;
 import static com.sluv.server.domain.user.entity.QUser.user;
 
@@ -571,6 +573,46 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom{
      */
     @Override
     public List<Item> updateWeekHotItem() {
+        return  jpaQueryFactory.selectFrom(item)
+                .leftJoin(itemLike).on(itemLike.item.eq(item))
+                .leftJoin(itemScrap).on(itemScrap.item.eq(item))
+                .where(item.itemStatus.eq(ACTIVE))
+                .orderBy(itemLike.count().add(itemScrap.count()).add(item.viewNum).desc())
+                .groupBy(item)
+                .limit(21)
+                .fetch();
+    }
+    /**
+     * 주간 HOT 아이템 조회
+     */
+    @Override
+    public List<Item> getWeekHotItem() {
+        return jpaQueryFactory.select(item)
+                .from(weekHotItem)
+                .leftJoin(weekHotItem.item, item)
+                .where(item.itemStatus.eq(ACTIVE))
+                .groupBy(item)
+                .fetch();
+    }
+
+    /**
+     * 일간 HOT 아이템 조회
+     */
+    @Override
+    public List<Item> getDayHotItem() {
+        return jpaQueryFactory.select(item)
+                .from(dayHotItem)
+                .leftJoin(dayHotItem.item, item)
+                .where(item.itemStatus.eq(ACTIVE))
+                .groupBy(item)
+                .fetch();
+    }
+
+    /**
+     * 일간 HOT 셀럽 아이템 업데이트
+     */
+    @Override
+    public List<Item> updateDayHotItem() {
         return  jpaQueryFactory.selectFrom(item)
                 .leftJoin(itemLike).on(itemLike.item.eq(item))
                 .leftJoin(itemScrap).on(itemScrap.item.eq(item))

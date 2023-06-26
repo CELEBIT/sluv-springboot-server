@@ -544,4 +544,14 @@ public class ItemService {
                 .content(content)
                 .build();
     }
+
+    public PaginationResDto<ItemSimpleResDto> getWeekHotItem(User user) {
+        List<Item> itemPage = itemRepository.getWeekHotItem();
+        return null;
+    }
+
+    public PaginationResDto<ItemSimpleResDto> getDayHotItem(User user) {
+        List<Item> itemPage = itemRepository.getDayHotItem();
+        return null;
+    }
 }

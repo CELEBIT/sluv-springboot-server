@@ -337,4 +337,24 @@ public class ItemController {
                         .build()
         );
     }
+
+    @Operation(
+            summary = "*주목해야할 럭셔리 무드 아이템 조회",
+            description = """
+                    주목해야할 럭셔리 무드 아이템 조회\n
+                    - (User Id 필요) -> 스크랩 여부 확인\n
+                    - Pagination 적용\n
+                    """
+    )
+    @GetMapping("/luxury")
+    public ResponseEntity<SuccessDataResponse<PaginationResDto<ItemSimpleResDto>>> getLuxuryItem(@AuthenticationPrincipal User user,
+                                                                                              Pageable pageable,
+                                                                                              SearchFilterReqDto dto) {
+
+        return ResponseEntity.ok().body(
+                SuccessDataResponse.<PaginationResDto<ItemSimpleResDto>>builder()
+                        .result(itemService.getLuxuryItem(user, pageable, dto))
+                        .build()
+        );
+    }
 }

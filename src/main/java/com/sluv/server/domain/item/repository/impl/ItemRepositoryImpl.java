@@ -22,6 +22,7 @@ import static com.sluv.server.domain.item.entity.QItem.item;
 import static com.sluv.server.domain.item.entity.QItemLike.itemLike;
 import static com.sluv.server.domain.item.entity.QItemLink.itemLink;
 import static com.sluv.server.domain.item.entity.QItemScrap.itemScrap;
+import static com.sluv.server.domain.item.entity.QLuxuryItem.luxuryItem;
 import static com.sluv.server.domain.item.entity.QRecentItem.recentItem;
 import static com.sluv.server.domain.item.enums.ItemStatus.ACTIVE;
 import static com.sluv.server.domain.user.entity.QUser.user;
@@ -288,6 +289,35 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom{
 
     }
 
+    /**
+     * 정렬 조건 추가 (디폴트 인기순)
+     */
+    private OrderSpecifier<?> getSearchItemOrderHot(Sort sort) {
+        List<OrderSpecifier<?>> orderSpecifiers = new ArrayList<>();
+        if (sort.isSorted()) {
+            for (Sort.Order order : sort) {
+
+                // 기본이 최신순
+                OrderSpecifier<?> orderSpecifier = item.whenDiscovery.desc();
+                String property = order.getProperty();
+                switch (property) {
+                    case "최신순" -> orderSpecifier = item.whenDiscovery.desc();
+                    case "인기순" -> orderSpecifier = itemLike.count().add(itemScrap.count()).add(item.viewNum).desc();
+                    case "저가순" -> orderSpecifier = item.price.asc();
+                    case "고가순" -> orderSpecifier = item.price.desc();
+                }
+
+                orderSpecifiers.add(orderSpecifier);
+            }
+        }else{
+            orderSpecifiers.add(itemLike.count().add(itemScrap.count()).add(item.viewNum).desc());
+        }
+
+        return orderSpecifiers.get(0);
+
+
+    }
+
     @Override
     public List<Item> getRecentTop2Item(User targetUser) {
 
@@ -441,5 +471,55 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom{
                 .orderBy(item.createdAt.desc());
 
         return PageableExecutionUtils.getPage(content, pageable, () -> countQuery.fetch().size());
+    }
+
+    /**
+     * 럭셔리 아이템 조회
+     */
+
+    @Override
+    public Page<Item> getLuxuryItem(Pageable pageable, SearchFilterReqDto dto) {
+        JPAQuery<Item> query = jpaQueryFactory.select(item)
+                .from(luxuryItem)
+                .leftJoin(luxuryItem.item, item)
+                .leftJoin(itemLike).on(itemLike.item.eq(item))
+                .leftJoin(itemScrap).on(itemScrap.item.eq(item))
+                .groupBy(item);
+
+
+        addFilterWhere(query, dto);
+
+        List<Item> content = query.orderBy(getSearchItemOrderHot(pageable.getSort()))
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+//        // Count Query
+        JPAQuery<Item> countQuery = jpaQueryFactory.select(item)
+                .from(luxuryItem)
+                .leftJoin(luxuryItem.item, item)
+                .leftJoin(itemLike).on(itemLike.item.eq(item))
+                .leftJoin(itemScrap).on(itemScrap.item.eq(item))
+                .groupBy(item);
+
+        addFilterWhere(countQuery, dto);
+
+        return PageableExecutionUtils.getPage(content, pageable, () -> countQuery.fetch().size());
+    }
+
+    /**
+     * 럭셔리 아이템 업데이트
+     */
+    @Override
+    public List<Item> updateLuxuryItem() {
+        return  jpaQueryFactory.select(item)
+                .from(item)
+                .leftJoin(itemLike).on(itemLike.item.eq(item))
+                .leftJoin(itemScrap).on(itemScrap.item.eq(item))
+                .groupBy(item)
+                .where(item.itemStatus.eq(ACTIVE)
+                        .and(item.price.goe(1000000))
+                )
+                .fetch();
     }
 }

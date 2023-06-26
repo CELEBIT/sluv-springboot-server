@@ -520,4 +520,16 @@ public class ItemService {
                 .content(content)
                 .build();
     }
+
+    public PaginationResDto<ItemSimpleResDto> getLuxuryItem(User user, Pageable pageable, SearchFilterReqDto dto) {
+        Page<Item> itemPage = itemRepository.getLuxuryItem(pageable, dto);
+
+        List<ItemSimpleResDto> content = convertItemToItemSameResDto(user, itemPage.getContent());
+
+        return PaginationResDto.<ItemSimpleResDto>builder()
+                .page(itemPage.getNumber())
+                .hasNext(itemPage.hasNext())
+                .content(content)
+                .build();
+    }
 }

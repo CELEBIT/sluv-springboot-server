@@ -408,4 +408,26 @@ public class ItemController {
                         .build()
         );
     }
+
+    @Operation(
+            summary = "*요즘 Hot Celeb의 아이템 조회",
+            description = """
+                    Hot Celeb의 아이템 조회\n
+                    - (User Id 필요) -> 스크랩 여부 확인\n
+                    - Pagination 추가\n
+                    - Filtering, Ordering 추가\n
+                    ===============\n
+                    - 셀럽 변경은 백오피스 개발시 다시 적용 예정
+                    """
+    )
+    @GetMapping("/hotCeleb")
+    public ResponseEntity<SuccessDataResponse<PaginationResDto<ItemSimpleResDto>>> getHotCelebItem(@AuthenticationPrincipal User user, Pageable pageable, SearchFilterReqDto dto) {
+
+
+        return ResponseEntity.ok().body(
+                SuccessDataResponse.<PaginationResDto<ItemSimpleResDto>>builder()
+                        .result(itemService.getHotCelebItem(user, pageable, dto))
+                        .build()
+        );
+    }
 }

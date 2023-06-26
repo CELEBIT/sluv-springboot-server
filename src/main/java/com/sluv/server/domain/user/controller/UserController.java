@@ -18,6 +18,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -396,6 +397,32 @@ public class UserController {
         return ResponseEntity.ok().body(
                 SuccessDataResponse.<PaginationCountResDto<CommentSimpleResDto>>builder()
                         .result(userService.getUserUploadComment(user, pageable))
+                        .build()
+        );
+    }
+
+    @Operation(
+            summary = "*인기 스러버 조회",
+            description = """
+                    전체 혹은 관심셀럽에 따른 인기 스러버 조회\n
+                    User Id Token 필요\n
+                        -> 팔로우 여부 체크\n
+                    정적으로 10개 검색\n
+                    1. 팔로워수 \n
+                    2. 아이템 업로드 수 \n
+                    ==================
+                    3. item Like 받은 수 \n
+                    4. question Like 받은 수 \n
+                    5. comment Like 받은 수 \n
+                    실시간으로 구현되어 있음 -> 이번주로 변경 예정
+                    """
+    )
+    @GetMapping("/hotSluver")
+    public ResponseEntity<SuccessDataResponse<List<UserSearchInfoDto>>> getHotSluver(@AuthenticationPrincipal User user, @Nullable @RequestParam("celebId") Long celebId){
+
+        return ResponseEntity.ok().body(
+                SuccessDataResponse.<List<UserSearchInfoDto>>builder()
+                        .result(userService.getHotSluver(user, celebId))
                         .build()
         );
     }

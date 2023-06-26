@@ -585,4 +585,18 @@ public class UserService {
                 commentPage.getTotalElements()
         );
     }
+
+    public List<UserSearchInfoDto> getHotSluver(User user, Long celebId) {
+        List<User> userList = userRepository.getHotSluver(user, celebId);
+
+        return userList.stream().map(_user -> UserSearchInfoDto.builder()
+                .id(_user.getId())
+                .nickName(_user.getNickname())
+                .profileImgUrl(_user.getProfileImgUrl())
+                .followStatus(followRepository.getFollowStatus(user, _user))
+                .build()
+        ).toList();
+
+
+    }
 }

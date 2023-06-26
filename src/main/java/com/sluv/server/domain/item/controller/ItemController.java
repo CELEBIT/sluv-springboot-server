@@ -17,6 +17,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/app/item")
@@ -388,10 +390,10 @@ public class ItemController {
                     """
     )
     @GetMapping("/hotItem")
-    public ResponseEntity<SuccessDataResponse<PaginationResDto<ItemSimpleResDto>>> getHotItem(@AuthenticationPrincipal User user,
-                                                                                                    @RequestParam("standard") String standard) {
+    public ResponseEntity<SuccessDataResponse<List<ItemSimpleResDto>>> getHotItem(@AuthenticationPrincipal User user,
+                                                                                  @RequestParam("standard") String standard) {
 
-        PaginationResDto<ItemSimpleResDto> result;
+        List<ItemSimpleResDto> result;
         if(standard.equals("주간")){
             result = itemService.getWeekHotItem(user);
         } else if (standard.equals("일간")) {
@@ -401,7 +403,7 @@ public class ItemController {
         }
 
         return ResponseEntity.ok().body(
-                SuccessDataResponse.<PaginationResDto<ItemSimpleResDto>>builder()
+                SuccessDataResponse.<List<ItemSimpleResDto>>builder()
                         .result(result)
                         .build()
         );

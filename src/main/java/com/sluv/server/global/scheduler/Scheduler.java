@@ -1,6 +1,10 @@
 package com.sluv.server.global.scheduler;
 
 import com.querydsl.core.Tuple;
+import com.sluv.server.domain.item.entity.Item;
+import com.sluv.server.domain.item.entity.LuxuryItem;
+import com.sluv.server.domain.item.repository.ItemRepository;
+import com.sluv.server.domain.item.repository.LuxuryItemRepository;
 import com.sluv.server.domain.search.entity.SearchData;
 import com.sluv.server.domain.search.entity.SearchRank;
 import com.sluv.server.domain.search.repository.SearchDataRepository;
@@ -20,6 +24,8 @@ import java.util.List;
 public class Scheduler {
     private final SearchDataRepository searchDataRepository;
     private final SearchRankRepository searchRankRepository;
+    private final LuxuryItemRepository luxuryItemRepository;
+    private final ItemRepository itemRepository;
 
     /**
      * SearchRank 업데이트
@@ -43,6 +49,28 @@ public class Scheduler {
 
         log.info("Save SearchRank. Time: {}", Calendar.getInstance().getTime());
         searchRankRepository.saveAll(result);
+    }
+
+    @Scheduled(cron = "0 0 0 * * *") // 초 분 시 일 월 요일
+    @Transactional
+    public void updateLuxuryItem(){
+        log.info("LuxuryItem Update Time: {}", Calendar.getInstance().getTime());
+
+        log.info("Delete Old LuxuryItem Data");
+        luxuryItemRepository.deleteAll();
+
+        log.info("Get LuxuryItem. Time: {}", Calendar.getInstance().getTime());
+        List<Item> newLuxuryItem = itemRepository.updateLuxuryItem();
+
+        log.info("Save LuxuryItem. Time: {}", Calendar.getInstance().getTime());
+
+        newLuxuryItem.forEach(item ->
+                luxuryItemRepository.save(
+                        LuxuryItem.builder()
+                        .item(item)
+                        .build()
+                )
+        );
     }
 
 }

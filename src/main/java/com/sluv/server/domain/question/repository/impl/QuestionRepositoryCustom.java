@@ -30,4 +30,14 @@ public interface QuestionRepositoryCustom {
     Page<Question> getUserLikeQuestion(User user, Pageable pageable);
 
     Page<Question> getUserAllQuestion(User user, Pageable pageable);
+
+    Page<Question> getTotalQuestionList(Pageable pageable);
+
+    Page<QuestionBuy> getQuestionBuyList(Pageable pageable);
+
+    Page<QuestionFind> getQuestionFindList(Pageable pageable);
+
+    Page<QuestionHowabout> getQuestionHowaboutList(Pageable pageable);
+
+    Page<QuestionRecommend> getQuestionRecommendList(Pageable pageable);
 }

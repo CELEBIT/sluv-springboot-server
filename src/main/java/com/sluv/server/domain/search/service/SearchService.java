@@ -285,19 +285,16 @@ public class SearchService {
 
 
         // Item 검색
-        System.out.println("아이템");
         Pageable itemPageable = PageRequest.of(0, itemSize);
         SearchFilterReqDto dto = SearchFilterReqDto.builder().build();
 
         List<ItemSimpleResDto> searchItem = this.getSearchItem(user, keyword, dto, itemPageable).getContent();
 
-        System.out.println("질문");
         // Question 검색 -> 찾아주세요 -> 이거 어때 -> 이 중에 뭐 살까 -> 추천해 줘 순서
         Pageable questionPageable = PageRequest.of(0, questionSize);
 
         List<QuestionSimpleResDto> result = this.getSearchQuestion(user, keyword, "Find", questionPageable).getContent().stream().toList();
 
-        System.out.println("여기!");
 
         if(result.size() < 4){
             List<QuestionSimpleResDto> temp =
@@ -322,7 +319,7 @@ public class SearchService {
         }
 
         List<QuestionSimpleResDto> searchQuestion = result;
-        System.out.println("사람");
+
         // User 검색
         Pageable userPageable = PageRequest.of(0, userSize);
 

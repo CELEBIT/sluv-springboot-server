@@ -233,4 +233,79 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom{
 
         return PageableExecutionUtils.getPage(content, pageable, () -> query.fetch().size());
     }
+
+    @Override
+    public Page<Question> getTotalQuestionList(Pageable pageable) {
+        List<Question> content = jpaQueryFactory.selectFrom(question)
+                .where(question.questionStatus.eq(ACTIVE))
+                .orderBy(question.createdAt.desc())
+                .fetch();
+
+        // Count Query
+        JPAQuery<Question> query = jpaQueryFactory.selectFrom(question)
+                .where(question.questionStatus.eq(ACTIVE))
+                .orderBy(question.createdAt.desc());
+
+        return PageableExecutionUtils.getPage(content, pageable, () -> query.fetch().size());
+    }
+
+    @Override
+    public Page<QuestionBuy> getQuestionBuyList(Pageable pageable) {
+        List<QuestionBuy> content = jpaQueryFactory.selectFrom(questionBuy)
+                .where(questionBuy.questionStatus.eq(ACTIVE))
+                .orderBy(questionBuy.createdAt.desc())
+                .fetch();
+
+        // Count Query
+        JPAQuery<QuestionBuy> query = jpaQueryFactory.selectFrom(questionBuy)
+                .where(questionBuy.questionStatus.eq(ACTIVE))
+                .orderBy(questionBuy.createdAt.desc());
+
+        return PageableExecutionUtils.getPage(content, pageable, () -> query.fetch().size());
+    }
+
+    @Override
+    public Page<QuestionFind> getQuestionFindList(Pageable pageable) {
+        List<QuestionFind> content = jpaQueryFactory.selectFrom(questionFind)
+                .where(questionFind.questionStatus.eq(ACTIVE))
+                .orderBy(questionFind.createdAt.desc())
+                .fetch();
+
+        // Count Query
+        JPAQuery<QuestionFind> query = jpaQueryFactory.selectFrom(questionFind)
+                .where(questionFind.questionStatus.eq(ACTIVE))
+                .orderBy(questionFind.createdAt.desc());
+
+        return PageableExecutionUtils.getPage(content, pageable, () -> query.fetch().size());
+    }
+
+    @Override
+    public Page<QuestionHowabout> getQuestionHowaboutList(Pageable pageable) {
+        List<QuestionHowabout> content = jpaQueryFactory.selectFrom(questionHowabout)
+                .where(questionHowabout.questionStatus.eq(ACTIVE))
+                .orderBy(questionHowabout.createdAt.desc())
+                .fetch();
+
+        // Count Query
+        JPAQuery<QuestionHowabout> query = jpaQueryFactory.selectFrom(questionHowabout)
+                .where(questionHowabout.questionStatus.eq(ACTIVE))
+                .orderBy(questionHowabout.createdAt.desc());
+
+        return PageableExecutionUtils.getPage(content, pageable, () -> query.fetch().size());
+    }
+
+    @Override
+    public Page<QuestionRecommend> getQuestionRecommendList(Pageable pageable) {
+        List<QuestionRecommend> content = jpaQueryFactory.selectFrom(questionRecommend)
+                .where(questionRecommend.questionStatus.eq(ACTIVE))
+                .orderBy(questionRecommend.createdAt.desc())
+                .fetch();
+
+        // Count Query
+        JPAQuery<QuestionRecommend> query = jpaQueryFactory.selectFrom(questionRecommend)
+                .where(questionRecommend.questionStatus.eq(ACTIVE))
+                .orderBy(questionRecommend.createdAt.desc());
+
+        return PageableExecutionUtils.getPage(content, pageable, () -> query.fetch().size());
+    }
 }

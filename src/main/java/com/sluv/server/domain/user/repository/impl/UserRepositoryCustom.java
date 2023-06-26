@@ -11,4 +11,6 @@ public interface UserRepositoryCustom {
 
     Page<User> getAllFollower(Long userId, Pageable pageable);
     Page<User> getAllFollowing(Long userId, Pageable pageable);
+
+    List<User> getHotSluver(User user, Long celebId);
 }

@@ -1,8 +1,10 @@
 package com.sluv.server.global.scheduler;
 
 import com.querydsl.core.Tuple;
+import com.sluv.server.domain.item.entity.EfficientItem;
 import com.sluv.server.domain.item.entity.Item;
 import com.sluv.server.domain.item.entity.LuxuryItem;
+import com.sluv.server.domain.item.repository.EfficientItemRepository;
 import com.sluv.server.domain.item.repository.ItemRepository;
 import com.sluv.server.domain.item.repository.LuxuryItemRepository;
 import com.sluv.server.domain.search.entity.SearchData;
@@ -25,6 +27,7 @@ public class Scheduler {
     private final SearchDataRepository searchDataRepository;
     private final SearchRankRepository searchRankRepository;
     private final LuxuryItemRepository luxuryItemRepository;
+    private final EfficientItemRepository efficientItemRepository;
     private final ItemRepository itemRepository;
 
     /**
@@ -51,6 +54,9 @@ public class Scheduler {
         searchRankRepository.saveAll(result);
     }
 
+    /**
+     * 럭셔리 아이템 업데이트
+     */
     @Scheduled(cron = "0 0 0 * * *") // 초 분 시 일 월 요일
     @Transactional
     public void updateLuxuryItem(){
@@ -69,6 +75,31 @@ public class Scheduler {
                         LuxuryItem.builder()
                         .item(item)
                         .build()
+                )
+        );
+    }
+
+    /**
+     * 가성비 선물 아이템 업데이트
+     */
+    @Scheduled(cron = "0 0 0 * * *") // 초 분 시 일 월 요일
+    @Transactional
+    public void updateEfficientItem(){
+        log.info("EfficientItem Update Time: {}", Calendar.getInstance().getTime());
+
+        log.info("Delete Old EfficientItem Data");
+        efficientItemRepository.deleteAll();
+
+        log.info("Get EfficientItem. Time: {}", Calendar.getInstance().getTime());
+        List<Item> newEfficientItem = itemRepository.updateEfficientItem();
+
+        log.info("Save EfficientItem. Time: {}", Calendar.getInstance().getTime());
+
+        newEfficientItem.forEach(item ->
+                efficientItemRepository.save(
+                        EfficientItem.builder()
+                                .item(item)
+                                .build()
                 )
         );
     }

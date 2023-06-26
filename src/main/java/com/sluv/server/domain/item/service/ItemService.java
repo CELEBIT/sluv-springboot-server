@@ -532,4 +532,16 @@ public class ItemService {
                 .content(content)
                 .build();
     }
+
+    public PaginationResDto<ItemSimpleResDto> getEfficientItem(User user, Pageable pageable, SearchFilterReqDto dto) {
+        Page<Item> itemPage = itemRepository.getEfficientItem(pageable, dto);
+
+        List<ItemSimpleResDto> content = convertItemToItemSameResDto(user, itemPage.getContent());
+
+        return PaginationResDto.<ItemSimpleResDto>builder()
+                .page(itemPage.getNumber())
+                .hasNext(itemPage.hasNext())
+                .content(content)
+                .build();
+    }
 }

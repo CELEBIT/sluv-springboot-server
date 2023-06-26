@@ -357,4 +357,24 @@ public class ItemController {
                         .build()
         );
     }
+
+    @Operation(
+            summary = "*가성비 좋은 선물 아이템 조회",
+            description = """
+                    가성비 좋은 선물 아이템 조회\n
+                    - (User Id 필요) -> 스크랩 여부 확인\n
+                    - Pagination 적용\n
+                    """
+    )
+    @GetMapping("/efficient")
+    public ResponseEntity<SuccessDataResponse<PaginationResDto<ItemSimpleResDto>>> getEfficientItem(@AuthenticationPrincipal User user,
+                                                                                                 Pageable pageable,
+                                                                                                 SearchFilterReqDto dto) {
+
+        return ResponseEntity.ok().body(
+                SuccessDataResponse.<PaginationResDto<ItemSimpleResDto>>builder()
+                        .result(itemService.getEfficientItem(user, pageable, dto))
+                        .build()
+        );
+    }
 }

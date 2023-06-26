@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.sluv.server.domain.closet.entity.QCloset.closet;
+import static com.sluv.server.domain.item.entity.QEfficientItem.efficientItem;
 import static com.sluv.server.domain.item.entity.QItem.item;
 import static com.sluv.server.domain.item.entity.QItemLike.itemLike;
 import static com.sluv.server.domain.item.entity.QItemLink.itemLink;
@@ -494,7 +495,7 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom{
                 .limit(pageable.getPageSize())
                 .fetch();
 
-//        // Count Query
+        // Count Query
         JPAQuery<Item> countQuery = jpaQueryFactory.select(item)
                 .from(luxuryItem)
                 .leftJoin(luxuryItem.item, item)
@@ -514,11 +515,53 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom{
     public List<Item> updateLuxuryItem() {
         return  jpaQueryFactory.select(item)
                 .from(item)
-                .leftJoin(itemLike).on(itemLike.item.eq(item))
-                .leftJoin(itemScrap).on(itemScrap.item.eq(item))
-                .groupBy(item)
                 .where(item.itemStatus.eq(ACTIVE)
                         .and(item.price.goe(1000000))
+                )
+                .fetch();
+    }
+    /**
+     * 가성비 선물 아이템 조회
+     */
+    @Override
+    public Page<Item> getEfficientItem(Pageable pageable, SearchFilterReqDto dto) {
+        JPAQuery<Item> query = jpaQueryFactory.select(item)
+                .from(efficientItem)
+                .leftJoin(efficientItem.item, item)
+                .leftJoin(itemLike).on(itemLike.item.eq(item))
+                .leftJoin(itemScrap).on(itemScrap.item.eq(item))
+                .groupBy(item);
+
+
+        addFilterWhere(query, dto);
+
+        List<Item> content = query.orderBy(getSearchItemOrderHot(pageable.getSort()))
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        // Count Query
+        JPAQuery<Item> countQuery = jpaQueryFactory.select(item)
+                .from(efficientItem)
+                .leftJoin(efficientItem.item, item)
+                .leftJoin(itemLike).on(itemLike.item.eq(item))
+                .leftJoin(itemScrap).on(itemScrap.item.eq(item))
+                .groupBy(item);
+
+        addFilterWhere(countQuery, dto);
+
+        return PageableExecutionUtils.getPage(content, pageable, () -> countQuery.fetch().size());
+    }
+
+    /**
+     * 가성비 선물 아이템 업데이트
+     */
+    @Override
+    public List<Item> updateEfficientItem() {
+        return  jpaQueryFactory.select(item)
+                .from(item)
+                .where(item.itemStatus.eq(ACTIVE)
+                        .and(item.price.loe(100000))
                 )
                 .fetch();
     }

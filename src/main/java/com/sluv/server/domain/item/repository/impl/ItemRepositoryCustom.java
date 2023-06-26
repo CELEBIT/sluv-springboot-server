@@ -44,4 +44,8 @@ public interface ItemRepositoryCustom {
     Page<Item> getLuxuryItem(Pageable pageable, SearchFilterReqDto dto);
 
     List<Item> updateLuxuryItem();
+
+    Page<Item> getEfficientItem(Pageable pageable, SearchFilterReqDto dto);
+
+    List<Item> updateEfficientItem();
 }

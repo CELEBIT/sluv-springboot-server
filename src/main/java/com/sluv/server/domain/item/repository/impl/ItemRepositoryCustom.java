@@ -60,4 +60,6 @@ public interface ItemRepositoryCustom {
 
     Page<Item> getHotCelebItem(Long celebId, Pageable pageable, SearchFilterReqDto dto);
     List<Item> getCurationItem(User user, List<Celeb> interestedCeleb);
+
+    List<Item> getHowAboutItem(User user, List<Celeb> interestedCeleb);
 }

@@ -580,4 +580,11 @@ public class ItemService {
 
         return convertItemToItemSimpleResDto(user, itemList);
     }
+
+    public List<ItemSimpleResDto> getHowAboutItem(User user) {
+        List<Celeb> interestedCeleb = celebRepository.findInterestedCeleb(user);
+        List<Item> itemList = itemRepository.getHowAboutItem(user, interestedCeleb);
+
+        return convertItemToItemSimpleResDto(user, itemList);
+    }
 }

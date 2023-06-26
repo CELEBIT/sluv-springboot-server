@@ -8,6 +8,7 @@ import com.sluv.server.domain.closet.entity.Closet;
 import com.sluv.server.domain.item.entity.Item;
 import com.sluv.server.domain.search.dto.SearchFilterReqDto;
 import com.sluv.server.domain.user.entity.User;
+import com.sluv.server.domain.user.enums.UserStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cglib.core.Local;
 import org.springframework.data.domain.Page;
@@ -20,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
+import static com.sluv.server.domain.celeb.entity.QInterestedCeleb.interestedCeleb;
 import static com.sluv.server.domain.closet.entity.QCloset.closet;
 import static com.sluv.server.domain.item.entity.QEfficientItem.efficientItem;
 import static com.sluv.server.domain.item.entity.QItem.item;
@@ -708,5 +710,32 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom{
 
 
         return result;
+    }
+
+    /**
+     * 이 아이템은 어때요? 아이템 조회
+     */
+    @Override
+    public List<Item> getHowAboutItem(User _user, List<Celeb> interestedCelebList) {
+        List<User> userList = jpaQueryFactory.select(user)
+                        .from(interestedCeleb)
+                        .leftJoin(interestedCeleb.user, user)
+                        .where(interestedCeleb.celeb.in(interestedCelebList)
+                                .and(interestedCeleb.user.userStatus.eq(UserStatus.ACTIVE))
+                        )
+                        .fetch();
+
+
+        return jpaQueryFactory.select(item)
+                .from(itemLike)
+                .leftJoin(itemLike.item, item)
+                .where(itemLike.user.in(userList)
+                        .and(item.itemStatus.eq(ACTIVE))
+                )
+                .orderBy(itemLike.count().desc())
+                .groupBy(item)
+                .limit(4)
+                .fetch();
+
     }
 }

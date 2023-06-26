@@ -1,6 +1,7 @@
 package com.sluv.server.domain.item.controller;
 
 import com.sluv.server.domain.item.dto.*;
+import com.sluv.server.domain.item.exception.StandardNotFoundException;
 import com.sluv.server.domain.item.service.*;
 import com.sluv.server.domain.search.dto.SearchFilterReqDto;
 import com.sluv.server.domain.user.entity.User;
@@ -15,6 +16,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -374,6 +377,34 @@ public class ItemController {
         return ResponseEntity.ok().body(
                 SuccessDataResponse.<PaginationResDto<ItemSimpleResDto>>builder()
                         .result(itemService.getEfficientItem(user, pageable, dto))
+                        .build()
+        );
+    }
+
+    @Operation(
+            summary = "*일간/주간 HOT 아이템 조회",
+            description = """
+                    *일간/주간 HOT 아이템 조회\n
+                    - (User Id 필요) -> 스크랩 여부 확인\n
+                    - 정적으로 21개 조회.
+                    """
+    )
+    @GetMapping("/hotItem")
+    public ResponseEntity<SuccessDataResponse<List<ItemSimpleResDto>>> getHotItem(@AuthenticationPrincipal User user,
+                                                                                  @RequestParam("standard") String standard) {
+
+        List<ItemSimpleResDto> result;
+        if(standard.equals("주간")){
+            result = itemService.getWeekHotItem(user);
+        } else if (standard.equals("일간")) {
+            result = itemService.getDayHotItem(user);
+        }else{
+            throw new StandardNotFoundException();
+        }
+
+        return ResponseEntity.ok().body(
+                SuccessDataResponse.<List<ItemSimpleResDto>>builder()
+                        .result(result)
                         .build()
         );
     }

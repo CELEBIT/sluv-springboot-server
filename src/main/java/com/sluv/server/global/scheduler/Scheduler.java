@@ -1,12 +1,8 @@
 package com.sluv.server.global.scheduler;
 
 import com.querydsl.core.Tuple;
-import com.sluv.server.domain.item.entity.EfficientItem;
-import com.sluv.server.domain.item.entity.Item;
-import com.sluv.server.domain.item.entity.LuxuryItem;
-import com.sluv.server.domain.item.repository.EfficientItemRepository;
-import com.sluv.server.domain.item.repository.ItemRepository;
-import com.sluv.server.domain.item.repository.LuxuryItemRepository;
+import com.sluv.server.domain.item.entity.*;
+import com.sluv.server.domain.item.repository.*;
 import com.sluv.server.domain.search.entity.SearchData;
 import com.sluv.server.domain.search.entity.SearchRank;
 import com.sluv.server.domain.search.repository.SearchDataRepository;
@@ -28,6 +24,8 @@ public class Scheduler {
     private final SearchRankRepository searchRankRepository;
     private final LuxuryItemRepository luxuryItemRepository;
     private final EfficientItemRepository efficientItemRepository;
+    private final WeekHotItemRepository weekHotItemRepository;
+    private final DayHotItemRepository dayHotItemRepository;
     private final ItemRepository itemRepository;
 
     /**
@@ -98,6 +96,56 @@ public class Scheduler {
         newEfficientItem.forEach(item ->
                 efficientItemRepository.save(
                         EfficientItem.builder()
+                                .item(item)
+                                .build()
+                )
+        );
+    }
+
+    /**
+     * 주간 HOT 셀럽 아이템
+     */
+    @Scheduled(cron = "0 0 0 * * MON") // 초 분 시 일 월 요일
+    @Transactional
+    public void updateWeekHotItem(){
+        log.info("WeekHotItem Update Time: {}", Calendar.getInstance().getTime());
+
+        log.info("Delete Old WeekHotItem Data");
+        weekHotItemRepository.deleteAll();
+
+        log.info("Get WeekHotItem. Time: {}", Calendar.getInstance().getTime());
+        List<Item> newWeekHotItem = itemRepository.updateWeekHotItem();
+
+        log.info("Save WeekHotItem. Time: {}", Calendar.getInstance().getTime());
+
+        newWeekHotItem.forEach(item ->
+                weekHotItemRepository.save(
+                        WeekHotItem.builder()
+                                .item(item)
+                                .build()
+                )
+        );
+    }
+
+    /**
+     * 일간 HOT 셀럽 아이템
+     */
+    @Scheduled(cron = "0 0 0 * * *") // 초 분 시 일 월 요일
+    @Transactional
+    public void updateDayHotItem(){
+        log.info("DayHotItem Update Time: {}", Calendar.getInstance().getTime());
+
+        log.info("Delete Old DayHotItem Data");
+        dayHotItemRepository.deleteAll();
+
+        log.info("Get DayHotItem. Time: {}", Calendar.getInstance().getTime());
+        List<Item> newDayHotItem = itemRepository.updateDayHotItem();
+
+        log.info("Save DayHotItem. Time: {}", Calendar.getInstance().getTime());
+
+        newDayHotItem.forEach(item ->
+                dayHotItemRepository.save(
+                        DayHotItem.builder()
                                 .item(item)
                                 .build()
                 )

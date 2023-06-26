@@ -318,18 +318,18 @@ public class ItemService {
 
         // 11. 같은 셀럽 아이템 리스트
         boolean celebJudge = item.getCeleb() != null;
-        List<ItemSimpleResDto> sameCelebItemList = convertItemToItemSameResDto(
+        List<ItemSimpleResDto> sameCelebItemList = convertItemToItemSimpleResDto(
                                                                 user , itemRepository.findSameCelebItem(item, celebJudge)
                                                 );
 
         // 12. 같은 브랜드 아이템 리스트
         boolean brandJudge = item.getBrand() != null;
-        List<ItemSimpleResDto> sameBrandItemList = convertItemToItemSameResDto(
+        List<ItemSimpleResDto> sameBrandItemList = convertItemToItemSimpleResDto(
                                                             user, itemRepository.findSameBrandItem(item, brandJudge)
                                                     );
 
         // 13. 다른 스러버들이 함께 보관한 아이템 리스트
-        List<ItemSimpleResDto> sameClosetItemList = convertItemToItemSameResDto(
+        List<ItemSimpleResDto> sameClosetItemList = convertItemToItemSimpleResDto(
                                                             user, getClosetItemList(item)
                                                     );
 
@@ -399,7 +399,7 @@ public class ItemService {
     public PaginationResDto<ItemSimpleResDto> getRecentItem(User user, Pageable pageable) {
         Page<Item> recentItemPage = itemRepository.getRecentItem(user, pageable);
 
-        return convertItemSamePageDto(user, pageable, recentItemPage);
+        return convertItemSimplePageDto(user, pageable, recentItemPage);
 
 
     }
@@ -408,12 +408,12 @@ public class ItemService {
         // User, Closet, Item 조인하여 ItemPage 조회
         Page<Item> itemPage = itemRepository.getAllScrapItem(user, pageable);
 
-        return convertItemSamePageDto(user, pageable, itemPage);
+        return convertItemSimplePageDto(user, pageable, itemPage);
     }
 
-    private PaginationResDto<ItemSimpleResDto> convertItemSamePageDto(User user, Pageable pageable, Page<Item> page) {
+    private PaginationResDto<ItemSimpleResDto> convertItemSimplePageDto(User user, Pageable pageable, Page<Item> page) {
         // ItemPage에서 ItemSameResDto 생성
-        List<ItemSimpleResDto> content = convertItemToItemSameResDto(user, page.getContent());
+        List<ItemSimpleResDto> content = convertItemToItemSimpleResDto(user, page.getContent());
 
         return PaginationResDto.<ItemSimpleResDto>builder()
                 .page(page.getNumber())
@@ -430,7 +430,7 @@ public class ItemService {
         return itemRepository.getSameClosetItems(item, recentAddClosetList);
     }
 
-    private List<ItemSimpleResDto> convertItemToItemSameResDto(User user, List<Item> itemList){
+    private List<ItemSimpleResDto> convertItemToItemSimpleResDto(User user, List<Item> itemList){
         // User의 모든 Closet 조회
         List<Closet> closetList = closetRepository.findAllByUserId(user.getId());
 
@@ -462,7 +462,7 @@ public class ItemService {
         Page<Item> recommendItemPage = itemRepository.getRecommendItemPage(pageable);
 
         List<ItemSimpleResDto> content =
-                convertItemToItemSameResDto(user, recommendItemPage.getContent());
+                convertItemToItemSimpleResDto(user, recommendItemPage.getContent());
 
 
 
@@ -480,7 +480,7 @@ public class ItemService {
         // itemPage 조회
         Page<Item> itemPage = itemRepository.getCelebSummerItem(pageable, dto);
         // Content 조립
-        List<ItemSimpleResDto> content = convertItemToItemSameResDto(user, itemPage.getContent());
+        List<ItemSimpleResDto> content = convertItemToItemSimpleResDto(user, itemPage.getContent());
 
         return PaginationResDto.<ItemSimpleResDto>builder()
                 .page(itemPage.getNumber())
@@ -497,7 +497,7 @@ public class ItemService {
         Page<Item> itemPage = itemRepository.getNowBuyItem(pageable, dto);
 
         // Content 조립
-        List<ItemSimpleResDto> content = convertItemToItemSameResDto(user, itemPage.getContent());
+        List<ItemSimpleResDto> content = convertItemToItemSimpleResDto(user, itemPage.getContent());
 
         return PaginationResDto.<ItemSimpleResDto>builder()
                 .page(itemPage.getNumber())
@@ -512,7 +512,7 @@ public class ItemService {
         Page<Item> itemPage = itemRepository.getNewItem(pageable);
 
         // Content 조립
-        List<ItemSimpleResDto> content = convertItemToItemSameResDto(user, itemPage.getContent());
+        List<ItemSimpleResDto> content = convertItemToItemSimpleResDto(user, itemPage.getContent());
 
         return PaginationResDto.<ItemSimpleResDto>builder()
                 .page(itemPage.getNumber())
@@ -524,7 +524,7 @@ public class ItemService {
     public PaginationResDto<ItemSimpleResDto> getLuxuryItem(User user, Pageable pageable, SearchFilterReqDto dto) {
         Page<Item> itemPage = itemRepository.getLuxuryItem(pageable, dto);
 
-        List<ItemSimpleResDto> content = convertItemToItemSameResDto(user, itemPage.getContent());
+        List<ItemSimpleResDto> content = convertItemToItemSimpleResDto(user, itemPage.getContent());
 
         return PaginationResDto.<ItemSimpleResDto>builder()
                 .page(itemPage.getNumber())
@@ -536,12 +536,22 @@ public class ItemService {
     public PaginationResDto<ItemSimpleResDto> getEfficientItem(User user, Pageable pageable, SearchFilterReqDto dto) {
         Page<Item> itemPage = itemRepository.getEfficientItem(pageable, dto);
 
-        List<ItemSimpleResDto> content = convertItemToItemSameResDto(user, itemPage.getContent());
+        List<ItemSimpleResDto> content = convertItemToItemSimpleResDto(user, itemPage.getContent());
 
         return PaginationResDto.<ItemSimpleResDto>builder()
                 .page(itemPage.getNumber())
                 .hasNext(itemPage.hasNext())
                 .content(content)
                 .build();
+    }
+
+    public List<ItemSimpleResDto> getWeekHotItem(User user) {
+        List<Item> itemPage = itemRepository.getWeekHotItem();
+        return convertItemToItemSimpleResDto(user, itemPage);
+    }
+
+    public List<ItemSimpleResDto> getDayHotItem(User user) {
+        List<Item> itemPage = itemRepository.getDayHotItem();
+        return convertItemToItemSimpleResDto(user, itemPage);
     }
 }

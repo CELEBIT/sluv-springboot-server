@@ -48,4 +48,12 @@ public interface ItemRepositoryCustom {
     Page<Item> getEfficientItem(Pageable pageable, SearchFilterReqDto dto);
 
     List<Item> updateEfficientItem();
+
+    List<Item> updateWeekHotItem();
+
+    List<Item> getWeekHotItem();
+
+    List<Item> getDayHotItem();
+
+    List<Item> updateDayHotItem();
 }

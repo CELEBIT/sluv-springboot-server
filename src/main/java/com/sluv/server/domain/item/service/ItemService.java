@@ -448,7 +448,9 @@ public class ItemService {
                             )
                             .celebName(
                                     item.getCeleb() != null
-                                            ? item.getCeleb().getCelebNameKr()
+                                            ? item.getCeleb().getParent() != null
+                                                ? item.getCeleb().getParent().getCelebNameKr() + " " + item.getCeleb().getCelebNameKr()
+                                                : item.getCeleb().getCelebNameKr()
                                             : item.getNewCeleb().getCelebName()
                             )
                             .imgUrl(itemImg.getItemImgUrl())
@@ -553,5 +555,22 @@ public class ItemService {
     public List<ItemSimpleResDto> getDayHotItem(User user) {
         List<Item> itemPage = itemRepository.getDayHotItem();
         return convertItemToItemSimpleResDto(user, itemPage);
+    }
+
+    /**
+     * 요즘 핫한 셀럽의 Item 조회
+     */
+    public PaginationResDto<ItemSimpleResDto> getHotCelebItem(User user, Pageable pageable, SearchFilterReqDto dto) {
+        Long celebId = 511L;
+
+        Page<Item> itemPage = itemRepository.getHoyCelebItem(celebId, pageable, dto);
+
+        List<ItemSimpleResDto> content = convertItemToItemSimpleResDto(user, itemPage.getContent());
+
+        return PaginationResDto.<ItemSimpleResDto>builder()
+                .page(itemPage.getNumber())
+                .hasNext(itemPage.hasNext())
+                .content(content)
+                .build();
     }
 }

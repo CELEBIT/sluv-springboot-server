@@ -56,4 +56,6 @@ public interface ItemRepositoryCustom {
     List<Item> getDayHotItem();
 
     List<Item> updateDayHotItem();
+
+    Page<Item> getHoyCelebItem(Long celebId, Pageable pageable, SearchFilterReqDto dto);
 }

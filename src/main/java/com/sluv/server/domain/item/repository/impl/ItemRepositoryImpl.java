@@ -622,4 +622,47 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom{
                 .limit(21)
                 .fetch();
     }
+
+    /**
+     * 요즘 핫한 셀럽의 아이템 조회
+     */
+    @Override
+    public Page<Item> getHoyCelebItem(Long celebId, Pageable pageable, SearchFilterReqDto dto) {
+        JPAQuery<Item> query = jpaQueryFactory.selectFrom(item)
+                .leftJoin(itemLike).on(itemLike.item.eq(item))
+                .leftJoin(itemScrap).on(itemScrap.item.eq(item))
+                .where(item.itemStatus.eq(ACTIVE)
+                        .and(item.celeb.id.eq(celebId)
+                                .or(item.celeb.parent.id.eq(celebId))
+                                .or(item.newCeleb.id.eq(celebId))
+                        )
+                )
+                .groupBy(item);
+
+        addFilterWhere(query, dto);
+
+        List<Item> content = query
+                .orderBy(getSearchItemOrderHot(pageable.getSort()))
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        // Count Query;
+        JPAQuery<Item> countQuery = jpaQueryFactory.selectFrom(item)
+                .leftJoin(itemLike).on(itemLike.item.eq(item))
+                .leftJoin(itemScrap).on(itemScrap.item.eq(item))
+                .where(item.itemStatus.eq(ACTIVE)
+                        .and(item.celeb.id.eq(celebId)
+                                .or(item.celeb.parent.id.eq(celebId))
+                                .or(item.newCeleb.id.eq(celebId))
+                        )
+                )
+                .groupBy(item);
+
+        addFilterWhere(countQuery, dto);
+
+        JPAQuery<Item> newCountQuery = countQuery.orderBy(getSearchItemOrderHot(pageable.getSort()));
+
+        return PageableExecutionUtils.getPage(content, pageable, () -> newCountQuery.fetch().size());
+    }
 }

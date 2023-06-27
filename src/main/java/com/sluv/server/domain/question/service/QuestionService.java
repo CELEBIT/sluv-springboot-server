@@ -90,11 +90,11 @@ public class QuestionService {
         QuestionFind newQuestionFind = questionRepository.save(questionFind);
 
         // 3. QuestionImg 저장
-        postQuestionImgs(dto.getImgList().stream(), questionFind);
+        postQuestionImgs(dto.getImgList(), questionFind);
 
 
         // 4. QuestionItem 저장
-        postQuestionItems(dto.getItemList().stream(), questionFind);
+        postQuestionItems(dto.getItemList(), questionFind);
 
         return QuestionPostResDto.builder()
                 .id(newQuestionFind.getId())
@@ -129,10 +129,10 @@ public class QuestionService {
         QuestionBuy newQuestionBuy = questionRepository.save(questionBuy);
 
         // 3. QuestionImg 저장
-        postQuestionImgs(dto.getImgList().stream(), questionBuy);
+        postQuestionImgs(dto.getImgList(), questionBuy);
 
         // 4. QuestionItem 저장
-        postQuestionItems(dto.getItemList().stream(), questionBuy);
+        postQuestionItems(dto.getItemList(), questionBuy);
 
         return QuestionPostResDto.builder()
                 .id(newQuestionBuy.getId())
@@ -166,10 +166,10 @@ public class QuestionService {
         QuestionHowabout newQuestionHowabout = questionRepository.save(questionHowabout);
 
         // 3. QuestionImg 저장
-        postQuestionImgs(dto.getImgList().stream(), newQuestionHowabout);
+        postQuestionImgs(dto.getImgList(), newQuestionHowabout);
 
         // 4. QuestionItem 저장
-        postQuestionItems(dto.getItemList().stream(), newQuestionHowabout);
+        postQuestionItems(dto.getItemList(), newQuestionHowabout);
 
         return QuestionPostResDto.builder()
                 .id(newQuestionHowabout.getId())
@@ -218,10 +218,11 @@ public class QuestionService {
         questionRecommendCategoryRepository.saveAll(recommendCategoryList);
 
         // 4. QuestionImg 저장
-        postQuestionImgs(dto.getImgList().stream(), newQuestionRecommend);
+
+        postQuestionImgs(dto.getImgList(), newQuestionRecommend);
 
         // 4. QuestionItem 저장
-        postQuestionItems(dto.getItemList().stream(), newQuestionRecommend);
+        postQuestionItems(dto.getItemList(), newQuestionRecommend);
 
         return QuestionPostResDto.builder()
                 .id(newQuestionRecommend.getId())
@@ -233,22 +234,24 @@ public class QuestionService {
      * @param dtoStream
      * @param question
      */
-    private void postQuestionImgs(Stream<QuestionImgReqDto> dtoStream, Question question){
+    private void postQuestionImgs(List<QuestionImgReqDto> dtoList, Question question){
         // Question에 대한 Img 초기화
         questionImgRepository.deleteAllByQuestionId(question.getId());
 
-        // Question Img들 추가
-        List<QuestionImg> imgList = dtoStream.map(imgDto -> QuestionImg.builder()
-                .question(question)
-                .imgUrl(imgDto.getImgUrl())
-                .description(imgDto.getDescription())
-                .representFlag(imgDto.getRepresentFlag())
-                .itemImgOrLinkStatus(ItemImgOrLinkStatus.ACTIVE)
-                .sortOrder(imgDto.getSortOrder())
-                .build()
-        ).toList();
+        if(dtoList != null) {
+            // Question Img들 추가
+            List<QuestionImg> imgList = dtoList.stream().map(imgDto -> QuestionImg.builder()
+                    .question(question)
+                    .imgUrl(imgDto.getImgUrl())
+                    .description(imgDto.getDescription())
+                    .representFlag(imgDto.getRepresentFlag())
+                    .itemImgOrLinkStatus(ItemImgOrLinkStatus.ACTIVE)
+                    .sortOrder(imgDto.getSortOrder())
+                    .build()
+            ).toList();
 
-        questionImgRepository.saveAll(imgList);
+            questionImgRepository.saveAll(imgList);
+        }
     }
 
     /**
@@ -256,24 +259,25 @@ public class QuestionService {
      * @param dtoStream
      * @param question
      */
-    private void postQuestionItems(Stream<QuestionItemReqDto> dtoStream, Question question){
+    private void postQuestionItems(List<QuestionItemReqDto> dtoList, Question question){
         // Question에 대한 Item 초기화
         questionItemRepository.deleteAllByQuestionId(question.getId());
+        if(dtoList != null) {
+            // Question Item들 추가
+            List<QuestionItem> itemList = dtoList.stream().map(itemDto -> {
+                        Item item = itemRepository.findById(itemDto.getItemId()).orElseThrow(ItemNotFoundException::new);
+                        return QuestionItem.builder()
+                                .question(question)
+                                .item(item)
+                                .description(itemDto.getDescription())
+                                .representFlag(itemDto.getRepresentFlag())
+                                .sortOrder(itemDto.getSortOrder())
+                                .build();
+                    }
+            ).toList();
 
-        // Question Item들 추가
-        List<QuestionItem> itemList = dtoStream.map(itemDto -> {
-                    Item item = itemRepository.findById(itemDto.getItemId()).orElseThrow(ItemNotFoundException::new);
-                    return QuestionItem.builder()
-                            .question(question)
-                            .item(item)
-                            .description(itemDto.getDescription())
-                            .representFlag(itemDto.getRepresentFlag())
-                            .sortOrder(itemDto.getSortOrder())
-                            .build();
-                }
-        ).toList();
-
-        questionItemRepository.saveAll(itemList);
+            questionItemRepository.saveAll(itemList);
+        }
     }
 
 

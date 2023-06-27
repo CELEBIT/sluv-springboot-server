@@ -74,8 +74,14 @@ public class QuestionService {
         }
 
         // 2. QuestionFind 저장
-        Celeb celeb = celebRepository.findById(dto.getCelebId()).orElse(null);
-        NewCeleb newCeleb = newCelebRepository.findById(dto.getNewCelebId()).orElse(null);
+        Celeb celeb = null;
+        if(dto.getCelebId() != null) {
+           celeb = celebRepository.findById(dto.getCelebId()).orElse(null);
+        }
+        NewCeleb newCeleb = null;
+        if(dto.getNewCelebId() != null) {
+            newCeleb = newCelebRepository.findById(dto.getNewCelebId()).orElse(null);
+        }
 
         QuestionFind questionFind = questionFindBuilder
                 .user(user)
@@ -90,11 +96,10 @@ public class QuestionService {
         QuestionFind newQuestionFind = questionRepository.save(questionFind);
 
         // 3. QuestionImg 저장
-        postQuestionImgs(dto.getImgList(), questionFind);
-
+        postQuestionImgs(dto.getImgList(), newQuestionFind);
 
         // 4. QuestionItem 저장
-        postQuestionItems(dto.getItemList(), questionFind);
+        postQuestionItems(dto.getItemList(), newQuestionFind);
 
         return QuestionPostResDto.builder()
                 .id(newQuestionFind.getId())
@@ -129,10 +134,10 @@ public class QuestionService {
         QuestionBuy newQuestionBuy = questionRepository.save(questionBuy);
 
         // 3. QuestionImg 저장
-        postQuestionImgs(dto.getImgList(), questionBuy);
+        postQuestionImgs(dto.getImgList(), newQuestionBuy);
 
         // 4. QuestionItem 저장
-        postQuestionItems(dto.getItemList(), questionBuy);
+        postQuestionItems(dto.getItemList(), newQuestionBuy);
 
         return QuestionPostResDto.builder()
                 .id(newQuestionBuy.getId())

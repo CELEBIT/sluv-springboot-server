@@ -50,3 +50,9 @@ aws:
     region: ap-northeast-2
     bucketName: elasticbeanstalk-ap-northeast-2-931662394917
     baseUrl: asset
+
+fcm:
+  key:
+    path: /firebase/celebit-sluv-firebase-adminsdk-4ycho-d951e67a8e.json
+    api: https://fcm.googleapis.com/v1/projects/celebit-sluv/messages:send
+    scope: https://www.googleapis.com/auth/cloud-platform

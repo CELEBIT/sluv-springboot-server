@@ -5,6 +5,7 @@ import com.sluv.server.domain.brand.entity.Brand;
 import com.sluv.server.domain.brand.entity.NewBrand;
 import com.sluv.server.domain.brand.exception.BrandNotFoundException;
 import com.sluv.server.domain.brand.exception.NewBrandNotFoundException;
+import com.sluv.server.domain.brand.mapper.NewBrandMapper;
 import com.sluv.server.domain.brand.repository.BrandRepository;
 import com.sluv.server.domain.brand.repository.NewBrandRepository;
 import com.sluv.server.domain.celeb.dto.CelebDto;
@@ -53,6 +54,9 @@ public class TempItemService {
     private final BrandRepository brandRepository;
     private final NewBrandRepository newBrandRepository;
     private final NewCelebRepository newCelebRepository;
+
+
+    private final NewBrandMapper newBrandMapper;
 
 
     @Transactional
@@ -223,10 +227,7 @@ public class TempItemService {
                             )
                             .newBrand(
                                     tempItem.getNewBrand() != null
-                                    ? NewBrandPostResDto.builder()
-                                            .newBrandId(tempItem.getNewBrand().getId())
-                                            .newBrandName(tempItem.getNewBrand().getBrandName())
-                                            .build()
+                                    ? newBrandMapper.toNewBrandPostResDto(tempItem.getNewBrand())
                                     :null
                                     )
                             .updatedAt(tempItem.getUpdatedAt())

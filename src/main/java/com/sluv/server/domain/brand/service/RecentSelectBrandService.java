@@ -6,6 +6,7 @@ import com.sluv.server.domain.brand.entity.NewBrand;
 import com.sluv.server.domain.brand.entity.RecentSelectBrand;
 import com.sluv.server.domain.brand.exception.BrandNotFoundException;
 import com.sluv.server.domain.brand.exception.NewBrandNotFoundException;
+import com.sluv.server.domain.brand.mapper.RecentSelectBrandMapper;
 import com.sluv.server.domain.brand.repository.BrandRepository;
 import com.sluv.server.domain.brand.repository.NewBrandRepository;
 import com.sluv.server.domain.brand.repository.RecentSelectBrandRepository;
@@ -21,6 +22,8 @@ public class RecentSelectBrandService {
     private final NewBrandRepository newBrandRepository;
     private final RecentSelectBrandRepository recentSelectBrandRepository;
 
+    private final RecentSelectBrandMapper recentSelectBrandMapper;
+
     public void postRecentSelectBrand(User user, RecentSelectBrandReqDto dto){
         Brand brand = dto.getBrandId() != null
                 ? brandRepository.findById(dto.getBrandId())
@@ -33,11 +36,7 @@ public class RecentSelectBrandService {
                 : null;
 
         recentSelectBrandRepository.save(
-                RecentSelectBrand.builder()
-                        .brand(brand)
-                        .newBrand(newBrand)
-                        .user(user)
-                        .build()
+                recentSelectBrandMapper.toEntity(brand, newBrand, user)
         );
     }
 

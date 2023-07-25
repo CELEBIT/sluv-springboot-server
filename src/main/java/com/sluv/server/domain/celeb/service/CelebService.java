@@ -16,6 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -136,7 +137,7 @@ public class CelebService {
     public List<CelebSearchByCategoryResDto> getCelebByCategory() {
         // Parent Id가 null인 CelebCategory를 모두 조회
         List<CelebCategory> categoryList = celebCategoryRepository.findAllByParentIdIsNull();
-
+        categoryList.sort(Comparator.comparing(CelebCategory::getName));
         return categoryList.stream()
                             .parallel()
                             // 카테고리별 CelebSearchByCategoryResDto 생성

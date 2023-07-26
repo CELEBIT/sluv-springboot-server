@@ -18,7 +18,8 @@ spring:
         android: 924373234165-adalqufkonkljl23qk6vv4g3bnc9imfr.apps.googleusercontent.com
         apple: 924373234165-hfd08tk9pt36g4e9r54hqhpe9ircrv4q.apps.googleusercontent.com
 
-
+  elasticsearch:
+    uri: http://awseb-awseb-clwnl48v6djo-1067213661.ap-northeast-2.elb.amazonaws.com
 
 
 jasypt:
@@ -44,8 +45,14 @@ apple:
 
 aws:
   s3:
-    accessKey: AKIA5R23H6YS2FVCHYQK
-    secretKey: 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
+    accessKey: AKIA5R23H6YS5ZD6OOCH
+    secretKey: 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
     region: ap-northeast-2
-    bucketName: sluv-dev-img-bucket
-    baseUrl: https://sluv-dev-img-bucket.s3.ap-northeast-2.amazonaws.com
+    bucketName: elasticbeanstalk-ap-northeast-2-931662394917
+    baseUrl: asset
+
+fcm:
+  key:
+    path: /firebase/celebit-sluv-firebase-adminsdk-4ycho-d951e67a8e.json
+    api: https://fcm.googleapis.com/v1/projects/celebit-sluv/messages:send
+    scope: https://www.googleapis.com/auth/cloud-platform

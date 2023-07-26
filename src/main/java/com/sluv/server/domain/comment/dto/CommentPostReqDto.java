@@ -16,7 +16,7 @@ public class CommentPostReqDto {
     @Schema(description = "Comment 내용")
     private String content;
     @Schema(description = "Comment Img List")
-    private List<String> imgList;
+    private List<CommentImgDto> imgList;
     @Schema(description = "Comment Item List")
-    private List<Long> itemList;
+    private List<CommentItemReqDto> itemList;
 }

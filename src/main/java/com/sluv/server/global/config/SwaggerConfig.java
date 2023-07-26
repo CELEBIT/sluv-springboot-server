@@ -19,21 +19,7 @@ public class SwaggerConfig {
         Info info = new Info()
                 .version("v1.0.0")
                 .title("Sluv")
-                .description("Sluv Swagger" +
-                        "\n- === Status Code ===" +
-                        "\n- == 1000 == -> 성공" +
-                        "\n- 1000: 요청성공" +
-                        "\n- == 2000 == -> User 관련" +
-                        "\n- 2000: 존재하지 않는 유저" +
-                        "\n- == 3000 == -> Validation 관련" +
-                        "\n- 3000: InValidate" +
-                        "\n- == 4000 == -> Token 관련" +
-                        "\n- 4000: 토큰 없음" +
-                        "\n- 4001: 유효하지 않는 토큰" +
-                        "\n- 4002: 만료된 토큰" +
-                        "\n- == 5000 == -> 서버 내부 에러" +
-                        "\n- 5000: 서버 내부 에러" +
-                        "\n- 5001: DB 에러");
+                .description("Sluv Swagger");
 
 
         // SecuritySecheme명
@@ -74,15 +60,7 @@ public class SwaggerConfig {
     public GroupedOpenApi authGroup(){
         return GroupedOpenApi.builder()
                 .group("Auth")
-                .pathsToMatch("/auth/**")
-                .build();
-    }
-
-    @Bean
-    public GroupedOpenApi userGroup(){
-        return GroupedOpenApi.builder()
-                .group("User")
-                .pathsToMatch("/user/**")
+                .pathsToMatch("/app/auth/**")
                 .build();
     }
 
@@ -95,10 +73,66 @@ public class SwaggerConfig {
     }
 
     @Bean
+    public GroupedOpenApi celebGroup(){
+        return GroupedOpenApi.builder()
+                .group("Celeb")
+                .pathsToMatch("/app/celeb/**")
+                .build();
+    }
+
+    @Bean
+    public GroupedOpenApi closetGroup(){
+        return GroupedOpenApi.builder()
+                .group("Closet")
+                .pathsToMatch("/app/closet/**")
+                .build();
+    }
+
+    @Bean
+    public GroupedOpenApi commentGroup(){
+        return GroupedOpenApi.builder()
+                .group("Comment")
+                .pathsToMatch("/app/comment/**")
+                .build();
+    }
+
+    @Bean
     public GroupedOpenApi itemGroup(){
         return GroupedOpenApi.builder()
                 .group("Item")
                 .pathsToMatch("/app/item/**")
+                .build();
+    }
+
+    @Bean
+    public GroupedOpenApi questionGroup(){
+        return GroupedOpenApi.builder()
+                .group("Question")
+                .pathsToMatch("/app/question/**")
+                .build();
+    }
+
+    @Bean
+    public GroupedOpenApi searchGroup(){
+        return GroupedOpenApi.builder()
+                .group("Search")
+                .pathsToMatch("/app/search/**")
+                .build();
+    }
+
+    @Bean
+    public GroupedOpenApi userGroup(){
+        return GroupedOpenApi.builder()
+                .group("User")
+                .pathsToMatch("/app/user/**")
+                .build();
+    }
+
+    @Bean
+    public GroupedOpenApi s3Group(){
+        return GroupedOpenApi.builder()
+                .group("S3")
+                .pathsToMatch("/app/s3/**")
                 .build();
     }
 

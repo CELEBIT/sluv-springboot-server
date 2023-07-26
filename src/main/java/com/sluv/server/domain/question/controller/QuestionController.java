@@ -1,9 +1,11 @@
 package com.sluv.server.domain.question.controller;
 
 import com.sluv.server.domain.question.dto.*;
+import com.sluv.server.domain.question.exception.QuestionTypeNotFoundException;
 import com.sluv.server.domain.question.service.QuestionService;
 import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.global.common.response.ErrorResponse;
+import com.sluv.server.global.common.response.PaginationResDto;
 import com.sluv.server.global.common.response.SuccessDataResponse;
 import com.sluv.server.global.common.response.SuccessResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -11,10 +13,14 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -186,4 +192,76 @@ public class QuestionController {
                         .build()
         );
     }
+    @Operation(
+            summary = "*QuestionBuy 게시글 투표",
+            description = """
+                    QuestionBuy 게시글 투표 \n
+                    최초 호출 -> QuestionVote 등록 \n
+                    재호출 -> QuestionVote 삭제 \n
+                    좋아요 시스템과 동일.
+                    """
+    )
+    @PostMapping("/{questionId}/vote")
+    public ResponseEntity<SuccessResponse> postQuestionVote(@AuthenticationPrincipal User user,
+                                                            @PathVariable("questionId") Long questionId,
+                                                            @RequestBody QuestionVoteReqDto dto){
+
+        questionService.postQuestionVote(user, questionId, dto);
+
+        return ResponseEntity.ok().body(
+                new SuccessResponse()
+        );
+    }
+
+    @Operation(
+            summary = "*Question 기다리고 있어요",
+            description = """
+                    유저를 기다리고 있는 Question 조회\n
+                    qType에 따라 Question 타입 변경\n
+                    questionId는 현재 Question은 제외하고 조회하기 위함.
+                    """
+    )
+    @GetMapping("/wait")
+    public ResponseEntity<SuccessDataResponse<List<QuestionSimpleResDto>>> getWaitQuestionBuy(@AuthenticationPrincipal User user,
+                                                                                              @RequestParam("questionId") Long questionId,
+                                                                                              @RequestParam("qType") String qType){
+        List<QuestionSimpleResDto> result = switch (qType) {
+            case "Buy" -> questionService.getWaitQuestionBuy(user, questionId);
+            case "Find" -> questionService.getWaitQuestionFind(user, questionId);
+            case "How" -> questionService.getWaitQuestionHowabout(user, questionId);
+            case "Recommend" -> questionService.getWaitQuestionRecommend(user, questionId);
+            default -> throw new QuestionTypeNotFoundException();
+        };
+
+        return ResponseEntity.ok().body(
+                SuccessDataResponse.<List<QuestionSimpleResDto>>builder()
+                        .result(result)
+                        .build()
+        );
+    }
+    @Operation(
+            summary = "Question 커뮤니티 리스트 조회",
+            description = """
+                    Question 커뮤니티 리스트 조회\n
+                    Pagination 적용
+                    """
+    )
+    @GetMapping("/list")
+    public ResponseEntity<SuccessDataResponse<PaginationResDto<QuestionSimpleResDto>>> getQuestionList(@Nullable @RequestParam("qType") String qType, Pageable pageable){
+        PaginationResDto<QuestionSimpleResDto> result = switch (qType) {
+            case "Total" -> questionService.getTotalQuestionList(pageable);
+            case "Buy" -> questionService.getQuestionBuyList(pageable);
+            case "Find" -> questionService.getQuestionFindList(pageable);
+            case "How" -> questionService.getQuestionHowaboutList(pageable);
+            case "Recommend" -> questionService.getQuestionRecommendList(pageable);
+            default -> throw new QuestionTypeNotFoundException();
+        };
+
+        return ResponseEntity.ok().body(
+                SuccessDataResponse.<PaginationResDto<QuestionSimpleResDto>>builder()
+                        .result(result)
+                        .build()
+        );
+    }
+
 }

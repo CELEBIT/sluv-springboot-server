@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ItemSameResDto {
+public class ItemSimpleResDto {
     /**
      * Item 세부 검색 시 하단에 등장하는
      * 연관 Item 정보를 전달

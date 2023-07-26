@@ -4,7 +4,6 @@ import com.sluv.server.domain.item.entity.Item;
 import com.sluv.server.global.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -29,10 +28,13 @@ public class CommentItem extends BaseEntity {
     @NotNull
     private Item item;
 
+    private Integer sortOrder;
+
     @Builder
-    public CommentItem(Long id, Comment comment, Item item) {
+    public CommentItem(Long id, Comment comment, Item item, Integer sortOrder) {
         this.id = id;
         this.comment = comment;
         this.item = item;
+        this.sortOrder = sortOrder;
     }
 }

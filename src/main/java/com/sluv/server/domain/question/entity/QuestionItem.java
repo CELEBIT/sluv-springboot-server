@@ -32,19 +32,19 @@ public class QuestionItem extends BaseEntity {
     @Size(max = 100)
     private String description;
 
-    private Long vote;
-
     @NotNull
     @ColumnDefault("0")
     private Boolean representFlag;
 
+    private Integer sortOrder;
+
     @Builder
-    public QuestionItem(Long id, Question question, Item item, String description, Long vote, Boolean representFlag) {
+    public QuestionItem(Long id, Question question, Item item, String description, Boolean representFlag, Integer sortOrder) {
         this.id = id;
         this.question = question;
         this.item = item;
         this.description = description;
-        this.vote = vote;
         this.representFlag = representFlag;
+        this.sortOrder = sortOrder;
     }
 }

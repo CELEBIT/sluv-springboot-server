@@ -35,4 +35,8 @@ public class ItemScrap extends BaseEntity {
         this.item = item;
         this.closet = closet;
     }
+
+    public void changeCloset(Closet closet){
+        this.closet = closet;
+    }
 }

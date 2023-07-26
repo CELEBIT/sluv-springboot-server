@@ -28,7 +28,7 @@ import com.sluv.server.domain.item.repository.hashtag.HashtagRepository;
 import com.sluv.server.domain.item.repository.hashtag.TempItemHashtagRepository;
 import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.global.common.enums.ItemImgOrLinkStatus;
-import com.sluv.server.global.common.response.PaginationResDto;
+import com.sluv.server.global.common.response.PaginationCountResDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -55,6 +55,7 @@ public class TempItemService {
     private final NewCelebRepository newCelebRepository;
 
 
+    @Transactional
     public Long postTempItem(User user, TempItemPostReqDto reqDto) {
         Celeb celeb = reqDto.getCelebId() != null ? celebRepository.findById(reqDto.getCelebId())
                 .orElseThrow(CelebNotFoundException::new)
@@ -102,6 +103,7 @@ public class TempItemService {
                                         .tempItemImgUrl(tempItemImg.getImgUrl())
                                         .representFlag(tempItemImg.getRepresentFlag())
                                         .itemImgOrLinkStatus(ItemImgOrLinkStatus.ACTIVE)
+                                        .sortOrder(tempItemImg.getSortOrder())
                                         .build()
                             ).forEach(tempItemImgRepository::save);
 
@@ -140,7 +142,7 @@ public class TempItemService {
         return saveTempItem.getId();
     }
 
-    public TempItemPageDto<TempItemResDto> getTempItemList(User user, Pageable pageable){
+    public PaginationCountResDto<TempItemResDto> getTempItemList(User user, Pageable pageable){
 
         Page<TempItem> contentPage = tempItemRepository.getTempItemList(user, pageable);
 
@@ -150,6 +152,7 @@ public class TempItemService {
                             .stream().map(tempItemImg -> ItemImgResDto.builder()
                                     .imgUrl(tempItemImg.getTempItemImgUrl())
                                     .representFlag(tempItemImg.getRepresentFlag())
+                                    .sortOrder(tempItemImg.getSortOrder())
                                     .build()
                             ).collect(Collectors.toList());
 
@@ -232,7 +235,7 @@ public class TempItemService {
                 }
         ).toList();
 
-        return new TempItemPageDto<TempItemResDto>(
+        return new PaginationCountResDto<>(
                 contentPage.hasNext(),
                 contentPage.getNumber(),
                 dtoList,

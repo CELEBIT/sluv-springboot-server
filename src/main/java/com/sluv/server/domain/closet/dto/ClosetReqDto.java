@@ -11,7 +11,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ClosetReqDto {
+public class
+ClosetReqDto {
     @Schema(description = "Closet 이름")
     private String name;
     @Schema(description = "Closet 커버 사진 URL")

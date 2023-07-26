@@ -67,13 +67,13 @@ public class ItemDetailResDto {
     private String infoSource;
 
     @Schema(description = "같은 셀럽 아이템 리스트")
-    private List<ItemSameResDto> sameCelebItemList;
+    private List<ItemSimpleResDto> sameCelebItemList;
 
     @Schema(description = "같은 브랜드 아이템 리스트")
-    private List<ItemSameResDto> sameBrandItemList;
+    private List<ItemSimpleResDto> sameBrandItemList;
 
     @Schema(description = "다른 스러버들이 함께 보관한 아이템 리스트")
-    private List<ItemSameResDto> otherSluverItemList;
+    private List<ItemSimpleResDto> otherSluverItemList;
 
     @Schema(description = "색")
     private String color;

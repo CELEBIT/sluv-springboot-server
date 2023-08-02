@@ -158,7 +158,7 @@ public class CelebService {
 
     }
 
-    public List<InterestedCelebParentResDto> searchInterestedCelebByName(String celebName) {
+    public List<CelebSearchByCategoryResDto> searchInterestedCelebByName(String celebName) {
         // 1. Parent Celeb과 일치
         List<Celeb> celebByParent = celebRepository.searchInterestedCelebByParent(celebName);
 
@@ -175,7 +175,7 @@ public class CelebService {
         return celebCategoryList.stream()
                 // 카테고리별 분류
                 .map(category ->{
-                             List<InterestedCelebChildResDto> eachCategoryCeleb =
+                             List<CelebChipResDto> eachCategoryCeleb =
                                      // 카테고리에 맞는 셀럽 filtering
                                      celebList.stream().filter(celeb -> {
                                         // ParentCategory가 있다면 ParentCategory. 없다면, CelebCategory.
@@ -185,19 +185,19 @@ public class CelebService {
 
                                         return tempCategory == category;
                                         // Category에 맞게 분류된 celeb을 Dto로 변경
-                                    }).map(celeb -> InterestedCelebChildResDto.builder()
-                                                         .id(celeb.getId())
-                                                         .celebNameKr(celeb.getCelebNameKr())
+                                    }).map(celeb -> CelebChipResDto.builder()
+                                                        .celebId(celeb.getId())
+                                                         .celebName(celeb.getCelebNameKr())
                                                          .build()
                             )
                              // 가나다 순으로 정렬
-                            .sorted(Comparator.comparing(InterestedCelebChildResDto::getCelebNameKr))
+                            .sorted(Comparator.comparing(CelebChipResDto::getCelebName))
                             .toList();
 
-                 return InterestedCelebParentResDto.builder()
-                         .id(category.getId())
-                         .celebNameKr(category.getName())
-                         .subCelebList(eachCategoryCeleb)
+                 return CelebSearchByCategoryResDto.builder()
+                         .categoryId(category.getId())
+                         .categoryName(category.getName())
+                         .celebList(eachCategoryCeleb)
                          .build();
                 })
                 .toList();

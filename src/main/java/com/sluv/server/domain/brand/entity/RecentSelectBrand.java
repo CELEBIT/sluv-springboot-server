@@ -1,9 +1,12 @@
 package com.sluv.server.domain.brand.entity;
 
+import com.sluv.server.domain.brand.dto.NewBrandPostReqDto;
+import com.sluv.server.domain.brand.enums.NewBrandStatus;
 import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.global.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,6 +14,8 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Table(name = "recent_select_brand")
 public class RecentSelectBrand extends BaseEntity {
 
@@ -31,12 +36,11 @@ public class RecentSelectBrand extends BaseEntity {
     @NotNull
     private User user;
 
-
-    @Builder
-    public RecentSelectBrand(Long id, Brand brand, NewBrand newBrand, User user) {
-        this.id = id;
-        this.brand = brand;
-        this.newBrand = newBrand;
-        this.user = user;
+    public static RecentSelectBrand toEntity(Brand brand, NewBrand newBrand, User user){
+        return RecentSelectBrand.builder()
+                .brand(brand)
+                .newBrand(newBrand)
+                .user(user)
+                .build();
     }
 }

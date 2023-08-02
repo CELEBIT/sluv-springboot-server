@@ -171,7 +171,7 @@ public class UserService {
     public UserMypageResDto getUserMypage(User user, Long userId) {
         UserMypageResDto.UserMypageResDtoBuilder result = UserMypageResDto.builder();
         User targetUser;
-        if(user.getId().equals(userId)){ // 특정 유저와 현재 유저가 같을 때
+        if(userId == null){ // 현재 유저일때
             targetUser = user;
 
             Long questionNum = questionRepository.countByUserId(targetUser.getId());
@@ -186,7 +186,7 @@ public class UserService {
                 .imgList(imgList)
                 .communityCount(questionNum + commentNum);
 
-        }else{ // 특정 유저와 현재 유저가 다를 때
+        }else{ // 특정 유저일때
             targetUser = userRepository.findById(userId)
                                             .orElseThrow(UserNotFoundException::new);
         }
@@ -214,6 +214,7 @@ public class UserService {
                             .profileImgUrl(targetUser.getProfileImgUrl())
                             .build()
                 )
+                .followStatus(followRepository.getFollowStatus(user, targetUser))
                 .followerCount(followRepository.getFollowerCount(targetUser))
                 .followingCount(followRepository.getFollowingCount(targetUser))
                 .interestedCelebList(interestedCelebList)

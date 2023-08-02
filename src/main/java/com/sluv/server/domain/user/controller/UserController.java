@@ -127,15 +127,32 @@ public class UserController {
             description = """
                     특정 유저의 마이페이지 조회
                     User Id Token 필요
-                     -> 특정 유저가 현재 유저와 일치하는지, 혹은 팔로우 여부를 체크
+                     -> 현재 유저와 특정 유저 간의 팔로우 여부를 체크
                     """
     )
     @GetMapping("/{userId}/mypage")
-    public ResponseEntity<SuccessDataResponse<UserMypageResDto>> getUserMypage(@AuthenticationPrincipal User user, @PathVariable("userId") Long userId){
+    public ResponseEntity<SuccessDataResponse<UserMypageResDto>> getTargetUserMypage(@AuthenticationPrincipal User user, @PathVariable("userId") Long userId){
 
         return ResponseEntity.ok().body(
                 SuccessDataResponse.<UserMypageResDto>builder()
                         .result(userService.getUserMypage(user, userId))
+                        .build()
+        );
+    }
+    @Operation(
+            summary = "현재 유저의 마이페이지 조회",
+            description = """
+                    현재 유저의 마이페이지 조회
+                    User Id Token 필요
+                     -> 현재 유저와 일치하는지, 혹은 팔로우 여부를 체크
+                    """
+    )
+    @GetMapping("/mypage")
+    public ResponseEntity<SuccessDataResponse<UserMypageResDto>> getUserMypage(@AuthenticationPrincipal User user){
+
+        return ResponseEntity.ok().body(
+                SuccessDataResponse.<UserMypageResDto>builder()
+                        .result(userService.getUserMypage(user, null))
                         .build()
         );
     }

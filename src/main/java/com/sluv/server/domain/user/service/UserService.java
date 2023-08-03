@@ -93,18 +93,11 @@ public class UserService {
                     List<InterestedCelebChildResDto> subDtoList = null;
                     if(!celeb.getSubCelebList().isEmpty()){
                          subDtoList = celeb.getSubCelebList().stream()
-                                .map(subCeleb -> InterestedCelebChildResDto.builder()
-                                .id(subCeleb.getId())
-                                .celebNameKr(subCeleb.getCelebNameKr())
-                                .build()
-                                ).toList();
+                                .map(InterestedCelebChildResDto::of)
+                                .toList();
                     }
 
-                    return InterestedCelebParentResDto.builder()
-                            .id(celeb.getId())
-                            .celebNameKr(celeb.getCelebNameKr())
-                            .subCelebList(subDtoList)
-                            .build();
+                    return InterestedCelebParentResDto.of(celeb, subDtoList);
 
                 }).toList();
 
@@ -194,16 +187,8 @@ public class UserService {
 
 
         List<InterestedCelebResDto> interestedCelebList = interestedCelebRepository.findAllByUserId(targetUser.getId())
-                .stream().map(interestedCeleb -> InterestedCelebResDto.builder()
-                        .id(interestedCeleb.getCeleb().getId())
-                        .celebNameKr(interestedCeleb.getCeleb().getCelebNameKr())
-                        .celebCategory(
-                                interestedCeleb.getCeleb().getCelebCategory().getParent() != null
-                                ? interestedCeleb.getCeleb().getCelebCategory().getParent().getName()
-                                : interestedCeleb.getCeleb().getCelebCategory().getName()
-                        )
-                        .build()
-                ).toList();
+                .stream().map(InterestedCelebResDto::of)
+                .toList();
 
 
         return result

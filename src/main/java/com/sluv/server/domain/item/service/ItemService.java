@@ -216,28 +216,8 @@ public class ItemService {
                                                         ).toList();
 
         // 3. Item Celeb
-        CelebSearchResDto celeb = item.getCeleb() != null ?
-
-                CelebSearchResDto.builder()
-                                .id(item.getCeleb().getId())
-                                .category(null)
-                                .celebParentNameKr(
-                                        item.getCeleb().getParent() != null
-                                        ? item.getCeleb().getParent().getCelebNameKr()
-                                        :null
-                                )
-                                .celebChildNameKr(item.getCeleb().getCelebNameKr())
-                                .celebTotalNameKr(
-                                        item.getCeleb().getParent() != null
-                                        ? item.getCeleb().getParent().getCelebNameKr() + " " + item.getCeleb().getCelebNameKr()
-                                        : item.getCeleb().getCelebNameKr()
-                                )
-                                .celebTotalNameEn(
-                                        item.getCeleb().getParent() != null
-                                        ? item.getCeleb().getParent().getCelebNameEn() + " " + item.getCeleb().getCelebNameEn()
-                                        : item.getCeleb().getCelebNameEn()
-                                )
-                                .build()
+        CelebSearchResDto celeb = item.getCeleb() != null
+                ? CelebSearchResDto.of(item.getCeleb())
                 : null;
 
         String newCeleb = item.getNewCeleb() != null ?

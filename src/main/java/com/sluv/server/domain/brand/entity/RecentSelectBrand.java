@@ -1,7 +1,5 @@
 package com.sluv.server.domain.brand.entity;
 
-import com.sluv.server.domain.brand.dto.NewBrandPostReqDto;
-import com.sluv.server.domain.brand.enums.NewBrandStatus;
 import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.global.common.entity.BaseEntity;
 import jakarta.persistence.*;

@@ -167,15 +167,7 @@ public class TempItemService {
                             ).collect(Collectors.toList());
 
                     CelebDto celebDto = tempItem.getCeleb() != null ?
-                            CelebDto.builder()
-                                    .id(tempItem.getCeleb().getId())
-                                    .celebNameKr(tempItem.getCeleb().getCelebNameKr())
-                                    .celebNameEn(tempItem.getCeleb().getCelebNameEn())
-                                    .categoryChild(tempItem.getCeleb().getCelebCategory().getName())
-                                    .categoryParent(tempItem.getCeleb().getCelebCategory().getParent().getName())
-                                    .parentCelebNameKr(tempItem.getCeleb().getParent() != null ? tempItem.getCeleb().getParent().getCelebNameKr() : null)
-                                    .parentCelebNameEn(tempItem.getCeleb().getParent() != null ? tempItem.getCeleb().getParent().getCelebNameEn() : null)
-                                    .build()
+                            CelebDto.of(tempItem.getCeleb())
                             : null;
 
                     ItemCategoryDto itemCategoryDto = tempItem.getCategory() != null ?
@@ -215,10 +207,7 @@ public class TempItemService {
                             .infoSource(tempItem.getInfoSource())
                             .newCeleb(
                                     tempItem.getNewCeleb() != null
-                                    ? NewCelebPostResDto.builder()
-                                            .newCelebId(tempItem.getNewCeleb().getId())
-                                            .newCelebName(tempItem.getNewCeleb().getCelebName())
-                                            .build()
+                                    ? NewCelebPostResDto.of(tempItem.getNewCeleb())
                                     :null
                             )
                             .newBrand(

@@ -1,6 +1,5 @@
 package com.sluv.server.domain.celeb.repository;
 
-import com.sluv.server.domain.celeb.dto.InterestedCelebChildResDto;
 import com.sluv.server.domain.celeb.entity.InterestedCeleb;
 import org.springframework.data.jpa.repository.JpaRepository;
 

@@ -56,16 +56,9 @@ public class ClosetService {
     @Transactional
     public void postCloset(User user, ClosetReqDto dto) {
 
-        Closet newCloset = Closet.builder()
-                .user(user)
-                .name(dto.getName())
-                .coverImgUrl(dto.getCoverImgUrl())
-                .color(dto.getColor())
-                .basicFlag(false)
-                .closetStatus(dto.getClosetStatus())
-                .build();
-
-        closetRepository.save(newCloset);
+        closetRepository.save(
+                Closet.toEntity(user, dto)
+        );
     }
 
     @Transactional
@@ -196,7 +189,18 @@ public class ClosetService {
 
         List<ItemSimpleResDto> content = getItemContent(itemPage);
 
-        return new ClosetDetailResDto<>(itemPage.hasNext(), itemPage.getNumber(), content, closet.getCoverImgUrl(), closet.getName(), closet.getClosetStatus(), itemPage.getTotalElements());
+        return ClosetDetailResDto.<ItemSimpleResDto>builder()
+                .hasNext(itemPage.hasNext())
+                .page(itemPage.getNumber())
+                .content(content)
+                .coverImgUrl(closet.getCoverImgUrl())
+                .title(closet.getName())
+                .closetStatus(closet.getClosetStatus())
+                .itemNum(itemPage.getTotalElements())
+                .build();
+
+
+//        return new ClosetDetailResDto<>(itemPage.hasNext(), itemPage.getNumber(), content, closet.getCoverImgUrl(), closet.getName(), closet.getClosetStatus(), itemPage.getTotalElements());
 
     }
 
@@ -227,13 +231,11 @@ public class ClosetService {
         List<Closet> closetList = closetRepository.findAllByUserId(user.getId());
 
 
-        return closetList.stream().map(closet -> ClosetResDto.builder()
-                                            .name(closet.getName())
-                                            .coverImgUrl(closet.getCoverImgUrl())
-                                            .closetStatus(closet.getClosetStatus())
-                                            .color(closet.getColor())
-                                            .itemNum(itemScrapRepository.countByClosetId(closet.getId()))
-                                            .build()
+        return closetList
+                .stream().map(closet -> ClosetResDto.of(
+                                                    closet,
+                                                    itemScrapRepository.countByClosetId(closet.getId())
+                                                    )
                 ).toList();
     }
 }

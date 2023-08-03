@@ -253,13 +253,10 @@ public class UserService {
         }
 
         List<ClosetResDto> content = closetPage.stream().map(closet ->
-                ClosetResDto.builder()
-                        .name(closet.getName())
-                        .coverImgUrl(closet.getCoverImgUrl())
-                        .closetStatus(closet.getClosetStatus())
-                        .color(closet.getColor())
-                        .itemNum(itemScrapRepository.countByClosetId(closet.getId()))
-                        .build()
+                ClosetResDto.of(
+                        closet,
+                        itemScrapRepository.countByClosetId(closet.getId())
+                        )
         ).toList();
 
         return PaginationResDto.<ClosetResDto>builder()

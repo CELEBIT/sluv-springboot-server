@@ -1,5 +1,6 @@
 package com.sluv.server.domain.closet.dto;
 
+import com.sluv.server.domain.closet.entity.Closet;
 import com.sluv.server.domain.closet.enums.ClosetStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
@@ -22,5 +23,15 @@ public class ClosetResDto {
     private String color;
     @Schema(description = "해당 Closet의 Item 개수")
     private Long itemNum;
+
+    public static ClosetResDto of(Closet closet, Long itemNum){
+        return ClosetResDto.builder()
+                .name(closet.getName())
+                .coverImgUrl(closet.getCoverImgUrl())
+                .closetStatus(closet.getClosetStatus())
+                .color(closet.getColor())
+                .itemNum(itemNum)
+                .build();
+    }
 
 }

@@ -17,8 +17,6 @@ import java.util.List;
 @Entity
 @Getter
 @NoArgsConstructor
-@AllArgsConstructor
-@Builder
 @JsonPropertyOrder({"id", "parent", "celebCategory", "celebNameKr", "celebNameEn", "celebStatus", "created_at", "updated_at"})
 @Table(name = "celeb")
 public class Celeb extends BaseEntity {
@@ -51,4 +49,13 @@ public class Celeb extends BaseEntity {
     @OneToMany(mappedBy = "parent")
     private List<Celeb> subCelebList = new ArrayList<>();
 
+    @Builder
+    public Celeb(Long id, Celeb parent, CelebCategory celebCategory, String celebNameKr, String celebNameEn, CelebStatus celebStatus) {
+        this.id = id;
+        this.parent = parent;
+        this.celebCategory = celebCategory;
+        this.celebNameKr = celebNameKr;
+        this.celebNameEn = celebNameEn;
+        this.celebStatus = celebStatus;
+    }
 }

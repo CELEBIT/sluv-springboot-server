@@ -58,38 +58,10 @@ public class CelebService {
     public List<RecentSelectCelebResDto> getUserRecentSelectCeleb(User user){
         List<RecentSelectCeleb> recentSelectCelebList = recentSearchCelebRepository.getRecentSelectCelebTop20(user);
 
-        return recentSelectCelebList.stream().map(recentSelectCeleb -> {
-            Long celebChildId;
-            Long celebParentId;
-            String celebChildName;
-            String celebParentName;
-
-            String flag = recentSelectCeleb.getCeleb() != null ? "Y" :"N";
-            if(flag.equals("Y")){
-                celebChildId = recentSelectCeleb.getCeleb().getId();
-                celebParentId = recentSelectCeleb.getCeleb().getParent() != null
-                        ? recentSelectCeleb.getCeleb().getParent().getId()
-                        : null;
-                celebChildName = recentSelectCeleb.getCeleb().getCelebNameKr();
-                celebParentName = recentSelectCeleb.getCeleb().getParent() != null
-                        ? recentSelectCeleb.getCeleb().getParent().getCelebNameKr()
-                        : null;
-            }else{
-                celebChildId = recentSelectCeleb.getNewCeleb().getId();
-                celebParentId = null;
-                celebChildName = recentSelectCeleb.getNewCeleb().getCelebName();
-                celebParentName = null;
-            }
-            return RecentSelectCelebResDto.builder()
-                    .id(celebChildId)
-                    .parentId(celebParentId)
-                    .childCelebName(celebChildName)
-                    .parentCelebName(celebParentName)
-                    .flag(flag)
-                    .build();
-        }).toList();
-
-
+        return recentSelectCelebList
+                .stream()
+                .map(RecentSelectCelebResDto::of)
+                .toList();
     }
 
     public List<CelebSearchResDto> getTop10Celeb(){
@@ -101,37 +73,8 @@ public class CelebService {
      */
     private List<CelebSearchResDto> changeCelebSearchResDto(List<Celeb> celebList){
         return celebList.stream()
-                .map(celeb ->
-                         CelebSearchResDto.builder()
-                                .id(celeb.getId())
-                                .parentId(
-                                        celeb.getParent() != null
-                                        ? celeb.getParent().getId()
-                                        : null
-                                )
-                                .category(celeb.getCelebCategory().getParent() != null
-                                        ? celeb.getCelebCategory().getParent().getName()
-                                        : celeb.getCelebCategory().getName()
-                                        )
-                                .celebParentNameKr(
-                                        celeb.getParent() != null
-                                        ? celeb.getParent().getCelebNameKr()
-                                        :null
-                                        )
-                                .celebChildNameKr(celeb.getCelebNameKr())
-                                .celebTotalNameKr(
-                                        celeb.getParent() != null
-                                        ? celeb.getParent().getCelebNameKr() + " " + celeb.getCelebNameKr()
-                                        : celeb.getCelebNameKr()
-                                        )
-                                .celebTotalNameEn(
-                                        celeb.getParent() != null
-                                                ? celeb.getParent().getCelebNameEn() + " " + celeb.getCelebNameEn()
-                                                : celeb.getCelebNameEn()
-                                )
-                                .build()
-
-                ).toList();
+                .map(CelebSearchResDto::of)
+                .toList();
     }
 
     public List<CelebSearchByCategoryResDto> getCelebByCategory() {
@@ -141,19 +84,13 @@ public class CelebService {
         return categoryList.stream()
                             .parallel()
                             // 카테고리별 CelebSearchByCategoryResDto 생성
-                            .map(category ->  CelebSearchByCategoryResDto.builder()
-                                                                        .categoryId(category.getId())
-                                                                        .categoryName(category.getName())
-                                                                        .celebList(
-                                                                                celebRepository.getCelebByCategory(category)
-                                                                                        .stream()
-                                                                                        // 셀럽별 CelebChipResDto 생성
-                                                                                        .map(celeb -> CelebChipResDto.builder()
-                                                                                                .celebId(celeb.getId())
-                                                                                                .celebName(celeb.getCelebNameKr())
-                                                                                                .build()
-                                                                                        ).toList()
-                                                                        ).build()
+                            .map(category ->  CelebSearchByCategoryResDto.of(category,
+                                            celebRepository.getCelebByCategory(category)
+                                            .stream()
+                                            // 셀럽별 CelebChipResDto 생성
+                                            .map(CelebChipResDto::of)
+                                            .toList()
+                                            )
                             ).toList();
 
     }
@@ -185,20 +122,12 @@ public class CelebService {
 
                                         return tempCategory == category;
                                         // Category에 맞게 분류된 celeb을 Dto로 변경
-                                    }).map(celeb -> CelebChipResDto.builder()
-                                                        .celebId(celeb.getId())
-                                                         .celebName(celeb.getCelebNameKr())
-                                                         .build()
-                            )
+                                    }).map(CelebChipResDto::of)
                              // 가나다 순으로 정렬
                             .sorted(Comparator.comparing(CelebChipResDto::getCelebName))
                             .toList();
 
-                 return CelebSearchByCategoryResDto.builder()
-                         .categoryId(category.getId())
-                         .categoryName(category.getName())
-                         .celebList(eachCategoryCeleb)
-                         .build();
+                 return CelebSearchByCategoryResDto.of(category, eachCategoryCeleb);
                 })
                 .toList();
     }

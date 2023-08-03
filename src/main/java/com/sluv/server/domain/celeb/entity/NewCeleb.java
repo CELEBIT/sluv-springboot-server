@@ -1,22 +1,21 @@
 package com.sluv.server.domain.celeb.entity;
 
-import com.sluv.server.domain.brand.enums.NewBrandStatus;
+import com.sluv.server.domain.celeb.dto.NewCelebPostReqDto;
 import com.sluv.server.domain.celeb.enums.NewCelebStatus;
-import com.sluv.server.domain.comment.entity.CommentReport;
-import com.sluv.server.domain.item.entity.Item;
 import com.sluv.server.global.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Entity
 @Getter
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Table(name = "new_celeb")
 public class NewCeleb extends BaseEntity {
 
@@ -32,10 +31,10 @@ public class NewCeleb extends BaseEntity {
     @Column(length = 45, columnDefinition = "varchar(45) default 'ACTIVE'")
     private NewCelebStatus newCelebStatus;
 
-    @Builder
-    public NewCeleb(Long id, String celebName, NewCelebStatus newCelebStatus) {
-        this.id = id;
-        this.celebName = celebName;
-        this.newCelebStatus = newCelebStatus;
+    public static NewCeleb toEntity(NewCelebPostReqDto dto){
+        return NewCeleb.builder()
+                .celebName(dto.getNewCelebName())
+                .newCelebStatus(NewCelebStatus.ACTIVE)
+                .build();
     }
 }

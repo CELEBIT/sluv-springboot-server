@@ -5,7 +5,6 @@ import com.sluv.server.domain.brand.entity.Brand;
 import com.sluv.server.domain.brand.entity.NewBrand;
 import com.sluv.server.domain.brand.exception.BrandNotFoundException;
 import com.sluv.server.domain.brand.exception.NewBrandNotFoundException;
-import com.sluv.server.domain.brand.mapper.NewBrandMapper;
 import com.sluv.server.domain.brand.repository.BrandRepository;
 import com.sluv.server.domain.brand.repository.NewBrandRepository;
 import com.sluv.server.domain.celeb.dto.CelebDto;
@@ -54,9 +53,6 @@ public class TempItemService {
     private final BrandRepository brandRepository;
     private final NewBrandRepository newBrandRepository;
     private final NewCelebRepository newCelebRepository;
-
-
-    private final NewBrandMapper newBrandMapper;
 
 
     @Transactional
@@ -171,15 +167,7 @@ public class TempItemService {
                             ).collect(Collectors.toList());
 
                     CelebDto celebDto = tempItem.getCeleb() != null ?
-                            CelebDto.builder()
-                                    .id(tempItem.getCeleb().getId())
-                                    .celebNameKr(tempItem.getCeleb().getCelebNameKr())
-                                    .celebNameEn(tempItem.getCeleb().getCelebNameEn())
-                                    .categoryChild(tempItem.getCeleb().getCelebCategory().getName())
-                                    .categoryParent(tempItem.getCeleb().getCelebCategory().getParent().getName())
-                                    .parentCelebNameKr(tempItem.getCeleb().getParent() != null ? tempItem.getCeleb().getParent().getCelebNameKr() : null)
-                                    .parentCelebNameEn(tempItem.getCeleb().getParent() != null ? tempItem.getCeleb().getParent().getCelebNameEn() : null)
-                                    .build()
+                            CelebDto.of(tempItem.getCeleb())
                             : null;
 
                     ItemCategoryDto itemCategoryDto = tempItem.getCategory() != null ?
@@ -219,15 +207,12 @@ public class TempItemService {
                             .infoSource(tempItem.getInfoSource())
                             .newCeleb(
                                     tempItem.getNewCeleb() != null
-                                    ? NewCelebPostResDto.builder()
-                                            .newCelebId(tempItem.getNewCeleb().getId())
-                                            .newCelebName(tempItem.getNewCeleb().getCelebName())
-                                            .build()
+                                    ? NewCelebPostResDto.of(tempItem.getNewCeleb())
                                     :null
                             )
                             .newBrand(
                                     tempItem.getNewBrand() != null
-                                    ? newBrandMapper.toNewBrandPostResDto(tempItem.getNewBrand())
+                                    ? NewBrandPostResDto.of(tempItem.getNewBrand())
                                     :null
                                     )
                             .updatedAt(tempItem.getUpdatedAt())

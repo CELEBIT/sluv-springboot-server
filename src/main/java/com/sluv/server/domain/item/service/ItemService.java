@@ -5,7 +5,6 @@ import com.sluv.server.domain.brand.entity.Brand;
 import com.sluv.server.domain.brand.entity.NewBrand;
 import com.sluv.server.domain.brand.exception.BrandNotFoundException;
 import com.sluv.server.domain.brand.exception.NewBrandNotFoundException;
-import com.sluv.server.domain.brand.mapper.BrandMapper;
 import com.sluv.server.domain.brand.repository.BrandRepository;
 import com.sluv.server.domain.brand.repository.NewBrandRepository;
 import com.sluv.server.domain.celeb.dto.CelebSearchResDto;
@@ -63,8 +62,6 @@ public class ItemService {
     private final FollowRepository followRepository;
     private final ClosetRepository closetRepository;
     private final ItemScrapRepository itemScrapRepository;
-
-    private final BrandMapper brandMapper;
 
     @Transactional
     public ItemPostResDto postItem(User user, ItemPostReqDto reqDto) {
@@ -219,28 +216,8 @@ public class ItemService {
                                                         ).toList();
 
         // 3. Item Celeb
-        CelebSearchResDto celeb = item.getCeleb() != null ?
-
-                CelebSearchResDto.builder()
-                                .id(item.getCeleb().getId())
-                                .category(null)
-                                .celebParentNameKr(
-                                        item.getCeleb().getParent() != null
-                                        ? item.getCeleb().getParent().getCelebNameKr()
-                                        :null
-                                )
-                                .celebChildNameKr(item.getCeleb().getCelebNameKr())
-                                .celebTotalNameKr(
-                                        item.getCeleb().getParent() != null
-                                        ? item.getCeleb().getParent().getCelebNameKr() + " " + item.getCeleb().getCelebNameKr()
-                                        : item.getCeleb().getCelebNameKr()
-                                )
-                                .celebTotalNameEn(
-                                        item.getCeleb().getParent() != null
-                                        ? item.getCeleb().getParent().getCelebNameEn() + " " + item.getCeleb().getCelebNameEn()
-                                        : item.getCeleb().getCelebNameEn()
-                                )
-                                .build()
+        CelebSearchResDto celeb = item.getCeleb() != null
+                ? CelebSearchResDto.of(item.getCeleb())
                 : null;
 
         String newCeleb = item.getNewCeleb() != null ?
@@ -265,13 +242,7 @@ public class ItemService {
 
         // 4. Brand
         BrandSearchResDto brand = item.getBrand() != null ?
-                    brandMapper.toBrandSearchResDto(item.getBrand())
-//                    BrandSearchResDto.builder()
-//                        .id(item.getBrand().getId())
-//                        .brandKr(item.getBrand().getBrandKr())
-//                        .brandEn(item.getBrand().getBrandEn())
-//                        .brandImgUrl(item.getBrand().getBrandImgUrl())
-//                        .build()
+                    BrandSearchResDto.of(item.getBrand())
                 : null;
 
         String newBrand = item.getNewBrand() != null ?

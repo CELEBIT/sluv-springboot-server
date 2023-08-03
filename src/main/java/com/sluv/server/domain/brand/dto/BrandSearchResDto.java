@@ -1,12 +1,16 @@
 package com.sluv.server.domain.brand.dto;
 
+import com.sluv.server.domain.brand.entity.Brand;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class BrandSearchResDto{
     @Schema(description = "브랜드 Id")
     private Long id;
@@ -17,11 +21,12 @@ public class BrandSearchResDto{
     @Schema(description = "브랜드 이미지 URL")
     private String brandImgUrl;
 
-    @Builder
-    public BrandSearchResDto(Long id, String brandKr, String brandEn, String brandImgUrl) {
-        this.id = id;
-        this.brandKr = brandKr;
-        this.brandEn = brandEn;
-        this.brandImgUrl = brandImgUrl;
+    public static BrandSearchResDto of(Brand brand){
+        return BrandSearchResDto.builder()
+                .id(brand.getId())
+                .brandKr(brand.getBrandKr())
+                .brandEn(brand.getBrandEn())
+                .brandImgUrl(brand.getBrandImgUrl())
+                .build();
     }
 }

@@ -60,9 +60,6 @@ dependencies {
 	// AWS S3
 	implementation 'com.amazonaws:aws-java-sdk-s3:1.12.232'
 
-	// DtoMapper
-	implementation 'org.mapstruct:mapstruct:1.4.2.Final'
-	annotationProcessor 'org.mapstruct:mapstruct-processor:1.4.2.Final'
 }
 
 

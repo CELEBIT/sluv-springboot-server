@@ -1,11 +1,14 @@
 package com.sluv.server.domain.celeb.dto;
 
+import com.sluv.server.domain.celeb.entity.Celeb;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class CelebDto {
@@ -25,6 +28,17 @@ public class CelebDto {
     @Schema(description = "셀럽의 그룹 영어이름")
     private String parentCelebNameEn;
 
+    public static CelebDto of(Celeb celeb){
+        return CelebDto.builder()
+                .id(celeb.getId())
+                .celebNameKr(celeb.getCelebNameKr())
+                .celebNameEn(celeb.getCelebNameEn())
+                .categoryChild(celeb.getCelebCategory().getName())
+                .categoryParent(celeb.getCelebCategory().getParent().getName())
+                .parentCelebNameKr(celeb.getParent() != null ? celeb.getParent().getCelebNameKr() : null)
+                .parentCelebNameEn(celeb.getParent() != null ? celeb.getParent().getCelebNameEn() : null)
+                .build();
+    }
 
 
 }

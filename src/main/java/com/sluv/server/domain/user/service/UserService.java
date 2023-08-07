@@ -495,7 +495,7 @@ public class UserService {
     public PaginationCountResDto<CommentSimpleResDto> getUserLikeComment(User user, Pageable pageable) {
         Page<Comment> commentPage = commentRepository.getUserAllLikeComment(user, pageable);
 
-        List<CommentSimpleResDto> content = commentPage.stream().map(this::convertCommentToCommentSimpleResDto).toList();
+        List<CommentSimpleResDto> content = commentPage.stream().map(CommentSimpleResDto::of).toList();
 
         return new PaginationCountResDto<>(
                 commentPage.hasNext(),
@@ -503,15 +503,6 @@ public class UserService {
                 content,
                 commentPage.getTotalElements()
         );
-    }
-
-    private CommentSimpleResDto convertCommentToCommentSimpleResDto(Comment comment){
-
-        return CommentSimpleResDto.builder()
-                .id(comment.getId())
-                .questionTitle(comment.getQuestion().getTitle())
-                .content(comment.getContent())
-                .build();
     }
 
     /**
@@ -559,7 +550,7 @@ public class UserService {
     public PaginationCountResDto<CommentSimpleResDto> getUserUploadComment(User user, Pageable pageable) {
         Page<Comment> commentPage = commentRepository.getUserAllComment(user, pageable);
 
-        List<CommentSimpleResDto> content = commentPage.stream().map(this::convertCommentToCommentSimpleResDto).toList();
+        List<CommentSimpleResDto> content = commentPage.stream().map(CommentSimpleResDto::of).toList();
 
         return new PaginationCountResDto<>(
                 commentPage.hasNext(),

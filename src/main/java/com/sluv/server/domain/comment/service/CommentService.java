@@ -1,5 +1,7 @@
 package com.sluv.server.domain.comment.service;
 
+import com.sluv.server.domain.closet.entity.Closet;
+import com.sluv.server.domain.closet.repository.ClosetRepository;
 import com.sluv.server.domain.comment.dto.*;
 import com.sluv.server.domain.comment.entity.*;
 import com.sluv.server.domain.comment.enums.CommentStatus;
@@ -12,6 +14,7 @@ import com.sluv.server.domain.item.entity.ItemImg;
 import com.sluv.server.domain.item.exception.ItemNotFoundException;
 import com.sluv.server.domain.item.repository.ItemImgRepository;
 import com.sluv.server.domain.item.repository.ItemRepository;
+import com.sluv.server.domain.item.repository.ItemScrapRepository;
 import com.sluv.server.domain.question.entity.Question;
 import com.sluv.server.domain.question.exception.QuestionNotFoundException;
 import com.sluv.server.domain.question.repository.QuestionRepository;
@@ -39,6 +42,8 @@ public class CommentService {
     private final QuestionRepository questionRepository;
     private final ItemRepository itemRepository;
     private final ItemImgRepository itemImgRepository;
+    private final ItemScrapRepository itemScrapRepository;
+    private final ClosetRepository closetRepository;
 
     @Transactional
     public void postComment(User user, Long questionId, CommentPostReqDto dto){
@@ -52,12 +57,7 @@ public class CommentService {
 
         // 1. Comment 등록
         Comment comment = commentRepository.save(
-                Comment.builder()
-                        .user(user)
-                        .question(question)
-                        .content(dto.getContent())
-                        .commentStatus(CommentStatus.ACTIVE)
-                        .build()
+                Comment.toEntity(user, question, dto.getContent())
         );
 
         // 2. CommentImg 등록
@@ -86,13 +86,7 @@ public class CommentService {
         Comment parentComment = commentRepository.findById(commentId).orElseThrow(CommentNotFoundException::new);
 
         Comment comment = commentRepository.save(
-                Comment.builder()
-                        .user(user)
-                        .question(question)
-                        .content(dto.getContent())
-                        .parent(parentComment)
-                        .commentStatus(CommentStatus.ACTIVE)
-                        .build()
+                Comment.toEntity(user, question, dto.getContent(), parentComment)
         );
 
         // 2. CommentImg 등록
@@ -135,13 +129,9 @@ public class CommentService {
         commentItemRepository.deleteAllByCommentId(comment.getId());
         if(dto.getItemList() != null) {
             // dto로 부터 새로운 CommentItem 생성
-            List<CommentItem> itemList = dto.getItemList().stream().map(_item -> {
-                        Item item = itemRepository.findById(_item.getItemId()).orElseThrow(ItemNotFoundException::new);
-                        return CommentItem.builder()
-                                .comment(comment)
-                                .item(item)
-                                .sortOrder(_item.getSortOrder())
-                                .build();
+            List<CommentItem> itemList = dto.getItemList().stream().map(itemReqDto -> {
+                        Item item = itemRepository.findById(itemReqDto.getItemId()).orElseThrow(ItemNotFoundException::new);
+                        return CommentItem.toEntity(comment, item, itemReqDto);
                     }
             ).toList();
 
@@ -157,11 +147,7 @@ public class CommentService {
         // dto로 부터 새로운 CommentImg 생성
         if(dto.getImgList() != null) {
             List<CommentImg> imgList = dto.getImgList().stream().map(imgUrl ->
-                    CommentImg.builder()
-                            .comment(comment)
-                            .imgUrl(imgUrl.getImgUrl())
-                            .sortOrder(imgUrl.getSortOrder())
-                            .build()
+                    CommentImg.toEntity(comment, imgUrl)
             ).toList();
 
             // 저장
@@ -177,10 +163,7 @@ public class CommentService {
         if(!commentListStatus){
             Comment comment = commentRepository.findById(commentId).orElseThrow(CommentNotFoundException::new);
             commentLikeRepository.save(
-                    CommentLike.builder()
-                            .user(user)
-                            .comment(comment)
-                            .build()
+                    CommentLike.toEntity(user, comment)
             );
         }else{
             commentLikeRepository.deleteByUserIdAndCommentId(user.getId(), commentId);
@@ -196,13 +179,7 @@ public class CommentService {
 
         Comment comment = commentRepository.findById(commentId).orElseThrow(CommentNotFoundException::new);
         commentReportRepository.save(
-                CommentReport.builder()
-                        .reporter(user)
-                        .comment(comment)
-                        .commentReportReason(dto.getReason())
-                        .content(dto.getContent())
-                        .reportStatus(ReportStatus.WAITING)
-                        .build()
+                CommentReport.toEntity(comment, user, dto)
         );
     }
 
@@ -250,7 +227,7 @@ public class CommentService {
                 ? commentPage.getTotalElements() - ((long) (commentPage.getNumber() + 1) * commentPage.getSize())
                 : 0;
 
-        return new SubCommentPageResDto<CommentResDto>(commentPage.hasNext(), commentPage.getNumber(), content, restCommentNum);
+        return SubCommentPageResDto.of(commentPage, content, restCommentNum);
 
     }
 
@@ -261,69 +238,33 @@ public class CommentService {
 
                     // 해당 Comment에 해당하는 이미지 조회
                     List<CommentImgDto> imgList = commentImgRepository.findAllByCommentId(comment.getId())
-                            .stream().map(commentImg -> CommentImgDto.builder()
-                                    .imgUrl(commentImg.getImgUrl())
-                                    .sortOrder(commentImg.getSortOrder())
-                                    .build()
-                            ).toList();
+                            .stream().map(CommentImgDto::of)
+                            .toList();
                     // 해당 Comment에 해당하는 아이템 조회
                     List<CommentItemResDto> itemList = commentItemRepository.findAllByCommentId(comment.getId())
-                            .stream().map(commentItem -> CommentItemResDto.builder()
-                                            .item(getItemSameResDto(commentItem.getItem()))
-                                            .sortOrder(commentItem.getSortOrder())
-                                            .build()
-                            ).toList();
-
+                            .stream().map(commentItem -> getCommentItemResDto(commentItem, user))
+                            .toList();
 
                     // 해당 Comment의 좋아요 수
                     Integer likeNum = commentLikeRepository.countByCommentId(comment.getId());
                     // 현재 유저의 해당 Comment 좋아요 여부
                     Boolean likeStatus = commentLikeRepository.existsByUserIdAndCommentId(user.getId(), comment.getId());
 
-                    return CommentResDto.builder()
-                            .id(comment.getId())
-                            .user(UserInfoDto.builder()
-                                    .id(comment.getUser().getId())
-                                    .nickName(comment.getUser().getNickname())
-                                    .profileImgUrl(comment.getUser().getProfileImgUrl())
-                                    .build()
-                            )
-                            .content(comment.getContent())
-                            .imgUrlList(imgList)
-                            .itemList(itemList)
-                            .createdAt(comment.getCreatedAt())
-                            .likeNum(likeNum)
-                            .likeStatus(likeStatus)
-                            .hasMine(comment.getUser().getId().equals(user.getId()))
-                            .modifyStatus(!comment.getCreatedAt().equals(comment.getUpdatedAt()))
-                            .build();
+                    return CommentResDto.of(comment, user, imgList, itemList, likeNum, likeStatus);
                 }).toList();
     }
 
     /**
-     * Item -> ItemSameResDto로 변경하는 메소
-     * @param item
-     * @return
+     * CommentItem -> CommentItemResDto 변경하는 메소드
+     * @param commentItem
+     * @return CommentItemResDto
      */
-    private ItemSimpleResDto getItemSameResDto(Item item) {
-        ItemImg mainImg = itemImgRepository.findMainImg(item.getId());
+    private CommentItemResDto getCommentItemResDto(CommentItem commentItem, User user) {
+        ItemImg mainImg = itemImgRepository.findMainImg(commentItem.getItem().getId());
+        List<Closet> closetList = closetRepository.findAllByUserId(user.getId());
+        Boolean itemScrapStatus = itemScrapRepository.getItemScrapStatus(commentItem.getItem(), closetList);
 
-        return ItemSimpleResDto.builder()
-                .itemId(item.getId())
-                .imgUrl(mainImg.getItemImgUrl())
-                .brandName(
-                        item.getBrand() != null
-                                ? item.getBrand().getBrandKr()
-                                : item.getNewBrand().getBrandName()
-                )
-                .celebName(
-                        item.getCeleb() != null
-                                ? item.getCeleb().getCelebNameKr()
-                                : item.getNewCeleb().getCelebName()
-                )
-                .itemName(item.getName())
-                .scrapStatus(null) // scrap 구현 후 추가
-                .build();
+        return CommentItemResDto.of(commentItem, mainImg, itemScrapStatus);
     }
 
 

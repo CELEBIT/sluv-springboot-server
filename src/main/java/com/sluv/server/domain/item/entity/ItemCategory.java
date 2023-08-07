@@ -1,6 +1,5 @@
 package com.sluv.server.domain.item.entity;
 
-import com.sluv.server.domain.comment.entity.CommentReport;
 import com.sluv.server.global.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -9,7 +8,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
 
 @Entity
 @NoArgsConstructor

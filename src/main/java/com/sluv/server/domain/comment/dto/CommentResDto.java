@@ -1,6 +1,8 @@
 package com.sluv.server.domain.comment.dto;
 
+import com.sluv.server.domain.comment.entity.Comment;
 import com.sluv.server.domain.user.dto.UserInfoDto;
+import com.sluv.server.domain.user.entity.User;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -36,4 +38,24 @@ public class CommentResDto {
     private Boolean hasMine;
     @Schema(description = "Comment 수정 여부")
     private Boolean modifyStatus;
+
+    public static CommentResDto of(Comment comment, User user,
+                                   List<CommentImgDto> imgList,
+                                   List<CommentItemResDto> itemList,
+                                   Integer likeNum,
+                                   Boolean likeStatus){
+
+        return CommentResDto.builder()
+                .id(comment.getId())
+                .user(UserInfoDto.of(user))
+                .content(comment.getContent())
+                .imgUrlList(imgList)
+                .itemList(itemList)
+                .createdAt(comment.getCreatedAt())
+                .likeNum(likeNum)
+                .likeStatus(likeStatus)
+                .hasMine(comment.getUser().getId().equals(user.getId()))
+                .modifyStatus(!comment.getCreatedAt().equals(comment.getUpdatedAt()))
+                .build();
+    }
 }

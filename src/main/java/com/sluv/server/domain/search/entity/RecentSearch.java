@@ -5,6 +5,7 @@ import com.sluv.server.global.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,6 +13,8 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Table(name = "recent_search")
 public class RecentSearch extends BaseEntity {
 
@@ -28,10 +31,10 @@ public class RecentSearch extends BaseEntity {
     @Size(max = 255)
     private String searchWord;
 
-    @Builder
-    public RecentSearch(Long id, User user, String searchWord) {
-        this.id = id;
-        this.user = user;
-        this.searchWord = searchWord;
+    public static RecentSearch of(User user, String searchWord) {
+        return RecentSearch.builder()
+                .user(user)
+                .searchWord(searchWord)
+                .build();
     }
 }

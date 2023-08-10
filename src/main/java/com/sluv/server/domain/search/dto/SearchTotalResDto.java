@@ -22,4 +22,14 @@ public class SearchTotalResDto {
     List<QuestionSimpleResDto> questionList;
     @Schema(description = "조회된 User 리스트")
     List<UserSearchInfoDto> userList;
+
+    public static SearchTotalResDto of( List<ItemSimpleResDto> itemList,
+                                        List<QuestionSimpleResDto> questionList,
+                                        List<UserSearchInfoDto> userList){
+        return SearchTotalResDto.builder()
+                .itemList(itemList)
+                .questionList(questionList)
+                .userList(userList)
+                .build();
+    }
 }

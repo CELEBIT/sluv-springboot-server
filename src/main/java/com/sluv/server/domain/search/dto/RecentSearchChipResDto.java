@@ -13,4 +13,10 @@ import lombok.NoArgsConstructor;
 public class RecentSearchChipResDto {
     @Schema(description = "최근 검색어 키워드")
     private String keyword;
+
+    public static RecentSearchChipResDto of(String keyword){
+        return RecentSearchChipResDto.builder()
+                .keyword(keyword)
+                .build();
+    }
 }

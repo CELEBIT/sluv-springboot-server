@@ -329,11 +329,7 @@ public class SearchService {
         // 서치 데이터 등록
         postSearchData(keyword);
 
-        return SearchTotalResDto.builder()
-                .itemList(searchItem)
-                .questionList(searchQuestion)
-                .userList(searchUser)
-                .build();
+        return SearchTotalResDto.of(searchItem, searchQuestion, searchUser);
     }
 
     public SearchItemCountResDto getSearchItemCount(String keyword, SearchFilterReqDto dto) {
@@ -343,16 +339,13 @@ public class SearchService {
         // ElasticSearch 에서 Keyword에 해당하는 Item의 Id 조회
         List<Long> itemIdList = elasticSearchConnectUtil.connectElasticSearch(keyword, itemPath);
 
-        return SearchItemCountResDto.builder()
-                .itemCount(itemRepository.getSearchItemCount(itemIdList, dto))
-                .build();
+        return SearchItemCountResDto.of(
+                    itemRepository.getSearchItemCount(itemIdList, dto)
+                );
     }
 
     private void postRecentSearch(User user, String keyword){
-        RecentSearch recentSearch = RecentSearch.builder()
-                .user(user)
-                .searchWord(keyword)
-                .build();
+        RecentSearch recentSearch = RecentSearch.of(user, keyword);
 
         log.info("Post RecentSearch -> User: {}, Keyword: {}", user.getId(), keyword);
         recentSearchRepository.save(recentSearch);
@@ -363,9 +356,8 @@ public class SearchService {
         List<RecentSearchChipResDto> result
                 = recentSearchRepository.getRecentSearch(user)
                 .stream()
-                .map(recentSearch -> RecentSearchChipResDto.builder()
-                        .keyword(recentSearch.getSearchWord())
-                        .build()
+                .map(recentSearch ->
+                        RecentSearchChipResDto.of(recentSearch.getSearchWord())
                 ).toList();
 
         return result;
@@ -375,17 +367,13 @@ public class SearchService {
         List<SearchRank> searchRankList = searchRankRepository.findAllByOrderBySearchCountDesc();
         return searchRankList
                 .stream()
-                .map(searchRank -> SearchKeywordResDto.builder()
-                        .keyword(searchRank.getSearchWord())
-                        .build()
-                        ).toList();
+                .map(searchRank ->
+                        SearchKeywordResDto.of(searchRank.getSearchWord())
+                ).toList();
     }
 
     private void postSearchData(String keyword){
-        SearchData searchData = SearchData.builder()
-                .searchWord(keyword)
-                .build();
-
+        SearchData searchData = SearchData.of(keyword);
 
         log.info("Post SearchData -> Keyword: {}", keyword);
         searchDataRepository.save(searchData);
@@ -395,9 +383,10 @@ public class SearchService {
     public PaginationResDto<SearchKeywordResDto> getSearchKeyword(String keyword, Pageable pageable) {
         Page<SearchData> searchDataPage = searchDataRepository.getSearchKeyword(keyword, pageable);
 
-        List<SearchKeywordResDto> content = searchDataPage.stream().map(searchData -> SearchKeywordResDto.builder()
-                .keyword(searchData.getSearchWord())
-                .build()
+        List<SearchKeywordResDto> content = searchDataPage.stream()
+                .map(searchData ->
+                        SearchKeywordResDto.of(searchData.getSearchWord()
+                )
         ).toList();
 
         return PaginationResDto.<SearchKeywordResDto>builder()

@@ -42,10 +42,11 @@ public class Scheduler {
         log.info("Get SearchData. Time: {}", Calendar.getInstance().getTime());
         List<Tuple> topData = searchDataRepository.getTopData();
 
-        List<SearchRank> result = topData.stream().map(data -> SearchRank.builder()
-                .searchWord(data.get(0, SearchData.class).getSearchWord())
-                .searchCount(data.get(1, Long.class))
-                .build()
+        List<SearchRank> result = topData.stream().map(data ->
+                SearchRank.of(
+                        data.get(1, Long.class),
+                        data.get(0, SearchData.class).getSearchWord()
+                )
         ).toList();
 
         log.info("Save SearchRank. Time: {}", Calendar.getInstance().getTime());

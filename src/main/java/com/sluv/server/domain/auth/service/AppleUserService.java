@@ -7,7 +7,7 @@ import com.sluv.server.domain.auth.dto.AuthRequestDto;
 import com.sluv.server.domain.auth.dto.AuthResponseDto;
 import com.sluv.server.domain.auth.dto.SocialUserInfoDto;
 import com.sluv.server.domain.closet.service.ClosetService;
-import com.sluv.server.domain.user.dto.UserDto;
+import com.sluv.server.domain.user.dto.UserIdDto;
 import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.domain.user.exception.UserNotFoundException;
 import com.sluv.server.domain.user.repository.UserRepository;
@@ -196,7 +196,7 @@ public class AppleUserService {
      */
     private String createUserToken(User user) {
 
-        return jwtProvider.createAccessToken(UserDto.builder().id(user.getId()).build());
+        return jwtProvider.createAccessToken(UserIdDto.of(user.getId()));
     }
 
     /**
@@ -256,13 +256,9 @@ public class AppleUserService {
         User user = userRepository.findByEmail(userInfoDto.getEmail()).orElse(null);
 
         if(user == null) {
-            userRepository.save(User.builder()
-                    .email(userInfoDto.getEmail())
-                    .snsType(APPLE)
-                    .profileImgUrl(userInfoDto.getProfileImgUrl())
-                    .ageRange(userInfoDto.getAgeRange())
-                    .gender(userInfoDto.getGender())
-                    .build());
+            userRepository.save(
+                    User.toEntity(userInfoDto, APPLE)
+            );
 
             user = userRepository.findByEmail(userInfoDto.getEmail())
                     .orElseThrow(UserNotFoundException::new);

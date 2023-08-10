@@ -1,5 +1,6 @@
 package com.sluv.server.domain.user.dto;
 
+import com.sluv.server.domain.user.entity.User;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -22,4 +23,13 @@ public class UserSearchInfoDto {
     private String profileImgUrl;
     @Schema(description = "현재 사용자의 팔로우 여부")
     private Boolean followStatus;
+
+    public static UserSearchInfoDto of(User user, Boolean followStatus){
+        return UserSearchInfoDto.builder()
+                .id(user.getId())
+                .nickName(user.getNickname())
+                .profileImgUrl(user.getProfileImgUrl())
+                .followStatus(followStatus)
+                .build();
+    }
 }

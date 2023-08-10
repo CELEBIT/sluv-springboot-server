@@ -486,11 +486,7 @@ public class QuestionService {
         return builder
                 .qType(qType)
                 .user(
-                        UserInfoDto.builder()
-                        .id(writer.getId())
-                        .nickName(writer.getNickname())
-                        .profileImgUrl(writer.getProfileImgUrl())
-                        .build()
+                        UserInfoDto.of(writer)
                 )
                 .title(question.getTitle())
                 .content(question.getContent())

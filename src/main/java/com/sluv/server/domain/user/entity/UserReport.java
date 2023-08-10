@@ -1,12 +1,13 @@
 package com.sluv.server.domain.user.entity;
 
+import com.sluv.server.domain.user.dto.UserReportReqDto;
 import com.sluv.server.domain.user.enums.UserReportReason;
-import com.sluv.server.domain.user.enums.UserStatus;
 import com.sluv.server.global.common.entity.BaseEntity;
 import com.sluv.server.global.common.enums.ReportStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,6 +15,8 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Table(name = "user_report")
 public class UserReport extends BaseEntity {
 
@@ -42,14 +45,13 @@ public class UserReport extends BaseEntity {
     @Column(length = 45, columnDefinition = "varchar(45) default 'WAITING'")
     private ReportStatus reportStatus;
 
-
-    @Builder
-    public UserReport(Long id, User reporter, User reported, UserReportReason userReportReason, String content, ReportStatus reportStatus) {
-        this.id = id;
-        this.reporter = reporter;
-        this.reported = reported;
-        this.userReportReason = userReportReason;
-        this.content = content;
-        this.reportStatus = reportStatus;
+    public static UserReport toEntity(User reporter, User target, UserReportReqDto dto){
+        return UserReport.builder()
+                .reporter(reporter)
+                .reported(target)
+                .userReportReason(dto.getReason())
+                .content(dto.getContent())
+                .reportStatus(ReportStatus.WAITING)
+                .build();
     }
 }

@@ -74,11 +74,10 @@ public class UserService {
     private final JwtProvider jwtProvider;
 
 
-    public UserDto getUserIdByToken(HttpServletRequest request) {
+    public UserIdDto getUserIdByToken(HttpServletRequest request) {
         String token = jwtProvider.resolveToken(request);
-            return UserDto.builder()
-                           .id(jwtProvider.getUserId(token))
-                            .build();
+
+        return UserIdDto.of(jwtProvider.getUserId(token));
     }
 
     /**
@@ -117,10 +116,7 @@ public class UserService {
         }else {
             // Follow 정보 등록.
             followRepository.save(
-                    Follow.builder()
-                            .follower(user)
-                            .followee(targetUser)
-                            .build()
+                    Follow.toEntity(user, targetUser)
             );
         }
 
@@ -164,46 +160,47 @@ public class UserService {
     public UserMypageResDto getUserMypage(User user, Long userId) {
         UserMypageResDto.UserMypageResDtoBuilder result = UserMypageResDto.builder();
         User targetUser;
+        Long itemCount = null;
+        List<String> imgList = null;
+        Long communityCount = null;
+
         if(userId == null){ // 현재 유저일때
             targetUser = user;
 
             Long questionNum = questionRepository.countByUserId(targetUser.getId());
             Long commentNum = commentRepository.countByUserId(targetUser.getId());
 
-            List<String> imgList = itemRepository.getRecentTop2Item(targetUser)
-                    .stream()
-                    .map(item -> itemImgRepository.findMainImg(item.getId()).getItemImgUrl()).toList();
+            communityCount = questionNum + commentNum;
 
-            result
-                .itemCount(itemRepository.countByUserId(targetUser.getId()))
-                .imgList(imgList)
-                .communityCount(questionNum + commentNum);
+            imgList = itemRepository.getRecentTop2Item(targetUser)
+                                    .stream()
+                                    .map(item -> itemImgRepository.findMainImg(item.getId()).getItemImgUrl())
+                                    .toList();
+
+            itemCount = itemRepository.countByUserId(targetUser.getId());
 
         }else{ // 특정 유저일때
             targetUser = userRepository.findById(userId)
                                             .orElseThrow(UserNotFoundException::new);
         }
 
-
-
         List<InterestedCelebResDto> interestedCelebList = interestedCelebRepository.findAllByUserId(targetUser.getId())
                 .stream().map(InterestedCelebResDto::of)
                 .toList();
 
+        Boolean followStatus = followRepository.getFollowStatus(user, targetUser)
+        Long followerCount = followRepository.getFollowerCount(targetUser);
+        Long followingCount = followRepository.getFollowingCount(targetUser);
 
-        return result
-                .userInfo(
-                        UserInfoDto.builder()
-                            .id(targetUser.getId())
-                            .nickName(targetUser.getNickname())
-                            .profileImgUrl(targetUser.getProfileImgUrl())
-                            .build()
-                )
-                .followStatus(followRepository.getFollowStatus(user, targetUser))
-                .followerCount(followRepository.getFollowerCount(targetUser))
-                .followingCount(followRepository.getFollowingCount(targetUser))
-                .interestedCelebList(interestedCelebList)
-                .build();
+        return UserMypageResDto.of(targetUser,
+                followStatus,
+                followerCount,
+                followingCount,
+                interestedCelebList,
+                itemCount,
+                imgList,
+                communityCount
+                );
     }
 
     public PaginationResDto<ItemSimpleResDto> getUserItem(User user, Long userId, Pageable pageable) {
@@ -359,12 +356,11 @@ public class UserService {
         Page<User> followerPage = userRepository.getAllFollower(userId, pageable);
 
         // UserSearchInfoDto로 가공
-        List<UserSearchInfoDto> content = followerPage.stream().map(follower -> UserSearchInfoDto.builder()
-                .id(follower.getId())
-                .nickName(follower.getNickname())
-                .profileImgUrl(follower.getProfileImgUrl())
-                .followStatus(followRepository.getFollowStatus(user, follower))
-                .build()
+        List<UserSearchInfoDto> content = followerPage.stream().map(follower ->
+                UserSearchInfoDto.of(
+                    follower,
+                    followRepository.getFollowStatus(user, follower)
+                )
         ).toList();
 
         return PaginationResDto.<UserSearchInfoDto>builder()
@@ -379,12 +375,11 @@ public class UserService {
         Page<User> followerPage = userRepository.getAllFollowing(userId, pageable);
 
         // UserSearchInfoDto로 가공
-        List<UserSearchInfoDto> content = followerPage.stream().map(follower -> UserSearchInfoDto.builder()
-                .id(follower.getId())
-                .nickName(follower.getNickname())
-                .profileImgUrl(follower.getProfileImgUrl())
-                .followStatus(followRepository.getFollowStatus(user, follower))
-                .build()
+        List<UserSearchInfoDto> content = followerPage.stream().map(follower ->
+                UserSearchInfoDto.of(
+                        follower,
+                        followRepository.getFollowStatus(user, follower)
+                )
         ).toList();
 
         return PaginationResDto.<UserSearchInfoDto>builder()
@@ -563,12 +558,11 @@ public class UserService {
     public List<UserSearchInfoDto> getHotSluver(User user, Long celebId) {
         List<User> userList = userRepository.getHotSluver(user, celebId);
 
-        return userList.stream().map(_user -> UserSearchInfoDto.builder()
-                .id(_user.getId())
-                .nickName(_user.getNickname())
-                .profileImgUrl(_user.getProfileImgUrl())
-                .followStatus(followRepository.getFollowStatus(user, _user))
-                .build()
+        return userList.stream().map(_user ->
+                UserSearchInfoDto.of(
+                        _user,
+                        followRepository.getFollowStatus(user, _user)
+                )
         ).toList();
 
 

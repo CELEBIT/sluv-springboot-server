@@ -1,13 +1,13 @@
 package com.sluv.server.domain.user.entity;
 
-//import com.sluv.server.domain.user.enums.SnsType;
-
+import com.sluv.server.domain.auth.dto.SocialUserInfoDto;
 import com.sluv.server.domain.auth.enums.SnsType;
 import com.sluv.server.domain.user.enums.UserStatus;
 import com.sluv.server.global.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,10 +18,14 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 
+import static com.sluv.server.domain.auth.enums.SnsType.APPLE;
+
 
 @Entity
 @Getter
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @DynamicInsert
 @Table(name = "user")
 public class User extends BaseEntity implements UserDetails {
@@ -50,19 +54,14 @@ public class User extends BaseEntity implements UserDetails {
     @Column(length = 45, columnDefinition = "varchar(45) default 'PENDING_PROFILE'")
     private UserStatus userStatus;
 
-    @Builder
-    public User(Long id, String email, String nickname,
-                SnsType snsType, String profileImgUrl,
-                String ageRange, String gender, UserStatus userStatus) {
-        this.id = id;
-        this.email = email;
-        this.nickname = nickname;
-        this.snsType = snsType;
-        this.profileImgUrl = profileImgUrl;
-        this.ageRange = ageRange;
-        this.gender = gender;
-        this.userStatus = userStatus;
-
+    public static User toEntity(SocialUserInfoDto userInfoDto, SnsType snsType){
+        return User.builder()
+                .email(userInfoDto.getEmail())
+                .snsType(snsType)
+                .profileImgUrl(userInfoDto.getProfileImgUrl())
+                .ageRange(userInfoDto.getAgeRange())
+                .gender(userInfoDto.getGender())
+                .build();
     }
 
     public void changeProfileImgUrl(String profileImgUrl){

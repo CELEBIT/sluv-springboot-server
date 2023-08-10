@@ -8,7 +8,7 @@ import com.sluv.server.domain.auth.service.AuthService;
 import com.sluv.server.domain.auth.service.GoogleUserService;
 import com.sluv.server.domain.auth.service.KakaoUserService;
 
-import com.sluv.server.domain.user.dto.UserDto;
+import com.sluv.server.domain.user.dto.UserIdDto;
 import com.sluv.server.global.common.response.ErrorResponse;
 import com.sluv.server.global.common.response.SuccessDataResponse;
 import com.sluv.server.global.common.response.SuccessResponse;
@@ -79,7 +79,7 @@ public class AuthController {
     }
 
     @PostMapping("/test")
-    public ResponseEntity<?> testToken(@RequestBody UserDto dto){
+    public ResponseEntity<?> testToken(@RequestBody UserIdDto dto){
 
         return ResponseEntity.ok().body(SuccessDataResponse.builder()
                                                         .result(authService.jwtTestService(dto))

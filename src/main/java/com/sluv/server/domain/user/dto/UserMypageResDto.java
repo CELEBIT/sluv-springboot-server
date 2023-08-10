@@ -1,6 +1,7 @@
 package com.sluv.server.domain.user.dto;
 
 import com.sluv.server.domain.celeb.dto.InterestedCelebResDto;
+import com.sluv.server.domain.user.entity.User;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -32,4 +33,26 @@ public class UserMypageResDto {
     private List<String> imgList;
     @Schema(description = "해당 유저가 작성한 Question + Comment 개수")
     private Long communityCount;
+
+    public static UserMypageResDto of(User user,
+                                      Boolean followStatus,
+                                      Long followerCount,
+                                      Long followingCount,
+                                      List<InterestedCelebResDto> interestedCelebList,
+                                      Long itemCount,
+                                      List<String> imgList,
+                                      Long communityCount
+                                      ){
+
+        return UserMypageResDto.builder()
+                .userInfo(UserInfoDto.of(user))
+                .followStatus(followStatus)
+                .followerCount(followerCount)
+                .followingCount(followingCount)
+                .interestedCelebList(interestedCelebList)
+                .itemCount(itemCount)
+                .imgList(imgList)
+                .communityCount(communityCount)
+                .build();
+    }
 }

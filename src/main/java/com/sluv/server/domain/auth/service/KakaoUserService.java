@@ -7,7 +7,7 @@ import com.sluv.server.domain.auth.dto.AuthRequestDto;
 import com.sluv.server.domain.auth.dto.AuthResponseDto;
 import com.sluv.server.domain.auth.dto.SocialUserInfoDto;
 import com.sluv.server.domain.closet.service.ClosetService;
-import com.sluv.server.domain.user.dto.UserDto;
+import com.sluv.server.domain.user.dto.UserIdDto;
 import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.domain.user.exception.UserNotFoundException;
 import com.sluv.server.domain.user.repository.UserRepository;
@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
+import static com.sluv.server.domain.auth.enums.SnsType.GOOGLE;
 import static com.sluv.server.domain.auth.enums.SnsType.KAKAO;
 
 
@@ -120,23 +121,18 @@ public class KakaoUserService {
     /**
      * == KAKAO에서 받은 정보로 DB에서 유저 탐색 ==
      *
-     * @param UserInfo
+     * @param userInfoDto
      * @return DB에 등록된 user
      * @throws , BaseException(NOT_FOUND_USER)
      */
-    private User registerKakaoUserIfNeed(SocialUserInfoDto UserInfo) {
-        User user = userRepository.findByEmail(UserInfo.getEmail()).orElse(null);
+    private User registerKakaoUserIfNeed(SocialUserInfoDto userInfoDto) {
+        User user = userRepository.findByEmail(userInfoDto.getEmail()).orElse(null);
 
         if(user == null) {
-            userRepository.save(User.builder()
-                    .email(UserInfo.getEmail())
-                    .snsType(KAKAO)
-                    .profileImgUrl(UserInfo.getProfileImgUrl())
-                    .ageRange(UserInfo.getAgeRange())
-                    .gender(UserInfo.getGender())
-                    .build());
-
-            user = userRepository.findByEmail(UserInfo.getEmail())
+            userRepository.save(
+                    User.toEntity(userInfoDto, GOOGLE)
+            );
+            user = userRepository.findByEmail(userInfoDto.getEmail())
                                             .orElseThrow(UserNotFoundException::new);
 
             // 생성과 동시에 기본 Closet 생성
@@ -154,7 +150,7 @@ public class KakaoUserService {
      */
     private String createUserToken(User user) {
 
-        return jwtProvider.createAccessToken(UserDto.builder().id(user.getId()).build());
+        return jwtProvider.createAccessToken(UserIdDto.of(user.getId()));
     }
 
 }

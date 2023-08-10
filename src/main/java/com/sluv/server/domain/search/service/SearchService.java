@@ -253,12 +253,10 @@ public class SearchService {
 
         // Cotent 조립
         List<UserSearchInfoDto> content = searchUserPage.stream().map(searchUser ->
-                UserSearchInfoDto.builder()
-                        .id(searchUser.getId())
-                        .nickName(searchUser.getNickname())
-                        .profileImgUrl(searchUser.getProfileImgUrl())
-                        .followStatus(followRepository.getFollowStatus(user, searchUser))
-                        .build()
+                UserSearchInfoDto.of(
+                        searchUser,
+                        followRepository.getFollowStatus(user, searchUser)
+                )
         ).toList();
 
         // 최근 검색 등록

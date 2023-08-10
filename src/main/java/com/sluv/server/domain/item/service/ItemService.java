@@ -272,11 +272,7 @@ public class ItemService {
         // 9. 작성자 info
         User writer = userRepository.findById(item.getUser().getId())
                                                 .orElseThrow(UserNotFoundException::new);
-        UserInfoDto writerInfo = UserInfoDto.builder()
-                .id(writer.getId())
-                .profileImgUrl(writer.getProfileImgUrl())
-                .nickName(writer.getNickname())
-                .build();
+        UserInfoDto writerInfo = UserInfoDto.of(writer);
 
         // 10. Hashtag
         List<ItemHashtag> itemHashtagId = itemHashtagRepository.findAllByItemId(itemId);

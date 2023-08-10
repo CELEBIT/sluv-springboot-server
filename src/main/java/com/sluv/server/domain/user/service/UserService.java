@@ -188,7 +188,7 @@ public class UserService {
                 .stream().map(InterestedCelebResDto::of)
                 .toList();
 
-        Boolean followStatus = followRepository.getFollowStatus(user, targetUser)
+        Boolean followStatus = followRepository.getFollowStatus(user, targetUser);
         Long followerCount = followRepository.getFollowerCount(targetUser);
         Long followingCount = followRepository.getFollowingCount(targetUser);
 

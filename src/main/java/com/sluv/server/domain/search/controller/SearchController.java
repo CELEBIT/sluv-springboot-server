@@ -140,7 +140,8 @@ public class SearchController {
             summary = "인기 검색어 조회",
             description = """
                     인기 검색어 조회\n
-                    한번에 9개를 모두 조회.
+                    한번에 12개를 모두 조회.\n
+                    Scheduler에 의해 12개를 업데이트
                     """
     )
     @GetMapping("/searchRank")

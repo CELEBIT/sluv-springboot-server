@@ -24,7 +24,7 @@ public class SearchDataRepositoryImpl implements SearchDataRepositoryCustom{
                 .from(searchData)
                 .groupBy(searchData.searchWord)
                 .orderBy(searchData.searchWord.count().desc())
-                .limit(9)
+                .limit(12)
                 .fetch();
     }
 

@@ -5,4 +5,5 @@ import com.sluv.server.domain.search.repository.impl.RecentSearchRepositoryCusto
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface RecentSearchRepository extends JpaRepository<RecentSearch, Long>, RecentSearchRepositoryCustom {
+    void deleteByUserIdAndSearchWord(Long id, String keyword);
 }

@@ -8,6 +8,7 @@ import com.sluv.server.domain.user.dto.UserSearchInfoDto;
 import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.global.common.response.PaginationResDto;
 import com.sluv.server.global.common.response.SuccessDataResponse;
+import com.sluv.server.global.common.response.SuccessResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -165,6 +166,21 @@ public class SearchController {
                 SuccessDataResponse.<PaginationResDto<SearchKeywordResDto>>builder()
                         .result(searchService.getSearchKeyword(keyword, pageable))
                         .build()
+        );
+    }
+
+    @Operation(
+            summary = "*최근 검색어 삭제 ",
+            description = """
+                    현재 유저의 최근 검색어 삭제 API.\n
+                    User Id Token 필요
+                    """
+    )
+    @DeleteMapping("/recentSearch")
+    public ResponseEntity<SuccessResponse> deleteRecentSearch(@AuthenticationPrincipal User user, @RequestParam String keyword){
+        searchService.deleteSearchKeyword(user, keyword);
+        return ResponseEntity.ok().body(
+                new SuccessResponse()
         );
     }
 }

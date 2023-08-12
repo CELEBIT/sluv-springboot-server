@@ -410,4 +410,13 @@ public class SearchService {
                 .sortOrder((long) mainImg.getSortOrder())
                 .build();
     }
+
+    /**
+     * 현재 유저의 RecentSearch 키워드 삭제
+     */
+    @Transactional
+    public void deleteSearchKeyword(User user, String keyword) {
+        log.info("Delete {}'s Recent Search Keyword: {} ", user.getId(), keyword);
+        recentSearchRepository.deleteByUserIdAndSearchWord(user.getId(), keyword);
+    }
 }

@@ -601,4 +601,27 @@ public class UserService {
 
 
     }
+
+    /**
+     * 특정 유저가 선택한 관심 Celeb을 조회
+     * CelebCategory를 기준으로 그룹핑
+     */
+
+    public List<InterestedCelebCategoryResDto> getTargetUserInterestedCeleb(Long userId) {
+        User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+        List<Celeb> interestedCelebList = celebRepository.findInterestedCeleb(user);
+
+        List<CelebCategory> categoryList = celebCategoryRepository.findAllByParentIdIsNull();
+        categoryList.sort(Comparator.comparing(CelebCategory::getName));
+
+        return categoryList.stream()
+                .parallel()
+                // 카테고리별 InterestedCelebCategoryResDto 생성
+                .map(category ->  {
+                            List<Celeb> categoryFilterCeleb = getCategoryFilterCeleb(interestedCelebList, category);
+                            return InterestedCelebCategoryResDto.of(category,
+                                    convertInterestedCelebParentResDto(categoryFilterCeleb));
+                        }
+                ).toList();
+    }
 }

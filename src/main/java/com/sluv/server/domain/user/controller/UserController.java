@@ -474,4 +474,21 @@ public class UserController {
                         .build()
         );
     }
+    @Operation(
+            summary = "*현재 유저가 등록한 팔로잉 조회",
+            description = """
+                    *현재 유저가 등록한 팔로잉 조회\n
+                    User Id Token 필요
+                    Pagination 적용\n
+                    """
+    )
+    @GetMapping("/following")
+    public ResponseEntity<SuccessDataResponse<PaginationResDto<UserSearchInfoDto>>> getNowUserFollowing(@AuthenticationPrincipal User user, Pageable pageable){
+
+        return ResponseEntity.ok().body(
+                SuccessDataResponse.<PaginationResDto<UserSearchInfoDto>>builder()
+                        .result(userService.getUserFollowing(user, user.getId(), pageable))
+                        .build()
+        );
+    }
 }

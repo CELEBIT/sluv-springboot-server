@@ -36,8 +36,8 @@ public class UserController {
     private final UserReportService userReportService;
 
     @Operation(
-            summary = "*유저의 관심 샐럽 조회",
-            description = "유저를 기준으로 InterstedCeleb 테이블에서 일치하는 Celeb을 검색"
+            summary = "*현재 유저의 관심 샐럽 조회",
+            description = "현재 유저를 기준으로 InterstedCeleb 테이블에서 일치하는 Celeb을 검색"
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "1000", description = "요청성공"),
@@ -443,5 +443,17 @@ public class UserController {
                         .result(userService.getHotSluver(user, celebId))
                         .build()
         );
+    }
+
+    @Operation(
+            summary = "*특정 유저의 관심 샐럽 조회",
+            description = "특정 유저를 기준으로 InterstedCeleb 테이블에서 일치하는 Celeb을 검색"
+    )
+    @GetMapping("/{userId}/celeb")
+    public ResponseEntity<SuccessDataResponse<List<InterestedCelebCategoryResDto>>> getTargetUserInterestedCeleb(@PathVariable("userId") Long userId){
+
+        return ResponseEntity.ok().body(SuccessDataResponse.<List<InterestedCelebCategoryResDto>>builder()
+                .result(userService.getTargetUserInterestedCeleb(userId))
+                .build());
     }
 }

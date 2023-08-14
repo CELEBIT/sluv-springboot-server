@@ -456,4 +456,22 @@ public class UserController {
                 .result(userService.getTargetUserInterestedCeleb(userId))
                 .build());
     }
+
+    @Operation(
+            summary = "*현재 유저를 등록한 팔로워들 조회",
+            description = """
+                    현재 유저를 좋아요한 아이템 조회\n
+                    User Id Token 필요
+                    Pagination 적용\n
+                    """
+    )
+    @GetMapping("/follower")
+    public ResponseEntity<SuccessDataResponse<PaginationResDto<UserSearchInfoDto>>> getNowUserFollower(@AuthenticationPrincipal User user, Pageable pageable){
+
+        return ResponseEntity.ok().body(
+                SuccessDataResponse.<PaginationResDto<UserSearchInfoDto>>builder()
+                        .result(userService.getUserFollower(user, user.getId(), pageable))
+                        .build()
+        );
+    }
 }

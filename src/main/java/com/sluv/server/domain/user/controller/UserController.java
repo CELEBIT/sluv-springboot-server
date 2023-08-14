@@ -1,6 +1,7 @@
 package com.sluv.server.domain.user.controller;
 
 
+import com.sluv.server.domain.celeb.dto.InterestedCelebCategoryResDto;
 import com.sluv.server.domain.celeb.dto.InterestedCelebParentResDto;
 import com.sluv.server.domain.celeb.dto.InterestedCelebPostReqDto;
 import com.sluv.server.domain.closet.dto.ClosetResDto;
@@ -44,9 +45,9 @@ public class UserController {
             @ApiResponse(responseCode = "5001", description = "DB 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @GetMapping("/celeb")
-    public ResponseEntity<SuccessDataResponse<List<InterestedCelebParentResDto>>> getInterestedCeleb(@AuthenticationPrincipal User user){
+    public ResponseEntity<SuccessDataResponse<List<InterestedCelebCategoryResDto>>> getInterestedCeleb(@AuthenticationPrincipal User user){
 
-        return ResponseEntity.ok().body(SuccessDataResponse.<List<InterestedCelebParentResDto>>builder()
+        return ResponseEntity.ok().body(SuccessDataResponse.<List<InterestedCelebCategoryResDto>>builder()
                                                             .result(userService.getInterestedCeleb(user))
                                                             .build());
     }

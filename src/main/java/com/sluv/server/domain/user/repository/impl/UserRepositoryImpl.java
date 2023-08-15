@@ -55,8 +55,8 @@ public class UserRepositoryImpl implements UserRepositoryCustom{
     public Page<User> getAllFollower(Long userId, Pageable pageable) {
         List<User> content = jpaQueryFactory.select(user)
                 .from(follow)
-                .leftJoin(follow.follower, user)
-                .where(follow.followee.id.eq(userId).and(follow.followee.userStatus.eq(ACTIVE)))
+                .leftJoin(follow.followee, user)
+                .where(follow.follower.id.eq(userId).and(follow.followee.userStatus.eq(ACTIVE)))
                 .orderBy(follow.id.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -65,23 +65,23 @@ public class UserRepositoryImpl implements UserRepositoryCustom{
         // Count Query
         JPAQuery<User> query = jpaQueryFactory.select(user)
                 .from(follow)
-                .leftJoin(follow.follower, user)
-                .where(follow.followee.id.eq(userId).and(follow.followee.userStatus.eq(ACTIVE)))
+                .leftJoin(follow.followee, user)
+                .where(follow.follower.id.eq(userId).and(follow.followee.userStatus.eq(ACTIVE)))
                 .orderBy(follow.id.desc());
 
         return PageableExecutionUtils.getPage(content, pageable, () -> query.fetch().size());
     }
 
     /**
-     * 특정 유저의 팔로잉 조회
+     * 특정 유저가 팔로잉하고 있는 유저 조회
      *
      */
     @Override
     public Page<User> getAllFollowing(Long userId, Pageable pageable) {
         List<User> content = jpaQueryFactory.select(user)
                 .from(follow)
-                .leftJoin(follow.followee, user)
-                .where(follow.follower.id.eq(userId).and(follow.follower.userStatus.eq(ACTIVE)))
+                .leftJoin(follow.follower, user)
+                .where(follow.followee.id.eq(userId).and(follow.follower.userStatus.eq(ACTIVE)))
                 .orderBy(follow.id.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -90,8 +90,8 @@ public class UserRepositoryImpl implements UserRepositoryCustom{
         // Count Query
         JPAQuery<User> query = jpaQueryFactory.select(user)
                 .from(follow)
-                .leftJoin(follow.followee, user)
-                .where(follow.follower.id.eq(userId).and(follow.follower.userStatus.eq(ACTIVE)))
+                .leftJoin(follow.follower, user)
+                .where(follow.followee.id.eq(userId).and(follow.follower.userStatus.eq(ACTIVE)))
                 .orderBy(follow.id.desc());
 
         return PageableExecutionUtils.getPage(content, pageable, () -> query.fetch().size());

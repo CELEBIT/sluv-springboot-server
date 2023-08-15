@@ -83,22 +83,11 @@ public class SearchService {
 
         // Cotent 조립
         List<ItemSimpleResDto> content = searchItemPage.stream().map(item ->
-                ItemSimpleResDto.builder()
-                        .itemId(item.getId())
-                        .imgUrl(itemImgRepository.findMainImg(item.getId()).getItemImgUrl())
-                        .brandName(
-                                item.getBrand() != null
-                                        ? item.getBrand().getBrandKr()
-                                        : item.getNewBrand().getBrandName()
-                        )
-                        .itemName(item.getName())
-                        .celebName(
-                                item.getCeleb() != null
-                                        ? item.getCeleb().getCelebNameKr()
-                                        : item.getNewCeleb().getCelebName()
-                        )
-                        .scrapStatus(itemScrapRepository.getItemScrapStatus(item, closetList))
-                        .build()
+                ItemSimpleResDto.of(
+                        item,
+                        itemImgRepository.findMainImg(item.getId()),
+                        itemScrapRepository.getItemScrapStatus(item, closetList)
+                )
         ).toList();
 
         // 최근 검색 등록

@@ -4,12 +4,14 @@ import com.sluv.server.domain.brand.entity.Brand;
 import com.sluv.server.domain.brand.entity.NewBrand;
 import com.sluv.server.domain.celeb.entity.Celeb;
 import com.sluv.server.domain.celeb.entity.NewCeleb;
+import com.sluv.server.domain.item.dto.ItemPostReqDto;
 import com.sluv.server.domain.item.enums.ItemStatus;
 import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.global.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,6 +21,8 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Table(name = "item")
 public class Item extends BaseEntity {
 
@@ -72,31 +76,60 @@ public class Item extends BaseEntity {
     @Column(columnDefinition = "TEXT")
     private String infoSource;
 
+    @Builder.Default
     @Column(name = "view_num")
-    private Long viewNum;
+    private Long viewNum = 0L;
 
+    @Builder.Default
     @Enumerated(EnumType.STRING)
     @Column(length = 45, columnDefinition = "varchar(45) default 'ACTIVE'")
-    private ItemStatus itemStatus;
+    private ItemStatus itemStatus = ItemStatus.ACTIVE;
 
-    @Builder
-    public Item(Long id, User user, Celeb celeb, NewCeleb newCeleb, ItemCategory category, Brand brand, NewBrand newBrand, String name, LocalDateTime whenDiscovery, String whereDiscovery, int price, String color, String additionalInfo, String infoSource, Long viewNum, ItemStatus itemStatus) {
-        this.id = id;
-        this.user = user;
-        this.celeb = celeb;
-        this.newCeleb = newCeleb;
-        this.category = category;
-        this.brand = brand;
-        this.newBrand = newBrand;
-        this.name = name;
-        this.whenDiscovery = whenDiscovery;
-        this.whereDiscovery = whereDiscovery;
-        this.price = price;
-        this.color = color;
-        this.additionalInfo = additionalInfo;
-        this.infoSource = infoSource;
-        this.viewNum = viewNum;
-        this.itemStatus = itemStatus;
+    /**
+     * Item 생성
+     */
+    public static Item toEntity(User user, Celeb celeb, NewCeleb newCeleb,
+                                ItemCategory itemCategory, Brand brand, NewBrand newBrand,
+                                ItemPostReqDto dto) {
+        return Item.builder()
+                .user(user)
+                .celeb(celeb)
+                .category(itemCategory)
+                .brand(brand)
+                .newBrand(newBrand)
+                .newCeleb(newCeleb)
+                .name(dto.getItemName())
+                .whenDiscovery(dto.getWhenDiscovery())
+                .whereDiscovery(dto.getWhereDiscovery())
+                .price(dto.getPrice())
+                .additionalInfo(dto.getAdditionalInfo())
+                .infoSource(dto.getInfoSource())
+                .build();
+
+    }
+
+    /**
+     * Item 수정
+     */
+    public static Item toEntity(Long id, User user, Celeb celeb, NewCeleb newCeleb,
+                                ItemCategory itemCategory, Brand brand, NewBrand newBrand,
+                                ItemPostReqDto dto) {
+        return Item.builder()
+                .id(id)
+                .user(user)
+                .celeb(celeb)
+                .category(itemCategory)
+                .brand(brand)
+                .newBrand(newBrand)
+                .newCeleb(newCeleb)
+                .name(dto.getItemName())
+                .whenDiscovery(dto.getWhenDiscovery())
+                .whereDiscovery(dto.getWhereDiscovery())
+                .price(dto.getPrice())
+                .additionalInfo(dto.getAdditionalInfo())
+                .infoSource(dto.getInfoSource())
+                .build();
+
     }
 
     public void increaseViewNum(){

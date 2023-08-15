@@ -76,20 +76,15 @@ public class TempItemService {
 
         TempItem tempItem = reqDto.getId() != null ? tempItemRepository.findById(reqDto.getId())
                 .orElseThrow(TempItemNotFoundException::new)
-                :TempItem.builder().itemStatus(ItemStatus.ACTIVE).build();
-
-        tempItem.setUser(user);
-        tempItem.setCeleb(celeb);
-        tempItem.setNewCeleb(newCeleb);
-        tempItem.setCategory(itemCategory);
-        tempItem.setBrand(brand);
-        tempItem.setNewBrand(newBrand);
-        tempItem.setName(reqDto.getItemName());
-        tempItem.setWhenDiscovery(reqDto.getWhenDiscovery());
-        tempItem.setWhereDiscovery(reqDto.getWhereDiscovery());
-        tempItem.setPrice(reqDto.getPrice());
-        tempItem.setAdditionalInfo(reqDto.getAdditionalInfo());
-        tempItem.setInfoSource(reqDto.getInfoSource());
+                :TempItem.toEntity(
+                        user,
+                        celeb,
+                        newCeleb,
+                        itemCategory,
+                        brand,
+                        newBrand,
+                        reqDto
+                );
 
         TempItem saveTempItem = tempItemRepository.save(tempItem);
 
@@ -98,13 +93,7 @@ public class TempItemService {
         if(reqDto.getImgList() != null) {
             reqDto.getImgList().stream()
                             .map(tempItemImg ->
-                                TempItemImg.builder()
-                                        .tempItem(saveTempItem)
-                                        .tempItemImgUrl(tempItemImg.getImgUrl())
-                                        .representFlag(tempItemImg.getRepresentFlag())
-                                        .itemImgOrLinkStatus(ItemImgOrLinkStatus.ACTIVE)
-                                        .sortOrder(tempItemImg.getSortOrder())
-                                        .build()
+                                TempItemImg.toEntity(saveTempItem, tempItemImg)
                             ).forEach(tempItemImgRepository::save);
 
         }
@@ -114,13 +103,7 @@ public class TempItemService {
         if(reqDto.getLinkList() != null) {
             reqDto.getLinkList().stream()
                             .map(tempItemLink ->
-                                    TempItemLink.builder()
-                                            .tempItem(saveTempItem)
-                                            .linkName(tempItemLink.getLinkName())
-                                            .tempItemLinkUrl(tempItemLink.getItemLinkUrl())
-                                            .itemImgOrLinkStatus(ItemImgOrLinkStatus.ACTIVE)
-                                            .build()
-
+                                    TempItemLink.toEntity(saveTempItem, tempItemLink)
                             ).forEach(tempItemLinkRepository::save);
         }
 
@@ -128,14 +111,11 @@ public class TempItemService {
         tempItemHashtagRepository.deleteAllByTempItemId(tempItem.getId());
         if(reqDto.getHashTagIdList() != null) {
             reqDto.getHashTagIdList().stream().map(hashTag ->
-                    TempItemHashtag.builder()
-                            .tempItem(saveTempItem)
-                            .hashtag(
-                                    hashtagRepository.findById(hashTag)
-                                            .orElseThrow(HashtagNotFoundException::new)
-                            )
-                            .build()
-
+                    TempItemHashtag.toEntity(
+                            saveTempItem,
+                            hashtagRepository.findById(hashTag)
+                                    .orElseThrow(HashtagNotFoundException::new)
+                    )
             ).forEach(tempItemHashtagRepository::save);
         }
 
@@ -149,75 +129,39 @@ public class TempItemService {
         List<TempItemResDto> dtoList = contentPage.stream().map(tempItem -> {
 
                     List<ItemImgResDto> tempImgList = tempItemImgRepository.findAllByTempItem(tempItem)
-                            .stream().map(tempItemImg -> ItemImgResDto.builder()
-                                    .imgUrl(tempItemImg.getTempItemImgUrl())
-                                    .representFlag(tempItemImg.getRepresentFlag())
-                                    .sortOrder(tempItemImg.getSortOrder())
-                                    .build()
-                            ).collect(Collectors.toList());
+                            .stream().map(ItemImgResDto::of).collect(Collectors.toList());
 
                     List<Hashtag> tempHashtagList = tempItemHashtagRepository.findAllByTempItem(tempItem)
                             .stream().map(TempItemHashtag::getHashtag).toList();
 
                     List<ItemLinkResDto> tempLinkList = tempItemLinkRepository.findAllByTempItem(tempItem)
-                            .stream().map(tempItemLink -> ItemLinkResDto.builder()
-                                    .linkName(tempItemLink.getLinkName())
-                                    .itemLinkUrl(tempItemLink.getTempItemLinkUrl())
-                                    .build()
-                            ).collect(Collectors.toList());
+                            .stream().map(ItemLinkResDto::of).collect(Collectors.toList());
 
                     CelebDto celebDto = tempItem.getCeleb() != null ?
                             CelebDto.of(tempItem.getCeleb())
                             : null;
 
                     ItemCategoryDto itemCategoryDto = tempItem.getCategory() != null ?
-                            ItemCategoryDto.builder()
-                                    .id(tempItem.getCategory().getId())
-                                    .name(tempItem.getCategory().getName())
-                                    .parentName(
-                                            tempItem.getCategory().getParent() != null
-                                                    ? tempItem.getCategory().getParent().getName()
-                                                    : null
-                                    )
-                                    .parentId(
-                                            tempItem.getCategory().getParent() != null
-                                                    ? tempItem.getCategory().getParent().getId()
-                                                    : null
-                                    )
-                                    .build()
+                            ItemCategoryDto.of(tempItem.getCategory())
                             : null;
 
                     Brand brand = tempItem.getBrand() != null
                             ? tempItem.getBrand()
                             : null;
 
-                    return TempItemResDto.builder()
-                            .id(tempItem.getId())
-                            .imgList(tempImgList)
-                            .celeb(celebDto)
-                            .brand(brand)
-                            .whenDiscovery(tempItem.getWhenDiscovery())
-                            .whereDiscovery(tempItem.getWhereDiscovery())
-                            .category(itemCategoryDto)
-                            .itemName(tempItem.getName())
-                            .price(tempItem.getPrice())
-                            .additionalInfo(tempItem.getAdditionalInfo())
-                            .hashTagList(tempHashtagList)
-                            .linkList(tempLinkList)
-                            .infoSource(tempItem.getInfoSource())
-                            .newCeleb(
-                                    tempItem.getNewCeleb() != null
-                                    ? NewCelebPostResDto.of(tempItem.getNewCeleb())
-                                    :null
-                            )
-                            .newBrand(
-                                    tempItem.getNewBrand() != null
-                                    ? NewBrandPostResDto.of(tempItem.getNewBrand())
-                                    :null
-                                    )
-                            .updatedAt(tempItem.getUpdatedAt())
-                            .build();
+                    NewCelebPostResDto newCelebPostResDto = tempItem.getNewCeleb() != null
+                            ? NewCelebPostResDto.of(tempItem.getNewCeleb())
+                            : null;
+                    NewBrandPostResDto newBrandPostResDto = tempItem.getNewBrand() != null
+                            ? NewBrandPostResDto.of(tempItem.getNewBrand())
+                            : null;
 
+                    return TempItemResDto.of(
+                                tempItem, celebDto, newCelebPostResDto,
+                                brand, newBrandPostResDto, itemCategoryDto,
+                                tempImgList, tempLinkList, tempHashtagList
+
+                    );
                 }
         ).toList();
 

@@ -13,4 +13,10 @@ import lombok.NoArgsConstructor;
 public class HotPlaceResDto {
     @Schema(description = "장소명")
     private String placeName;
+
+    public static HotPlaceResDto of(String placeName){
+        return HotPlaceResDto.builder()
+                .placeName(placeName)
+                .build();
+    }
 }

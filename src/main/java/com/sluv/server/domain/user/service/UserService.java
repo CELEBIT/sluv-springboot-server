@@ -253,24 +253,11 @@ public class UserService {
     }
 
     private ItemSimpleResDto getItemSimpleResDto(Item item, List<Closet> closetList) {
-        return ItemSimpleResDto.builder()
-                .itemId(item.getId())
-                .imgUrl(itemImgRepository.findMainImg(item.getId()).getItemImgUrl())
-                .brandName(
-                        item.getBrand() != null
-                                ? item.getBrand().getBrandKr()
-                                : item.getNewBrand().getBrandName()
-                )
-                .itemName(item.getName())
-                .celebName(
-                        item.getCeleb() != null
-                                ? item.getCeleb().getParent() != null
-                                ? item.getCeleb().getParent().getCelebNameKr() + " " + item.getCeleb().getCelebNameKr()
-                                : item.getCeleb().getCelebNameKr()
-                                : item.getNewCeleb().getCelebName()
-                )
-                .scrapStatus(itemScrapRepository.getItemScrapStatus(item, closetList))
-                .build();
+        return ItemSimpleResDto.of(
+                    item,
+                    itemImgRepository.findMainImg(item.getId()),
+                    itemScrapRepository.getItemScrapStatus(item, closetList)
+                );
     }
 
     public PaginationResDto<ClosetResDto> getUserCloset(User user, Long userId, Pageable pageable) {

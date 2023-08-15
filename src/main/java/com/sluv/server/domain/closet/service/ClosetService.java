@@ -108,10 +108,7 @@ public class ClosetService {
 
         log.info("Save ItemScrap with item Id: {}, Closet Id {}", item.getId(), closet.getId());
         ItemScrap saveItemScrap = itemScrapRepository.save(
-                ItemScrap.builder()
-                        .item(item)
-                        .closet(closet)
-                        .build()
+                ItemScrap.toEntity(item, closet)
         );
         log.info("Save Success with ItemScrap Id: {}", saveItemScrap.getId());
 
@@ -187,7 +184,7 @@ public class ClosetService {
 
         Page<Item> itemPage = itemRepository.getClosetItems(closet, pageable);
 
-        List<ItemSimpleResDto> content = getItemContent(itemPage);
+        List<ItemSimpleResDto> content = getItemContent(user, itemPage);
 
         return ClosetDetailResDto.<ItemSimpleResDto>builder()
                 .hasNext(itemPage.hasNext())
@@ -204,27 +201,15 @@ public class ClosetService {
 
     }
 
-    private List<ItemSimpleResDto> getItemContent(Page<Item> itemPage) {
-        return itemPage.stream().map(item -> {
+    private List<ItemSimpleResDto> getItemContent(User user, Page<Item> itemPage) {
+        List<Closet> closetList = closetRepository.findAllByUserId(user.getId());
+
+        return itemPage.stream()
+                .map(item -> {
                     ItemImg mainImg = itemImgRepository.findMainImg(item.getId());
-                    return ItemSimpleResDto.builder()
-                            .itemId(item.getId())
-                            .imgUrl(mainImg.getItemImgUrl())
-                            .brandName(
-                                    item.getBrand() != null
-                                            ? item.getBrand().getBrandKr()
-                                            : item.getNewBrand().getBrandName()
-                            )
-                            .itemName(item.getName())
-                            .celebName(
-                                    item.getCeleb() != null
-                                            ? item.getCeleb().getCelebNameKr()
-                                            : item.getNewCeleb().getCelebName()
-                            )
-                            .scrapStatus(true)
-                            .build();
-                }
-        ).toList();
+                    Boolean itemScrapStatus = itemScrapRepository.getItemScrapStatus(item, closetList);
+                    return ItemSimpleResDto.of(item,mainImg, itemScrapStatus);
+                }).toList();
     }
 
     public List<ClosetResDto> getClosetList(User user) {

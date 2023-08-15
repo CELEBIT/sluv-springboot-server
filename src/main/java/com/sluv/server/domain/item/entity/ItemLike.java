@@ -4,6 +4,7 @@ import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.global.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,6 +12,8 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Table(name = "item_like")
 public class ItemLike extends BaseEntity {
 
@@ -29,10 +32,10 @@ public class ItemLike extends BaseEntity {
     private User user;
 
 
-    @Builder
-    public ItemLike(Long id, Item item, User user) {
-        this.id = id;
-        this.item = item;
-        this.user = user;
+    public static ItemLike toEntity(Item item, User user) {
+        return ItemLike.builder()
+                .item(item)
+                .user(user)
+                .build();
     }
 }

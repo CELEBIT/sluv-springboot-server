@@ -387,20 +387,12 @@ public class QuestionService {
                                             .stream()
                                             .map(questionItem -> {
                                                 List<Closet> closetList = closetRepository.findAllByUserId(user.getId());
-                                                ItemSimpleResDto dto = ItemSimpleResDto.builder()
-                                                                .itemId(questionItem.getItem().getId())
-                                                                .itemName(questionItem.getItem().getName())
-                                                                .celebName(questionItem.getItem().getBrand() != null
-                                                                        ? questionItem.getItem().getBrand().getBrandKr()
-                                                                        : questionItem.getItem().getNewBrand().getBrandName()
-                                                                )
-                                                                .brandName(questionItem.getItem().getBrand() != null
-                                                                        ? questionItem.getItem().getBrand().getBrandKr()
-                                                                        : questionItem.getItem().getNewBrand().getBrandName()
-                                                                )
-                                                                .imgUrl(itemImgRepository.findMainImg(questionItem.getItem().getId()).getItemImgUrl())
-                                                                .scrapStatus(itemScrapRepository.getItemScrapStatus(questionItem.getItem(),closetList))
-                                                                .build();
+                                                ItemSimpleResDto dto = ItemSimpleResDto.of(
+                                                                        questionItem.getItem(),
+                                                                        itemImgRepository.findMainImg(questionItem.getItem().getId()),
+                                                                        itemScrapRepository.getItemScrapStatus(questionItem.getItem(),closetList)
+                                                                );
+
                                                 QuestionItemResDto.QuestionItemResDtoBuilder builder = QuestionItemResDto.builder()
                                                         .item(dto)
                                                         .representFlag(questionItem.getRepresentFlag())

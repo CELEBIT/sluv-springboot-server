@@ -3,6 +3,7 @@ package com.sluv.server.domain.item.entity;
 import com.sluv.server.global.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -10,6 +11,8 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Table(name = "efficient_item")
 public class EfficientItem extends BaseEntity {
 
@@ -23,9 +26,9 @@ public class EfficientItem extends BaseEntity {
     private Item item;
 
 
-    @Builder
-    public EfficientItem(Long id, Item item) {
-        this.id = id;
-        this.item = item;
+    public static EfficientItem toEntity(Item item) {
+        return EfficientItem.builder()
+                .item(item)
+                .build();
     }
 }

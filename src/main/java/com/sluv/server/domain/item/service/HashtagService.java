@@ -26,15 +26,9 @@ public class HashtagService {
     public PaginationResDto<HashtagResponseDto> getHashtag(String name, Pageable pageable){
         Page<Tuple> hashtagPage = hashtagRepository.findAllByContent(name, pageable);
         List<HashtagResponseDto> dtoList = hashtagPage
-                .stream().map(data -> {
-                    Hashtag hashtag = data.get(0, Hashtag.class);
-
-                    return HashtagResponseDto.builder()
-                            .hashtagId(hashtag.getId())
-                            .hashtagContent(hashtag.getContent())
-                            .count(data.get(1, Long.class))
-                            .build();
-                }).toList();
+                .stream().map(data ->
+                    HashtagResponseDto.of(data.get(0, Hashtag.class), data.get(1, Long.class))
+                ).toList();
 
 
         return PaginationResDto.<HashtagResponseDto>builder()
@@ -51,19 +45,12 @@ public class HashtagService {
 
         //있다면 해당 Hashtag를 반환
         if(hashtag.isPresent()){
-            return  HashtagPostResponseDto.builder()
-                    .hashtagId(hashtag.get().getId())
-                    .hashtagContent(hashtag.get().getContent())
-                    .build();
+            return  HashtagPostResponseDto.of(hashtag.get());
         }else{ // 없다면 등록후 반환
-            Hashtag save = hashtagRepository.save(Hashtag.builder()
-                    .content(requestDto.getHashtagContent())
-                    .build()
+            Hashtag save = hashtagRepository.save(
+                    Hashtag.toEntity(requestDto.getHashtagContent())
             );
-            return HashtagPostResponseDto.builder()
-                    .hashtagId(save.getId())
-                    .hashtagContent(save.getContent())
-                    .build();
+            return HashtagPostResponseDto.of(save);
         }
 
     }

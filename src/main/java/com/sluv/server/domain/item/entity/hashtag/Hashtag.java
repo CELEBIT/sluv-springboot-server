@@ -4,12 +4,15 @@ import com.sluv.server.global.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Getter
 @Table(name = "hashtag")
 public class Hashtag extends BaseEntity {
@@ -22,13 +25,15 @@ public class Hashtag extends BaseEntity {
     @Size(max = 45)
     private String content;
 
+    @Builder.Default
     @Enumerated(EnumType.STRING)
+    @Column(length = 45, columnDefinition = "varchar(45) default 'ACTIVE'")
     private HashtagStatus hashtagStatus = HashtagStatus.ACTIVE;
 
-    @Builder
-    public Hashtag(Long id, String content) {
-        this.id = id;
-        this.content = content;
+    public static Hashtag toEntity(String content) {
+        return Hashtag.builder()
+                .content(content)
+                .build();
     }
 
     public void changeStatus(HashtagStatus status){

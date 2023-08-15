@@ -4,8 +4,7 @@ import com.sluv.server.domain.brand.dto.NewBrandPostResDto;
 import com.sluv.server.domain.brand.entity.Brand;
 import com.sluv.server.domain.celeb.dto.CelebDto;
 import com.sluv.server.domain.celeb.dto.NewCelebPostResDto;
-import com.sluv.server.domain.celeb.entity.Celeb;
-import com.sluv.server.domain.item.entity.ItemCategory;
+import com.sluv.server.domain.item.entity.TempItem;
 import com.sluv.server.domain.item.entity.hashtag.Hashtag;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
@@ -15,7 +14,6 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 
 @Data
 @NoArgsConstructor
@@ -61,5 +59,30 @@ public class TempItemResDto {
 
     @Schema(description = "최신 update 시점")
     private LocalDateTime updatedAt;
+
+    public static TempItemResDto of(TempItem tempItem, CelebDto celeb, NewCelebPostResDto newCeleb,
+                                    Brand brand, NewBrandPostResDto newBrand, ItemCategoryDto itemCategory,
+                                    List<ItemImgResDto> imgList, List<ItemLinkResDto> linkList, List<Hashtag> hashtagList
+                                    ){
+
+        return TempItemResDto.builder()
+                .id(tempItem.getId())
+                .imgList(imgList)
+                .celeb(celeb)
+                .newCeleb(newCeleb)
+                .category(itemCategory)
+                .itemName(tempItem.getName())
+                .brand(brand)
+                .newBrand(newBrand)
+                .linkList(linkList)
+                .whenDiscovery(tempItem.getWhenDiscovery())
+                .whereDiscovery(tempItem.getWhereDiscovery())
+                .price(tempItem.getPrice())
+                .additionalInfo(tempItem.getAdditionalInfo())
+                .hashTagList(hashtagList)
+                .infoSource(tempItem.getInfoSource())
+                .updatedAt(tempItem.getUpdatedAt())
+                .build();
+    }
 
 }

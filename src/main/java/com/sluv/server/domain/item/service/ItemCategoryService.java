@@ -25,17 +25,9 @@ public class ItemCategoryService {
                 .stream().map(parent -> {
                     List<ItemCategoryChildResponseDto> childDtoList = childList.stream()
                             .filter(child -> Objects.equals(child.getParent().getId(), parent.getId()))
-                            .map(child -> ItemCategoryChildResponseDto.builder()
-                                    .id(child.getId())
-                                    .name(child.getName())
-                                    .build()
-                            ).toList();
+                            .map(ItemCategoryChildResponseDto::of).toList();
 
-                   return ItemCategoryParentResponseDto.builder()
-                            .id(parent.getId())
-                            .name(parent.getName())
-                            .subCategoryList(childDtoList)
-                            .build();
+                   return ItemCategoryParentResponseDto.of(parent, childDtoList);
 
                 }).toList();
     }

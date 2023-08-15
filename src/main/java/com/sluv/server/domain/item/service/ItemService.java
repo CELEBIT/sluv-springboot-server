@@ -102,31 +102,18 @@ public class ItemService {
         Item item = reqDto.getId() != null ? itemRepository.findById(reqDto.getId()).orElseThrow(ItemNotFoundException::new)
                 :null;
 
-        // Item id를 제외한 나머지 부분 Builder로 조립.
-        Item.ItemBuilder itemBuilder = Item.builder()
-                .user(user)
-                .celeb(celeb)
-                .category(itemCategory)
-                .brand(brand)
-                .newBrand(newBrand)
-                .newCeleb(newCeleb)
-                .name(reqDto.getItemName())
-                .whenDiscovery(reqDto.getWhenDiscovery())
-                .whereDiscovery(reqDto.getWhereDiscovery())
-                .price(reqDto.getPrice())
-                .additionalInfo(reqDto.getAdditionalInfo())
-                .infoSource(reqDto.getInfoSource())
-                .itemStatus(ItemStatus.ACTIVE)
-                .viewNum(0L);
-
+        Item postItem;
         // Item 수정이라면, 기존의 Item의 Id를 추가.
         if(item != null){
-            itemBuilder.id(item.getId());
+            postItem = Item.toEntity(item.getId(), user, celeb, newCeleb, itemCategory, brand, newBrand, reqDto);
+        }else {
+            // Item 생성
+            postItem = Item.toEntity(user, celeb, newCeleb, itemCategory, brand, newBrand, reqDto);
         }
 
         // 완성된 Item save
         Item newItem = itemRepository.save(
-                itemBuilder.build()
+                postItem
         );
 
         // 기존의 Img, Link, Hashtag가 있다면 모두 삭제
@@ -137,13 +124,7 @@ public class ItemService {
         // ItemImg 테이블에 추가
         reqDto.getImgList().stream()
                         .map(itemImg->
-                            ItemImg.builder()
-                                    .item(newItem)
-                                    .itemImgUrl(itemImg.getImgUrl())
-                                    .representFlag(itemImg.getRepresentFlag())
-                                    .itemImgOrLinkStatus(ItemImgOrLinkStatus.ACTIVE)
-                                    .sortOrder(itemImg.getSortOrder())
-                                    .build()
+                            ItemImg.toEntity(newItem, itemImg)
                         ).forEach(itemImgRepository::save);
 
 
@@ -167,33 +148,23 @@ public class ItemService {
         if(reqDto.getHashTagIdList() != null) {
             reqDto.getHashTagIdList().stream().map(hashTag ->
 
-                    ItemHashtag.builder()
-                            .item(newItem)
-                            .hashtag(
-                                    hashtagRepository.findById(hashTag)
-                                            .orElseThrow(HashtagNotFoundException::new)
-                            )
-                            .build()
-
+                    ItemHashtag.toEntity(
+                            newItem,
+                            hashtagRepository.findById(hashTag)
+                                    .orElseThrow(HashtagNotFoundException::new)
+                    )
             ).forEach(itemHashtagRepository::save);
         }
 
 
 
-        return ItemPostResDto.builder()
-                .itemId(newItem.getId())
-                .build();
+        return ItemPostResDto.of(newItem.getId());
     }
 
     public List<HotPlaceResDto> getTopPlace() {
 
         return itemRepository.findTopPlace().stream()
-                .map(placeName ->
-                        HotPlaceResDto.builder()
-                                .placeName(placeName)
-                                .build()
-                ).toList();
-
+                .map(HotPlaceResDto::of).toList();
     }
 
     public ItemDetailResDto getItemDetail(User user, Long itemId) {
@@ -208,12 +179,7 @@ public class ItemService {
         // 2. Item 이미지들 조회
         List<ItemImgResDto> imgList = itemImgRepository.findAllByItemId(itemId)
                                                         .stream()
-                                                        .map(itemImg -> ItemImgResDto.builder()
-                                                                .imgUrl(itemImg.getItemImgUrl())
-                                                                .representFlag(itemImg.getRepresentFlag())
-                                                                .sortOrder(itemImg.getSortOrder())
-                                                                .build()
-                                                        ).toList();
+                                                        .map(ItemImgResDto::of).toList();
 
         // 3. Item Celeb
         CelebSearchResDto celeb = item.getCeleb() != null
@@ -225,20 +191,7 @@ public class ItemService {
                 : null;
 
         // 4. Item Category
-        ItemCategoryDto category = ItemCategoryDto.builder()
-                .id(item.getCategory().getId())
-                .parentId(
-                        item.getCategory().getParent() != null
-                            ? item.getCategory().getParent().getId()
-                            : null
-                )
-                .name(item.getCategory().getName())
-                .parentName(
-                        item.getCategory().getParent() != null
-                                ? item.getCategory().getParent().getName()
-                                : null
-                )
-                .build();
+        ItemCategoryDto category = ItemCategoryDto.of(item.getCategory());
 
         // 4. Brand
         BrandSearchResDto brand = item.getBrand() != null ?
@@ -262,12 +215,7 @@ public class ItemService {
 
         List<ItemLinkResDto> linkList = itemLinkRepository.findByItemId(itemId)
                                                         .stream()
-                                                        .map(itemLink -> ItemLinkResDto.builder()
-                                                                .linkName(itemLink.getLinkName())
-                                                                .itemLinkUrl(itemLink.getItemLinkUrl())
-                                                                .build()
-                                                        )
-                                                        .toList();
+                                                        .map(ItemLinkResDto::of).toList();
 
         // 9. 작성자 info
         User writer = userRepository.findById(item.getUser().getId())
@@ -279,11 +227,7 @@ public class ItemService {
         List<HashtagResponseDto> hashtagList = itemHashtagId.stream()
             .parallel()
             .map(itemHashtag ->
-            HashtagResponseDto.builder()
-                    .hashtagId(itemHashtag.getHashtag().getId())
-                    .hashtagContent(itemHashtag.getHashtag().getContent())
-                    .count(null)
-                    .build()
+            HashtagResponseDto.of(itemHashtag.getHashtag(), null)
         ).toList();
 
 
@@ -311,34 +255,33 @@ public class ItemService {
         // 15. 팔로우 여부
         boolean followStatus = followRepository.getFollowStatus(user, writer);
 
+        // 16. 스크랩 여부
+        List<Closet> closetList = closetRepository.findAllByUserId(user.getId());
+        boolean scrapStatus = itemScrapRepository.getItemScrapStatus(item, closetList);
+
         // Dto 조립
-        return ItemDetailResDto.builder()
-                .imgList(imgList)
-                .celeb(celeb)
-                .newCelebName(newCeleb)
-                .category(category)
-                .itemName(item.getName())
-                .brand(brand)
-                .newBrandName(newBrand)
-                .likeNum(likeNum)
-                .likeStatus(likeStatus)
-                .scrapNum(scrapNum)
-                .viewNum(viewNum)
-                .linkList(linkList)
-                .writer(writerInfo)
-                .whenDiscovery(item.getWhenDiscovery())
-                .whereDiscovery(item.getWhereDiscovery())
-                .price(item.getPrice())
-                .additionalInfo(item.getAdditionalInfo())
-                .hashTagList(hashtagList)
-                .infoSource(item.getInfoSource())
-                .sameCelebItemList(sameCelebItemList)
-                .sameBrandItemList(sameBrandItemList)
-                .otherSluverItemList(sameClosetItemList)
-                .color(item.getColor())
-                .followStatus(followStatus)
-                .hasMine(item.getUser().getId().equals(user.getId()))
-                .build();
+        return ItemDetailResDto.of(
+                item,
+                celeb,
+                newCeleb,
+                brand,
+                newBrand,
+                category,
+                likeNum,
+                likeStatus,
+                scrapNum,
+                scrapStatus,
+                viewNum,
+                writerInfo,
+                followStatus,
+                item.getUser().getId().equals(user.getId()),
+                imgList,
+                linkList,
+                hashtagList,
+                sameCelebItemList,
+                sameBrandItemList,
+                sameClosetItemList
+        );
     }
 
     @Transactional
@@ -348,10 +291,7 @@ public class ItemService {
         boolean likeExist = itemLikeRepository.existsByUserIdAndItemId(user.getId(), itemId);
         if(!likeExist){
             itemLikeRepository.save(
-                    ItemLike.builder()
-                            .item(item)
-                            .user(user)
-                            .build()
+                    ItemLike.toEntity(item, user)
             );
         }else{
             itemLikeRepository.deleteByUserIdAndItemId(user.getId(), itemId);
@@ -409,26 +349,8 @@ public class ItemService {
                 .map(item ->{
                     ItemImg itemImg = itemImgRepository.findMainImg(item.getId());
                     Boolean scrapStatus = itemScrapRepository.getItemScrapStatus(item, closetList);
-                    return ItemSimpleResDto.builder()
-                            .itemId(item.getId())
-                            .itemName(item.getName())
-                            .brandName(
-                                    item.getBrand() != null
-                                    ?item.getBrand().getBrandKr()
-                                    :item.getNewBrand().getBrandName()
-                            )
-                            .celebName(
-                                    item.getCeleb() != null
-                                            ? item.getCeleb().getParent() != null
-                                                ? item.getCeleb().getParent().getCelebNameKr() + " " + item.getCeleb().getCelebNameKr()
-                                                : item.getCeleb().getCelebNameKr()
-                                            : item.getNewCeleb().getCelebName()
-                            )
-                            .imgUrl(itemImg.getItemImgUrl())
-                            .scrapStatus(scrapStatus)
-                            .build();
-                })
-                .toList();
+                    return ItemSimpleResDto.of(item, itemImg, scrapStatus);
+                }).toList();
     }
 
     public PaginationResDto<ItemSimpleResDto> getRecommendItem(User user, Pageable pageable) {

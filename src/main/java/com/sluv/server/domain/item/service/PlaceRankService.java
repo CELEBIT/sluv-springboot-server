@@ -18,10 +18,7 @@ public class PlaceRankService {
 
     public void postPlace(User user, PlaceRankReqDto dto) {
         placeRankRepository.save(
-                PlaceRank.builder()
-                        .user(user)
-                        .place(dto.getPlaceName())
-                        .build()
+                PlaceRank.toEntity(user, dto)
         );
 
     }
@@ -39,10 +36,6 @@ public class PlaceRankService {
     public List<PlaceRankResDto> getRecentPlaceTop20(User user) {
         return placeRankRepository.getRecentPlaceTop20(user)
                             .stream()
-                            .map(placeRank ->
-                                    PlaceRankResDto.builder()
-                                    .placeName(placeRank.getPlace())
-                                    .build()
-                            ).toList();
+                            .map(PlaceRankResDto::of).toList();
     }
 }

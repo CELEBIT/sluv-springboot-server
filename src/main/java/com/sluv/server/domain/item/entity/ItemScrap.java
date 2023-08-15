@@ -4,6 +4,7 @@ import com.sluv.server.domain.closet.entity.Closet;
 import com.sluv.server.global.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,6 +12,8 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Table(name = "item_scrap")
 public class ItemScrap extends BaseEntity {
 
@@ -29,11 +32,11 @@ public class ItemScrap extends BaseEntity {
     private Closet closet;
 
 
-    @Builder
-    public ItemScrap(Long id, Item item, Closet closet) {
-        this.id = id;
-        this.item = item;
-        this.closet = closet;
+    public static ItemScrap toEntity(Item item, Closet closet) {
+        return ItemScrap.builder()
+                .item(item)
+                .closet(closet)
+                .build();
     }
 
     public void changeCloset(Closet closet){

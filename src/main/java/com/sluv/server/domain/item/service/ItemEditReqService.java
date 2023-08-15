@@ -20,12 +20,7 @@ public class ItemEditReqService {
         Item item = itemRepository.findById(itemId).orElseThrow(ItemNotFoundException::new);
 
         itemEditReqRepository.save(
-                ItemEditReq.builder()
-                            .requester(user)
-                            .item(item)
-                            .itemEditReqReason(dto.getReason())
-                            .content(dto.getContent())
-                            .build()
+                ItemEditReq.toEntity(user, item, dto)
         );
     }
 }

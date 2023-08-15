@@ -4,16 +4,14 @@ import com.sluv.server.domain.brand.entity.Brand;
 import com.sluv.server.domain.brand.entity.NewBrand;
 import com.sluv.server.domain.celeb.entity.Celeb;
 import com.sluv.server.domain.celeb.entity.NewCeleb;
+import com.sluv.server.domain.item.dto.TempItemPostReqDto;
 import com.sluv.server.domain.item.enums.ItemStatus;
 import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.global.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
@@ -21,6 +19,8 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Table(name = "temp_item")
 public class TempItem extends BaseEntity {
 
@@ -68,25 +68,27 @@ public class TempItem extends BaseEntity {
     @Column(columnDefinition = "TEXT")
     private String infoSource;
 
+    @Builder.Default
     @Enumerated(EnumType.STRING)
     @Column(length = 45, columnDefinition = "varchar(45) default 'ACTIVE'")
-    private ItemStatus itemStatus;
+    private ItemStatus itemStatus = ItemStatus.ACTIVE;
 
-    @Builder
-    public TempItem(Long id, User user, Celeb celeb, NewCeleb newCeleb, ItemCategory category, Brand brand, NewBrand newBrand, String name, LocalDateTime whenDiscovery, String whereDiscovery, Integer price, String additionalInfo, String infoSource, ItemStatus itemStatus) {
-        this.id = id;
-        this.user = user;
-        this.celeb = celeb;
-        this.newCeleb = newCeleb;
-        this.category = category;
-        this.brand = brand;
-        this.newBrand = newBrand;
-        this.name = name;
-        this.whenDiscovery = whenDiscovery;
-        this.whereDiscovery = whereDiscovery;
-        this.price = price;
-        this.additionalInfo = additionalInfo;
-        this.infoSource = infoSource;
-        this.itemStatus = itemStatus;
+    public static TempItem toEntity(User user, Celeb celeb, NewCeleb newCeleb,
+                                    ItemCategory category, Brand brand, NewBrand newBrand,
+                                    TempItemPostReqDto dto) {
+        return TempItem.builder()
+                .user(user)
+                .celeb(celeb)
+                .newCeleb(newCeleb)
+                .category(category)
+                .brand(brand)
+                .newBrand(newBrand)
+                .name(dto.getItemName())
+                .whenDiscovery(dto.getWhenDiscovery())
+                .whereDiscovery(dto.getWhereDiscovery())
+                .price(dto.getPrice())
+                .additionalInfo(dto.getAdditionalInfo())
+                .infoSource(dto.getInfoSource())
+                .build();
     }
 }

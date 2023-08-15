@@ -71,9 +71,7 @@ public class Scheduler {
 
         newLuxuryItem.forEach(item ->
                 luxuryItemRepository.save(
-                        LuxuryItem.builder()
-                        .item(item)
-                        .build()
+                        LuxuryItem.toEntity(item)
                 )
         );
     }
@@ -96,9 +94,7 @@ public class Scheduler {
 
         newEfficientItem.forEach(item ->
                 efficientItemRepository.save(
-                        EfficientItem.builder()
-                                .item(item)
-                                .build()
+                        EfficientItem.toEntity(item)
                 )
         );
     }
@@ -121,9 +117,7 @@ public class Scheduler {
 
         newWeekHotItem.forEach(item ->
                 weekHotItemRepository.save(
-                        WeekHotItem.builder()
-                                .item(item)
-                                .build()
+                        WeekHotItem.toEntity(item)
                 )
         );
     }
@@ -146,9 +140,7 @@ public class Scheduler {
 
         newDayHotItem.forEach(item ->
                 dayHotItemRepository.save(
-                        DayHotItem.builder()
-                                .item(item)
-                                .build()
+                        DayHotItem.toEntity(item)
                 )
         );
     }

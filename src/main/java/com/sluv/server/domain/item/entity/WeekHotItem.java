@@ -3,6 +3,7 @@ package com.sluv.server.domain.item.entity;
 import com.sluv.server.global.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -10,6 +11,8 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Table(name = "week_hot_item")
 public class WeekHotItem extends BaseEntity {
 
@@ -23,10 +26,9 @@ public class WeekHotItem extends BaseEntity {
     @NotNull
     private Item item;
 
-
-    @Builder
-    public WeekHotItem(Long id, Item item) {
-        this.id = id;
-        this.item = item;
+    public static WeekHotItem toEntity(Item item) {
+        return WeekHotItem.builder()
+                .item(item)
+                .build();
     }
 }

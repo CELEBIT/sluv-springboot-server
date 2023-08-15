@@ -1,16 +1,16 @@
 package com.sluv.server.domain.item.dto;
 
+import com.sluv.server.domain.item.entity.ItemCategory;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Builder;
-import lombok.Data;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.List;
 
 @Data
 @Getter
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class ItemCategoryParentResponseDto {
 
     @Schema(description = "상위 카테고리 Id")
@@ -20,10 +20,13 @@ public class ItemCategoryParentResponseDto {
     @Schema(description = "하위 카테고리 목록")
     private List<ItemCategoryChildResponseDto> subCategoryList;
 
-    @Builder
-    public ItemCategoryParentResponseDto(Long id, String name, List<ItemCategoryChildResponseDto> subCategoryList) {
-        this.id = id;
-        this.name = name;
-        this.subCategoryList = subCategoryList;
+    public static ItemCategoryParentResponseDto of(ItemCategory itemCategory,
+                                                   List<ItemCategoryChildResponseDto> subCategoryList){
+
+        return ItemCategoryParentResponseDto.builder()
+                .id(itemCategory.getId())
+                .name(itemCategory.getName())
+                .subCategoryList(subCategoryList)
+                .build();
     }
 }

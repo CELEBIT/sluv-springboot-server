@@ -1,7 +1,13 @@
 package com.sluv.server.domain.item.dto;
 
 import com.sluv.server.domain.brand.dto.BrandSearchResDto;
+import com.sluv.server.domain.brand.entity.Brand;
+import com.sluv.server.domain.brand.entity.NewBrand;
 import com.sluv.server.domain.celeb.dto.CelebSearchResDto;
+import com.sluv.server.domain.celeb.entity.Celeb;
+import com.sluv.server.domain.celeb.entity.NewCeleb;
+import com.sluv.server.domain.item.entity.Item;
+import com.sluv.server.domain.item.entity.ItemCategory;
 import com.sluv.server.domain.user.dto.UserInfoDto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Size;
@@ -84,8 +90,42 @@ public class ItemDetailResDto {
     @Schema(description = "현재 유저가 작성한 글인지 판단")
     private Boolean hasMine;
 
+    public static ItemDetailResDto of(Item item, CelebSearchResDto celeb, String newCelebName,
+                                      BrandSearchResDto brand, String newBrandName, ItemCategoryDto itemCategory,
+                                      Integer likeNum, Boolean likeStatus, Integer scrapNum, Boolean scrapStatus,
+                                      Long viewNum, UserInfoDto writerInfo, Boolean followStatus, Boolean hasMine,
+                                      List<ItemImgResDto> imgList, List<ItemLinkResDto> linkList, List<HashtagResponseDto> hashtagList,
+                                      List<ItemSimpleResDto> sameCelebItemList, List<ItemSimpleResDto> sameBrandItemList, List<ItemSimpleResDto> otherSluverItemList
+                                      ){
 
-
+        return ItemDetailResDto.builder()
+                .imgList(imgList)
+                .celeb(celeb)
+                .newCelebName(newCelebName)
+                .category(itemCategory)
+                .itemName(item.getName())
+                .brand(brand)
+                .newBrandName(newBrandName)
+                .likeNum(likeNum)
+                .likeStatus(likeStatus)
+                .scrapNum(scrapNum)
+                .scrapStatus(scrapStatus)
+                .viewNum(viewNum)
+                .linkList(linkList)
+                .writer(writerInfo)
+                .whenDiscovery(item.getWhenDiscovery())
+                .whereDiscovery(item.getWhereDiscovery())
+                .price(item.getPrice())
+                .additionalInfo(item.getAdditionalInfo())
+                .hashTagList(hashtagList)
+                .infoSource(item.getInfoSource())
+                .sameCelebItemList(sameCelebItemList)
+                .sameBrandItemList(sameBrandItemList)
+                .otherSluverItemList(otherSluverItemList)
+                .followStatus(followStatus)
+                .hasMine(hasMine)
+                .build();
+    }
 
 
 

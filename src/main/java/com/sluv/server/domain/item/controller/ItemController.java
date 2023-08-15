@@ -64,11 +64,11 @@ public class ItemController {
         return ResponseEntity.ok().body(
                 SuccessDataResponse.<TempItemPostResDto>builder()
                         .result(
-                                TempItemPostResDto.builder()
-                                                .tempItemId(tempItemService.postTempItem(user, reqDto))
-                                                .build()
+                                TempItemPostResDto.of(
+                                                tempItemService.postTempItem(user, reqDto)
                                 )
-                        .build()
+                        )
+                .build()
         );
     }
     @Operation(

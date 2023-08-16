@@ -91,7 +91,7 @@ public class UserService {
         List<Celeb> interestedCelebList = celebRepository.findInterestedCeleb(user);
 
         List<CelebCategory> categoryList = celebCategoryRepository.findAllByParentIdIsNull();
-        categoryList.sort(Comparator.comparing(CelebCategory::getName));
+        changeCategoryOrder(categoryList);
 
         return categoryList.stream()
                 .parallel()
@@ -610,5 +610,17 @@ public class UserService {
                                     convertInterestedCelebParentResDto(categoryFilterCeleb));
                         }
                 ).toList();
+    }
+
+    /**
+     * 가수 -> 배우 -> 방송인 -> 스포츠인 -> 인플루언서 순서로 변
+     */
+
+    private void changeCategoryOrder(List<CelebCategory> categoryList) {
+        categoryList.sort(Comparator.comparing(CelebCategory::getName));
+
+        CelebCategory tempCategory = categoryList.get(1);
+        categoryList.set(1, categoryList.get(2));
+        categoryList.set(2, tempCategory);
     }
 }

@@ -80,7 +80,8 @@ public class CelebService {
     public List<CelebSearchByCategoryResDto> getCelebByCategory() {
         // Parent Id가 null인 CelebCategory를 모두 조회
         List<CelebCategory> categoryList = celebCategoryRepository.findAllByParentIdIsNull();
-        categoryList.sort(Comparator.comparing(CelebCategory::getName));
+        changeCategoryOrder(categoryList);
+
         return categoryList.stream()
                             .parallel()
                             // 카테고리별 CelebSearchByCategoryResDto 생성
@@ -130,5 +131,16 @@ public class CelebService {
                  return CelebSearchByCategoryResDto.of(category, eachCategoryCeleb);
                 })
                 .toList();
+    }
+    /**
+     * 가수 -> 배우 -> 방송인 -> 스포츠인 -> 인플루언서 순서로 변
+     */
+
+    private void changeCategoryOrder(List<CelebCategory> categoryList) {
+        categoryList.sort(Comparator.comparing(CelebCategory::getName));
+
+        CelebCategory tempCategory = categoryList.get(1);
+        categoryList.set(1, categoryList.get(2));
+        categoryList.set(2, tempCategory);
     }
 }

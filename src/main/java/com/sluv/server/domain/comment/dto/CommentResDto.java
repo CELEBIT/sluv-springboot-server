@@ -1,6 +1,7 @@
 package com.sluv.server.domain.comment.dto;
 
 import com.sluv.server.domain.comment.entity.Comment;
+import com.sluv.server.domain.comment.enums.CommentStatus;
 import com.sluv.server.domain.user.dto.UserInfoDto;
 import com.sluv.server.domain.user.entity.User;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -38,6 +39,9 @@ public class CommentResDto {
     private Boolean hasMine;
     @Schema(description = "Comment 수정 여부")
     private Boolean modifyStatus;
+    @Schema(description = "Comment 상태")
+    private CommentStatus commentStatus;
+
 
     public static CommentResDto of(Comment comment, User user,
                                    List<CommentImgDto> imgList,
@@ -56,6 +60,7 @@ public class CommentResDto {
                 .likeStatus(likeStatus)
                 .hasMine(comment.getUser().getId().equals(user.getId()))
                 .modifyStatus(!comment.getCreatedAt().equals(comment.getUpdatedAt()))
+                .commentStatus(comment.getCommentStatus())
                 .build();
     }
 }

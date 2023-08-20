@@ -1,5 +1,6 @@
 package com.sluv.server.domain.question.dto;
 
+import com.sluv.server.domain.question.entity.Question;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -35,4 +36,20 @@ public class QuestionSimpleResDto {
     //추천해 줘
     @Schema(description = "QuestionRecommend 게시글 카테고리 리스트")
     private List<String> categoryName;
+    public static QuestionSimpleResDto of(String qType, Question question,
+                                          String celebName,
+                                          List<QuestionImgSimpleResDto> imgList, List<QuestionImgSimpleResDto> itemImgList,
+                                          List<String> categoryName){
+
+        return QuestionSimpleResDto.builder()
+                .qType(qType)
+                .id(question.getId())
+                .title(question.getTitle())
+                .content(question.getContent())
+                .celebName(celebName)
+                .imgList(imgList)
+                .itemImgList(itemImgList)
+                .categoryName(categoryName)
+                .build();
+    }
 }

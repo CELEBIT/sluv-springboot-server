@@ -1,7 +1,9 @@
 package com.sluv.server.domain.question.dto;
 
 import com.sluv.server.domain.celeb.dto.CelebChipResDto;
+import com.sluv.server.domain.question.entity.Question;
 import com.sluv.server.domain.user.dto.UserInfoDto;
+import com.sluv.server.domain.user.entity.User;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -59,6 +61,35 @@ public class QuestionGetDetailResDto {
     // Question Recommend
     @Schema(description = "QuestionRecommend Category 리스트")
     private List<String> recommendCategoryList;
+    public static QuestionGetDetailResDto of(Question question, String qType, User user,
+                                             List<QuestionImgResDto> imgList, List<QuestionItemResDto> itemList,
+                                             Long likeNum, Long commentNum, Boolean hasLike, Boolean hasMine,
+                                             CelebChipResDto celeb, CelebChipResDto newCeleb,
+                                             LocalDateTime voteEndTime, Long totalVoteNum, Long voteStatus,
+                                             List<String> recommendCategoryList){
 
+        UserInfoDto writer = UserInfoDto.of(user);
+
+        return QuestionGetDetailResDto.builder()
+                .qType(qType)
+                .user(writer)
+                .title(question.getTitle())
+                .content(question.getContent())
+                .imgList(imgList)
+                .itemList(itemList)
+                .searchNum(question.getSearchNum())
+                .likeNum(likeNum)
+                .commentNum(commentNum)
+                .createdAt(question.getCreatedAt())
+                .hasLike(hasLike)
+                .hasMine(hasMine)
+                .voteEndTime(voteEndTime)
+                .totalVoteNum(totalVoteNum)
+                .voteStatus(voteStatus)
+                .celeb(celeb)
+                .newCeleb(newCeleb)
+                .recommendCategoryList(recommendCategoryList)
+                .build();
+    }
 
 }

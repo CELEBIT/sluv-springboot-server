@@ -1,10 +1,13 @@
 package com.sluv.server.domain.question.entity;
 
 import com.sluv.server.domain.item.entity.Item;
+import com.sluv.server.domain.question.dto.QuestionItemReqDto;
+import com.sluv.server.domain.question.dto.QuestionItemResDto;
 import com.sluv.server.global.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,6 +16,8 @@ import org.hibernate.annotations.ColumnDefault;
 @Getter
 @Entity
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Table(name = "question_item")
 public class QuestionItem extends BaseEntity {
 
@@ -38,13 +43,13 @@ public class QuestionItem extends BaseEntity {
 
     private Integer sortOrder;
 
-    @Builder
-    public QuestionItem(Long id, Question question, Item item, String description, Boolean representFlag, Integer sortOrder) {
-        this.id = id;
-        this.question = question;
-        this.item = item;
-        this.description = description;
-        this.representFlag = representFlag;
-        this.sortOrder = sortOrder;
+    public static QuestionItem toEntity(Question question, Item item, QuestionItemReqDto reqDto) {
+        return QuestionItem.builder()
+                .question(question)
+                .item(item)
+                .description(reqDto.getDescription())
+                .representFlag(reqDto.getRepresentFlag())
+                .sortOrder(reqDto.getSortOrder())
+                .build();
     }
 }

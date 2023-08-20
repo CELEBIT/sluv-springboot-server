@@ -1,5 +1,6 @@
 package com.sluv.server.domain.question.dto;
 
+import com.sluv.server.domain.question.entity.QuestionImg;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -23,4 +24,23 @@ public class QuestionImgResDto {
     private Boolean representFlag;
     @Schema(description = "순서")
     private Integer sortOrder;
+
+    public static QuestionImgResDto of(QuestionImg questionImg, QuestionVoteDataDto voteDataDto){
+        return QuestionImgResDto.builder()
+                .imgUrl(questionImg.getImgUrl())
+                .description(questionImg.getDescription())
+                .voteNum(
+                        voteDataDto != null
+                                ? voteDataDto.getVoteNum()
+                                : null
+                )
+                .votePercent(
+                        voteDataDto != null
+                                ? voteDataDto.getVotePercent()
+                                : null
+                )
+                .representFlag(questionImg.getRepresentFlag())
+                .sortOrder(questionImg.getSortOrder())
+                .build();
+    }
 }

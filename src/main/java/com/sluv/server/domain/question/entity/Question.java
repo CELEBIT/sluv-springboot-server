@@ -42,11 +42,11 @@ public class Question{
     private String content;
 
     @NotNull
-    private Long searchNum;
+    private Long searchNum = 0L;
 
     @Enumerated(EnumType.STRING)
     @Column(columnDefinition = "varchar(45) default 'ACTIVE'")
-    private QuestionStatus questionStatus;
+    private QuestionStatus questionStatus = QuestionStatus.ACTIVE;
 
     @CreatedDate
     @Column(updatable = false)

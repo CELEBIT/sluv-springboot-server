@@ -1,10 +1,12 @@
 package com.sluv.server.domain.question.entity;
 
+import com.sluv.server.domain.question.dto.QuestionImgReqDto;
 import com.sluv.server.global.common.entity.BaseEntity;
 import com.sluv.server.global.common.enums.ItemImgOrLinkStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,6 +15,8 @@ import org.hibernate.annotations.ColumnDefault;
 @Getter
 @Entity
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Table(name = "question_img")
 public class QuestionImg extends BaseEntity {
 
@@ -39,17 +43,17 @@ public class QuestionImg extends BaseEntity {
     private Integer sortOrder;
 
     @Enumerated(EnumType.STRING)
+    @Builder.Default
     @Column(columnDefinition = "varchar(45) default 'ACTIVE'")
-    private ItemImgOrLinkStatus itemImgOrLinkStatus;
+    private ItemImgOrLinkStatus itemImgOrLinkStatus = ItemImgOrLinkStatus.ACTIVE;
 
-    @Builder
-    public QuestionImg(Long id, Question question, String imgUrl, String description, Boolean representFlag, Integer sortOrder, ItemImgOrLinkStatus itemImgOrLinkStatus) {
-        this.id = id;
-        this.question = question;
-        this.imgUrl = imgUrl;
-        this.description = description;
-        this.representFlag = representFlag;
-        this.sortOrder = sortOrder;
-        this.itemImgOrLinkStatus = itemImgOrLinkStatus;
+    public static QuestionImg toEntity(Question question, QuestionImgReqDto reqDto) {
+        return QuestionImg.builder()
+                .question(question)
+                .imgUrl(reqDto.getImgUrl())
+                .description(reqDto.getDescription())
+                .representFlag(reqDto.getRepresentFlag())
+                .sortOrder(reqDto.getSortOrder())
+                .build();
     }
 }

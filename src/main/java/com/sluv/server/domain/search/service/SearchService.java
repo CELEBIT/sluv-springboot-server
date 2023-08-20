@@ -123,21 +123,20 @@ public class SearchService {
             {
                 // 해당 Question의 item 이미지 리스트 구하기
                 List<QuestionItem> questionItemList = questionItemRepository.findAllByQuestionId(question.getId());
-                List<QuestionImgSimpleResDto> itemImgList = questionItemList.stream().map(this::convertQuestionItemToQuestionImgSimpleResDto).toList();
+//                List<QuestionImgSimpleResDto> itemImgList = questionItemList.stream().map(this::convertQuestionItemToQuestionImgSimpleResDto).toList();
+                List<QuestionImgSimpleResDto> itemImgList = questionItemList.stream()
+                                                .map(questionItem -> {
+                                                    ItemImg mainImg = itemImgRepository.findMainImg(questionItem.getItem().getId());
+                                                    return QuestionImgSimpleResDto.of(mainImg);
+                                                }).toList();
 
                 // 해당 Question의 이미지 리스트 구하기
                 List<QuestionImgSimpleResDto> imgList = questionImgRepository.findAllByQuestionId(question.getId())
                         .stream()
-                        .map(this::convertQuestionImgToQuestionImgSimpleResDto).toList();
+                        .map(QuestionImgSimpleResDto::of).toList();
 
-                return QuestionSimpleResDto.builder()
-                        .qType("Buy")
-                        .id(question.getId())
-                        .title(question.getTitle())
-                        .content(question.getContent())
-                        .imgList(imgList)
-                        .itemImgList(itemImgList)
-                        .build();
+                return QuestionSimpleResDto.of("Buy", question, null,
+                                imgList, itemImgList, null);
             }).toList();
 
             return PaginationResDto.<QuestionSimpleResDto>builder()
@@ -150,20 +149,14 @@ public class SearchService {
             Page<QuestionFind> searchQuestionPage =
                     questionRepository.getSearchQuestionFind(questionIdList, pageable);
 
-            List<QuestionSimpleResDto> content = searchQuestionPage.stream().map(question ->
+            List<QuestionSimpleResDto> content = searchQuestionPage.stream().map(question -> {
+                String celebName = question.getCeleb() != null
+                                    ? question.getCeleb().getCelebNameKr()
+                                    : question.getNewCeleb().getCelebName();
 
-                QuestionSimpleResDto.builder()
-                        .qType("Find")
-                        .id(question.getId())
-                        .title(question.getTitle())
-                        .content(question.getContent())
-                        .celebName(
-                                question.getCeleb() != null
-                                ?question.getCeleb().getCelebNameKr()
-                                :question.getNewCeleb().getCelebName()
-                        )
-                        .build()
-            ).toList();
+                return QuestionSimpleResDto.of("Find", question, celebName, null, null, null);
+
+            }).toList();
 
             return PaginationResDto.<QuestionSimpleResDto>builder()
                     .page(searchQuestionPage.getNumber())
@@ -200,13 +193,7 @@ public class SearchService {
                 List<String> categoryList = questionRecommendCategoryRepository.findAllByQuestionId(question.getId())
                         .stream()
                         .map(QuestionRecommendCategory::getName).toList();
-                return QuestionSimpleResDto.builder()
-                        .qType("Recommend")
-                        .id(question.getId())
-                        .title(question.getTitle())
-                        .content(question.getContent())
-                        .categoryName(categoryList)
-                        .build();
+                return QuestionSimpleResDto.of("Recommend", question, null, null, null, categoryList);
             }).toList();
 
             // 최근 검색 등록
@@ -382,21 +369,6 @@ public class SearchService {
                 .page(searchDataPage.getNumber())
                 .hasNext(searchDataPage.hasNext())
                 .content(content)
-                .build();
-    }
-
-    public QuestionImgSimpleResDto convertQuestionImgToQuestionImgSimpleResDto(QuestionImg questionImg){
-        return QuestionImgSimpleResDto.builder()
-                .imgUrl(questionImg.getImgUrl())
-                .sortOrder((long)questionImg.getSortOrder())
-                .build();
-    }
-
-    public QuestionImgSimpleResDto convertQuestionItemToQuestionImgSimpleResDto(QuestionItem questionItem){
-        ItemImg mainImg = itemImgRepository.findMainImg(questionItem.getItem().getId());
-        return QuestionImgSimpleResDto.builder()
-                .imgUrl(mainImg.getItemImgUrl())
-                .sortOrder((long) mainImg.getSortOrder())
                 .build();
     }
 

@@ -1,5 +1,9 @@
 package com.sluv.server.domain.question.entity;
 
+import com.sluv.server.domain.celeb.entity.Celeb;
+import com.sluv.server.domain.celeb.entity.NewCeleb;
+import com.sluv.server.domain.question.dto.QuestionBuyPostReqDto;
+import com.sluv.server.domain.question.dto.QuestionFindPostReqDto;
 import com.sluv.server.domain.question.enums.QuestionStatus;
 import com.sluv.server.domain.user.entity.User;
 import jakarta.persistence.DiscriminatorValue;
@@ -24,5 +28,20 @@ public class QuestionBuy extends Question{
     public QuestionBuy(Long id, User user, String title, String content, Long searchNum, QuestionStatus questionStatus, LocalDateTime voteEndTime) {
         super(id, user, title, content, searchNum, questionStatus);
         this.voteEndTime = voteEndTime;
+    }
+
+    public static QuestionBuy toEntity(User user, QuestionBuyPostReqDto postReqDto){
+        QuestionBuyBuilder builder = QuestionBuy.builder();
+
+        if(postReqDto.getId() != null) {
+            builder
+                .id(postReqDto.getId());
+        }
+
+        return builder
+                    .user(user)
+                    .title(postReqDto.getTitle())
+                    .voteEndTime(postReqDto.getVoteEndTime())
+                    .build();
     }
 }

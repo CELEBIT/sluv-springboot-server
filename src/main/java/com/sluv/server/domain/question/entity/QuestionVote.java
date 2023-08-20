@@ -1,5 +1,6 @@
 package com.sluv.server.domain.question.entity;
 
+import com.sluv.server.domain.question.dto.QuestionVoteReqDto;
 import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.global.common.entity.BaseEntity;
 import jakarta.persistence.*;
@@ -29,5 +30,13 @@ public class QuestionVote extends BaseEntity {
     private User user;
 
     private Long voteSortOrder;
+
+    public static QuestionVote toEntity(Question question, User user, QuestionVoteReqDto dto){
+        return QuestionVote.builder()
+                .question(question)
+                .user(user)
+                .voteSortOrder(dto.getVoteSortOrder())
+                .build();
+    }
 
 }

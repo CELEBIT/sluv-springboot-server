@@ -4,6 +4,7 @@ import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.global.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,6 +12,8 @@ import lombok.NoArgsConstructor;
 @Getter
 @Entity
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Table(name = "question_like")
 public class QuestionLike extends BaseEntity {
 
@@ -29,10 +32,10 @@ public class QuestionLike extends BaseEntity {
     private User user;
 
 
-    @Builder
-    public QuestionLike(Long id, Question question, User user) {
-        this.id = id;
-        this.question = question;
-        this.user = user;
+    public static QuestionLike toEntity(User user, Question question) {
+        return QuestionLike.builder()
+                .user(user)
+                .question(question)
+                .build();
     }
 }

@@ -1,5 +1,6 @@
 package com.sluv.server.domain.celeb.entity;
 
+import com.sluv.server.domain.celeb.exception.CelebNotFoundException;
 import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.global.common.entity.BaseEntity;
 import jakarta.persistence.*;
@@ -30,5 +31,12 @@ public class InterestedCeleb extends BaseEntity {
     @JoinColumn(name = "celeb_id")
     @NotNull
     private Celeb celeb;
+
+    public static InterestedCeleb toEntity(User user, Celeb celeb){
+        return InterestedCeleb.builder()
+                .user(user)
+                .celeb(celeb)
+                .build();
+    }
 
 }

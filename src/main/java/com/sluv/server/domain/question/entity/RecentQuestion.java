@@ -35,5 +35,13 @@ public class RecentQuestion extends BaseEntity {
     @NotNull
     private User user;
 
+    public static RecentQuestion toEntity(User user, String qType, Question question){
+        return RecentQuestion.builder()
+                .user(user)
+                .qType(qType)
+                .question(question)
+                .build();
+    }
+
 }
 

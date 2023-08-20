@@ -1,6 +1,7 @@
 package com.sluv.server.domain.question.dto;
 
 import com.sluv.server.domain.item.dto.ItemSimpleResDto;
+import com.sluv.server.domain.question.entity.QuestionItem;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -24,4 +25,23 @@ public class QuestionItemResDto {
     private Boolean representFlag;
     @Schema(description = "순서")
     private Integer sortOrder;
+
+    public static QuestionItemResDto of(QuestionItem questionItem, ItemSimpleResDto itemSimpleResDto, QuestionVoteDataDto voteDataDto){
+        return QuestionItemResDto.builder()
+                .item(itemSimpleResDto)
+                .description(questionItem.getDescription())
+                .voteNum(
+                        voteDataDto != null
+                        ? voteDataDto.getVoteNum()
+                        : null
+                )
+                .votePercent(
+                        voteDataDto != null
+                        ? voteDataDto.getVotePercent()
+                        : null
+                )
+                .representFlag(questionItem.getRepresentFlag())
+                .sortOrder(questionItem.getSortOrder())
+                .build();
+    }
 }

@@ -164,10 +164,10 @@ public class UserService {
         // 초기화 상태에서 다시 추가.
         List<InterestedCeleb> interestedCelebList = dto.getCelebIdList().stream()
                 .map(celeb ->
-                        InterestedCeleb.builder()
-                                .user(user)
-                                .celeb(celebRepository.findById(celeb).orElseThrow(CelebNotFoundException::new))
-                                .build()
+                        InterestedCeleb.toEntity(
+                                user,
+                                celebRepository.findById(celeb).orElseThrow(CelebNotFoundException::new)
+                        )
                 ).toList();
 
         interestedCelebRepository.saveAll(interestedCelebList);
@@ -306,50 +306,45 @@ public class UserService {
         List<QuestionSimpleResDto> content = recentQuestionPage.stream().map(recentQuestion -> {
             Question question = questionRepository.findById(recentQuestion.getQuestion().getId())
                     .orElseThrow(QuestionNotFoundException::new);
+            List<QuestionImgSimpleResDto> imgList = null;
+            List<QuestionImgSimpleResDto> itemImgList = null;
+            List<String> categoryList = null;
+            String celebName = null;
 
-            QuestionSimpleResDto.QuestionSimpleResDtoBuilder builder = QuestionSimpleResDto.builder()
-                    .qType(recentQuestion.getQType())
-                    .id(question.getId())
-                    .title(question.getTitle())
-                    .content(question.getContent());
 
             if (recentQuestion.getQType().equals("Buy")) {
                 // 이미지 Dto 생성
-                List<QuestionImgSimpleResDto> imgList = questionImgRepository.findAllByQuestionId(question.getId())
+                imgList = questionImgRepository.findAllByQuestionId(question.getId())
                         .stream()
-                        .map(this::convertQuestionImgToQuestionImgSimpleResDto).toList();
+                        .map(QuestionImgSimpleResDto::of).toList();
                 // 아이템 이미지 Dto 생성
-                List<QuestionImgSimpleResDto> itemImgList = questionItemRepository.findAllByQuestionId(question.getId())
+                itemImgList = questionItemRepository.findAllByQuestionId(question.getId())
                         .stream()
-                        .map(this::convertQuestionItemToQuestionImgSimpleResDto).toList();
-                builder
-                    .imgList(imgList)
-                    .itemImgList(itemImgList);
+                        .map(questionItem -> {
+                                ItemImg mainImg = itemImgRepository.findMainImg(questionItem.getItem().getId());
+                                return QuestionImgSimpleResDto.of(mainImg);
+                        }).toList();
 
             } else if (recentQuestion.getQType().equals("How")) {
 
             } else if (recentQuestion.getQType().equals("Recommend")) {
                 // Question 카테고리
-                List<String> categoryList = questionRecommendCategoryRepository.findAllByQuestionId(question.getId())
+                categoryList = questionRecommendCategoryRepository.findAllByQuestionId(question.getId())
                         .stream()
                         .map(QuestionRecommendCategory::getName).toList();
-                builder
-                    .categoryName(categoryList);
             } else if (recentQuestion.getQType().equals("Find")) {
                 QuestionFind questionFind = (QuestionFind) question;
-                builder
-                        .celebName(
-                                questionFind.getCeleb() != null
+                celebName = questionFind.getCeleb() != null
                                 ?questionFind.getCeleb().getParent() != null
                                         ?questionFind.getCeleb().getParent().getCelebNameKr() + " " + questionFind.getCeleb().getCelebNameKr()
                                         :questionFind.getCeleb().getCelebNameKr()
-                                :questionFind.getNewCeleb().getCelebName()
-                        );
+                                :questionFind.getNewCeleb().getCelebName();
             } else {
                 throw new QuestionTypeNotFoundException();
             }
 
-            return builder.build();
+            return QuestionSimpleResDto.of(recentQuestion.getQType(), question, celebName, imgList, itemImgList, categoryList);
+
 
 
         }).toList();
@@ -442,66 +437,52 @@ public class UserService {
     }
 
     private QuestionSimpleResDto dtoBuildByQuestionType(Question question) {
-        QuestionSimpleResDto.QuestionSimpleResDtoBuilder builder = QuestionSimpleResDto.builder()
-                .id(question.getId())
-                .title(question.getTitle())
-                .content(question.getContent());
+        String qType = null;
+        List<QuestionImgSimpleResDto> imgList = null;
+        List<QuestionImgSimpleResDto> itemImgList = null;
+        String celebName = null;
+        List<String> categoryList = null;
 
         if(question instanceof QuestionBuy){ // 1. question이 QuestionBuy 일 경우
             // 이미지 DTO 생성
-            List<QuestionImgSimpleResDto> imgList = questionImgRepository.findAllByQuestionId(question.getId())
+            List<QuestionImgSimpleResDto> imgSimpleList = questionImgRepository.findAllByQuestionId(question.getId())
                     .stream()
-                    .map(this::convertQuestionImgToQuestionImgSimpleResDto).toList();
+                    .map(QuestionImgSimpleResDto::of).toList();
             // 아이템 이미지 DTO 생성
-            List<QuestionImgSimpleResDto> itemImgList = questionItemRepository.findAllByQuestionId(question.getId())
+            List<QuestionImgSimpleResDto> itemImgSimpleList = questionItemRepository.findAllByQuestionId(question.getId())
                     .stream()
-                    .map(this::convertQuestionItemToQuestionImgSimpleResDto).toList();
+                    .map(questionItem -> {
+                        ItemImg mainImg = itemImgRepository.findMainImg(questionItem.getItem().getId());
+                        return QuestionImgSimpleResDto.of(mainImg);
+                    }).toList();
 
-            builder
-                .qType("Buy")
-                .imgList(imgList)
-                .itemImgList(itemImgList);
+            qType = "Buy";
+            imgList = imgSimpleList;
+            itemImgList = itemImgSimpleList;
 
         } else if (question instanceof QuestionFind questionFind) { // 2. question이 QuestionFind 일 경우
-            builder
-                .qType("Find")
-                .celebName(questionFind.getCeleb() != null
+            qType = "Find";
+            celebName = questionFind.getCeleb() != null
                         ?questionFind.getCeleb().getParent() != null
                                 ? questionFind.getCeleb().getParent().getCelebNameKr() + " " + questionFind.getCeleb().getCelebNameKr()
                                 : questionFind.getCeleb().getCelebNameKr()
-                        : questionFind.getNewCeleb().getCelebName()
-                );
+                        : questionFind.getNewCeleb().getCelebName();
+
         } else if (question instanceof QuestionHowabout) { // 3. question이 QuestionHowabout 일 경우
-            builder
-                .qType("How");
+            qType = "How";
 
         } else if (question instanceof QuestionRecommend) { // 4. question이 QuestionRecommend 일 경우
-            List<String> categoryList = questionRecommendCategoryRepository.findAllByQuestionId(question.getId())
+            List<String> categoryNameList = questionRecommendCategoryRepository.findAllByQuestionId(question.getId())
                     .stream()
                     .map(QuestionRecommendCategory::getName).toList();
-            builder
-                .qType("Recommend")
-                .categoryName(categoryList);
+            qType = "Recommend";
+            categoryList = categoryNameList;
+
         }else{
             throw new QuestionTypeNotFoundException();
         }
 
-        return builder.build();
-    }
-
-    private QuestionImgSimpleResDto convertQuestionImgToQuestionImgSimpleResDto(QuestionImg questionImg){
-        return QuestionImgSimpleResDto.builder()
-                .imgUrl(questionImg.getImgUrl())
-                .sortOrder((long)questionImg.getSortOrder())
-                .build();
-    }
-
-    private QuestionImgSimpleResDto convertQuestionItemToQuestionImgSimpleResDto(QuestionItem questionItem){
-        ItemImg mainImg = itemImgRepository.findMainImg(questionItem.getItem().getId());
-        return QuestionImgSimpleResDto.builder()
-                .imgUrl(mainImg.getItemImgUrl())
-                .sortOrder((long) mainImg.getSortOrder())
-                .build();
+        return QuestionSimpleResDto.of(qType, question, celebName, imgList, itemImgList, categoryList);
     }
 
     /**

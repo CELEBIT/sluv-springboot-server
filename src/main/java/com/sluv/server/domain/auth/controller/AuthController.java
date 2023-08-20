@@ -9,6 +9,8 @@ import com.sluv.server.domain.auth.service.GoogleUserService;
 import com.sluv.server.domain.auth.service.KakaoUserService;
 
 import com.sluv.server.domain.user.dto.UserIdDto;
+import com.sluv.server.domain.user.entity.User;
+import com.sluv.server.domain.user.service.UserService;
 import com.sluv.server.global.common.response.ErrorResponse;
 import com.sluv.server.global.common.response.SuccessDataResponse;
 import com.sluv.server.global.common.response.SuccessResponse;
@@ -24,6 +26,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -35,6 +38,7 @@ public class AuthController {
     private final GoogleUserService googleUserService;
     private final AppleUserService appleUserService;
     private final AuthService authService;
+    private final UserService userService;
 
     private final JwtProvider jwtProvider;
 
@@ -71,9 +75,8 @@ public class AuthController {
             summary = "*자동 로그인"
     )
     @GetMapping("/auto-login")
-    public ResponseEntity<SuccessResponse> autoLogin(HttpServletRequest request){
-        String accessToken = jwtProvider.resolveToken(request);
-        jwtProvider.validateToken(accessToken);
+    public ResponseEntity<SuccessResponse> autoLogin(@AuthenticationPrincipal User user){
+        userService.checkUserStatue(user);
 
         return ResponseEntity.ok().body(new SuccessResponse());
     }

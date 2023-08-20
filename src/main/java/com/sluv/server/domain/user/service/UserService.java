@@ -1,5 +1,6 @@
 package com.sluv.server.domain.user.service;
 
+import com.sluv.server.domain.auth.exception.UserBlockedException;
 import com.sluv.server.domain.celeb.dto.*;
 import com.sluv.server.domain.celeb.entity.Celeb;
 import com.sluv.server.domain.celeb.entity.CelebCategory;
@@ -603,5 +604,12 @@ public class UserService {
         CelebCategory tempCategory = categoryList.get(1);
         categoryList.set(1, categoryList.get(2));
         categoryList.set(2, tempCategory);
+    }
+
+    public void checkUserStatue(User user) {
+
+        if (user.getUserStatus().equals(UserStatus.BLOCKED)){
+            throw new UserBlockedException();
+        }
     }
 }

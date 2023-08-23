@@ -15,6 +15,8 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Builder
 public class NoticeSimpleResDto {
+    @Schema(description = "공지사항 id")
+    private Long id;
     @Schema(description = "공지사항 제목")
     private String title;
     @Schema(description = "공지사항 공지일")
@@ -25,6 +27,7 @@ public class NoticeSimpleResDto {
     public static NoticeSimpleResDto of(Notice notice){
 
         return NoticeSimpleResDto.builder()
+                .id(notice.getId())
                 .title(notice.getTitle())
                 .createdAt(notice.getCreatedAt())
                 .noticeType(notice.getNoticeType())

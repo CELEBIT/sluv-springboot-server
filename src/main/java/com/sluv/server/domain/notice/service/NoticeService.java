@@ -1,7 +1,9 @@
 package com.sluv.server.domain.notice.service;
 
+import com.sluv.server.domain.notice.dto.NoticeDetailResDto;
 import com.sluv.server.domain.notice.dto.NoticeSimpleResDto;
 import com.sluv.server.domain.notice.entity.Notice;
+import com.sluv.server.domain.notice.exception.NoticeNotFoundException;
 import com.sluv.server.domain.notice.repository.NoticeRepository;
 import com.sluv.server.global.common.response.PaginationResDto;
 import lombok.RequiredArgsConstructor;
@@ -29,5 +31,12 @@ public class NoticeService {
                 .hasNext(noticePage.hasNext())
                 .content(content)
                 .build();
+    }
+
+    public NoticeDetailResDto getNoticeDetail(Long noticeId) {
+
+        Notice notice = noticeRepository.findById(noticeId).orElseThrow(NoticeNotFoundException::new);
+
+        return NoticeDetailResDto.of(notice);
     }
 }

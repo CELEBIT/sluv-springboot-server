@@ -13,15 +13,18 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class NoticeSimpleResDto {
+public class NoticeDetailResDto {
+
     private String title;
+    private String content;
     private LocalDateTime createdAt;
     private NoticeType noticeType;
 
-    public static NoticeSimpleResDto of(Notice notice){
+    public static NoticeDetailResDto of(Notice notice){
 
-        return NoticeSimpleResDto.builder()
+        return NoticeDetailResDto.builder()
                 .title(notice.getTitle())
+                .content(notice.getContent())
                 .createdAt(notice.getCreatedAt())
                 .noticeType(notice.getNoticeType())
                 .build();

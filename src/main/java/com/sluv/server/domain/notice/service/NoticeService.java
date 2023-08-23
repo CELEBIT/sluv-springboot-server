@@ -18,10 +18,14 @@ import java.util.List;
 public class NoticeService {
     private final NoticeRepository noticeRepository;
 
+    /**
+     * 공지사항 리스트 조회
+     */
     public PaginationResDto<NoticeSimpleResDto> getAllNotice(Pageable pageable) {
-
+        // 공지사항 리스트 Page 조회
         Page<Notice> noticePage = noticeRepository.getAllNotice(pageable);
 
+        // Content가 될 Dto 제작
         List<NoticeSimpleResDto> content = noticePage.stream()
                                                         .map(NoticeSimpleResDto::of)
                                                         .toList();
@@ -33,8 +37,12 @@ public class NoticeService {
                 .build();
     }
 
+    /**
+     * 공지사항 상세 조회
+     */
     public NoticeDetailResDto getNoticeDetail(Long noticeId) {
 
+        // noticeId에 해당하는 공지사항 조회
         Notice notice = noticeRepository.findById(noticeId).orElseThrow(NoticeNotFoundException::new);
 
         return NoticeDetailResDto.of(notice);

@@ -19,7 +19,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class NoticeController {
     private final NoticeService noticeService;
-
+    @Operation(
+            summary = "공지사항 리스트 조회",
+            description = """
+                    - 공지사항 리스트 조회 API\n
+                    - Pagination 적용
+                    """
+    )
     @GetMapping("")
     public ResponseEntity<SuccessDataResponse<PaginationResDto<NoticeSimpleResDto>>> getAllNotice(Pageable pageable){
 
@@ -30,6 +36,13 @@ public class NoticeController {
         );
     }
 
+    @Operation(
+            summary = "공지사항 상세 조회",
+            description = """
+                    - 공지사항 상세 조회 API\n
+                    - 상세 조회할 공지사항의 Id를 PathVariable로 받음.
+                    """
+    )
     @GetMapping("/{noticeId}")
     public ResponseEntity<SuccessDataResponse<NoticeDetailResDto>> getNoticeDetail(@PathVariable("noticeId") Long noticeId){
 

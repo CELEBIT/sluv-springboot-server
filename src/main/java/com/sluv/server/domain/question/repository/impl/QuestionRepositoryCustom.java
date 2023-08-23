@@ -19,6 +19,8 @@ public interface QuestionRepositoryCustom {
 
     Page<QuestionRecommend> getSearchQuestionRecommend(List<Long> questionIdList, Pageable pageable);
 
+    Page<Question> getSearchQuestion(List<Long> questionIdList, Pageable pageable);
+
     List<QuestionBuy> getWaitQuestionBuy(User user, Long questionId, List<Celeb> interestedCeleb);
 
     List<QuestionRecommend> getWaitQuestionRecommend(User user, Long questionId);

@@ -23,6 +23,7 @@ import com.sluv.server.domain.question.exception.QuestionNotFoundException;
 import com.sluv.server.domain.question.exception.QuestionReportDuplicateException;
 import com.sluv.server.domain.question.exception.QuestionTypeNotFoundException;
 import com.sluv.server.domain.question.repository.*;
+import com.sluv.server.domain.user.dto.UserInfoDto;
 import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.global.common.enums.ItemImgOrLinkStatus;
 import com.sluv.server.global.common.enums.ReportStatus;
@@ -531,9 +532,19 @@ public class QuestionService {
                     }).toList();
         }
 
+        // 작성자 InfoDto
+        UserInfoDto userInfoDto = UserInfoDto.of(question.getUser());
 
-        return QuestionSimpleResDto.of(qType, question,
-                        null, imgList, itemImgList, null);
+        // Question 좋아요 수
+        Long likeNum = questionLikeRepository.countByQuestionId(question.getId());
+
+        // Question 댓글 수
+        Long commentNum = commentRepository.countByQuestionId(question.getId());
+
+
+
+        return QuestionSimpleResDto.of(qType, userInfoDto, likeNum, commentNum,
+                question, null, imgList, itemImgList, null);
     }
 
     public PaginationResDto<QuestionSimpleResDto> getTotalQuestionList(Pageable pageable) {

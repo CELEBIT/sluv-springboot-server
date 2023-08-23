@@ -3,6 +3,7 @@ package com.sluv.server.domain.search.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sluv.server.domain.closet.entity.Closet;
 import com.sluv.server.domain.closet.repository.ClosetRepository;
+import com.sluv.server.domain.comment.repository.CommentRepository;
 import com.sluv.server.domain.item.dto.ItemSimpleResDto;
 import com.sluv.server.domain.item.entity.Item;
 import com.sluv.server.domain.item.entity.ItemImg;
@@ -13,10 +14,7 @@ import com.sluv.server.domain.question.dto.QuestionImgSimpleResDto;
 import com.sluv.server.domain.question.dto.QuestionSimpleResDto;
 import com.sluv.server.domain.question.entity.*;
 import com.sluv.server.domain.question.exception.QuestionTypeNotFoundException;
-import com.sluv.server.domain.question.repository.QuestionImgRepository;
-import com.sluv.server.domain.question.repository.QuestionItemRepository;
-import com.sluv.server.domain.question.repository.QuestionRecommendCategoryRepository;
-import com.sluv.server.domain.question.repository.QuestionRepository;
+import com.sluv.server.domain.question.repository.*;
 import com.sluv.server.domain.search.dto.*;
 import com.sluv.server.domain.search.entity.RecentSearch;
 import com.sluv.server.domain.search.entity.SearchData;
@@ -25,6 +23,7 @@ import com.sluv.server.domain.search.repository.RecentSearchRepository;
 import com.sluv.server.domain.search.repository.SearchDataRepository;
 import com.sluv.server.domain.search.repository.SearchRankRepository;
 import com.sluv.server.domain.search.utils.ElasticSearchConnectUtil;
+import com.sluv.server.domain.user.dto.UserInfoDto;
 import com.sluv.server.domain.user.dto.UserSearchInfoDto;
 import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.domain.user.repository.FollowRepository;
@@ -38,6 +37,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
@@ -56,6 +56,8 @@ public class SearchService {
     private final QuestionRecommendCategoryRepository questionRecommendCategoryRepository;
     private final UserRepository userRepository;
     private final FollowRepository followRepository;
+    private final QuestionLikeRepository questionLikeRepository;
+    private final CommentRepository commentRepository;
 
     private final ClosetRepository closetRepository;
     private final ElasticSearchConnectUtil elasticSearchConnectUtil;
@@ -135,8 +137,17 @@ public class SearchService {
                         .stream()
                         .map(QuestionImgSimpleResDto::of).toList();
 
-                return QuestionSimpleResDto.of("Buy", question, null,
-                                imgList, itemImgList, null);
+                // 작성자 InfoDto
+                UserInfoDto userInfoDto = UserInfoDto.of(question.getUser());
+
+                // Question 좋아요 수
+                Long likeNum = questionLikeRepository.countByQuestionId(question.getId());
+
+                // Question 댓글 수
+                Long commentNum = commentRepository.countByQuestionId(question.getId());
+
+                return QuestionSimpleResDto.of("Buy", userInfoDto, likeNum, commentNum,
+                        question, null, imgList, itemImgList, null);
             }).toList();
 
             return PaginationResDto.<QuestionSimpleResDto>builder()
@@ -154,7 +165,17 @@ public class SearchService {
                                     ? question.getCeleb().getCelebNameKr()
                                     : question.getNewCeleb().getCelebName();
 
-                return QuestionSimpleResDto.of("Find", question, celebName, null, null, null);
+                // 작성자 InfoDto
+                UserInfoDto userInfoDto = UserInfoDto.of(question.getUser());
+
+                // Question 좋아요 수
+                Long likeNum = questionLikeRepository.countByQuestionId(question.getId());
+
+                // Question 댓글 수
+                Long commentNum = commentRepository.countByQuestionId(question.getId());
+
+                return QuestionSimpleResDto.of("Find", userInfoDto, likeNum, commentNum,
+                        question, celebName, null, null, null);
 
             }).toList();
 
@@ -168,15 +189,20 @@ public class SearchService {
             Page<QuestionHowabout> searchQuestionPage =
                     questionRepository.getSearchQuestionHowabout(questionIdList, pageable);
 
-            List<QuestionSimpleResDto> content = searchQuestionPage.stream().map(question ->
+            List<QuestionSimpleResDto> content = searchQuestionPage.stream().map(question -> {
 
-                QuestionSimpleResDto.builder()
-                        .qType("How")
-                        .id(question.getId())
-                        .title(question.getTitle())
-                        .content(question.getContent())
-                        .build()
-            ).toList();
+                    // 작성자 InfoDto
+                    UserInfoDto userInfoDto = UserInfoDto.of(question.getUser());
+
+                    // Question 좋아요 수
+                    Long likeNum = questionLikeRepository.countByQuestionId(question.getId());
+
+                    // Question 댓글 수
+                    Long commentNum = commentRepository.countByQuestionId(question.getId());
+
+                    return QuestionSimpleResDto.of("How", userInfoDto, likeNum, commentNum,
+                            question, null, null, null, null);
+            }).toList();
 
             return PaginationResDto.<QuestionSimpleResDto>builder()
                     .page(searchQuestionPage.getNumber())
@@ -184,7 +210,7 @@ public class SearchService {
                     .content(content)
                     .build();
 
-        }else if(qType.equals("Recommend")){
+        }else if(qType.equals("Recommend")) {
             Page<QuestionRecommend> searchQuestionPage =
                     questionRepository.getSearchQuestionRecommend(questionIdList, pageable);
 
@@ -193,7 +219,17 @@ public class SearchService {
                 List<String> categoryList = questionRecommendCategoryRepository.findAllByQuestionId(question.getId())
                         .stream()
                         .map(QuestionRecommendCategory::getName).toList();
-                return QuestionSimpleResDto.of("Recommend", question, null, null, null, categoryList);
+                // 작성자 InfoDto
+                UserInfoDto userInfoDto = UserInfoDto.of(question.getUser());
+
+                // Question 좋아요 수
+                Long likeNum = questionLikeRepository.countByQuestionId(question.getId());
+
+                // Question 댓글 수
+                Long commentNum = commentRepository.countByQuestionId(question.getId());
+
+                return QuestionSimpleResDto.of("Recommend", userInfoDto, likeNum, commentNum,
+                        question, null, null, null, categoryList);
             }).toList();
 
             // 최근 검색 등록

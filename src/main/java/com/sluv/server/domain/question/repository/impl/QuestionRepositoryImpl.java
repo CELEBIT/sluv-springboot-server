@@ -308,4 +308,26 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom{
 
         return PageableExecutionUtils.getPage(content, pageable, () -> query.fetch().size());
     }
+
+    @Override
+    public Page<Question> getSearchQuestion(List<Long> questionIdList, Pageable pageable) {
+        List<Question> content = jpaQueryFactory.selectFrom(question)
+                .where(question.id.in(questionIdList)
+                        .and(question.questionStatus.eq(ACTIVE))
+                )
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .orderBy(question.createdAt.desc()) // 추구 후현
+                .fetch();
+
+        //Count Query
+        JPAQuery<Question> countJPAQuery = jpaQueryFactory.selectFrom(question)
+                .where(question.id.in(questionIdList)
+                        .and(question.questionStatus.eq(ACTIVE))
+                )
+                .orderBy(question.createdAt.desc());// 추구 후현
+
+
+        return PageableExecutionUtils.getPage(content, pageable, () -> countJPAQuery.fetch().size());
+    }
 }

@@ -191,7 +191,7 @@ public class ClosetService {
                 .page(itemPage.getNumber())
                 .content(content)
                 .coverImgUrl(closet.getCoverImgUrl())
-                .title(closet.getName())
+                .name(closet.getName())
                 .closetStatus(closet.getClosetStatus())
                 .itemNum(itemPage.getTotalElements())
                 .build();

@@ -7,16 +7,14 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
-import java.util.List;
-
 @Getter
 @NoArgsConstructor
 @SuperBuilder
 public class ClosetDetailResDto<T> extends PaginationResDto<T> {
     @Schema(description = "Closet 커버 이미지 Url")
     private String coverImgUrl;
-    @Schema(description = "Closet 제목")
-    private String title;
+    @Schema(description = "Closet 이름")
+    private String name;
     @Schema(description = "Closet 공개여부")
     private ClosetStatus closetStatus;
     @Schema(description = "Closet에 있는 아이템 개수")

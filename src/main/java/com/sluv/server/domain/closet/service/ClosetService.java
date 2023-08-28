@@ -5,6 +5,7 @@ import com.sluv.server.domain.closet.dto.ClosetItemSelectReqDto;
 import com.sluv.server.domain.closet.dto.ClosetReqDto;
 import com.sluv.server.domain.closet.dto.ClosetResDto;
 import com.sluv.server.domain.closet.entity.Closet;
+import com.sluv.server.domain.closet.enums.ClosetColor;
 import com.sluv.server.domain.closet.enums.ClosetStatus;
 import com.sluv.server.domain.closet.exception.BasicClosetDeleteException;
 import com.sluv.server.domain.closet.exception.ClosetNotFoundException;
@@ -39,14 +40,12 @@ public class ClosetService {
 
     public void postBasicCloset(User user){
 
-        // 기본 Url 지정이 필요
-        String DEFAULT_COVER_IMG_URL = "def";
-
         Closet defCloset = Closet.builder()
                 .user(user)
                 .name("기본 옷장")
-                .coverImgUrl(DEFAULT_COVER_IMG_URL)
+                .coverImgUrl(null)
                 .basicFlag(true)
+                .color(ClosetColor.PURPLE)
                 .closetStatus(ClosetStatus.PRIVATE)
                 .build();
 

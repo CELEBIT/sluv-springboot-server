@@ -31,6 +31,7 @@ public class    ClosetController {
     )
     @PostMapping("")
     public ResponseEntity<SuccessResponse> postCloset(@AuthenticationPrincipal User user, @RequestBody ClosetReqDto dto){
+
         closetService.postCloset(user, dto);
         return ResponseEntity.ok().body(
                 new SuccessResponse()

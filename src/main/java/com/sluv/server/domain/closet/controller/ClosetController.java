@@ -1,9 +1,6 @@
 package com.sluv.server.domain.closet.controller;
 
-import com.sluv.server.domain.closet.dto.ClosetDetailResDto;
-import com.sluv.server.domain.closet.dto.ClosetItemSelectReqDto;
-import com.sluv.server.domain.closet.dto.ClosetReqDto;
-import com.sluv.server.domain.closet.dto.ClosetResDto;
+import com.sluv.server.domain.closet.dto.*;
 import com.sluv.server.domain.closet.service.ClosetService;
 import com.sluv.server.domain.item.dto.ItemSimpleResDto;
 import com.sluv.server.domain.user.entity.User;
@@ -155,10 +152,10 @@ public class    ClosetController {
                     """
     )
     @GetMapping("/list")
-    public ResponseEntity<SuccessDataResponse<List<ClosetResDto>>> getClosetList(@AuthenticationPrincipal User user){
+    public ResponseEntity<SuccessDataResponse<ClosetListCountResDto>> getClosetList(@AuthenticationPrincipal User user){
 
         return ResponseEntity.ok().body(
-                SuccessDataResponse.<List<ClosetResDto>>builder()
+                SuccessDataResponse.<ClosetListCountResDto>builder()
                                 .result(closetService.getClosetList(user))
                                 .build()
         );

@@ -1,9 +1,6 @@
 package com.sluv.server.domain.closet.service;
 
-import com.sluv.server.domain.closet.dto.ClosetDetailResDto;
-import com.sluv.server.domain.closet.dto.ClosetItemSelectReqDto;
-import com.sluv.server.domain.closet.dto.ClosetReqDto;
-import com.sluv.server.domain.closet.dto.ClosetResDto;
+import com.sluv.server.domain.closet.dto.*;
 import com.sluv.server.domain.closet.entity.Closet;
 import com.sluv.server.domain.closet.enums.ClosetColor;
 import com.sluv.server.domain.closet.enums.ClosetStatus;
@@ -211,15 +208,20 @@ public class ClosetService {
                 }).toList();
     }
 
-    public List<ClosetResDto> getClosetList(User user) {
+    public ClosetListCountResDto getClosetList(User user) {
         List<Closet> closetList = closetRepository.findAllByUserId(user.getId());
 
 
-        return closetList
+        List<ClosetResDto> closetResDtoList = closetList
                 .stream().map(closet -> ClosetResDto.of(
-                                                    closet,
-                                                    itemScrapRepository.countByClosetId(closet.getId())
-                                                    )
+                                closet,
+                                itemScrapRepository.countByClosetId(closet.getId())
+                        )
                 ).toList();
+
+        return ClosetListCountResDto.of(
+                closetRepository.countByUserId(user.getId()),
+                closetResDtoList
+        );
     }
 }

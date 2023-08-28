@@ -9,4 +9,6 @@ import java.util.List;
 
 public interface ClosetRepository extends JpaRepository<Closet, Long>, ClosetRepositoryCustom {
     List<Closet> findAllByUserId(Long id);
+
+    Long countByUserId(Long id);
 }

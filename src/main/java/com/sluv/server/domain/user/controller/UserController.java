@@ -4,11 +4,11 @@ package com.sluv.server.domain.user.controller;
 import com.sluv.server.domain.celeb.dto.InterestedCelebCategoryResDto;
 import com.sluv.server.domain.celeb.dto.InterestedCelebParentResDto;
 import com.sluv.server.domain.celeb.dto.InterestedCelebPostReqDto;
+import com.sluv.server.domain.celeb.dto.InterestedCelebResDto;
 import com.sluv.server.domain.closet.dto.ClosetResDto;
 import com.sluv.server.domain.comment.dto.CommentSimpleResDto;
 import com.sluv.server.domain.item.dto.ItemSimpleResDto;
 import com.sluv.server.domain.question.dto.QuestionSimpleResDto;
-import com.sluv.server.domain.question.entity.Question;
 import com.sluv.server.domain.user.dto.*;
 import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.domain.user.service.UserReportService;
@@ -36,19 +36,19 @@ public class UserController {
     private final UserReportService userReportService;
 
     @Operation(
-            summary = "*현재 유저의 관심 샐럽 조회",
-            description = "현재 유저를 기준으로 InterstedCeleb 테이블에서 일치하는 Celeb을 검색"
+            summary = "*현재 유저의 관심 샐럽을 카테고리를 기준으로 조회",
+            description = "현재 유저를 기준으로 InterstedCeleb 테이블에서 일치하는 Celeb을 카테고리를 기준으로 검색"
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "1000", description = "요청성공"),
             @ApiResponse(responseCode = "5000", description = "서버내부 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "5001", description = "DB 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
-    @GetMapping("/celeb")
-    public ResponseEntity<SuccessDataResponse<List<InterestedCelebCategoryResDto>>> getInterestedCeleb(@AuthenticationPrincipal User user){
+    @GetMapping("/celeb/category")
+    public ResponseEntity<SuccessDataResponse<List<InterestedCelebCategoryResDto>>> getInterestedCelebByCategory(@AuthenticationPrincipal User user){
 
         return ResponseEntity.ok().body(SuccessDataResponse.<List<InterestedCelebCategoryResDto>>builder()
-                                                            .result(userService.getInterestedCeleb(user))
+                                                            .result(userService.getInterestedCelebByCategory(user))
                                                             .build());
     }
 
@@ -446,14 +446,14 @@ public class UserController {
     }
 
     @Operation(
-            summary = "*특정 유저의 관심 샐럽 조회",
-            description = "특정 유저를 기준으로 InterstedCeleb 테이블에서 일치하는 Celeb을 검색"
+            summary = "*특정 유저의 관심 샐럽을 카테고리를 기준으로 조회",
+            description = "특정 유저를 기준으로 InterstedCeleb 테이블에서 일치하는 Celeb을 카테고리를 기준으로 검색"
     )
-    @GetMapping("/{userId}/celeb")
-    public ResponseEntity<SuccessDataResponse<List<InterestedCelebCategoryResDto>>> getTargetUserInterestedCeleb(@PathVariable("userId") Long userId){
+    @GetMapping("/{userId}/celeb/category")
+    public ResponseEntity<SuccessDataResponse<List<InterestedCelebCategoryResDto>>> getTargetUserInterestedCelebByCategory(@PathVariable("userId") Long userId){
 
         return ResponseEntity.ok().body(SuccessDataResponse.<List<InterestedCelebCategoryResDto>>builder()
-                .result(userService.getTargetUserInterestedCeleb(userId))
+                .result(userService.getTargetUserInterestedCelebByCategory(userId))
                 .build());
     }
 
@@ -490,5 +490,29 @@ public class UserController {
                         .result(userService.getUserFollowing(user, user.getId(), pageable))
                         .build()
         );
+    }
+
+    @Operation(
+            summary = "특정 유저의 관심 샐럽을 등록순을 기준으로 조회",
+            description = "특정 유저를 기준으로 InterstedCeleb 테이블에서 일치하는 Celeb을 등록순을 기준으로 검색"
+    )
+    @GetMapping("/{userId}/celeb")
+    public ResponseEntity<SuccessDataResponse<List<InterestedCelebParentResDto>>> getTargetUserInterestedCelebByPostTime(@PathVariable("userId") Long userId){
+
+        return ResponseEntity.ok().body(SuccessDataResponse.<List<InterestedCelebParentResDto>>builder()
+                .result(userService.getTargetUserInterestedCelebByPostTime(userId))
+                .build());
+    }
+
+    @Operation(
+            summary = "*현재 유저의 관심 샐럽을 등록순을 기준으로 조회",
+            description = "현재 유저를 기준으로 InterstedCeleb 테이블에서 일치하는 Celeb을 등록순을 기준으로 검색"
+    )
+    @GetMapping("/celeb")
+    public ResponseEntity<SuccessDataResponse<List<InterestedCelebParentResDto>>> getInterestedCelebByPostTime(@AuthenticationPrincipal User user){
+
+        return ResponseEntity.ok().body(SuccessDataResponse.<List<InterestedCelebParentResDto>>builder()
+                .result(userService.getInterestedCelebByPostTime(user))
+                .build());
     }
 }

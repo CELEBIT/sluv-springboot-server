@@ -14,16 +14,29 @@ import java.util.List;
 public class InterestedCelebParentResDto {
     @Schema(description = "상위 Celeb id")
     private Long id;
-    @Schema(description = "상위 Celeb 한글 이름")
+    @Schema(description = "Celeb 한글 이름")
     private String celebNameKr;
+    @Schema(description = "Celeb 카테고리 이름")
+    private String celebCategory;
     @Schema(description = "하위 Celeb 리스트")
     private List<InterestedCelebChildResDto> subCelebList;
 
-    public static InterestedCelebParentResDto of(Celeb celeb, List<InterestedCelebChildResDto> list){
+    public static InterestedCelebParentResDto of(Celeb celeb){
+        List<InterestedCelebChildResDto> subDtoList = null;
+        if (!celeb.getSubCelebList().isEmpty()) {
+            subDtoList = celeb.getSubCelebList().stream()
+                    .map(InterestedCelebChildResDto::of)
+                    .toList();
+        }
         return InterestedCelebParentResDto.builder()
                 .id(celeb.getId())
                 .celebNameKr(celeb.getCelebNameKr())
-                .subCelebList(list)
+                .celebCategory(
+                        celeb.getCelebCategory().getParent() != null
+                        ? celeb.getCelebCategory().getParent().getName()
+                        : celeb.getCelebCategory().getName()
+                )
+                .subCelebList(subDtoList)
                 .build();
     }
 

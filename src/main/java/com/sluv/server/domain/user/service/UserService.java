@@ -48,7 +48,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Stream;
 
 
 @Service
@@ -88,7 +87,7 @@ public class UserService {
      * User가 선택한 관심 셀럽을 검색
      * 관심 샐럼의 상위 카테고리를 기준으로 묶어서 Response
      */
-    public List<InterestedCelebCategoryResDto> getInterestedCeleb(User user) {
+    public List<InterestedCelebCategoryResDto> getInterestedCelebByCategory(User user) {
         List<Celeb> interestedCelebList = celebRepository.findInterestedCeleb(user);
 
         List<CelebCategory> categoryList = celebCategoryRepository.findAllByParentIdIsNull();
@@ -146,15 +145,7 @@ public class UserService {
     private List<InterestedCelebParentResDto> convertInterestedCelebParentResDto(List<Celeb> celebList) {
         return celebList
                 .stream()
-                .map(celeb -> {
-                    List<InterestedCelebChildResDto> subDtoList = null;
-                    if (!celeb.getSubCelebList().isEmpty()) {
-                        subDtoList = celeb.getSubCelebList().stream()
-                                .map(InterestedCelebChildResDto::of)
-                                .toList();
-                    }
-                    return InterestedCelebParentResDto.of(celeb, subDtoList);
-                }).toList();
+                .map(InterestedCelebParentResDto::of).toList();
     }
 
     @Transactional
@@ -193,7 +184,6 @@ public class UserService {
     }
 
     public UserMypageResDto getUserMypage(User user, Long userId) {
-        UserMypageResDto.UserMypageResDtoBuilder result = UserMypageResDto.builder();
         User targetUser;
         Long itemCount = null;
         List<String> imgList = null;
@@ -219,10 +209,6 @@ public class UserService {
                                             .orElseThrow(UserNotFoundException::new);
         }
 
-        List<InterestedCelebResDto> interestedCelebList = interestedCelebRepository.findAllByUserId(targetUser.getId())
-                .stream().map(InterestedCelebResDto::of)
-                .toList();
-
         Boolean followStatus = followRepository.getFollowStatus(user, targetUser);
         Long followerCount = followRepository.getFollowerCount(targetUser);
         Long followingCount = followRepository.getFollowingCount(targetUser);
@@ -231,7 +217,6 @@ public class UserService {
                 followStatus,
                 followerCount,
                 followingCount,
-                interestedCelebList,
                 itemCount,
                 imgList,
                 communityCount
@@ -593,9 +578,10 @@ public class UserService {
     /**
      * 특정 유저가 선택한 관심 Celeb을 조회
      * CelebCategory를 기준으로 그룹핑
+     * 카테고리를 기준으로 조회
      */
 
-    public List<InterestedCelebCategoryResDto> getTargetUserInterestedCeleb(Long userId) {
+    public List<InterestedCelebCategoryResDto> getTargetUserInterestedCelebByCategory(Long userId) {
         User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
         List<Celeb> interestedCelebList = celebRepository.findInterestedCeleb(user);
 
@@ -630,5 +616,28 @@ public class UserService {
         if (user.getUserStatus().equals(UserStatus.BLOCKED)){
             throw new UserBlockedException();
         }
+    }
+
+    /**
+     * 특정 유저가 선택한 관심 Celeb을 조회
+     * CelebCategory를 기준으로 그룹핑
+     * 유저가 등록한 순서대로 조회
+     */
+
+    public List<InterestedCelebParentResDto> getTargetUserInterestedCelebByPostTime(Long userId) {
+        User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+        return celebRepository.findInterestedCeleb(user)
+                .stream()
+                .map(InterestedCelebParentResDto::of).toList();
+    }
+
+    /**
+     * User가 선택한 관심 셀럽을 검색
+     * 관심 셀럽 선택순서를 기준으로 조회
+     */
+    public List<InterestedCelebParentResDto> getInterestedCelebByPostTime(User user) {
+        return celebRepository.findInterestedCeleb(user)
+                .stream()
+                .map(InterestedCelebParentResDto::of).toList();
     }
 }

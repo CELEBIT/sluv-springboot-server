@@ -23,8 +23,6 @@ public class UserMypageResDto {
     private Long followerCount;
     @Schema(description = "해당 유저의 팔로잉 수")
     private Long followingCount;
-    @Schema(description = "해당 유저의 관심 셀럽 리스트")
-    private List<InterestedCelebResDto> interestedCelebList;
 
     // 현재 유저의 MyPage
     @Schema(description = "해당 유저가 작성한 아이템 개수")
@@ -38,7 +36,6 @@ public class UserMypageResDto {
                                       Boolean followStatus,
                                       Long followerCount,
                                       Long followingCount,
-                                      List<InterestedCelebResDto> interestedCelebList,
                                       Long itemCount,
                                       List<String> imgList,
                                       Long communityCount
@@ -49,7 +46,6 @@ public class UserMypageResDto {
                 .followStatus(followStatus)
                 .followerCount(followerCount)
                 .followingCount(followingCount)
-                .interestedCelebList(interestedCelebList)
                 .itemCount(itemCount)
                 .imgList(imgList)
                 .communityCount(communityCount)

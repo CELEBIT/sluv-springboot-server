@@ -14,11 +14,18 @@ public class InterestedCelebChildResDto {
     private Long id;
     @Schema(description = "멤버 Celeb 한글 이름")
     private String celebNameKr;
+    @Schema(description = "Celeb 카테고리 이름")
+    private String celebCategory;
 
     public static InterestedCelebChildResDto of(Celeb celeb){
         return InterestedCelebChildResDto.builder()
                 .id(celeb.getId())
                 .celebNameKr(celeb.getCelebNameKr())
+                .celebCategory(
+                        celeb.getCelebCategory().getParent() != null
+                                ? celeb.getCelebCategory().getParent().getName()
+                                : celeb.getCelebCategory().getName()
+                )
                 .build();
     }
 }

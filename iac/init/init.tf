@@ -24,5 +24,5 @@ resource "aws_dynamodb_table" "terraform_state_lock" {
 }
 
 variable "account_id" {
-  default = "sluv-id" # Please use the account alias for id
+  default = "sluv-2nd-id" # Please use the account alias for id
 }

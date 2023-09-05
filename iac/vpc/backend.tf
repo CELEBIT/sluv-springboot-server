@@ -1,6 +1,6 @@
 terraform {
   backend "s3" {
-    bucket         = "sluv-id-apnortheast2-tfstate" # Set bucket name
+    bucket         = "sluv-2nd-id-apnortheast2-tfstate" # Set bucket name
     key            = "sluv/terraform/vpc/terraform.tfstate"
     region         = "ap-northeast-2"
     encrypt        = true

@@ -5,7 +5,11 @@ vpc_name = "sluv-2nd-dev"
 # Availability Zone list
 availability_zones = ["ap-northeast-2a", "ap-northeast-2c"]
 
-# for amazon linux ec2
-#base_ami = "ami-0c9c942bd7bf113a2"
-#instance_type = "t2.small"
-#key_name = "EC2-KEY-SLUV-JENKINS"
+# ubuntu ec2 for jenkins instance
+jenkins_base_ami = "ami-00fdfe418c69b624a"
+jenkins_instance_type = "t2.small"
+key_name = "SEC-SLUV-EC2-KEY"
+
+# ubuntu ec2 for was instance
+was_base_ami = "ami-00fdfe418c69b624a"
+was_instance_type = "t2.micro"

@@ -31,6 +31,9 @@ variable "cidr_numeral_private" {
   }
 }
 
-#variable "base_ami" {}
-#variable "instance_type" {}
-#variable "key_name" {}
+variable "jenkins_base_ami" {}
+variable "jenkins_instance_type" {}
+variable "key_name" {}
+
+variable "was_base_ami" {}
+variable "was_instance_type" {}

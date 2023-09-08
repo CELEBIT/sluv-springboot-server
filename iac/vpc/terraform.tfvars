@@ -11,5 +11,5 @@ jenkins_instance_type = "t2.small"
 key_name = "SEC-SLUV-EC2-KEY"
 
 # ubuntu ec2 for was instance
-was_base_ami = "ami-00fdfe418c69b624a"
+was_base_ami = "ami-0c9c942bd7bf113a2"
 was_instance_type = "t2.micro"

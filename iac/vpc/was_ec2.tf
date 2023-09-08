@@ -19,7 +19,7 @@ resource "aws_security_group" "was_ec2_sg" {
   vpc_id      = aws_vpc.default.id
 }
 
-resource "aws_security_group_rule" "websg_ssh" {
+resource "aws_security_group_rule" "was_sg_ssh" {
   type              = "ingress"
   from_port         = 22
   to_port           = 22
@@ -29,7 +29,7 @@ resource "aws_security_group_rule" "websg_ssh" {
   description       = "ssh"
 }
 
-resource "aws_security_group_rule" "websg_http" {
+resource "aws_security_group_rule" "was_sg_http" {
   type              = "ingress"
   from_port         = 80
   to_port           = 80
@@ -39,7 +39,7 @@ resource "aws_security_group_rule" "websg_http" {
   description       = "http"
 }
 
-resource "aws_security_group_rule" "websg_https" {
+resource "aws_security_group_rule" "was_sg_https" {
   type              = "ingress"
   from_port         = 443
   to_port           = 443
@@ -49,7 +49,7 @@ resource "aws_security_group_rule" "websg_https" {
   description       = "https"
 }
 
-resource "aws_security_group_rule" "websg_was" {
+resource "aws_security_group_rule" "was_sg_was" {
   type              = "ingress"
   from_port         = 8080
   to_port           = 8080
@@ -59,7 +59,7 @@ resource "aws_security_group_rule" "websg_was" {
   description       = "jenkins"
 }
 
-resource "aws_security_group_rule" "websg_outbound" {
+resource "aws_security_group_rule" "was_sg_outbound" {
   type              = "egress"
   from_port         = 0
   to_port           = 0

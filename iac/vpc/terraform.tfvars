@@ -6,7 +6,7 @@ vpc_name = "sluv-2nd-dev"
 availability_zones = ["ap-northeast-2a", "ap-northeast-2c"]
 
 # ubuntu ec2 for jenkins instance
-jenkins_base_ami = "ami-00fdfe418c69b624a"
+jenkins_base_ami = "ami-0c9c942bd7bf113a2"
 jenkins_instance_type = "t2.small"
 key_name = "SEC-SLUV-EC2-KEY"
 

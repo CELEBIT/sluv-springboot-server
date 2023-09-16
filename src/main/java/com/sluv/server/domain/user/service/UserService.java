@@ -587,6 +587,7 @@ public class UserService {
 
         List<CelebCategory> categoryList = celebCategoryRepository.findAllByParentIdIsNull();
         categoryList.sort(Comparator.comparing(CelebCategory::getName));
+        changeCategoryOrder(categoryList);
 
         return categoryList.stream()
                 // 카테고리별 InterestedCelebCategoryResDto 생성

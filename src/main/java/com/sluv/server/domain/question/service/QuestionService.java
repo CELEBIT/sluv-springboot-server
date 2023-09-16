@@ -594,8 +594,14 @@ public class QuestionService {
                 .build();
     }
 
-    public PaginationResDto<QuestionSimpleResDto> getQuestionFindList(Pageable pageable) {
-        Page<QuestionFind> questionPage = questionRepository.getQuestionFindList(pageable);
+    /**
+     * QuestionFind 커뮤니티 게시글 조회.
+     */
+
+    public PaginationResDto<QuestionSimpleResDto> getQuestionFindList(Long celebId, Pageable pageable) {
+
+        Page<QuestionFind> questionPage = questionRepository.getQuestionFindList(celebId, pageable);
+
         List<QuestionSimpleResDto> content = questionPage.stream().map(question ->
             getQuestionSimpleResDto(question, "Find")
         ).toList();

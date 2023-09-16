@@ -13,10 +13,10 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.Nullable;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -253,7 +253,7 @@ public class QuestionController {
         PaginationResDto<QuestionSimpleResDto> result = switch (qType) {
             case "Total" -> questionService.getTotalQuestionList(pageable);
             case "Buy" -> questionService.getQuestionBuyList(pageable);
-            case "Find" -> questionService.getQuestionFindList(pageable);
+            case "Find" -> questionService.getQuestionFindList(null, pageable);
             case "How" -> questionService.getQuestionHowaboutList(pageable);
             case "Recommend" -> questionService.getQuestionRecommendList(pageable);
             default -> throw new QuestionTypeNotFoundException();
@@ -280,6 +280,25 @@ public class QuestionController {
         return ResponseEntity.ok().body(
                 SuccessDataResponse.<PaginationResDto<QuestionSimpleResDto>>builder()
                         .result(questionService.getTotalQuestionList(pageable))
+                        .build()
+        );
+    }
+
+    @Operation(
+            summary = "QuestionFind 커뮤니티 게시글 검색",
+            description = """
+                    QuestionFind 커뮤니티 게시글 검색\n
+                    - Pagination 적용
+                    - Ordering: 최신순으로 조회
+                    - Filtering: celebId
+                    """
+    )
+    @GetMapping("/find")
+    public ResponseEntity<SuccessDataResponse<PaginationResDto<QuestionSimpleResDto>>> getQuestionTotalList(@Nullable @RequestParam("celebId") Long celebId, Pageable pageable){
+
+        return ResponseEntity.ok().body(
+                SuccessDataResponse.<PaginationResDto<QuestionSimpleResDto>>builder()
+                        .result(questionService.getQuestionFindList(celebId, pageable))
                         .build()
         );
     }

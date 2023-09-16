@@ -239,6 +239,8 @@ public class QuestionController {
                         .build()
         );
     }
+
+    @Deprecated
     @Operation(
             summary = "Question 커뮤니티 리스트 조회",
             description = """
@@ -260,6 +262,24 @@ public class QuestionController {
         return ResponseEntity.ok().body(
                 SuccessDataResponse.<PaginationResDto<QuestionSimpleResDto>>builder()
                         .result(result)
+                        .build()
+        );
+    }
+
+    @Operation(
+            summary = "Question 커뮤니티 게시글 종합 검색",
+            description = """
+                    Question 커뮤니티 게시글 종합 검색\n
+                    - Pagination 적용
+                    - 최신순으로 조회
+                    """
+    )
+    @GetMapping("/total")
+    public ResponseEntity<SuccessDataResponse<PaginationResDto<QuestionSimpleResDto>>> getQuestionTotalList(Pageable pageable){
+
+        return ResponseEntity.ok().body(
+                SuccessDataResponse.<PaginationResDto<QuestionSimpleResDto>>builder()
+                        .result(questionService.getTotalQuestionList(pageable))
                         .build()
         );
     }

@@ -44,7 +44,7 @@ public class QuestionImg extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     @Builder.Default
-    @Column(columnDefinition = "varchar(45) default 'ACTIVE'")
+    @Column(name = "img_status", columnDefinition = "varchar(45) default 'ACTIVE'")
     private ItemImgOrLinkStatus itemImgOrLinkStatus = ItemImgOrLinkStatus.ACTIVE;
 
     public static QuestionImg toEntity(Question question, QuestionImgReqDto reqDto) {

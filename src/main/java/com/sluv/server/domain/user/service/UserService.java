@@ -589,7 +589,6 @@ public class UserService {
         categoryList.sort(Comparator.comparing(CelebCategory::getName));
 
         return categoryList.stream()
-                .parallel()
                 // 카테고리별 InterestedCelebCategoryResDto 생성
                 .map(category ->  {
                             List<Celeb> categoryFilterCeleb = getCategoryFilterCeleb(interestedCelebList, category);

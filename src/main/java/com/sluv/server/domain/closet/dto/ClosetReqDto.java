@@ -21,6 +21,6 @@ ClosetReqDto {
     @Schema(description = "Closet 공개 여부")
     private ClosetStatus closetStatus;
     @Schema(description = "Closet 커버 색상")
-    private ClosetColor color;
+    private ClosetColor colorScheme;
 
 }

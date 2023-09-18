@@ -66,7 +66,7 @@ public class Closet extends BaseEntity {
                 .user(user)
                 .name(dto.getName())
                 .coverImgUrl(dto.getCoverImgUrl())
-                .color(dto.getColor())
+                .color(dto.getColorScheme())
                 .basicFlag(false)
                 .closetStatus(dto.getClosetStatus())
                 .build();

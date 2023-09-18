@@ -23,7 +23,7 @@ public class ClosetResDto {
     @Schema(description = "Closet 공개 여부")
     private ClosetStatus closetStatus;
     @Schema(description = "Closet 커버 색상")
-    private ClosetColor color;
+    private ClosetColor colorScheme;
     @Schema(description = "해당 Closet의 Item 개수")
     private Long itemNum;
 
@@ -33,7 +33,7 @@ public class ClosetResDto {
                 .name(closet.getName())
                 .coverImgUrl(closet.getCoverImgUrl())
                 .closetStatus(closet.getClosetStatus())
-                .color(closet.getColor())
+                .colorScheme(closet.getColor())
                 .itemNum(itemNum)
                 .build();
     }

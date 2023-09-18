@@ -66,7 +66,7 @@ public class ClosetService {
             throw new UserNotMatchedException();
         }
 
-        closet.changeClosetCover(dto.getName(), dto.getCoverImgUrl(), dto.getColor(), dto.getClosetStatus());
+        closet.changeClosetCover(dto.getName(), dto.getCoverImgUrl(), dto.getColorScheme(), dto.getClosetStatus());
 
     }
 
@@ -186,9 +186,11 @@ public class ClosetService {
                 .hasNext(itemPage.hasNext())
                 .page(itemPage.getNumber())
                 .content(content)
+                .id(closet.getId())
                 .coverImgUrl(closet.getCoverImgUrl())
                 .name(closet.getName())
                 .closetStatus(closet.getClosetStatus())
+                .colorScheme(closet.getColor())
                 .itemNum(itemPage.getTotalElements())
                 .build();
 

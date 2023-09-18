@@ -14,6 +14,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class ClosetResDto {
+    @Schema(description = "Closet id")
+    private Long id;
     @Schema(description = "Closet 이름")
     private String name;
     @Schema(description = "Closet 커버 사진 URL")
@@ -27,6 +29,7 @@ public class ClosetResDto {
 
     public static ClosetResDto of(Closet closet, Long itemNum){
         return ClosetResDto.builder()
+                .id(closet.getId())
                 .name(closet.getName())
                 .coverImgUrl(closet.getCoverImgUrl())
                 .closetStatus(closet.getClosetStatus())

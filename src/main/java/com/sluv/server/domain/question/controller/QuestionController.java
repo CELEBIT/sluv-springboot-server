@@ -308,8 +308,12 @@ public class QuestionController {
             description = """
                     QuestionBuy 커뮤니티 게시글 검색\n
                     - Pagination 적용
-                    - Ordering: 최신순으로 조회
                     - Filtering: 전체, 진행중, 마감임박, 종료
+                    =Ordering=\n
+                         * 전체 → 최신순\n
+                         * 진행 중 → 최신순\n
+                         * 종료 임박 → 종료 임박 순\n
+                         * 종료 → 최신순\n
                     """
     )
     @GetMapping("/buy")

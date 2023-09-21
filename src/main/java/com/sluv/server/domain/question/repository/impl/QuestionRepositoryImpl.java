@@ -1,12 +1,12 @@
 package com.sluv.server.domain.question.repository.impl;
 
+import com.querydsl.core.types.Order;
+import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
-import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sluv.server.domain.celeb.entity.Celeb;
 import com.sluv.server.domain.question.entity.*;
-import com.sluv.server.domain.question.repository.QuestionRepository;
 import com.sluv.server.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -14,7 +14,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static com.sluv.server.domain.question.entity.QQuestion.question;
 import static com.sluv.server.domain.question.entity.QQuestionBuy.questionBuy;
@@ -252,8 +254,12 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom{
 
     /**
      * QuestionBuy만 조회.
-     * Ordering: createdAt
      * Filtering: voteStatus
+     * =Ordering=
+     * 전체 → 최신순
+     * 진행 중 → 최신순
+     * 종료 임박 → 종료 임박 순
+     * 종료 → 최신순
      *
      * voteStatus가 null이면 모든 voteStatus에 대해 조회.
      */
@@ -262,13 +268,13 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom{
 
         List<QuestionBuy> content = jpaQueryFactory.selectFrom(questionBuy)
                     .where(getQuestionBuyFiltering(voteStatus))
-                    .orderBy(questionBuy.createdAt.desc())
+                    .orderBy(getQuestionBuyOrderSpecifier(voteStatus))
                     .fetch();
 
             // Count Query
         JPAQuery<QuestionBuy> query = jpaQueryFactory.selectFrom(questionBuy)
-                    .where(getQuestionBuyFiltering(voteStatus))
-                    .orderBy(questionBuy.createdAt.desc());
+                    .where(getQuestionBuyFiltering(voteStatus));
+//                    .orderBy(getQuestionBuyOrderSpecifier());
 
         return PageableExecutionUtils.getPage(content, pageable, () -> query.fetch().size());
     }
@@ -377,6 +383,21 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom{
         }
 
         return predicate;
+    }
+
+    private OrderSpecifier[] getQuestionBuyOrderSpecifier(String voteStatus){
+        List<OrderSpecifier> orderSpecifiers = new ArrayList<>();
+
+        LocalDateTime now = LocalDateTime.now();
+
+        if(Objects.isNull(voteStatus)){
+            orderSpecifiers.add(new OrderSpecifier(Order.DESC, questionBuy.createdAt));
+        }else if(voteStatus.equals("종료 임박")){ // 종료 임박 순서
+            orderSpecifiers.add(new OrderSpecifier(Order.ASC, questionBuy.voteEndTime));
+        }else{
+            orderSpecifiers.add(new OrderSpecifier(Order.DESC, questionBuy.createdAt));
+        }
+        return orderSpecifiers.toArray(new OrderSpecifier[orderSpecifiers.size()]);
     }
 
 }

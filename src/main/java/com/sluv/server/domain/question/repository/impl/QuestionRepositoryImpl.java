@@ -1,5 +1,6 @@
 package com.sluv.server.domain.question.repository.impl;
 
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -249,17 +250,25 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom{
         return PageableExecutionUtils.getPage(content, pageable, () -> query.fetch().size());
     }
 
+    /**
+     * QuestionBuy만 조회.
+     * Ordering: createdAt
+     * Filtering: voteStatus
+     *
+     * voteStatus가 null이면 모든 voteStatus에 대해 조회.
+     */
     @Override
-    public Page<QuestionBuy> getQuestionBuyList(Pageable pageable) {
-        List<QuestionBuy> content = jpaQueryFactory.selectFrom(questionBuy)
-                .where(questionBuy.questionStatus.eq(ACTIVE))
-                .orderBy(questionBuy.createdAt.desc())
-                .fetch();
+    public Page<QuestionBuy> getQuestionBuyList(String voteStatus, Pageable pageable) {
 
-        // Count Query
+        List<QuestionBuy> content = jpaQueryFactory.selectFrom(questionBuy)
+                    .where(getQuestionBuyFiltering(voteStatus))
+                    .orderBy(questionBuy.createdAt.desc())
+                    .fetch();
+
+            // Count Query
         JPAQuery<QuestionBuy> query = jpaQueryFactory.selectFrom(questionBuy)
-                .where(questionBuy.questionStatus.eq(ACTIVE))
-                .orderBy(questionBuy.createdAt.desc());
+                    .where(getQuestionBuyFiltering(voteStatus))
+                    .orderBy(questionBuy.createdAt.desc());
 
         return PageableExecutionUtils.getPage(content, pageable, () -> query.fetch().size());
     }
@@ -273,44 +282,16 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom{
      */
     @Override
     public Page<QuestionFind> getQuestionFindList(Long celebId, Pageable pageable) {
-        List<QuestionFind> content;
-        JPAQuery<QuestionFind> query;
 
-
-        if(celebId == null) { // 모든 Celeb에 대해 조회
-            content = jpaQueryFactory.selectFrom(questionFind)
-                    .where(questionFind.questionStatus.eq(ACTIVE))
+        List<QuestionFind> content = jpaQueryFactory.selectFrom(questionFind)
+                    .where(getQuestionFindFiltering(celebId))
                     .orderBy(questionFind.createdAt.desc())
                     .fetch();
 
             // Count Query
-            query = jpaQueryFactory.selectFrom(questionFind)
-                    .where(questionFind.questionStatus.eq(ACTIVE))
+        JPAQuery<QuestionFind> query = jpaQueryFactory.selectFrom(questionFind)
+                    .where(getQuestionFindFiltering(celebId))
                     .orderBy(questionFind.createdAt.desc());
-
-        }else{// 특정 Celeb에 대해 조회
-            content = jpaQueryFactory.selectFrom(questionFind)
-                    .where(
-                            questionFind.questionStatus.eq(ACTIVE)
-                                    .and( // celebId가 본인 혹은 Parent의 id와 일치할 경우
-                                            questionFind.celeb.id.eq(celebId)
-                                                    .or(questionFind.celeb.parent.id.eq(celebId))
-                                    )
-                    )
-                    .orderBy(questionFind.createdAt.desc())
-                    .fetch();
-
-            // Count Query
-            query = jpaQueryFactory.selectFrom(questionFind)
-                    .where(
-                            questionFind.questionStatus.eq(ACTIVE)
-                                    .and( // celebId가 본인 혹은 Parent의 id와 일치할 경우
-                                            questionFind.celeb.id.eq(celebId)
-                                                .or(questionFind.celeb.parent.id.eq(celebId))
-                                    )
-                    )
-                    .orderBy(questionFind.createdAt.desc());
-        }
 
 
         return PageableExecutionUtils.getPage(content, pageable, () -> query.fetch().size());
@@ -367,4 +348,35 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom{
 
         return PageableExecutionUtils.getPage(content, pageable, () -> countJPAQuery.fetch().size());
     }
+
+    private BooleanExpression getQuestionBuyFiltering(String voteStatus){
+        BooleanExpression predicate = questionBuy.questionStatus.eq(ACTIVE);
+        LocalDateTime now = LocalDateTime.now();
+        if(voteStatus == null){
+            return predicate;
+        }else if (voteStatus.equals("진행 중")) {
+            predicate = predicate.and(questionBuy.voteEndTime.after(now.plusDays(3)));
+        } else if (voteStatus.equals("종료 임박")){
+            predicate = predicate.and(questionBuy.voteEndTime.between(now, now.plusDays(3)));
+        }else if(voteStatus.equals("종료")){
+            predicate = predicate.and(questionBuy.voteEndTime.before(now));
+        }
+
+        return predicate;
+    }
+
+    private BooleanExpression getQuestionFindFiltering(Long celebId){
+        BooleanExpression predicate = questionFind.questionStatus.eq(ACTIVE);
+        if(celebId == null){
+            return predicate;
+        }else {
+            predicate = predicate.and(
+                    questionFind.celeb.id.eq(celebId)
+                            .or(questionFind.celeb.parent.id.eq(celebId))
+            );
+        }
+
+        return predicate;
+    }
+
 }

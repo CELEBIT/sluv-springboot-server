@@ -252,7 +252,7 @@ public class QuestionController {
     public ResponseEntity<SuccessDataResponse<PaginationResDto<QuestionSimpleResDto>>> getQuestionList(@Nullable @RequestParam("qType") String qType, Pageable pageable){
         PaginationResDto<QuestionSimpleResDto> result = switch (qType) {
             case "Total" -> questionService.getTotalQuestionList(pageable);
-            case "Buy" -> questionService.getQuestionBuyList(pageable);
+            case "Buy" -> questionService.getQuestionBuyList(null, pageable);
             case "Find" -> questionService.getQuestionFindList(null, pageable);
             case "How" -> questionService.getQuestionHowaboutList(pageable);
             case "Recommend" -> questionService.getQuestionRecommendList(pageable);
@@ -294,11 +294,34 @@ public class QuestionController {
                     """
     )
     @GetMapping("/find")
-    public ResponseEntity<SuccessDataResponse<PaginationResDto<QuestionSimpleResDto>>> getQuestionTotalList(@Nullable @RequestParam("celebId") Long celebId, Pageable pageable){
+    public ResponseEntity<SuccessDataResponse<PaginationResDto<QuestionSimpleResDto>>> getQuestionFindList(@Nullable @RequestParam("celebId") Long celebId, Pageable pageable){
 
         return ResponseEntity.ok().body(
                 SuccessDataResponse.<PaginationResDto<QuestionSimpleResDto>>builder()
                         .result(questionService.getQuestionFindList(celebId, pageable))
+                        .build()
+        );
+    }
+
+    @Operation(
+            summary = "QuestionBuy 커뮤니티 게시글 검색",
+            description = """
+                    QuestionBuy 커뮤니티 게시글 검색\n
+                    - Pagination 적용
+                    - Filtering: 전체, 진행중, 마감임박, 종료
+                    =Ordering=\n
+                         * 전체 → 최신순\n
+                         * 진행 중 → 최신순\n
+                         * 종료 임박 → 종료 임박 순\n
+                         * 종료 → 최신순\n
+                    """
+    )
+    @GetMapping("/buy")
+    public ResponseEntity<SuccessDataResponse<PaginationResDto<QuestionSimpleResDto>>> getQuestionBuyList(@Nullable @RequestParam("voteStatus") String voteStatus, Pageable pageable){
+
+        return ResponseEntity.ok().body(
+                SuccessDataResponse.<PaginationResDto<QuestionSimpleResDto>>builder()
+                        .result(questionService.getQuestionBuyList(voteStatus, pageable))
                         .build()
         );
     }

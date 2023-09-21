@@ -581,8 +581,8 @@ public class QuestionService {
                 .build();
     }
 
-    public PaginationResDto<QuestionSimpleResDto> getQuestionBuyList(Pageable pageable) {
-        Page<QuestionBuy> questionPage = questionRepository.getQuestionBuyList(pageable);
+    public PaginationResDto<QuestionSimpleResDto> getQuestionBuyList(String voteStatus, Pageable pageable) {
+        Page<QuestionBuy> questionPage = questionRepository.getQuestionBuyList(voteStatus, pageable);
         List<QuestionSimpleResDto> content = questionPage.stream().map(question ->
             getQuestionSimpleResDto(question, "Buy")
         ).toList();

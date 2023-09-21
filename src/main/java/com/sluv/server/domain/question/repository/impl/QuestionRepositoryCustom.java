@@ -35,7 +35,7 @@ public interface QuestionRepositoryCustom {
 
     Page<Question> getTotalQuestionList(Pageable pageable);
 
-    Page<QuestionBuy> getQuestionBuyList(Pageable pageable);
+    Page<QuestionBuy> getQuestionBuyList(String voteStatus, Pageable pageable);
 
     Page<QuestionFind> getQuestionFindList(Long celebId, Pageable pageable);
 

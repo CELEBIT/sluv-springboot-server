@@ -326,4 +326,22 @@ public class QuestionController {
         );
     }
 
+    @Operation(
+            summary = "QuestionHowabout 커뮤니티 게시글 검색",
+            description = """
+                    QuestionHowabout 커뮤니티 게시글 검색\n
+                    - Pagination 적용 \n
+                    - Ordering 최신순
+                    """
+    )
+    @GetMapping("/howabout")
+    public ResponseEntity<SuccessDataResponse<PaginationResDto<QuestionSimpleResDto>>> getQuestionHowaboutList(Pageable pageable){
+
+        return ResponseEntity.ok().body(
+                SuccessDataResponse.<PaginationResDto<QuestionSimpleResDto>>builder()
+                        .result(questionService.getQuestionHowaboutList(pageable))
+                        .build()
+        );
+    }
+
 }

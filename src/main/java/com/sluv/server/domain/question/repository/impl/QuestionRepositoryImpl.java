@@ -303,11 +303,17 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom{
         return PageableExecutionUtils.getPage(content, pageable, () -> query.fetch().size());
     }
 
+    /**
+     * QuestionHowabout만 조회.
+     * Ordering: createdAt
+     */
     @Override
     public Page<QuestionHowabout> getQuestionHowaboutList(Pageable pageable) {
         List<QuestionHowabout> content = jpaQueryFactory.selectFrom(questionHowabout)
                 .where(questionHowabout.questionStatus.eq(ACTIVE))
                 .orderBy(questionHowabout.createdAt.desc())
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
                 .fetch();
 
         // Count Query
@@ -387,8 +393,6 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom{
 
     private OrderSpecifier[] getQuestionBuyOrderSpecifier(String voteStatus){
         List<OrderSpecifier> orderSpecifiers = new ArrayList<>();
-
-        LocalDateTime now = LocalDateTime.now();
 
         if(Objects.isNull(voteStatus)){
             orderSpecifiers.add(new OrderSpecifier(Order.DESC, questionBuy.createdAt));

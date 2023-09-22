@@ -255,7 +255,7 @@ public class QuestionController {
             case "Buy" -> questionService.getQuestionBuyList(null, pageable);
             case "Find" -> questionService.getQuestionFindList(null, pageable);
             case "How" -> questionService.getQuestionHowaboutList(pageable);
-            case "Recommend" -> questionService.getQuestionRecommendList(pageable);
+            case "Recommend" -> questionService.getQuestionRecommendList(null, pageable);
             default -> throw new QuestionTypeNotFoundException();
         };
 
@@ -340,6 +340,25 @@ public class QuestionController {
         return ResponseEntity.ok().body(
                 SuccessDataResponse.<PaginationResDto<QuestionSimpleResDto>>builder()
                         .result(questionService.getQuestionHowaboutList(pageable))
+                        .build()
+        );
+    }
+
+    @Operation(
+            summary = "QuestionRecommend 커뮤니티 게시글 검색",
+            description = """
+                    QuestionRecommend 커뮤니티 게시글 검색\n
+                    - Pagination 적용 \n
+                    - Ordering 최신순 \n
+                    - Filtering 전체, 특정해시태그
+                    """
+    )
+    @GetMapping("/recommend")
+    public ResponseEntity<SuccessDataResponse<PaginationResDto<QuestionSimpleResDto>>> getQuestionRecommendList(@Nullable @RequestParam String hashtag, Pageable pageable){
+
+        return ResponseEntity.ok().body(
+                SuccessDataResponse.<PaginationResDto<QuestionSimpleResDto>>builder()
+                        .result(questionService.getQuestionRecommendList(hashtag, pageable))
                         .build()
         );
     }

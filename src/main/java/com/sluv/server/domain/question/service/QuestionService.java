@@ -627,8 +627,8 @@ public class QuestionService {
     }
 
 
-    public PaginationResDto<QuestionSimpleResDto> getQuestionRecommendList(Pageable pageable) {
-        Page<QuestionRecommend> questionPage = questionRepository.getQuestionRecommendList(pageable);
+    public PaginationResDto<QuestionSimpleResDto> getQuestionRecommendList(String hashtag, Pageable pageable) {
+        Page<QuestionRecommend> questionPage = questionRepository.getQuestionRecommendList(hashtag, pageable);
         List<QuestionSimpleResDto> content = questionPage.stream().map(question ->
                 getQuestionSimpleResDto(question, "Recommend")
         ).toList();

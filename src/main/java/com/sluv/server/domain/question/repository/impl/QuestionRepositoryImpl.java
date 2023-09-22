@@ -24,6 +24,7 @@ import static com.sluv.server.domain.question.entity.QQuestionFind.questionFind;
 import static com.sluv.server.domain.question.entity.QQuestionHowabout.questionHowabout;
 import static com.sluv.server.domain.question.entity.QQuestionLike.questionLike;
 import static com.sluv.server.domain.question.entity.QQuestionRecommend.questionRecommend;
+import static com.sluv.server.domain.question.entity.QQuestionRecommendCategory.questionRecommendCategory;
 import static com.sluv.server.domain.question.enums.QuestionStatus.ACTIVE;
 
 @RequiredArgsConstructor
@@ -269,6 +270,8 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom{
         List<QuestionBuy> content = jpaQueryFactory.selectFrom(questionBuy)
                     .where(getQuestionBuyFiltering(voteStatus))
                     .orderBy(getQuestionBuyOrderSpecifier(voteStatus))
+                    .offset(pageable.getOffset())
+                    .limit(pageable.getPageSize())
                     .fetch();
 
             // Count Query
@@ -292,6 +295,8 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom{
         List<QuestionFind> content = jpaQueryFactory.selectFrom(questionFind)
                     .where(getQuestionFindFiltering(celebId))
                     .orderBy(questionFind.createdAt.desc())
+                    .offset(pageable.getOffset())
+                    .limit(pageable.getPageSize())
                     .fetch();
 
             // Count Query
@@ -324,16 +329,23 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom{
         return PageableExecutionUtils.getPage(content, pageable, () -> query.fetch().size());
     }
 
+    /**
+     * QuestionRecommend만 조회.
+     * Ordering: createdAt
+     * Filtering : hashtag
+     */
     @Override
-    public Page<QuestionRecommend> getQuestionRecommendList(Pageable pageable) {
-        List<QuestionRecommend> content = jpaQueryFactory.selectFrom(questionRecommend)
-                .where(questionRecommend.questionStatus.eq(ACTIVE))
+    public Page<QuestionRecommend> getQuestionRecommendList(String hashtag, Pageable pageable) {
+        List<QuestionRecommend> content = getQuestionRecommendTable(hashtag)
+                .where(getQuestionRecommendFiltering(hashtag))
                 .orderBy(questionRecommend.createdAt.desc())
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
                 .fetch();
 
         // Count Query
-        JPAQuery<QuestionRecommend> query = jpaQueryFactory.selectFrom(questionRecommend)
-                .where(questionRecommend.questionStatus.eq(ACTIVE))
+        JPAQuery<QuestionRecommend> query = getQuestionRecommendTable(hashtag)
+                .where(getQuestionRecommendFiltering(hashtag))
                 .orderBy(questionRecommend.createdAt.desc());
 
         return PageableExecutionUtils.getPage(content, pageable, () -> query.fetch().size());
@@ -390,6 +402,34 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom{
 
         return predicate;
     }
+
+    private JPAQuery<QuestionRecommend> getQuestionRecommendTable(String hashtag) {
+        JPAQuery<QuestionRecommend> select = jpaQueryFactory.select(questionRecommend);
+
+        if(hashtag == null){
+            return select.from(questionRecommend);
+        }else{
+            return select.from(questionRecommend)
+                    .leftJoin(questionRecommendCategory)
+                    .on(questionRecommend.id.eq(questionRecommendCategory.question.id));
+        }
+
+
+    }
+
+    private BooleanExpression getQuestionRecommendFiltering(String hashtag){
+        BooleanExpression predicate = questionRecommend.questionStatus.eq(ACTIVE);
+        if(hashtag == null){
+            return predicate;
+        }else {
+            predicate = predicate.and(
+                    questionRecommendCategory.name.eq(hashtag)
+            );
+        }
+
+        return predicate;
+    }
+
 
     private OrderSpecifier[] getQuestionBuyOrderSpecifier(String voteStatus){
         List<OrderSpecifier> orderSpecifiers = new ArrayList<>();

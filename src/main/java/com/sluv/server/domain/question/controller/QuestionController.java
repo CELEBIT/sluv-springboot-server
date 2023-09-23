@@ -363,4 +363,23 @@ public class QuestionController {
         );
     }
 
+    @Operation(
+            summary = "일간 핫 커뮤니티 게시글 검색",
+            description = """
+                    일간 핫 커뮤니티 게시글 검색\n
+                    - 10개 \n
+                    - Ordering 인기순\n
+                        - 조회수 + 좋아요 수 + 댓글 수\n
+                    - 매일 00시 00분 00초를 기준으로 업데이트
+                    """
+    )
+    @GetMapping("/dailyhot")
+    public ResponseEntity<SuccessDataResponse<List<QuestionHomeResDto>>> getDailyHotQuestionList(){
+
+        return ResponseEntity.ok().body(
+                SuccessDataResponse.<List<QuestionHomeResDto>>builder()
+                        .result(questionService.getDailyHotQuestionList())
+                        .build()
+        );
+    }
 }

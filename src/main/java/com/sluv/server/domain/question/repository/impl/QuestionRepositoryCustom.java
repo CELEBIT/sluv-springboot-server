@@ -42,4 +42,6 @@ public interface QuestionRepositoryCustom {
     Page<QuestionHowabout> getQuestionHowaboutList(Pageable pageable);
 
     Page<QuestionRecommend> getQuestionRecommendList(String hashtag, Pageable pageable);
+
+    List<Question> updateDailyHotQuestion();
 }

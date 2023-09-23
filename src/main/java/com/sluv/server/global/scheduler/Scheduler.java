@@ -3,6 +3,10 @@ package com.sluv.server.global.scheduler;
 import com.querydsl.core.Tuple;
 import com.sluv.server.domain.item.entity.*;
 import com.sluv.server.domain.item.repository.*;
+import com.sluv.server.domain.question.entity.DailyHotQuestion;
+import com.sluv.server.domain.question.entity.Question;
+import com.sluv.server.domain.question.repository.DailyHotQuestionRepository;
+import com.sluv.server.domain.question.repository.QuestionRepository;
 import com.sluv.server.domain.search.entity.SearchData;
 import com.sluv.server.domain.search.entity.SearchRank;
 import com.sluv.server.domain.search.repository.SearchDataRepository;
@@ -26,7 +30,9 @@ public class Scheduler {
     private final EfficientItemRepository efficientItemRepository;
     private final WeekHotItemRepository weekHotItemRepository;
     private final DayHotItemRepository dayHotItemRepository;
+    private final DailyHotQuestionRepository dailyHotQuestionRepository;
     private final ItemRepository itemRepository;
+    private final QuestionRepository questionRepository;
 
     /**
      * SearchRank 업데이트
@@ -141,6 +147,29 @@ public class Scheduler {
         newDayHotItem.forEach(item ->
                 dayHotItemRepository.save(
                         DayHotItem.toEntity(item)
+                )
+        );
+    }
+
+    /**
+     * 일간 HOT Question
+     */
+    @Scheduled(cron = "0 0 0 * * *") // 초 분 시 일 월 요일
+    @Transactional
+    public void updateDailyHotQuestion(){
+        log.info("DailyHotQuestion Update Time: {}", Calendar.getInstance().getTime());
+
+        log.info("Delete Old DailyHotQuestion Data");
+        dailyHotQuestionRepository.deleteAll();
+
+        log.info("Get DailyHotQuestion. Time: {}", Calendar.getInstance().getTime());
+        List<Question> newDailyHotQuestion = questionRepository.updateDailyHotQuestion();
+
+        log.info("Save DailyHotQuestion. Time: {}", Calendar.getInstance().getTime());
+
+        newDailyHotQuestion.forEach(question ->
+                dailyHotQuestionRepository.save(
+                        DailyHotQuestion.toEntity(question)
                 )
         );
     }

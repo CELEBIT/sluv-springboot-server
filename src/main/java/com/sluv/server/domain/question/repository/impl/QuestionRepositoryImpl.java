@@ -25,6 +25,7 @@ import static com.sluv.server.domain.question.entity.QQuestionHowabout.questionH
 import static com.sluv.server.domain.question.entity.QQuestionLike.questionLike;
 import static com.sluv.server.domain.question.entity.QQuestionRecommend.questionRecommend;
 import static com.sluv.server.domain.question.entity.QQuestionRecommendCategory.questionRecommendCategory;
+import static com.sluv.server.domain.comment.entity.QComment.comment;
 import static com.sluv.server.domain.question.enums.QuestionStatus.ACTIVE;
 
 @RequiredArgsConstructor
@@ -444,4 +445,18 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom{
         return orderSpecifiers.toArray(new OrderSpecifier[orderSpecifiers.size()]);
     }
 
+    /**
+     * Scheduler를 통한 일간 핫 Question 업데이트
+     */
+    @Override
+    public List<Question> updateDailyHotQuestion() {
+        return jpaQueryFactory.selectFrom(question)
+                .leftJoin(questionLike).on(questionLike.question.id.eq(question.id))
+                .leftJoin(comment).on(comment.question.id.eq(question.id))
+                .groupBy(question)
+                .where(question.questionStatus.eq(ACTIVE))
+                .orderBy(questionLike.count().add(comment.count()).add(question.searchNum).desc())
+                .limit(10)
+                .fetch();
+    }
 }

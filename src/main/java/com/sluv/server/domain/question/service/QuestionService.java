@@ -29,14 +29,14 @@ import com.sluv.server.global.common.enums.ItemImgOrLinkStatus;
 import com.sluv.server.global.common.enums.ReportStatus;
 import com.sluv.server.global.common.response.PaginationResDto;
 import lombok.RequiredArgsConstructor;
+import org.checkerframework.checker.units.qual.A;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -56,6 +56,7 @@ public class QuestionService {
     private final ItemScrapRepository itemScrapRepository;
     private final ClosetRepository closetRepository;
     private final QuestionVoteRepository questionVoteRepository;
+    private final DailyHotQuestionRepository dailyHotQuestionRepository;
 
     @Transactional
     public QuestionPostResDto postQuestionFind(User user, QuestionFindPostReqDto dto) {
@@ -646,6 +647,58 @@ public class QuestionService {
                             ?questionFind.getCeleb().getParent().getCelebNameKr() + " " + questionFind.getCeleb().getCelebNameKr()
                             :questionFind.getCeleb().getCelebNameKr()
                     : questionFind.getNewCeleb().getCelebName();
+    }
+
+    /**
+     * 일일 Hot Question 조회 기능.
+     */
+    public List<QuestionHomeResDto> getDailyHotQuestionList() {
+        List<Question> dailyHoyQuestionList = dailyHotQuestionRepository.findAll().stream()
+                                                                    .map(DailyHotQuestion::getQuestion)
+                                                                    .toList();
+
+        List<QuestionHomeResDto> result = dailyHoyQuestionList.stream().map(question -> {
+            List<QuestionImgSimpleResDto> questionImgSimpleList = getQuestionImgSimpleList(question);
+            return QuestionHomeResDto.of(question, questionImgSimpleList);
+
+        }).toList();
+
+        return result;
+
+    }
+
+    private List<QuestionImgSimpleResDto> getQuestionImgSimpleList(Question question){
+
+        // Question이 QuestionBuy인 경우 모든 이미지를 순서대로 조회
+        if(question instanceof QuestionBuy){
+            List<QuestionImgSimpleResDto> result = new ArrayList<>();
+
+            List<QuestionImg> questionImgList = questionImgRepository.findAllByQuestionId(question.getId());
+            List<ItemImg> questionItemImgList = questionItemRepository.findAllByQuestionId(question.getId()).stream().map(questionItem -> itemImgRepository.findMainImg(questionItem.getItem().getId())).toList();
+
+            questionImgList.forEach(questionImg -> result.add(QuestionImgSimpleResDto.of(questionImg)));
+            questionItemImgList.forEach(itemImg -> result.add(QuestionImgSimpleResDto.of(itemImg)));
+
+            result.sort(Comparator.comparing(QuestionImgSimpleResDto::getSortOrder));
+
+            return result;
+        }else{// 그 외에는 대표이미지만 조화
+
+            QuestionImg questionImg = questionImgRepository.findByQuestionIdAndRepresentFlag(question.getId(), true);
+            QuestionItem questionItem = questionItemRepository.findByQuestionIdAndRepresentFlag(question.getId(), true);
+
+            String imgUrl = null;
+
+            if (questionImg != null) {
+                imgUrl = questionImg.getImgUrl();
+            } else if(questionItem != null) {
+                imgUrl = itemImgRepository.findMainImg(questionItem.getItem().getId()).getItemImgUrl();
+            }
+
+            return imgUrl != null
+                    ? Arrays.asList(new QuestionImgSimpleResDto(imgUrl, 0L))
+                    : null;
+        }
     }
 }
 

@@ -382,4 +382,23 @@ public class QuestionController {
                         .build()
         );
     }
+
+    @Operation(
+            summary = "주간 핫 커뮤니티 게시글 검색",
+            description = """
+                    일간 핫 커뮤니티 게시글 검색\n
+                    - Pagination 적용 \n
+                    - Ordering 조회수 + 좋아요 수 + 댓글 수 \n
+                    - Filtering 현재를 기점으로 일주일간 작성된 글
+                    """
+    )
+    @GetMapping("/weeklyhot")
+    public ResponseEntity<SuccessDataResponse<PaginationResDto<QuestionSimpleResDto>>> getWeeklyHotQuestionList(Pageable pageable){
+
+        return ResponseEntity.ok().body(
+                SuccessDataResponse.<PaginationResDto<QuestionSimpleResDto>>builder()
+                        .result(questionService.getWeeklyHotQuestionList(pageable))
+                        .build()
+        );
+    }
 }

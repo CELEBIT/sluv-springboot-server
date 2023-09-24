@@ -125,7 +125,6 @@ public class SearchService {
             {
                 // 해당 Question의 item 이미지 리스트 구하기
                 List<QuestionItem> questionItemList = questionItemRepository.findAllByQuestionId(question.getId());
-//                List<QuestionImgSimpleResDto> itemImgList = questionItemList.stream().map(this::convertQuestionItemToQuestionImgSimpleResDto).toList();
                 List<QuestionImgSimpleResDto> itemImgList = questionItemList.stream()
                                                 .map(questionItem -> {
                                                     ItemImg mainImg = itemImgRepository.findMainImg(questionItem.getItem().getId());
@@ -137,17 +136,13 @@ public class SearchService {
                         .stream()
                         .map(QuestionImgSimpleResDto::of).toList();
 
-                // 작성자 InfoDto
-                UserInfoDto userInfoDto = UserInfoDto.of(question.getUser());
-
                 // Question 좋아요 수
                 Long likeNum = questionLikeRepository.countByQuestionId(question.getId());
 
                 // Question 댓글 수
                 Long commentNum = commentRepository.countByQuestionId(question.getId());
 
-                return QuestionSimpleResDto.of("Buy", userInfoDto, likeNum, commentNum,
-                        question, null, imgList, itemImgList, null);
+                return QuestionSimpleResDto.of(question, likeNum, commentNum, imgList, itemImgList, null);
             }).toList();
 
             return PaginationResDto.<QuestionSimpleResDto>builder()
@@ -161,12 +156,6 @@ public class SearchService {
                     questionRepository.getSearchQuestionFind(questionIdList, pageable);
 
             List<QuestionSimpleResDto> content = searchQuestionPage.stream().map(question -> {
-                String celebName = question.getCeleb() != null
-                                    ? question.getCeleb().getCelebNameKr()
-                                    : question.getNewCeleb().getCelebName();
-
-                // 작성자 InfoDto
-                UserInfoDto userInfoDto = UserInfoDto.of(question.getUser());
 
                 // Question 좋아요 수
                 Long likeNum = questionLikeRepository.countByQuestionId(question.getId());
@@ -174,8 +163,7 @@ public class SearchService {
                 // Question 댓글 수
                 Long commentNum = commentRepository.countByQuestionId(question.getId());
 
-                return QuestionSimpleResDto.of("Find", userInfoDto, likeNum, commentNum,
-                        question, celebName, null, null, null);
+                return QuestionSimpleResDto.of(question, likeNum, commentNum, null, null, null);
 
             }).toList();
 
@@ -191,17 +179,13 @@ public class SearchService {
 
             List<QuestionSimpleResDto> content = searchQuestionPage.stream().map(question -> {
 
-                    // 작성자 InfoDto
-                    UserInfoDto userInfoDto = UserInfoDto.of(question.getUser());
-
                     // Question 좋아요 수
                     Long likeNum = questionLikeRepository.countByQuestionId(question.getId());
 
                     // Question 댓글 수
                     Long commentNum = commentRepository.countByQuestionId(question.getId());
 
-                    return QuestionSimpleResDto.of("How", userInfoDto, likeNum, commentNum,
-                            question, null, null, null, null);
+                    return QuestionSimpleResDto.of(question, likeNum, commentNum, null, null, null);
             }).toList();
 
             return PaginationResDto.<QuestionSimpleResDto>builder()
@@ -219,8 +203,6 @@ public class SearchService {
                 List<String> categoryList = questionRecommendCategoryRepository.findAllByQuestionId(question.getId())
                         .stream()
                         .map(QuestionRecommendCategory::getName).toList();
-                // 작성자 InfoDto
-                UserInfoDto userInfoDto = UserInfoDto.of(question.getUser());
 
                 // Question 좋아요 수
                 Long likeNum = questionLikeRepository.countByQuestionId(question.getId());
@@ -228,8 +210,7 @@ public class SearchService {
                 // Question 댓글 수
                 Long commentNum = commentRepository.countByQuestionId(question.getId());
 
-                return QuestionSimpleResDto.of("Recommend", userInfoDto, likeNum, commentNum,
-                        question, null, null, null, categoryList);
+                return QuestionSimpleResDto.of(question, likeNum, commentNum, null, null, categoryList);
             }).toList();
 
             // 최근 검색 등록

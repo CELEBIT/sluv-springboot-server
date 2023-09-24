@@ -459,4 +459,40 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom{
                 .limit(10)
                 .fetch();
     }
+
+    /**
+     * 주간 Hot Question
+     */
+    @Override
+    public Page<Question> getWeeklyHotQuestion(Pageable pageable) {
+        LocalDateTime now = LocalDateTime.now();
+
+        List<Question> content = jpaQueryFactory.select(question)
+                .from(question)
+                .leftJoin(questionLike).on(questionLike.question.id.eq(question.id))
+                .leftJoin(comment).on(comment.question.id.eq(question.id))
+                .where(
+                        question.questionStatus.eq(ACTIVE)
+                                .and(question.createdAt.between(now.minusDays(7).toLocalDate().atStartOfDay(), now.toLocalDate().atStartOfDay()))
+
+                )
+                .groupBy(question)
+                .orderBy(question.searchNum.add(questionLike.count()).add(comment.count()).desc())
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        // Count Query
+        JPAQuery<Question> countQuery = jpaQueryFactory.select(question)
+                .from(question)
+                .leftJoin(questionLike).on(questionLike.question.id.eq(question.id))
+                .leftJoin(comment).on(comment.question.id.eq(question.id))
+                .where(
+                        question.questionStatus.eq(ACTIVE)
+                                .and(question.createdAt.between(now.minusDays(7).toLocalDate().atStartOfDay(), now.toLocalDate().atStartOfDay()))
+                )
+                .groupBy(question);
+
+        return PageableExecutionUtils.getPage(content, pageable, () -> countQuery.fetch().size());
+    }
 }

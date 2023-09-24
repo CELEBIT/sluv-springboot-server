@@ -534,13 +534,7 @@ public class QuestionService {
         if(qType.equals("Recommend")){
             categoryNameList = questionRecommendCategoryRepository.findAllByQuestionId(question.getId()).stream()
                     .map(QuestionRecommendCategory::getName).toList();
-        }else if(qType.equals("Find")){
-            QuestionFind questionFind = (QuestionFind) question;
-
-            celebName = getQuestionCelebName(questionFind);
         }
-        // 작성자 InfoDto
-        UserInfoDto userInfoDto = UserInfoDto.of(question.getUser());
 
         // Question 좋아요 수
         Long likeNum = questionLikeRepository.countByQuestionId(question.getId());
@@ -550,8 +544,8 @@ public class QuestionService {
 
 
 
-        return QuestionSimpleResDto.of(qType, userInfoDto, likeNum, commentNum,
-                question, celebName, imgList, itemImgList, categoryNameList);
+        return QuestionSimpleResDto.of(question, likeNum, commentNum,
+                imgList, itemImgList, categoryNameList);
     }
 
     /**
@@ -699,6 +693,48 @@ public class QuestionService {
                     ? Arrays.asList(new QuestionImgSimpleResDto(imgUrl, 0L))
                     : null;
         }
+    }
+
+    /**
+     * 주간 Hot Question 조회 기능.
+     */
+    public PaginationResDto<QuestionSimpleResDto> getWeeklyHotQuestionList(Pageable pageable) {
+        Page<Question> page = questionRepository.getWeeklyHotQuestion(pageable);
+
+        List<QuestionSimpleResDto> content = page.stream().map(question -> {
+            List<String> categoryList = null;
+            if (question instanceof QuestionRecommend) {
+                categoryList = questionRecommendCategoryRepository.findAllByQuestionId(question.getId())
+                        .stream()
+                        .map(QuestionRecommendCategory::getName).toList();
+            }
+
+            List<QuestionImgSimpleResDto> imgList = questionImgRepository.findAllByQuestionId(question.getId())
+                    .stream()
+                    .map(QuestionImgSimpleResDto::of)
+                    .toList();
+
+            List<QuestionImgSimpleResDto> itemImgList = questionItemRepository.findAllByQuestionId(question.getId())
+                    .stream()
+                    .map(questionItem ->
+                            QuestionImgSimpleResDto.of(itemImgRepository.findMainImg(questionItem.getItem().getId()))
+                    )
+                    .toList();
+
+
+            Long commentNum = commentRepository.countByQuestionId(question.getId());
+            Long likeNum = questionLikeRepository.countByQuestionId(question.getId());
+
+
+            return QuestionSimpleResDto.of(question, likeNum, commentNum, imgList, itemImgList, categoryList);
+        }).toList();
+
+
+        return PaginationResDto.<QuestionSimpleResDto>builder()
+                .page(page.getNumber())
+                .hasNext(page.hasNext())
+                .content(content)
+                .build();
     }
 }
 

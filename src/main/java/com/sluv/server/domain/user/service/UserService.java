@@ -329,17 +329,14 @@ public class UserService {
                 throw new QuestionTypeNotFoundException();
             }
 
-            // 작성자 InfoDto
-            UserInfoDto userInfoDto = UserInfoDto.of(question.getUser());
-
             // Question 좋아요 수
             Long likeNum = questionLikeRepository.countByQuestionId(question.getId());
 
             // Question 댓글 수
             Long commentNum = commentRepository.countByQuestionId(question.getId());
 
-            return QuestionSimpleResDto.of(recentQuestion.getQType(), userInfoDto, likeNum, commentNum,
-                    question, celebName, imgList, itemImgList, categoryList);
+            return QuestionSimpleResDto.of(question, likeNum, commentNum,
+                    imgList, itemImgList, categoryList);
 
 
 
@@ -477,8 +474,6 @@ public class UserService {
         }else{
             throw new QuestionTypeNotFoundException();
         }
-        // 작성자 InfoDto
-        UserInfoDto userInfoDto = UserInfoDto.of(question.getUser());
 
         // Question 좋아요 수
         Long likeNum = questionLikeRepository.countByQuestionId(question.getId());
@@ -486,8 +481,8 @@ public class UserService {
         // Question 댓글 수
         Long commentNum = commentRepository.countByQuestionId(question.getId());
 
-        return QuestionSimpleResDto.of(qType, userInfoDto, likeNum, commentNum,
-                question, celebName, imgList, itemImgList, categoryList);
+        return QuestionSimpleResDto.of(question, likeNum, commentNum,
+                imgList, itemImgList, categoryList);
     }
 
     /**

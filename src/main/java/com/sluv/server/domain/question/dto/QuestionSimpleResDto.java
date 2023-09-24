@@ -1,6 +1,6 @@
 package com.sluv.server.domain.question.dto;
 
-import com.sluv.server.domain.question.entity.Question;
+import com.sluv.server.domain.question.entity.*;
 import com.sluv.server.domain.user.dto.UserInfoDto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
@@ -45,19 +45,32 @@ public class QuestionSimpleResDto {
     //추천해 줘
     @Schema(description = "QuestionRecommend 게시글 카테고리 리스트")
     private List<String> categoryName;
-    public static QuestionSimpleResDto of(String qType, UserInfoDto userInfoDto,
-                                          Long likeNum, Long commentNum,
-                                          Question question,
-                                          String celebName,
+    public static QuestionSimpleResDto of(Question question, Long likeNum, Long commentNum,
                                           List<QuestionImgSimpleResDto> imgList, List<QuestionImgSimpleResDto> itemImgList,
                                           List<String> categoryName){
+
+        String celebName = null;
+        String qType = null;
+
+        if(question instanceof QuestionBuy){
+            qType = "Buy";
+        }else if(question instanceof QuestionFind questionFind){
+            qType = "Find";
+            celebName = questionFind.getCeleb() != null
+                    ? questionFind.getCeleb().getCelebNameKr()
+                    : questionFind.getNewCeleb().getCelebName();
+        }else if(question instanceof QuestionRecommend){
+            qType = "Recommend";
+        }else if(question instanceof QuestionHowabout) {
+            qType = "How";
+        }
 
         return QuestionSimpleResDto.builder()
                 .qType(qType)
                 .id(question.getId())
                 .title(question.getTitle())
                 .content(question.getContent())
-                .user(userInfoDto)
+                .user(UserInfoDto.of(question.getUser()))
                 .likeNum(likeNum)
                 .viewNum(question.getSearchNum())
                 .commentNum(commentNum)

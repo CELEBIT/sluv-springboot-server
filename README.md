@@ -67,6 +67,7 @@
 
 - [개요](#outline)
 - [Solution](#Solution)
+- [Architecture](#architecture)
 
 
 <br>
@@ -116,6 +117,16 @@
 <br><br/>
 </details>
 
+<br>
+
+# :building_construction: Architecture <a name = "architecture"></a>
+
+<details>
+   <summary> 본문 확인 (👈 Click)</summary>
+<br />
+<img width="700" alt="sluv_intro1" src="https://github.com/CELEBIT/sluv-springboot-server/assets/101792740/972d0587-a326-4de8-9964-9fc0be3a4cfe">
+
+</details>
 
 
 

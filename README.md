@@ -68,6 +68,7 @@
 - [개요](#outline)
 - [Solution](#Solution)
 - [Architecture](#architecture)
+- [결과물](#result)
 
 
 <br>
@@ -130,3 +131,91 @@
 
 
 
+<br>
+
+# :tada: 결과물 <a name = "result"></a>
+
+<details>
+   <summary> 본문 확인 (👈 Click)</summary>
+<br/>
+
+### 앱 도입 및 관심셀럽
+<div align="center">
+<img width="700" alt="sluv_intro1" src="https://github.com/CELEBIT/sluv-springboot-server/assets/101792740/63e9bac9-f139-4940-8cc8-b9f07a8f83c1">
+</div>
+<br><br/>
+- 앱도입
+<br><br/>
+
+<div align="center">
+<img width="700" alt="sluv_intro1" src="https://github.com/CELEBIT/sluv-springboot-server/assets/101792740/8c0c19ae-bae7-4974-aea6-02773b80cfb8">
+</div>
+<br><br/>
+- 관심셀럽
+<br><br/>
+
+
+### 마이페이지
+<div align="center">
+<img width="700" alt="sluv_intro1" src="https://github.com/CELEBIT/sluv-springboot-server/assets/101792740/bdac5fde-87a3-4385-95e8-b79c0c7fb546">
+</div>
+<br><br/>
+- 마이페이지
+<br><br/>
+
+   
+### 홈
+<div align="center">
+<img width="700" alt="sluv_intro1" src="https://github.com/CELEBIT/sluv-springboot-server/assets/101792740/f6c9b6f2-d71f-4ba2-9b18-972f6801ea35">
+</div>
+<br><br/>
+- 아이템 홈
+<br><br/>
+
+### 커뮤니티 홍
+<div align="center">
+<img width="700" alt="sluv_intro1" src="https://github.com/CELEBIT/sluv-springboot-server/assets/101792740/ffae8e50-f221-4dee-a89d-44f21dcc3fb1">
+</div>
+<br><br/>
+- 커뮤니티 홈
+<br><br/>
+
+### 커뮤니티
+
+
+### 정보공유
+<div align="center">
+<img width="700" alt="sluv_intro1" src="https://github.com/CELEBIT/sluv-springboot-server/assets/101792740/34789c09-5e2f-42e0-be14-9c9f39f17320">
+</div>
+<br><br/>
+- 정보 공유 입력 폼
+<br><br/>
+
+<div align="center">
+<img width="700" alt="sluv_intro1" src="https://github.com/CELEBIT/sluv-springboot-server/assets/101792740/65ccec99-8b02-424f-9c4d-8a48cd5ca63e">
+</div>
+<br><br/>
+- 획일화된 정보 화면
+<br><br/>
+
+
+### 옷장
+<div align="center">
+<img width="700" alt="sluv_intro1" src="https://github.com/CELEBIT/sluv-springboot-server/assets/101792740/6709bd2a-1cd1-45d3-84a3-ff46a6ded441">
+</div>
+<br><br/>
+- 옷장 시스템
+<br><br/>
+
+
+
+### 검색
+<div align="center">
+<img width="700" alt="sluv_intro1" src="https://github.com/CELEBIT/sluv-springboot-server/assets/101792740/a62f513a-7ebc-4a3c-b55f-c82844ca8f33">
+</div>
+<br><br/>
+- 검색
+<br><br/>
+
+
+</details>

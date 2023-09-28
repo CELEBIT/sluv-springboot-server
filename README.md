@@ -66,7 +66,7 @@
 # :memo: [목차](#index) <a name = "index"></a>
 
 - [개요](#outline)
-- [Solution](#Solution)
+- [Solution](#solution)
 - [Architecture](#architecture)
 - [결과물](#result)
 
@@ -94,7 +94,7 @@
 
 <br>
 
-# :bulb: Solution <a name = "outline"></a>
+# :bulb: Solution <a name = "solution"></a>
 
 <details>
    <summary> 본문 확인 (👈 Click)</summary>
@@ -139,28 +139,45 @@
    <summary> 본문 확인 (👈 Click)</summary>
 <br/>
 
-### 앱 도입 및 관심셀럽
+### 앱 도입
 <div align="center">
 <img width="700" alt="sluv_intro1" src="https://github.com/CELEBIT/sluv-springboot-server/assets/101792740/63e9bac9-f139-4940-8cc8-b9f07a8f83c1">
 </div>
 <br><br/>
-- 앱도입
+
+- 3개의 소셜 로그인 제공합니다. (카카오, 구글, 애플)
+- 약관 등록합니다.
+- 프로필 사진, 닉네임을 등록합니다.
+- 관심셀럽 선택합니다.
+
+  각 단계에서 앱 종료하는 것을 대비하여 UserStatus를 통해 재접속 시에 첫 단계부터 다시 시작하는 상황을 방지하였습니다.
+
 <br><br/>
 
+### 관심셀럽
 <div align="center">
 <img width="700" alt="sluv_intro1" src="https://github.com/CELEBIT/sluv-springboot-server/assets/101792740/8c0c19ae-bae7-4974-aea6-02773b80cfb8">
 </div>
 <br><br/>
-- 관심셀럽
+
+- 관심셀럽 설정을 통해 관심 있는 셀럽의 정보를 위주로 전달합니다.
+- 동명이인 셀럽은 프로필을 통해 구분할 수 있습니다.
+- 최대 50명까지 설정 가능합니다.
+
 <br><br/>
 
 
-### 마이페이지
+### 마이페이지
 <div align="center">
 <img width="700" alt="sluv_intro1" src="https://github.com/CELEBIT/sluv-springboot-server/assets/101792740/bdac5fde-87a3-4385-95e8-b79c0c7fb546">
 </div>
 <br><br/>
-- 마이페이지
+
+- 유저별 마이페이지 운영.
+- 내 마이페이지와 타인의 마이페이지 정보를 다르게 전달해 줍니다.
+- 유저가 작성한 아이템, 유저의 옷장, 관심셀럽, 팔로워, 팔로잉 확인할 수 있습니다.
+- 자신의 마이페이지에서 자신이 작성한 커뮤니티와 최근 본컨텐츠, 좋아요 한 게시글들을 확인할 수 있습니다.
+
 <br><br/>
 
    
@@ -169,18 +186,92 @@
 <img width="700" alt="sluv_intro1" src="https://github.com/CELEBIT/sluv-springboot-server/assets/101792740/f6c9b6f2-d71f-4ba2-9b18-972f6801ea35">
 </div>
 <br><br/>
-- 아이템 홈
+
+- 앱의 홈 화면.
+- 여러 셀럽의 아이템을 추천해 줍니다.
+- 인기 아이템과 스러버 등을 추천해 줍니다.
+- 설정한 관심셀럽들과 관련된 아이템 추천해 줍니다.
+
 <br><br/>
 
-### 커뮤니티 홍
+### 커뮤니티 홈
 <div align="center">
 <img width="700" alt="sluv_intro1" src="https://github.com/CELEBIT/sluv-springboot-server/assets/101792740/ffae8e50-f221-4dee-a89d-44f21dcc3fb1">
 </div>
 <br><br/>
-- 커뮤니티 홈
+
+- 커뮤니티의 홈 화면.
+- 일간, 주간 인기 커뮤니티 게시글 추천해 줍니다.
+- 커뮤니티 게시글 타입별 검색을 할 수 있습니다.
+   - 찾아주세요 : 셀럽별 필터링
+   - 이 중에 뭐 살까 : 투표 상태별 필터링
+   - 추천해 줘 : 해시태그별 필터링
+
 <br><br/>
 
 ### 커뮤니티
+
+<br><br/>
+
+- 커뮤니티는 4개의 타입으로 구성되어 있습니다.
+
+<br><br/>
+
+#### 찾아주세요
+<div align="center">
+<img width="500" alt="sluv_intro1" src="https://github.com/CELEBIT/sluv-springboot-server/assets/101792740/25946a9a-71e1-44d6-af44-d4bda2da9e0d">
+</div>
+<br><br/>
+
+- 셀럽을 기준으로 아이템을 찾아주는 게시글.
+- 아이템 및 사진 첨부할 수 있습니다.
+
+
+#### 이 중에 뭐 살까
+<div align="center">
+<img width="500" alt="sluv_intro1" src="https://github.com/CELEBIT/sluv-springboot-server/assets/101792740/b77e9456-6b2a-48cb-a4fa-ca8f5c28ab72">
+</div>
+
+- 투표를 통해 고민되는 아이템을 추천받는 게시글.
+- 아이템, 사진 첨부할 수 있습니다.
+- 투표 마감시간 설정할 수 있습니다.
+
+<br><br/>
+
+
+#### 이거 어때
+<div align="center">
+<img width="500" alt="sluv_intro1" src="https://github.com/CELEBIT/sluv-springboot-server/assets/101792740/1a0275a7-9202-4684-9688-5152381cec14">
+</div>
+
+- 자유롭게 아이템과 사진을 올려 질문하는 게시글.
+- 아이템, 사진 첨부할 수 있습니다.
+
+<br><br/>
+
+
+#### 추천해 줘
+<div align="center">
+<img width="500" alt="sluv_intro1" src="https://github.com/CELEBIT/sluv-springboot-server/assets/101792740/55f61e58-8ef9-41b8-9a97-54569e785fe9">
+</div>
+
+- 해시태그를 설정하여 주제를 기준으로 질문하고 추천받는 게시글.
+- 해시태그 설정을 할 수 있습니다.
+- 아이템, 사진 첨부할 수 있습니다.
+
+
+<br><br/>
+
+### 커뮤니티 댓글
+<div align="center">
+<img width="500" alt="sluv_intro1" src="https://github.com/CELEBIT/sluv-springboot-server/assets/101792740/6f7c2433-10f6-4dc9-a8ef-975b5ce0d8fb">
+</div>
+
+- 커뮤니티 게시글에 아이템/사진을 첨부하여 댓글을 남길 수 있습니다.
+- 댓글에 대댓글을 추가할 수 있습니다. 
+- 좋아요 기능이 있습니다.
+
+<br><br/>
 
 
 ### 정보공유
@@ -188,14 +279,20 @@
 <img width="700" alt="sluv_intro1" src="https://github.com/CELEBIT/sluv-springboot-server/assets/101792740/34789c09-5e2f-42e0-be14-9c9f39f17320">
 </div>
 <br><br/>
-- 정보 공유 입력 폼
+
+- 필수 정보만 입력해도 되는 입력폼 제공합니다.
+- 임시 보관함 기능을 통해 작성을 이어갈 수 있습니다.
+
 <br><br/>
 
 <div align="center">
 <img width="700" alt="sluv_intro1" src="https://github.com/CELEBIT/sluv-springboot-server/assets/101792740/65ccec99-8b02-424f-9c4d-8a48cd5ca63e">
 </div>
 <br><br/>
-- 획일화된 정보 화면
+
+- 획일화된 정보 게시글을 제공합니다.
+- 게시글과 같은 셀럽, 같은 브랜드, 함께 보관한 아이템을 추천해 줍니다.
+
 <br><br/>
 
 
@@ -204,18 +301,35 @@
 <img width="700" alt="sluv_intro1" src="https://github.com/CELEBIT/sluv-springboot-server/assets/101792740/6709bd2a-1cd1-45d3-84a3-ff46a6ded441">
 </div>
 <br><br/>
-- 옷장 시스템
+
+- 관심 있는 아이템 게시글을 옷장에 스크랩할 수 있습니다.
+- 기본 옷장은 회원가입 시 제공됩니다.
+- 배경 사진과 색, 이름을 변경할 수 있습니다.
+
 <br><br/>
 
 
 
 ### 검색
 <div align="center">
-<img width="700" alt="sluv_intro1" src="https://github.com/CELEBIT/sluv-springboot-server/assets/101792740/a62f513a-7ebc-4a3c-b55f-c82844ca8f33">
+<img width="700" alt="sluv_intro1" src="https://github.com/CELEBIT/sluv-springboot-server/assets/101792740/8e2803aa-d54a-47b0-b4ce-bbbab3ed53f8">
 </div>
 <br><br/>
-- 검색
+
+- 통합검색을 통해 검색어와 관련된 아이템, 커뮤니티, 사용자를 검색할 수 있습니다.
+- 일간 인기 검색어를 노출합니다.
+- 필터를 통해 검색할 수 있습니다.
+
 <br><br/>
 
+
+<div align="center">
+<img width="700" alt="sluv_intro1" src="https://github.com/CELEBIT/sluv-springboot-server/assets/101792740/297ff13f-81fa-4867-8887-b718353c9c42">
+</div>
+<br><br/>
+
+- 통합검색뿐만 아니라 아이템, 커뮤니티, 사용자로 묶어 검색할 수 있습니다.
+
+<br><br/>
 
 </details>

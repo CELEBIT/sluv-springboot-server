@@ -69,6 +69,7 @@
 - [Solution](#solution)
 - [Architecture](#architecture)
 - [결과물](#result)
+- [이 기술을 쓰는 이유](#why)
 
 
 <br>
@@ -333,3 +334,38 @@
 <br><br/>
 
 </details>
+
+<br>
+
+# :monocle_face: 이 기술을 쓰는 이유 <a name = "why"></a>
+
+<details>
+   <summary> 본문 확인 (👈 Click)</summary>
+<br />
+
+### API 문서화
+
+<div align="center">
+<img width="700" alt="sluv_intro1" src="https://github.com/CELEBIT/sluv-springboot-server/assets/101792740/d4918edf-03a3-4eba-ac1c-f75d007ed6f3">
+</div>
+
+- API 문서화를 Swagger와 Spring Rest Doc중에서 고민하였습니다.
+- 최종적으로 Swagger를 채택하였습니다.
+
+**[이유1]**
+
+- **Swagger 문서상에서 API를 테스트**할 수 있다는 점이 굉장한 장점으로 다가왔다.
+- 해당 기능을 통해 프론트 개발자가 API 문서를 보며 테스트할 수 있고, 실제 개발과 Swagger API 테스트로 2중 테스트가 가능하기 때문에 좋다고 생각했다.
+    
+    (실제로 프론트 개발자가 API 연동중 에러 발생 시 바로 말하는 것이 아닌, Swagger API 테스트 기능으로 한 번 더 확인해보고 서버 에러인지 여부를 판단할 수 있었다.)
+    
+
+**[이유2]**
+
+- 또한 Spring REST Docs는 테스트 코드를 작성해야 문서 생성할 수 있다.
+- 때문에 접근성이 떨어진다고 판단하였다.
+
+<br><br/>
+
+
+

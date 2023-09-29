@@ -368,4 +368,22 @@
 <br><br/>
 
 
+### Query DSL
+
+<div align="center">
+<img width="500" alt="sluv_intro1" src="https://github.com/CELEBIT/sluv-springboot-server/assets/101792740/317fd8bd-eecf-42e7-89a2-eed67d3985f1">
+</div>
+<br><br/>
+
+간단한 기능은 Spring Data JPA가 제공해 주는 CRUD 메소드를 사용하더라도, 복잡한 기능의 경우 JPQL을 사용하여 구현하게 됩니다.
+
+하지만 JPQL의 경우 문자열로 직접 작성하기 때문에 오타 혹은 문법적인 오류가 발생할 수 있습니다. 또한 SQL 문법을 작성하기 때문에 복잡한 구현 시 쿼리문이 길어지며 가독성이 떨어진다는 단점이 있습니다.
+
+다음과 같은 Query DSL의 특징이 JPQL의 단점을 보완하기 때문에 도입하였습니다.
+
+- 문자가 아닌 코드로 쿼리를 작성하여 문법 오류를 쉽게 확인할 수 있습니다.
+- 객체를 사용하는 방식과 동일한 작성법을 이용하기 때문에 가독성이 높습니다.
+- IDE의 도움을 받을 수 있습니다.
+
+
 

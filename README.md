@@ -70,6 +70,7 @@
 - [Architecture](#architecture)
 - [결과물](#result)
 - [이 기술을 쓰는 이유](#why)
+- [ERD](#erd)
 
 
 <br>
@@ -385,5 +386,18 @@
 - 객체를 사용하는 방식과 동일한 작성법을 이용하기 때문에 가독성이 높습니다.
 - IDE의 도움을 받을 수 있습니다.
 
+</details>
+<br>
 
+# :card_file_box: ERD <a name = "erd"></a>
 
+<details>
+   <summary> 본문 확인 (👈 Click)</summary>
+<br />
+
+<div align="center">
+<img width="912" alt="sluv_erd" src="https://github.com/CELEBIT/sluv-springboot-server/assets/101792740/bb324c0c-c057-4e4e-9661-84b9099ae6e2">
+</div>
+<br><br/>
+
+</details>

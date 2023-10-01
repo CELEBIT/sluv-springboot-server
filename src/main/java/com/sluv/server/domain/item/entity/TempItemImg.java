@@ -1,9 +1,11 @@
 package com.sluv.server.domain.item.entity;
 
+import com.sluv.server.domain.item.dto.ItemImgResDto;
 import com.sluv.server.global.common.entity.BaseEntity;
 import com.sluv.server.global.common.enums.ItemImgOrLinkStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,6 +14,8 @@ import org.hibernate.annotations.ColumnDefault;
 @Entity
 @Getter
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Table(name = "temp_item_img")
 public class TempItemImg extends BaseEntity {
 
@@ -31,17 +35,20 @@ public class TempItemImg extends BaseEntity {
     @ColumnDefault("0")
     private Boolean representFlag;
 
+    @Builder.Default
     @Enumerated(EnumType.STRING)
     @Column(length = 45, columnDefinition = "varchar(45) default 'ACTIVE'")
     private ItemImgOrLinkStatus itemImgOrLinkStatus = ItemImgOrLinkStatus.ACTIVE;
 
+    private Integer sortOrder;
 
-    @Builder
-    public TempItemImg(Long id, TempItem tempItem, String tempItemImgUrl, Boolean representFlag, ItemImgOrLinkStatus itemImgOrLinkStatus) {
-        this.id = id;
-        this.tempItem = tempItem;
-        this.tempItemImgUrl = tempItemImgUrl;
-        this.representFlag = representFlag;
-        this.itemImgOrLinkStatus = itemImgOrLinkStatus;
+
+    public static TempItemImg toEntity(TempItem tempItem, ItemImgResDto dto) {
+        return TempItemImg.builder()
+                .tempItem(tempItem)
+                .tempItemImgUrl(dto.getImgUrl())
+                .representFlag(dto.getRepresentFlag())
+                .sortOrder(dto.getSortOrder())
+                .build();
     }
 }

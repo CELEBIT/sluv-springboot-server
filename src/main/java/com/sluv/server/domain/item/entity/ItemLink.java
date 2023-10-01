@@ -1,10 +1,12 @@
 package com.sluv.server.domain.item.entity;
 
+import com.sluv.server.domain.item.dto.ItemLinkResDto;
 import com.sluv.server.global.common.entity.BaseEntity;
 import com.sluv.server.global.common.enums.ItemImgOrLinkStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,6 +14,8 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Table(name = "item_link")
 public class ItemLink extends BaseEntity {
 
@@ -32,16 +36,17 @@ public class ItemLink extends BaseEntity {
     @Column(columnDefinition = "TEXT")
     private String itemLinkUrl;
 
+    @Builder.Default
     @Enumerated(EnumType.STRING)
     @Column(length = 45, columnDefinition = "varchar(45) default 'ACTIVE'")
     private ItemImgOrLinkStatus itemImgOrLinkStatus = ItemImgOrLinkStatus.ACTIVE;
 
-    @Builder
-    public ItemLink(Long id, Item item, String linkName, String itemLinkUrl, ItemImgOrLinkStatus itemImgOrLinkStatus) {
-        this.id = id;
-        this.item = item;
-        this.linkName = linkName;
-        this.itemLinkUrl = itemLinkUrl;
-        this.itemImgOrLinkStatus = itemImgOrLinkStatus;
+
+    public static ItemLink toEntity(Item item , ItemLinkResDto dto){
+        return ItemLink.builder()
+                .item(item)
+                .linkName(dto.getLinkName())
+                .itemLinkUrl(dto.getItemLinkUrl())
+                .build();
     }
 }

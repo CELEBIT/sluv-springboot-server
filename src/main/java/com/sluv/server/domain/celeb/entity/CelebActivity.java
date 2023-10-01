@@ -10,6 +10,8 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Table(name = "celeb_activity")
 public class CelebActivity extends BaseEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,10 +24,4 @@ public class CelebActivity extends BaseEntity {
 
     private String activityName;
 
-    @Builder
-    public CelebActivity(Long id, Celeb celeb, String activityName) {
-        this.id = id;
-        this.celeb = celeb;
-        this.activityName = activityName;
-    }
 }

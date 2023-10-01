@@ -7,7 +7,6 @@ import com.sluv.server.domain.brand.exception.BrandNotFoundException;
 import com.sluv.server.domain.brand.exception.NewBrandNotFoundException;
 import com.sluv.server.domain.brand.repository.BrandRepository;
 import com.sluv.server.domain.brand.repository.NewBrandRepository;
-import com.sluv.server.domain.brand.repository.RecentSelectBrandRepository;
 import com.sluv.server.domain.celeb.dto.CelebSearchResDto;
 import com.sluv.server.domain.celeb.entity.Celeb;
 import com.sluv.server.domain.celeb.entity.NewCeleb;
@@ -15,10 +14,10 @@ import com.sluv.server.domain.celeb.exception.CelebNotFoundException;
 import com.sluv.server.domain.celeb.exception.NewCelebNotFoundException;
 import com.sluv.server.domain.celeb.repository.CelebRepository;
 import com.sluv.server.domain.celeb.repository.NewCelebRepository;
-import com.sluv.server.domain.celeb.repository.RecentSelectCelebRepository;
+import com.sluv.server.domain.closet.entity.Closet;
+import com.sluv.server.domain.closet.repository.ClosetRepository;
 import com.sluv.server.domain.item.dto.*;
 import com.sluv.server.domain.item.entity.*;
-import com.sluv.server.domain.item.entity.hashtag.Hashtag;
 import com.sluv.server.domain.item.entity.hashtag.ItemHashtag;
 import com.sluv.server.domain.item.enums.ItemStatus;
 import com.sluv.server.domain.item.exception.ItemCategoryNotFoundException;
@@ -27,13 +26,17 @@ import com.sluv.server.domain.item.exception.hashtag.HashtagNotFoundException;
 import com.sluv.server.domain.item.repository.*;
 import com.sluv.server.domain.item.repository.hashtag.HashtagRepository;
 import com.sluv.server.domain.item.repository.hashtag.ItemHashtagRepository;
+import com.sluv.server.domain.search.dto.SearchFilterReqDto;
 import com.sluv.server.domain.user.dto.UserInfoDto;
 import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.domain.user.exception.UserNotFoundException;
 import com.sluv.server.domain.user.repository.FollowRepository;
 import com.sluv.server.domain.user.repository.UserRepository;
 import com.sluv.server.global.common.enums.ItemImgOrLinkStatus;
+import com.sluv.server.global.common.response.PaginationResDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -57,10 +60,8 @@ public class ItemService {
 
     private final ItemLikeRepository itemLikeRepository;
     private final FollowRepository followRepository;
-
-    private final PlaceRankRepository placeRankRepository;
-    private final RecentSelectCelebRepository recentSearchCelebRepository;
-    private final RecentSelectBrandRepository recentSelectBrandRepository;
+    private final ClosetRepository closetRepository;
+    private final ItemScrapRepository itemScrapRepository;
 
     @Transactional
     public ItemPostResDto postItem(User user, ItemPostReqDto reqDto) {
@@ -101,31 +102,18 @@ public class ItemService {
         Item item = reqDto.getId() != null ? itemRepository.findById(reqDto.getId()).orElseThrow(ItemNotFoundException::new)
                 :null;
 
-        // Item id를 제외한 나머지 부분 Builder로 조립.
-        Item.ItemBuilder itemBuilder = Item.builder()
-                .user(user)
-                .celeb(celeb)
-                .category(itemCategory)
-                .brand(brand)
-                .newBrand(newBrand)
-                .newCeleb(newCeleb)
-                .name(reqDto.getItemName())
-                .whenDiscovery(reqDto.getWhenDiscovery())
-                .whereDiscovery(reqDto.getWhereDiscovery())
-                .price(reqDto.getPrice())
-                .additionalInfo(reqDto.getAdditionalInfo())
-                .infoSource(reqDto.getInfoSource())
-                .itemStatus(ItemStatus.ACTIVE)
-                .viewNum(0L);
-
+        Item postItem;
         // Item 수정이라면, 기존의 Item의 Id를 추가.
         if(item != null){
-            itemBuilder.id(item.getId());
+            postItem = Item.toEntity(item.getId(), user, celeb, newCeleb, itemCategory, brand, newBrand, reqDto);
+        }else {
+            // Item 생성
+            postItem = Item.toEntity(user, celeb, newCeleb, itemCategory, brand, newBrand, reqDto);
         }
 
         // 완성된 Item save
         Item newItem = itemRepository.save(
-                itemBuilder.build()
+                postItem
         );
 
         // 기존의 Img, Link, Hashtag가 있다면 모두 삭제
@@ -136,12 +124,7 @@ public class ItemService {
         // ItemImg 테이블에 추가
         reqDto.getImgList().stream()
                         .map(itemImg->
-                            ItemImg.builder()
-                                    .item(newItem)
-                                    .itemImgUrl(itemImg.getImgUrl())
-                                    .representFlag(itemImg.getRepresentFlag())
-                                    .itemImgOrLinkStatus(ItemImgOrLinkStatus.ACTIVE)
-                                    .build()
+                            ItemImg.toEntity(newItem, itemImg)
                         ).forEach(itemImgRepository::save);
 
 
@@ -165,33 +148,23 @@ public class ItemService {
         if(reqDto.getHashTagIdList() != null) {
             reqDto.getHashTagIdList().stream().map(hashTag ->
 
-                    ItemHashtag.builder()
-                            .item(newItem)
-                            .hashtag(
-                                    hashtagRepository.findById(hashTag)
-                                            .orElseThrow(HashtagNotFoundException::new)
-                            )
-                            .build()
-
+                    ItemHashtag.toEntity(
+                            newItem,
+                            hashtagRepository.findById(hashTag)
+                                    .orElseThrow(HashtagNotFoundException::new)
+                    )
             ).forEach(itemHashtagRepository::save);
         }
 
 
 
-        return ItemPostResDto.builder()
-                .itemId(newItem.getId())
-                .build();
+        return ItemPostResDto.of(newItem.getId());
     }
 
     public List<HotPlaceResDto> getTopPlace() {
 
         return itemRepository.findTopPlace().stream()
-                .map(placeName ->
-                        HotPlaceResDto.builder()
-                                .placeName(placeName)
-                                .build()
-                ).toList();
-
+                .map(HotPlaceResDto::of).toList();
     }
 
     public ItemDetailResDto getItemDetail(User user, Long itemId) {
@@ -206,35 +179,11 @@ public class ItemService {
         // 2. Item 이미지들 조회
         List<ItemImgResDto> imgList = itemImgRepository.findAllByItemId(itemId)
                                                         .stream()
-                                                        .map(itemImg -> ItemImgResDto.builder()
-                                                                .imgUrl(itemImg.getItemImgUrl())
-                                                                .representFlag(itemImg.getRepresentFlag())
-                                                                .build()
-                                                        ).toList();
+                                                        .map(ItemImgResDto::of).toList();
 
         // 3. Item Celeb
-        CelebSearchResDto celeb = item.getCeleb() != null ?
-
-                CelebSearchResDto.builder()
-                                .id(item.getCeleb().getId())
-                                .category(null)
-                                .celebParentNameKr(
-                                        item.getCeleb().getParent() != null
-                                        ? item.getCeleb().getParent().getCelebNameKr()
-                                        :null
-                                )
-                                .celebChildNameKr(item.getCeleb().getCelebNameKr())
-                                .celebTotalNameKr(
-                                        item.getCeleb().getParent() != null
-                                        ? item.getCeleb().getParent().getCelebNameKr() + " " + item.getCeleb().getCelebNameKr()
-                                        : item.getCeleb().getCelebNameKr()
-                                )
-                                .celebTotalNameEn(
-                                        item.getCeleb().getParent() != null
-                                        ? item.getCeleb().getParent().getCelebNameEn() + " " + item.getCeleb().getCelebNameEn()
-                                        : item.getCeleb().getCelebNameEn()
-                                )
-                                .build()
+        CelebSearchResDto celeb = item.getCeleb() != null
+                ? CelebSearchResDto.of(item.getCeleb())
                 : null;
 
         String newCeleb = item.getNewCeleb() != null ?
@@ -242,29 +191,11 @@ public class ItemService {
                 : null;
 
         // 4. Item Category
-        ItemCategoryDto category = ItemCategoryDto.builder()
-                .id(item.getCategory().getId())
-                .parentId(
-                        item.getCategory().getParent() != null
-                            ? item.getCategory().getParent().getId()
-                            : null
-                )
-                .name(item.getCategory().getName())
-                .parentName(
-                        item.getCategory().getParent() != null
-                                ? item.getCategory().getParent().getName()
-                                : null
-                )
-                .build();
+        ItemCategoryDto category = ItemCategoryDto.of(item.getCategory());
 
         // 4. Brand
         BrandSearchResDto brand = item.getBrand() != null ?
-                    BrandSearchResDto.builder()
-                        .id(item.getBrand().getId())
-                        .brandKr(item.getBrand().getBrandKr())
-                        .brandEn(item.getBrand().getBrandEn())
-                        .brandImgUrl(item.getBrand().getBrandImgUrl())
-                        .build()
+                    BrandSearchResDto.of(item.getBrand())
                 : null;
 
         String newBrand = item.getNewBrand() != null ?
@@ -275,86 +206,47 @@ public class ItemService {
         Integer likeNum = itemLikeRepository.countByItemId(item.getId());
 
         // 6. 스크랩 수
+        Integer scrapNum = itemScrapRepository.countByItemId(item.getId());
 
-        // 7. 조회수
-//        Long viewNum = item.getViewNum();
+        // 7. 조회수 TODO : Redis를 사용한 IP:PostId 저장으로 조회수 중복방지 기능
+        Long viewNum = item.getViewNum();
 
         // 8. Item 링크들 조회
 
         List<ItemLinkResDto> linkList = itemLinkRepository.findByItemId(itemId)
                                                         .stream()
-                                                        .map(itemLink -> ItemLinkResDto.builder()
-                                                                .linkName(itemLink.getLinkName())
-                                                                .itemLinkUrl(itemLink.getItemLinkUrl())
-                                                                .build()
-                                                        )
-                                                        .toList();
+                                                        .map(ItemLinkResDto::of).toList();
 
         // 9. 작성자 info
         User writer = userRepository.findById(item.getUser().getId())
                                                 .orElseThrow(UserNotFoundException::new);
-        UserInfoDto writerInfo = UserInfoDto.builder()
-                .id(writer.getId())
-                .profileImgUrl(writer.getProfileImgUrl())
-                .nickName(writer.getNickname())
-                .build();
+        UserInfoDto writerInfo = UserInfoDto.of(writer);
 
         // 10. Hashtag
         List<ItemHashtag> itemHashtagId = itemHashtagRepository.findAllByItemId(itemId);
         List<HashtagResponseDto> hashtagList = itemHashtagId.stream()
             .parallel()
             .map(itemHashtag ->
-            HashtagResponseDto.builder()
-                    .hashtagId(itemHashtag.getHashtag().getId())
-                    .hashtagContent(itemHashtag.getHashtag().getContent())
-                    .count(null)
-                    .build()
+            HashtagResponseDto.of(itemHashtag.getHashtag(), null)
         ).toList();
 
 
         // 11. 같은 셀럽 아이템 리스트
         boolean celebJudge = item.getCeleb() != null;
-        String celebName = celebJudge ? item.getCeleb().getCelebNameKr() : item.getNewCeleb().getCelebName();
-
-        List<ItemSameResDto> sameCelebItemList = itemRepository.findSameCelebItem(item, celebJudge)
-                        .stream().map(celebItem -> {
-                           ItemImg itemImg = itemImgRepository.findMainImg(celebItem.getId());
-                            return ItemSameResDto.builder()
-                                    .itemId(celebItem.getId())
-                                    .itemName(celebItem.getName())
-                                    .brandName(
-                                            celebItem.getBrand() != null
-                                            ?celebItem.getBrand().getBrandKr()
-                                            : celebItem.getNewBrand().getBrandName()
-                                    )
-                                    .celebName(celebName)
-                                    .imgUrl(itemImg.getItemImgUrl())
-                                    .build();
-                        }).toList();
-
+        List<ItemSimpleResDto> sameCelebItemList = convertItemToItemSimpleResDto(
+                                                                user , itemRepository.findSameCelebItem(item, celebJudge)
+                                                );
 
         // 12. 같은 브랜드 아이템 리스트
         boolean brandJudge = item.getBrand() != null;
-        String brandName = brandJudge ? item.getBrand().getBrandKr() : item.getNewBrand().getBrandName();
+        List<ItemSimpleResDto> sameBrandItemList = convertItemToItemSimpleResDto(
+                                                            user, itemRepository.findSameBrandItem(item, brandJudge)
+                                                    );
 
-        List<ItemSameResDto> sameBrandItemList = itemRepository.findSameBrandItem(item, brandJudge)
-                        .stream()
-                        .map(brandItem ->{
-                            ItemImg itemImg = itemImgRepository.findMainImg(brandItem.getId());
-                            return ItemSameResDto.builder()
-                                    .itemId(brandItem.getId())
-                                    .itemName(brandItem.getName())
-                                    .brandName(brandName)
-                                    .celebName(
-                                            brandItem.getCeleb() != null
-                                            ? brandItem.getCeleb().getCelebNameKr()
-                                            : brandItem.getNewCeleb().getCelebName()
-                                    )
-                                    .imgUrl(itemImg.getItemImgUrl())
-                                    .build();
-                        })
-                        .toList();
         // 13. 다른 스러버들이 함께 보관한 아이템 리스트
+        List<ItemSimpleResDto> sameClosetItemList = convertItemToItemSimpleResDto(
+                                                            user, getClosetItemList(item)
+                                                    );
 
 
         // 14. 좋아요 여부
@@ -363,34 +255,33 @@ public class ItemService {
         // 15. 팔로우 여부
         boolean followStatus = followRepository.getFollowStatus(user, writer);
 
+        // 16. 스크랩 여부
+        List<Closet> closetList = closetRepository.findAllByUserId(user.getId());
+        boolean scrapStatus = itemScrapRepository.getItemScrapStatus(item, closetList);
+
         // Dto 조립
-        return ItemDetailResDto.builder()
-                .imgList(imgList)
-                .celeb(celeb)
-                .newCelebName(newCeleb)
-                .category(category)
-                .itemName(item.getName())
-                .brand(brand)
-                .newBrandName(newBrand)
-                .likeNum(likeNum) // like 완성 후 변경 예정
-                .likeStatus(likeStatus)
-                .scrapNum(null) // closet 완성 후 변경 예정
-                .viewNum(item.getViewNum())
-                .linkList(linkList)
-                .writer(writerInfo)
-                .whenDiscovery(item.getWhenDiscovery())
-                .whereDiscovery(item.getWhereDiscovery())
-                .price(item.getPrice())
-                .additionalInfo(item.getAdditionalInfo())
-                .hashTagList(hashtagList)
-                .infoSource(item.getInfoSource())
-                .sameCelebItemList(sameCelebItemList)
-                .sameBrandItemList(sameBrandItemList)
-//                .sameClosetItemList(sameClosetItemList)
-                .color(item.getColor())
-                .followStatus(followStatus)
-                .hasMine(item.getUser().getId().equals(user.getId()))
-                .build();
+        return ItemDetailResDto.of(
+                item,
+                celeb,
+                newCeleb,
+                brand,
+                newBrand,
+                category,
+                likeNum,
+                likeStatus,
+                scrapNum,
+                scrapStatus,
+                viewNum,
+                writerInfo,
+                followStatus,
+                item.getUser().getId().equals(user.getId()),
+                imgList,
+                linkList,
+                hashtagList,
+                sameCelebItemList,
+                sameBrandItemList,
+                sameClosetItemList
+        );
     }
 
     @Transactional
@@ -400,14 +291,13 @@ public class ItemService {
         boolean likeExist = itemLikeRepository.existsByUserIdAndItemId(user.getId(), itemId);
         if(!likeExist){
             itemLikeRepository.save(
-                    ItemLike.builder()
-                            .item(item)
-                            .user(user)
-                            .build()
+                    ItemLike.toEntity(item, user)
             );
         }else{
             itemLikeRepository.deleteByUserIdAndItemId(user.getId(), itemId);
         }
+
+        item.decreaseViewNum();
     }
 
     public void deleteItem(Long itemId) {
@@ -415,5 +305,179 @@ public class ItemService {
 
         item.changeStatus(ItemStatus.DELETED);
         itemRepository.save(item);
+    }
+
+    public PaginationResDto<ItemSimpleResDto> getRecentItem(User user, Pageable pageable) {
+        Page<Item> recentItemPage = itemRepository.getRecentItem(user, pageable);
+
+        return convertItemSimplePageDto(user, pageable, recentItemPage);
+
+
+    }
+
+    public PaginationResDto<ItemSimpleResDto> getScrapItem(User user, Pageable pageable) {
+        // User, Closet, Item 조인하여 ItemPage 조회
+        Page<Item> itemPage = itemRepository.getAllScrapItem(user, pageable);
+
+        return convertItemSimplePageDto(user, pageable, itemPage);
+    }
+
+    private PaginationResDto<ItemSimpleResDto> convertItemSimplePageDto(User user, Pageable pageable, Page<Item> page) {
+        // ItemPage에서 ItemSameResDto 생성
+        List<ItemSimpleResDto> content = convertItemToItemSimpleResDto(user, page.getContent());
+
+        return PaginationResDto.<ItemSimpleResDto>builder()
+                .page(page.getNumber())
+                .hasNext(page.hasNext())
+                .content(content)
+                .build();
+    }
+
+    private List<Item> getClosetItemList(Item item) {
+        // 가장 최근에 해당 item을 추가한 상위 20개의 Closet을 검색
+        List<Closet> recentAddClosetList = closetRepository.getRecentAddCloset(item);
+
+        // 해당 Closet에 해당하는 아이템들을 최신순으로 정렬후 10개 추출.
+        return itemRepository.getSameClosetItems(item, recentAddClosetList);
+    }
+
+    private List<ItemSimpleResDto> convertItemToItemSimpleResDto(User user, List<Item> itemList){
+        // User의 모든 Closet 조회
+        List<Closet> closetList = closetRepository.findAllByUserId(user.getId());
+
+        return itemList.stream()
+                .map(item ->{
+                    ItemImg itemImg = itemImgRepository.findMainImg(item.getId());
+                    Boolean scrapStatus = itemScrapRepository.getItemScrapStatus(item, closetList);
+                    return ItemSimpleResDto.of(item, itemImg, scrapStatus);
+                }).toList();
+    }
+
+    public PaginationResDto<ItemSimpleResDto> getRecommendItem(User user, Pageable pageable) {
+        Page<Item> recommendItemPage = itemRepository.getRecommendItemPage(pageable);
+
+        List<ItemSimpleResDto> content =
+                convertItemToItemSimpleResDto(user, recommendItemPage.getContent());
+
+
+
+        return PaginationResDto.<ItemSimpleResDto>builder()
+                .page(recommendItemPage.getNumber())
+                .hasNext(recommendItemPage.hasNext())
+                .content(content)
+                .build();
+    }
+
+    /**
+     * 핫한 셀럽들이 선택한 여름나기 아이템 조회
+     */
+    public PaginationResDto<ItemSimpleResDto> getSummerItem(User user, Pageable pageable, SearchFilterReqDto dto) {
+        // itemPage 조회
+        Page<Item> itemPage = itemRepository.getCelebSummerItem(pageable, dto);
+        // Content 조립
+        List<ItemSimpleResDto> content = convertItemToItemSimpleResDto(user, itemPage.getContent());
+
+        return PaginationResDto.<ItemSimpleResDto>builder()
+                .page(itemPage.getNumber())
+                .hasNext(itemPage.hasNext())
+                .content(content)
+                .build();
+    }
+
+    /**
+     * 지금 당장 구매가능한 아이템 조회
+     */
+    public PaginationResDto<ItemSimpleResDto> getNowBuyItem(User user, Pageable pageable, SearchFilterReqDto dto) {
+        // itemPage 조회
+        Page<Item> itemPage = itemRepository.getNowBuyItem(pageable, dto);
+
+        // Content 조립
+        List<ItemSimpleResDto> content = convertItemToItemSimpleResDto(user, itemPage.getContent());
+
+        return PaginationResDto.<ItemSimpleResDto>builder()
+                .page(itemPage.getNumber())
+                .hasNext(itemPage.hasNext())
+                .content(content)
+                .build();
+
+    }
+
+    public PaginationResDto<ItemSimpleResDto> getNewItem(User user, Pageable pageable) {
+        // itemPage 조회
+        Page<Item> itemPage = itemRepository.getNewItem(pageable);
+
+        // Content 조립
+        List<ItemSimpleResDto> content = convertItemToItemSimpleResDto(user, itemPage.getContent());
+
+        return PaginationResDto.<ItemSimpleResDto>builder()
+                .page(itemPage.getNumber())
+                .hasNext(itemPage.hasNext())
+                .content(content)
+                .build();
+    }
+
+    public PaginationResDto<ItemSimpleResDto> getLuxuryItem(User user, Pageable pageable, SearchFilterReqDto dto) {
+        Page<Item> itemPage = itemRepository.getLuxuryItem(pageable, dto);
+
+        List<ItemSimpleResDto> content = convertItemToItemSimpleResDto(user, itemPage.getContent());
+
+        return PaginationResDto.<ItemSimpleResDto>builder()
+                .page(itemPage.getNumber())
+                .hasNext(itemPage.hasNext())
+                .content(content)
+                .build();
+    }
+
+    public PaginationResDto<ItemSimpleResDto> getEfficientItem(User user, Pageable pageable, SearchFilterReqDto dto) {
+        Page<Item> itemPage = itemRepository.getEfficientItem(pageable, dto);
+
+        List<ItemSimpleResDto> content = convertItemToItemSimpleResDto(user, itemPage.getContent());
+
+        return PaginationResDto.<ItemSimpleResDto>builder()
+                .page(itemPage.getNumber())
+                .hasNext(itemPage.hasNext())
+                .content(content)
+                .build();
+    }
+
+    public List<ItemSimpleResDto> getWeekHotItem(User user) {
+        List<Item> itemPage = itemRepository.getWeekHotItem();
+        return convertItemToItemSimpleResDto(user, itemPage);
+    }
+
+    public List<ItemSimpleResDto> getDayHotItem(User user) {
+        List<Item> itemPage = itemRepository.getDayHotItem();
+        return convertItemToItemSimpleResDto(user, itemPage);
+    }
+
+    /**
+     * 요즘 핫한 셀럽의 Item 조회
+     */
+    public PaginationResDto<ItemSimpleResDto> getHotCelebItem(User user, Pageable pageable, SearchFilterReqDto dto) {
+        Long celebId = 510L;
+
+        Page<Item> itemPage = itemRepository.getHotCelebItem(celebId, pageable, dto);
+
+        List<ItemSimpleResDto> content = convertItemToItemSimpleResDto(user, itemPage.getContent());
+
+        return PaginationResDto.<ItemSimpleResDto>builder()
+                .page(itemPage.getNumber())
+                .hasNext(itemPage.hasNext())
+                .content(content)
+                .build();
+    }
+
+    public List<ItemSimpleResDto> getCurationItem(User user) {
+        List<Celeb> interestedCeleb = celebRepository.findInterestedCeleb(user);
+        List<Item> itemList = itemRepository.getCurationItem(user, interestedCeleb);
+
+        return convertItemToItemSimpleResDto(user, itemList);
+    }
+
+    public List<ItemSimpleResDto> getHowAboutItem(User user) {
+        List<Celeb> interestedCeleb = celebRepository.findInterestedCeleb(user);
+        List<Item> itemList = itemRepository.getHowAboutItem(user, interestedCeleb);
+
+        return convertItemToItemSimpleResDto(user, itemList);
     }
 }

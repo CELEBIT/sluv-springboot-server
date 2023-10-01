@@ -33,11 +33,7 @@ public class RecentSelectBrandService {
                 : null;
 
         recentSelectBrandRepository.save(
-                RecentSelectBrand.builder()
-                        .brand(brand)
-                        .newBrand(newBrand)
-                        .user(user)
-                        .build()
+                RecentSelectBrand.toEntity(brand, newBrand, user)
         );
     }
 

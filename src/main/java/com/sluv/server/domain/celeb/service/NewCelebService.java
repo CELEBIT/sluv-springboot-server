@@ -15,15 +15,10 @@ public class NewCelebService {
     private final NewCelebRepository newCelebRepository;
 
     public NewCelebPostResDto postNewCeleb(NewCelebPostReqDto dto){
-        NewCeleb newCeleb = newCelebRepository.save(NewCeleb.builder()
-                .celebName(dto.getNewCelebName())
-                .newCelebStatus(NewCelebStatus.ACTIVE)
-                .build()
+        NewCeleb newCeleb = newCelebRepository.save(
+                NewCeleb.toEntity(dto)
         );
 
-        return NewCelebPostResDto.builder()
-                                .newCelebId(newCeleb.getId())
-                                .newCelebName(newCeleb.getCelebName())
-                                .build();
+        return NewCelebPostResDto.of(newCeleb);
     }
 }

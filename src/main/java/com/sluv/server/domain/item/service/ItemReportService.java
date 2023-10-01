@@ -32,13 +32,7 @@ public class ItemReportService {
         }else {
         // 중복이 아니라면 신고 접수
             itemReportRepository.save(
-                    ItemReport.builder()
-                            .reporter(user)
-                            .item(target)
-                            .itemReportReason(dto.getReason())
-                            .content(dto.getContent())
-                            .reportStatus(ReportStatus.WAITING)
-                            .build()
+                    ItemReport.toEntity(target, user, dto)
             );
         }
     }

@@ -16,9 +16,7 @@ public class CelebActivityService {
     public List<CelebActivityResDto> getCelebActivity(Long celebId) {
 
         return celebActivityRepository.findAllByCelebId(celebId).stream()
-                .map(celebActivity -> CelebActivityResDto.builder()
-                        .activityName(celebActivity.getActivityName())
-                        .build()
-                ).toList();
+                .map(CelebActivityResDto::of)
+                .toList();
     }
 }

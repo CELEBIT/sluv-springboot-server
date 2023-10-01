@@ -1,14 +1,20 @@
 package com.sluv.server.domain.question.entity;
 
+import com.sluv.server.global.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @NoArgsConstructor
-public class QuestionRecommendCategory {
+@AllArgsConstructor
+@Builder
+@Getter
+public class QuestionRecommendCategory extends BaseEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -22,10 +28,10 @@ public class QuestionRecommendCategory {
     @Size(max = 45)
     private String name;
 
-    @Builder
-    public QuestionRecommendCategory(Long id, Question question, String name) {
-        this.id = id;
-        this.question = question;
-        this.name = name;
+    public static QuestionRecommendCategory toEntity(Question question, String categoryName) {
+        return QuestionRecommendCategory.builder()
+                .question(question)
+                .name(categoryName)
+                .build();
     }
 }

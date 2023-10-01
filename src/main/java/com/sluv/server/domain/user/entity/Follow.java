@@ -3,6 +3,7 @@ package com.sluv.server.domain.user.entity;
 import com.sluv.server.global.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -10,6 +11,8 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Table(name = "follow")
 public class Follow extends BaseEntity {
 
@@ -27,10 +30,10 @@ public class Follow extends BaseEntity {
     @NotNull
     private User followee;
 
-    @Builder
-    public Follow(Long id, User follower, User followee) {
-        this.id = id;
-        this.follower = follower;
-        this.followee = followee;
+    public static Follow toEntity(User follower, User followee){
+        return Follow.builder()
+                .follower(follower)
+                .followee(followee)
+                .build();
     }
 }

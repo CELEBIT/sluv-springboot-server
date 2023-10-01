@@ -1,5 +1,6 @@
 package com.sluv.server.domain.closet.dto;
 
+import com.sluv.server.domain.closet.enums.ClosetColor;
 import com.sluv.server.domain.closet.enums.ClosetStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
@@ -11,7 +12,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ClosetReqDto {
+public class
+ClosetReqDto {
     @Schema(description = "Closet 이름")
     private String name;
     @Schema(description = "Closet 커버 사진 URL")
@@ -19,6 +21,6 @@ public class ClosetReqDto {
     @Schema(description = "Closet 공개 여부")
     private ClosetStatus closetStatus;
     @Schema(description = "Closet 커버 색상")
-    private String color;
+    private ClosetColor colorScheme;
 
 }

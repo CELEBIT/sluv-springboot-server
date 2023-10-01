@@ -1,5 +1,6 @@
 package com.sluv.server.domain.brand.entity;
 
+import com.sluv.server.domain.brand.dto.NewBrandPostReqDto;
 import com.sluv.server.domain.brand.enums.NewBrandStatus;
 import com.sluv.server.domain.item.entity.Item;
 import com.sluv.server.domain.item.enums.ItemStatus;
@@ -7,6 +8,7 @@ import com.sluv.server.global.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,6 +19,8 @@ import java.util.List;
 @Entity
 @Getter
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Table(name = "new_brand")
 public class NewBrand extends BaseEntity {
 
@@ -32,10 +36,10 @@ public class NewBrand extends BaseEntity {
     @Column(length = 45, columnDefinition = "varchar(45) default 'ACTIVE'")
     private NewBrandStatus newBrandStatus;
 
-    @Builder
-    public NewBrand(Long id, String brandName, NewBrandStatus newBrandStatus) {
-        this.id = id;
-        this.brandName = brandName;
-        this.newBrandStatus = newBrandStatus;
+    public static NewBrand toEntity(NewBrandPostReqDto newBrandPostReqDto){
+        return NewBrand.builder()
+                .brandName(newBrandPostReqDto.getNewBrandName())
+                .newBrandStatus(NewBrandStatus.ACTIVE)
+                .build();
     }
 }

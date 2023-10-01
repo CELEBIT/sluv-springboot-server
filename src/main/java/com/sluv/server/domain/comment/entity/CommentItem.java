@@ -1,10 +1,11 @@
 package com.sluv.server.domain.comment.entity;
 
+import com.sluv.server.domain.comment.dto.CommentItemReqDto;
 import com.sluv.server.domain.item.entity.Item;
 import com.sluv.server.global.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,6 +13,8 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Table(name = "comment_item")
 public class CommentItem extends BaseEntity {
 
@@ -29,10 +32,13 @@ public class CommentItem extends BaseEntity {
     @NotNull
     private Item item;
 
-    @Builder
-    public CommentItem(Long id, Comment comment, Item item) {
-        this.id = id;
-        this.comment = comment;
-        this.item = item;
+    private Integer sortOrder;
+
+    public static CommentItem toEntity(Comment comment, Item item, CommentItemReqDto dto){
+        return CommentItem.builder()
+                .comment(comment)
+                .item(item)
+                .sortOrder(dto.getSortOrder())
+                .build();
     }
 }

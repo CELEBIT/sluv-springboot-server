@@ -30,13 +30,7 @@ public class UserReportService {
         }else {
             // 중복이 아니라면 신고 접수
             userReportRepository.save(
-                    UserReport.builder()
-                            .reporter(user)
-                            .reported(target)
-                            .userReportReason(dto.getReason())
-                            .content(dto.getContent())
-                            .reportStatus(ReportStatus.WAITING)
-                            .build()
+                    UserReport.toEntity(user, target, dto)
             );
         }
     }

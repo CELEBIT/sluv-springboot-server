@@ -5,6 +5,7 @@ import lombok.Getter;
 public enum ErrorCode {
 
     INVALID_ARGUMENT(3000, "Validation을 만족하지 못합니다."),
+    ENUM_ERROR(3001, "잘못된 Enum 값 입니다."),
     INTERNAL_SERVER_ERROR(5000, "내부 서버 에러입니다."),
     DB_ACCESS_ERROR(5001, "DB 에러입니다.");
 

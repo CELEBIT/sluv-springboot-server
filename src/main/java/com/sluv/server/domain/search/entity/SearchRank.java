@@ -5,6 +5,7 @@ import com.sluv.server.global.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,6 +13,8 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Table(name = "search_rank")
 public class SearchRank extends BaseEntity {
 
@@ -28,11 +31,10 @@ public class SearchRank extends BaseEntity {
     @Column(columnDefinition = "varchar(45) default 'TODAY'")
     private SearchRankStatus searchRankStatus;
 
-    @Builder
-    public SearchRank(Long id, Long searchCount, String searchWord, SearchRankStatus searchRankStatus) {
-        this.id = id;
-        this.searchCount = searchCount;
-        this.searchWord = searchWord;
-        this.searchRankStatus = searchRankStatus;
+    public static SearchRank of(Long searchCount, String searchWord) {
+        return SearchRank.builder()
+                .searchCount(searchCount)
+                .searchWord(searchWord)
+                .build();
     }
 }

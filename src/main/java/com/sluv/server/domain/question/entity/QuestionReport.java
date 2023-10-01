@@ -1,5 +1,6 @@
 package com.sluv.server.domain.question.entity;
 
+import com.sluv.server.domain.question.dto.QuestionReportReqDto;
 import com.sluv.server.domain.question.enums.QuestionReportReason;
 import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.domain.user.enums.UserReportReason;
@@ -8,6 +9,7 @@ import com.sluv.server.global.common.enums.ReportStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,6 +17,8 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Table(name = "question_report")
 public class QuestionReport extends BaseEntity {
 
@@ -39,17 +43,18 @@ public class QuestionReport extends BaseEntity {
     @Size(max = 1002)
     private String content;
 
+    @Builder.Default
     @Enumerated(EnumType.STRING)
     @Column(length = 45, columnDefinition = "varchar(45) default 'WAITING'")
-    private ReportStatus reportStatus;
+    private ReportStatus reportStatus = ReportStatus.WAITING;
 
-    @Builder
-    public QuestionReport(Long id, User reporter, Question question, QuestionReportReason questionReportReason, String content, ReportStatus reportStatus) {
-        this.id = id;
-        this.reporter = reporter;
-        this.question = question;
-        this.questionReportReason = questionReportReason;
-        this.content = content;
-        this.reportStatus = reportStatus;
+
+    public static QuestionReport toEntity(User user, Question question, QuestionReportReqDto dto) {
+        return QuestionReport.builder()
+                .reporter(user)
+                .question(question)
+                .questionReportReason(dto.getReason())
+                .content(dto.getContent())
+                .build();
     }
 }

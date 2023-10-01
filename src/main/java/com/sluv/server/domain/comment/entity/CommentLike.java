@@ -4,11 +4,14 @@ import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.global.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
 
 @Entity
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Table(name = "comment_like")
 public class CommentLike extends BaseEntity {
 
@@ -26,10 +29,10 @@ public class CommentLike extends BaseEntity {
     @NotNull
     private User user;
 
-    @Builder
-    public CommentLike(Long id, Comment comment, User user) {
-        this.id = id;
-        this.comment = comment;
-        this.user = user;
+    public static CommentLike toEntity(User user, Comment comment){
+        return CommentLike.builder()
+                .user(user)
+                .comment(comment)
+                .build();
     }
 }

@@ -4,6 +4,7 @@ import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.global.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,6 +12,8 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Table(name = "recent_select_celeb")
 public class RecentSelectCeleb extends BaseEntity {
 
@@ -31,11 +34,4 @@ public class RecentSelectCeleb extends BaseEntity {
     @NotNull
     private User user;
 
-    @Builder
-    public RecentSelectCeleb(Long id, Celeb celeb, NewCeleb newCeleb, User user) {
-        this.id = id;
-        this.celeb = celeb;
-        this.newCeleb = newCeleb;
-        this.user = user;
-    }
 }

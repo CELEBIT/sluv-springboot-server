@@ -1,13 +1,14 @@
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: ENC(umIPYOdrigHivpZxQUaBn+1360z+xy13Hb4gHcoDY16JKXGxOF2jx4F+KkoFv9RKiIu7nXxn7tv/PoUCRVEYxqf96mTuqV007F1N8C45mpzyBg+tCBbRyNW66k7k4E0o)
+    url: ENC(XBdZAlksr2c2pgnH40ymItqXY8zpLmeXNK6MEYeuE8BCFSp4XLNu4yyCQPQ8OttHU7ppx3cNsLJwDpV9syGSdSFX8GWNhcEfiIhy6A3MGoIOLha03HwmkTmosHFNOMdtMLSLZUllfXU=)
     username: ENC(gh46WFclECYl96UilXt8Lw==)
     password: ENC(2HaAZ8j7cAaYFkIcemnUifSA0UAtPFLt)
   jpa:
     properties:
       hibernate:
         format_sql: true
+
 
   security:
     user:
@@ -18,7 +19,8 @@ spring:
         android: 924373234165-adalqufkonkljl23qk6vv4g3bnc9imfr.apps.googleusercontent.com
         apple: 924373234165-hfd08tk9pt36g4e9r54hqhpe9ircrv4q.apps.googleusercontent.com
 
-
+  elasticsearch:
+    uri: http://awseb-awseb-clwnl48v6djo-1067213661.ap-northeast-2.elb.amazonaws.com
 
 
 jasypt:
@@ -44,8 +46,8 @@ apple:
 
 aws:
   s3:
-    accessKey: AKIA5R23H6YS2FVCHYQK
-    secretKey: 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
+    accessKey: AKIA5R23H6YS5ZD6OOCH
+    secretKey: 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
     region: ap-northeast-2
-    bucketName: sluv-dev-img-bucket
-    baseUrl: https://sluv-dev-img-bucket.s3.ap-northeast-2.amazonaws.com
+    bucketName: elasticbeanstalk-ap-northeast-2-931662394917
+    baseUrl: asset

@@ -1,20 +1,24 @@
 package com.sluv.server.domain.closet.controller;
 
-import com.sluv.server.domain.closet.dto.ClosetItemDeleteReqDto;
-import com.sluv.server.domain.closet.dto.ClosetReqDto;
+import com.sluv.server.domain.closet.dto.*;
 import com.sluv.server.domain.closet.service.ClosetService;
+import com.sluv.server.domain.item.dto.ItemSimpleResDto;
 import com.sluv.server.domain.user.entity.User;
+import com.sluv.server.global.common.response.SuccessDataResponse;
 import com.sluv.server.global.common.response.SuccessResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/app/closet")
 @RequiredArgsConstructor
-public class ClosetController {
+public class    ClosetController {
     private final ClosetService closetService;
 
     @Operation(
@@ -24,6 +28,7 @@ public class ClosetController {
     )
     @PostMapping("")
     public ResponseEntity<SuccessResponse> postCloset(@AuthenticationPrincipal User user, @RequestBody ClosetReqDto dto){
+
         closetService.postCloset(user, dto);
         return ResponseEntity.ok().body(
                 new SuccessResponse()
@@ -75,21 +80,21 @@ public class ClosetController {
     @Operation(
             summary = "*옷장에 편집하기로 선택한 Item들을 삭제",
             description = """ 
-                    옷장 편집하기에서 선택한 Item들을 한번애 삭제하는 기능
+                    옷장 편집하기에서 선택한 Item들을 한번에 삭제하는 기능
                     User Id Token 필요
                     """
     )
     @PatchMapping("/{closetId}/items")
-    public ResponseEntity<SuccessResponse> patchItems(@AuthenticationPrincipal User user, @PathVariable("closetId") Long closetId, @RequestBody ClosetItemDeleteReqDto dto){
+    public ResponseEntity<SuccessResponse> patchItems(@AuthenticationPrincipal User user, @PathVariable("closetId") Long closetId, @RequestBody ClosetItemSelectReqDto dto){
         closetService.patchItems(user, closetId, dto);
         return ResponseEntity.ok().body(
                 new SuccessResponse()
         );
     }
     @Operation(
-            summary = "*옷장에 편집하기로 선택한 Item들을 삭제",
+            summary = "*아이템 게시글에서 북마크 버튼으로 삭제 시",
             description = """ 
-                    옷장 편집하기에서 선택한 Item들을 한번애 삭제하는 기능
+                    아이템 게시글에서 북마크를 한번 더 눌러 삭제 시 사용되는 기능.
                     User Id Token 필요
                     """
     )
@@ -98,6 +103,61 @@ public class ClosetController {
         closetService.deleteItemScrapFromCloset(user, itemId);
         return ResponseEntity.ok().body(
                 new SuccessResponse()
+        );
+    }
+
+    @Operation(
+            summary = "*옷장에 편집하기로 선택한 Item들을 다른 옷장으로 이동",
+            description = """ 
+                    옷장 편집하기에서 선택한 Item들을 한번에 다른 옷장으로 이동시키는 기능
+                    User Id Token 필요
+                    -> 옷장의 소유자가 현재 유저인지 판단.
+                    """
+    )
+    @PatchMapping("/{fromClosetId}/{toClosetId}/items")
+    public ResponseEntity<SuccessResponse> patchSaveCloset(@AuthenticationPrincipal User user,
+                                                           @PathVariable("fromClosetId") Long fromClosetId,
+                                                           @PathVariable("toClosetId") Long toClosetId,
+                                                           @RequestBody ClosetItemSelectReqDto dto){
+        closetService.patchSaveCloset(user, fromClosetId, toClosetId, dto);
+        return ResponseEntity.ok().body(
+                new SuccessResponse()
+        );
+    }
+    @Operation(
+            summary = "*현재 유저의 특정 옷장 상세조회",
+            description = """ 
+                    유저가 선택한 옷장 상세조
+                    User Id Token 필요
+                    -> 옷장의 소유자가 현재 유저인지 판단.
+                    Pagination 적용.
+                    가장 최근 Scrap 한 순서대로 정렬.
+                    """
+    )
+    @GetMapping("/{closetId}")
+    public ResponseEntity<ClosetDetailResDto<ItemSimpleResDto>> getClosetDetails(@AuthenticationPrincipal User user,
+                                                                                 @PathVariable("closetId") Long closetId,
+                                                                                 Pageable pageable){
+
+        return ResponseEntity.ok().body(
+                closetService.getClosetDetails(user, closetId, pageable)
+        );
+    }
+    @Operation(
+            summary = "*현재 유저의 옷장 리스트 조회",
+            description = """ 
+                    현재 유저의 옷장 리스트 조회
+                    User Id Token 필요
+                    -> Uset Id를 기준으로 Closet을 조회
+                    """
+    )
+    @GetMapping("/list")
+    public ResponseEntity<SuccessDataResponse<ClosetListCountResDto>> getClosetList(@AuthenticationPrincipal User user){
+
+        return ResponseEntity.ok().body(
+                SuccessDataResponse.<ClosetListCountResDto>builder()
+                                .result(closetService.getClosetList(user))
+                                .build()
         );
     }
 }

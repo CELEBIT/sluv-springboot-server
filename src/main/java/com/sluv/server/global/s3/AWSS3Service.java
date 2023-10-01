@@ -26,7 +26,7 @@ public class AWSS3Service {
     @Value("${aws.s3.bucketName}")
     private String bucketName;
 
-//    @Value("${aws.s3.baseUrl}")
+    @Value("${aws.s3.baseUrl}")
     private String baseUrl = "";
 
     /**
@@ -54,6 +54,7 @@ public class AWSS3Service {
         URL url =
                 amazonS3.generatePresignedUrl(
                         getGeneratePreSignedUrlRequest(bucketName, fileName, fixedExtension));
+        log.info("URL: {}", url.toString());
         return PreSingedUrlResDto.builder()
                 .preSignedUrl(url.toString())
                 .key(fileName)
@@ -91,6 +92,8 @@ public class AWSS3Service {
         URL url =
                 amazonS3.generatePresignedUrl(
                         getGeneratePreSignedUrlRequest(bucketName, fileName, fixedExtension));
+
+        log.info("URL: {}", url.toString());
         return PreSingedUrlResDto.builder()
                 .preSignedUrl(url.toString())
                 .key(fileName)
@@ -137,7 +140,7 @@ public class AWSS3Service {
     private Date getPreSignedUrlExpiration() {
         Date expiration = new Date();
         long expTimeMillis = expiration.getTime();
-        expTimeMillis += 1000 * 60 * 2;
+        expTimeMillis += 100000 * 60 * 2;
         expiration.setTime(expTimeMillis);
         log.info(expiration.toString());
         return expiration;

@@ -1,8 +1,10 @@
 package com.sluv.server.domain.comment.entity;
 
+import com.sluv.server.domain.comment.dto.CommentImgDto;
 import com.sluv.server.global.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -10,6 +12,8 @@ import lombok.NoArgsConstructor;
 @Getter
 @Entity
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Table(name = "comment_img")
 public class CommentImg extends BaseEntity {
 
@@ -26,10 +30,13 @@ public class CommentImg extends BaseEntity {
     @Column(columnDefinition = "TEXT")
     private String imgUrl;
 
-    @Builder
-    public CommentImg(Long id, Comment comment, String imgUrl) {
-        this.id = id;
-        this.comment = comment;
-        this.imgUrl = imgUrl;
+    private Integer sortOrder;
+
+    public static CommentImg toEntity(Comment comment, CommentImgDto dto){
+        return CommentImg.builder()
+                .comment(comment)
+                .imgUrl(dto.getImgUrl())
+                .sortOrder(dto.getSortOrder())
+                .build();
     }
 }

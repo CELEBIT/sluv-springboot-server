@@ -164,7 +164,7 @@ public class CelebRepositoryImpl implements CelebRepositoryCustom{
                         .or(celeb.celebCategory.parent.eq(celebCategory)
                         ).and(celeb.parent.isNull())
                 )
-                .limit(30)
+//                .limit(30)
                 .orderBy(celeb.celebNameKr.asc())
                 .fetch();
 

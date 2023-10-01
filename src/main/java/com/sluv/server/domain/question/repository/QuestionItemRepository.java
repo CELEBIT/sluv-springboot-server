@@ -9,4 +9,8 @@ public interface QuestionItemRepository extends JpaRepository<QuestionItem, Long
     void deleteAllByQuestionId(Long id);
 
     List<QuestionItem> findAllByQuestionId(Long questionId);
+
+    QuestionItem findByQuestionIdAndRepresentFlag(Long questionId, boolean b);
+
+    QuestionItem findOneByQuestionId(Long questionId);
 }

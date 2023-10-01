@@ -5,13 +5,15 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 import java.util.List;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+//@Builder
+@SuperBuilder
 public class PaginationResDto<T> {
     @Schema(description = "다음 페이지 존재 여부")
     private Boolean hasNext;

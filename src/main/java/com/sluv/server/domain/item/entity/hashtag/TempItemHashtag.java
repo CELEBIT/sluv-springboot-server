@@ -4,12 +4,15 @@ import com.sluv.server.domain.item.entity.TempItem;
 import com.sluv.server.global.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Getter
 @Table(name = "temp_item_hashtag")
 public class TempItemHashtag extends BaseEntity {
@@ -27,10 +30,10 @@ public class TempItemHashtag extends BaseEntity {
     @JoinColumn(name = "hashtag_id")
     private Hashtag hashtag;
 
-    @Builder
-    public TempItemHashtag(Long id, TempItem tempItem, Hashtag hashtag) {
-        this.id = id;
-        this.tempItem = tempItem;
-        this.hashtag = hashtag;
+    public static TempItemHashtag toEntity(TempItem tempItem, Hashtag hashtag) {
+        return TempItemHashtag.builder()
+                .tempItem(tempItem)
+                .hashtag(hashtag)
+                .build();
     }
 }

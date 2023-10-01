@@ -9,6 +9,7 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import static com.sluv.server.global.common.exception.ErrorCode.*;
 import static com.sluv.server.global.common.exception.ErrorCode.DB_ACCESS_ERROR;
@@ -42,6 +43,22 @@ public class GlobalExceptionHandler {
                 .body(ErrorResponse.builder()
                         .code(exception.getErrorCode())
                         .message(exception.getMessage())
+                        .build()
+                );
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ErrorResponse> handleMethodArgumentTypeMismatch(HttpMessageNotReadableException exception) {
+        log.error(
+                LOG_FORMAT,
+                "HttpMessageNotReadableException",
+                exception.getClass().getSimpleName(),
+                exception.getMessage()
+        );
+
+        return ResponseEntity.badRequest()
+                .body(ErrorResponse.customBuilder()
+                        .errorCode(ENUM_ERROR)
                         .build()
                 );
     }

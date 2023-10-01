@@ -94,11 +94,11 @@ public class CelebController {
             @ApiResponse(responseCode = "5001", description = "DB 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @GetMapping("/search/interested")
-    public ResponseEntity<SuccessDataResponse<List<InterestedCelebParentResDto>>> searchInterestedCelebByName(@RequestParam String celebName){
+    public ResponseEntity<SuccessDataResponse<List<CelebSearchByCategoryResDto>>> searchInterestedCelebByName(@RequestParam String celebName){
 
 
         return ResponseEntity.ok().body(
-                SuccessDataResponse.<List<InterestedCelebParentResDto>>builder()
+                SuccessDataResponse.<List<CelebSearchByCategoryResDto>>builder()
                         .result(celebService.searchInterestedCelebByName(celebName))
                         .build()
         );

@@ -1,5 +1,6 @@
 package com.sluv.server.domain.question.entity;
 
+import com.sluv.server.domain.comment.entity.Comment;
 import com.sluv.server.domain.question.enums.QuestionStatus;
 import com.sluv.server.domain.user.entity.User;
 import jakarta.persistence.*;
@@ -13,6 +14,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 
 @Entity
@@ -40,11 +42,11 @@ public class Question{
     private String content;
 
     @NotNull
-    private Long searchNum;
+    private Long searchNum = 0L;
 
     @Enumerated(EnumType.STRING)
     @Column(columnDefinition = "varchar(45) default 'ACTIVE'")
-    private QuestionStatus questionStatus;
+    private QuestionStatus questionStatus = QuestionStatus.ACTIVE;
 
     @CreatedDate
     @Column(updatable = false)
@@ -52,6 +54,9 @@ public class Question{
 
     @LastModifiedDate
     private LocalDateTime updatedAt = LocalDateTime.now();
+
+    @OneToMany(mappedBy = "question")
+    private List<Comment> commentList;
 
     public Question(Long id, User user, String title, String content, Long searchNum, QuestionStatus questionStatus) {
         this.id = id;
@@ -65,4 +70,12 @@ public class Question{
     public void changeQuestionStatus(QuestionStatus questionStatus){
         this.questionStatus = questionStatus;
     }
+
+    public void increaseSearchNum(){
+        this.searchNum++;
+    }
+    public void decreaseSearchNum(){
+        this.searchNum--;
+    }
+
 }

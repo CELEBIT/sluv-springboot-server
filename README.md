@@ -127,7 +127,7 @@
 <details>
    <summary> 본문 확인 (👈 Click)</summary>
 <br />
-<img width="700" alt="sluv_intro1" src="https://github.com/CELEBIT/sluv-springboot-server/assets/101792740/972d0587-a326-4de8-9964-9fc0be3a4cfe">
+<img width="700" alt="arch" src="https://github.com/CELEBIT/sluv-springboot-server/assets/101792740/972d0587-a326-4de8-9964-9fc0be3a4cfe">
 
 </details>
 
@@ -143,7 +143,7 @@
 
 ### 앱 도입
 <div align="center">
-<img width="700" alt="sluv_intro1" src="https://github.com/CELEBIT/sluv-springboot-server/assets/101792740/63e9bac9-f139-4940-8cc8-b9f07a8f83c1">
+<img width="700" alt="intro_result" src="https://github.com/CELEBIT/sluv-springboot-server/assets/101792740/63e9bac9-f139-4940-8cc8-b9f07a8f83c1">
 </div>
 <br><br/>
 
@@ -158,7 +158,7 @@
 
 ### 관심셀럽
 <div align="center">
-<img width="700" alt="sluv_intro1" src="https://github.com/CELEBIT/sluv-springboot-server/assets/101792740/8c0c19ae-bae7-4974-aea6-02773b80cfb8">
+<img width="700" alt="celeb_result" src="https://github.com/CELEBIT/sluv-springboot-server/assets/101792740/8c0c19ae-bae7-4974-aea6-02773b80cfb8">
 </div>
 <br><br/>
 
@@ -171,7 +171,7 @@
 
 ### 마이페이지
 <div align="center">
-<img width="700" alt="sluv_intro1" src="https://github.com/CELEBIT/sluv-springboot-server/assets/101792740/bdac5fde-87a3-4385-95e8-b79c0c7fb546">
+<img width="700" alt="mypage_result" src="https://github.com/CELEBIT/sluv-springboot-server/assets/101792740/bdac5fde-87a3-4385-95e8-b79c0c7fb546">
 </div>
 <br><br/>
 
@@ -185,7 +185,7 @@
    
 ### 홈
 <div align="center">
-<img width="700" alt="sluv_intro1" src="https://github.com/CELEBIT/sluv-springboot-server/assets/101792740/f6c9b6f2-d71f-4ba2-9b18-972f6801ea35">
+<img width="700" alt="home_result" src="https://github.com/CELEBIT/sluv-springboot-server/assets/101792740/f6c9b6f2-d71f-4ba2-9b18-972f6801ea35">
 </div>
 <br><br/>
 
@@ -198,7 +198,7 @@
 
 ### 커뮤니티 홈
 <div align="center">
-<img width="700" alt="sluv_intro1" src="https://github.com/CELEBIT/sluv-springboot-server/assets/101792740/ffae8e50-f221-4dee-a89d-44f21dcc3fb1">
+<img width="700" alt="community_home_result" src="https://github.com/CELEBIT/sluv-springboot-server/assets/101792740/ffae8e50-f221-4dee-a89d-44f21dcc3fb1">
 </div>
 <br><br/>
 
@@ -221,7 +221,7 @@
 
 #### 찾아주세요
 <div align="center">
-<img width="500" alt="sluv_intro1" src="https://github.com/CELEBIT/sluv-springboot-server/assets/101792740/25946a9a-71e1-44d6-af44-d4bda2da9e0d">
+<img width="500" alt="question_find_result" src="https://github.com/CELEBIT/sluv-springboot-server/assets/101792740/25946a9a-71e1-44d6-af44-d4bda2da9e0d">
 </div>
 <br><br/>
 
@@ -231,7 +231,7 @@
 
 #### 이 중에 뭐 살까
 <div align="center">
-<img width="500" alt="sluv_intro1" src="https://github.com/CELEBIT/sluv-springboot-server/assets/101792740/b77e9456-6b2a-48cb-a4fa-ca8f5c28ab72">
+<img width="500" alt="question_buy_result" src="https://github.com/CELEBIT/sluv-springboot-server/assets/101792740/b77e9456-6b2a-48cb-a4fa-ca8f5c28ab72">
 </div>
 
 - 투표를 통해 고민되는 아이템을 추천받는 게시글.
@@ -243,7 +243,7 @@
 
 #### 이거 어때
 <div align="center">
-<img width="500" alt="sluv_intro1" src="https://github.com/CELEBIT/sluv-springboot-server/assets/101792740/1a0275a7-9202-4684-9688-5152381cec14">
+<img width="500" alt="question_how_result" src="https://github.com/CELEBIT/sluv-springboot-server/assets/101792740/1a0275a7-9202-4684-9688-5152381cec14">
 </div>
 
 - 자유롭게 아이템과 사진을 올려 질문하는 게시글.
@@ -254,7 +254,7 @@
 
 #### 추천해 줘
 <div align="center">
-<img width="500" alt="sluv_intro1" src="https://github.com/CELEBIT/sluv-springboot-server/assets/101792740/55f61e58-8ef9-41b8-9a97-54569e785fe9">
+<img width="500" alt="question_recommend_result" src="https://github.com/CELEBIT/sluv-springboot-server/assets/101792740/55f61e58-8ef9-41b8-9a97-54569e785fe9">
 </div>
 
 - 해시태그를 설정하여 주제를 기준으로 질문하고 추천받는 게시글.
@@ -266,7 +266,7 @@
 
 ### 커뮤니티 댓글
 <div align="center">
-<img width="500" alt="sluv_intro1" src="https://github.com/CELEBIT/sluv-springboot-server/assets/101792740/6f7c2433-10f6-4dc9-a8ef-975b5ce0d8fb">
+<img width="500" alt="comment_result" src="https://github.com/CELEBIT/sluv-springboot-server/assets/101792740/6f7c2433-10f6-4dc9-a8ef-975b5ce0d8fb">
 </div>
 
 - 커뮤니티 게시글에 아이템/사진을 첨부하여 댓글을 남길 수 있습니다.
@@ -278,7 +278,7 @@
 
 ### 정보공유
 <div align="center">
-<img width="700" alt="sluv_intro1" src="https://github.com/CELEBIT/sluv-springboot-server/assets/101792740/34789c09-5e2f-42e0-be14-9c9f39f17320">
+<img width="700" alt="item_result1" src="https://github.com/CELEBIT/sluv-springboot-server/assets/101792740/34789c09-5e2f-42e0-be14-9c9f39f17320">
 </div>
 <br><br/>
 
@@ -288,7 +288,7 @@
 <br><br/>
 
 <div align="center">
-<img width="700" alt="sluv_intro1" src="https://github.com/CELEBIT/sluv-springboot-server/assets/101792740/65ccec99-8b02-424f-9c4d-8a48cd5ca63e">
+<img width="700" alt="item_result2" src="https://github.com/CELEBIT/sluv-springboot-server/assets/101792740/65ccec99-8b02-424f-9c4d-8a48cd5ca63e">
 </div>
 <br><br/>
 
@@ -300,7 +300,7 @@
 
 ### 옷장
 <div align="center">
-<img width="700" alt="sluv_intro1" src="https://github.com/CELEBIT/sluv-springboot-server/assets/101792740/6709bd2a-1cd1-45d3-84a3-ff46a6ded441">
+<img width="700" alt="closet_result" src="https://github.com/CELEBIT/sluv-springboot-server/assets/101792740/6709bd2a-1cd1-45d3-84a3-ff46a6ded441">
 </div>
 <br><br/>
 
@@ -314,7 +314,7 @@
 
 ### 검색
 <div align="center">
-<img width="700" alt="sluv_intro1" src="https://github.com/CELEBIT/sluv-springboot-server/assets/101792740/8e2803aa-d54a-47b0-b4ce-bbbab3ed53f8">
+<img width="700" alt="search_result1" src="https://github.com/CELEBIT/sluv-springboot-server/assets/101792740/8e2803aa-d54a-47b0-b4ce-bbbab3ed53f8">
 </div>
 <br><br/>
 
@@ -326,7 +326,7 @@
 
 
 <div align="center">
-<img width="700" alt="sluv_intro1" src="https://github.com/CELEBIT/sluv-springboot-server/assets/101792740/297ff13f-81fa-4867-8887-b718353c9c42">
+<img width="700" alt="search_result2" src="https://github.com/CELEBIT/sluv-springboot-server/assets/101792740/297ff13f-81fa-4867-8887-b718353c9c42">
 </div>
 <br><br/>
 
@@ -344,10 +344,36 @@
    <summary> 본문 확인 (👈 Click)</summary>
 <br />
 
+### SpringBoot 버전
+
+<div align="center">
+<img width="500" alt="SpringBoot_version" src="https://github.com/CELEBIT/sluv-springboot-server/assets/101792740/0cb3d0bc-b223-42ae-a5bd-94cb84e1daed")
+">
+</div>
+<br><br/>
+
+- SpringBoot의 버전을 SpringBoot 2와 SpringBoot 3중에서 고민하였습니다.
+- 최종적으로 SpringBoot 3을 채택하였습니다.
+
+**[이유1] 최신 버전의 기술로 구현해 보고 싶다는 생각이 가장 컸습니다.**
+<div align="center">
+<img width="400" alt="startIO" src="https://github.com/CELEBIT/sluv-springboot-server/assets/101792740/62e90d09-3c43-447c-b6bc-91421c1fa9ae")
+">
+</div>
+
+- Sluv의 Spring 서버 개발을 시작할 당시, [start.spring.io](https://start.spring.io/)에서 추천하는 버전이 SpringBoot 3.0.2였습니다.
+- 때문에 해당 버전이 최신 기술이라고 판단하였습니다.
+- SpringBoot 2가 관련 레퍼런스가 많았음에도 **최신 기술로 개발해 보고 싶다는 생각**이 들어 SpringBoot 3를 선택하였습니다.
+
+**[이유2] SpringBoot 2에서 SpringBoot 3으로 Migration 시 공수가 클 것이라고 판단했습니다.**
+- Sluv이라는 앱을 취업 이후에도 운영할 생각을 가지고 참여했습니다.
+- 때문에 추후 SpringBoot 2가 끝나고 SpringBoot 3으로의 Migration이 불가피할 경우 `WebSecurityConfigurerAdapter` 와 같이 Deprecated된 기능과 JAVA 17이 강제되며 발생하는 문법 변화 때문에 공수가 클 것이라고 판단하여 SpringBoot 3로의 개발을 선택하였습니다.
+
+
 ### API 문서화
 
 <div align="center">
-<img width="700" alt="sluv_intro1" src="https://github.com/CELEBIT/sluv-springboot-server/assets/101792740/d4918edf-03a3-4eba-ac1c-f75d007ed6f3">
+<img width="700" alt="API_Doc" src="https://github.com/CELEBIT/sluv-springboot-server/assets/101792740/d4918edf-03a3-4eba-ac1c-f75d007ed6f3">
 </div>
 
 - API 문서화를 Swagger와 Spring Rest Doc중에서 고민하였습니다.
@@ -372,7 +398,7 @@
 ### Query DSL
 
 <div align="center">
-<img width="500" alt="sluv_intro1" src="https://github.com/CELEBIT/sluv-springboot-server/assets/101792740/317fd8bd-eecf-42e7-89a2-eed67d3985f1">
+<img width="500" alt="query_dsl" src="https://github.com/CELEBIT/sluv-springboot-server/assets/101792740/317fd8bd-eecf-42e7-89a2-eed67d3985f1">
 </div>
 <br><br/>
 
@@ -396,7 +422,7 @@
 <br />
 
 <div align="center">
-<img width="912" alt="sluv_erd" src="https://github.com/CELEBIT/sluv-springboot-server/assets/101792740/bb324c0c-c057-4e4e-9661-84b9099ae6e2">
+<img width="912" alt="rds" src="https://github.com/CELEBIT/sluv-springboot-server/assets/101792740/bb324c0c-c057-4e4e-9661-84b9099ae6e2">
 </div>
 <br><br/>
 

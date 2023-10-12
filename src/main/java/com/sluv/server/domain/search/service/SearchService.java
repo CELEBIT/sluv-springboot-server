@@ -1,6 +1,5 @@
 package com.sluv.server.domain.search.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sluv.server.domain.closet.entity.Closet;
 import com.sluv.server.domain.closet.repository.ClosetRepository;
 import com.sluv.server.domain.comment.repository.CommentRepository;
@@ -23,7 +22,6 @@ import com.sluv.server.domain.search.repository.RecentSearchRepository;
 import com.sluv.server.domain.search.repository.SearchDataRepository;
 import com.sluv.server.domain.search.repository.SearchRankRepository;
 import com.sluv.server.domain.search.utils.ElasticSearchConnectUtil;
-import com.sluv.server.domain.user.dto.UserInfoDto;
 import com.sluv.server.domain.user.dto.UserSearchInfoDto;
 import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.domain.user.repository.FollowRepository;
@@ -32,15 +30,13 @@ import com.sluv.server.global.common.response.PaginationResDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.lang.reflect.Type;
-import java.util.Collections;
 import java.util.List;
-import java.util.stream.Stream;
+import java.util.concurrent.CompletableFuture;
 
 @Service
 @RequiredArgsConstructor
@@ -70,7 +66,9 @@ public class SearchService {
      * Item 검색 with ElasticSearch
      */
     @Transactional
-    public PaginationResDto<ItemSimpleResDto> getSearchItem(User user, String keyword, SearchFilterReqDto dto, Pageable pageable) {
+    @Async(value = "asyncThreadPoolExecutor")
+//    public PaginationResDto<ItemSimpleResDto> getSearchItem(User user, String keyword, SearchFilterReqDto dto, Pageable pageable) {
+    public CompletableFuture<PaginationResDto<ItemSimpleResDto>> getSearchItem(User user, String keyword, SearchFilterReqDto dto, Pageable pageable) {
         // ElasticSearch API Path
         String itemPath = "/search/searchItem";
 
@@ -98,18 +96,20 @@ public class SearchService {
         // 서치 데이터 등록
         postSearchData(keyword);
 
-        return PaginationResDto.<ItemSimpleResDto>builder()
+        return CompletableFuture.completedFuture(PaginationResDto.<ItemSimpleResDto>builder()
                 .page(searchItemPage.getNumber())
                 .hasNext(searchItemPage.hasNext())
                 .content(content)
-                .build();
+                .build());
     }
 
     /**
      * Question 검색 with ElasticSearch
      */
     @Transactional
-    public PaginationResDto<QuestionSimpleResDto> getSearchQuestion(User user, String keyword, String qType, Pageable pageable) {
+    @Async(value = "asyncThreadPoolExecutor")
+//    public PaginationResDto<QuestionSimpleResDto> getSearchQuestion(User user, String keyword, String qType, Pageable pageable) {
+    public CompletableFuture<PaginationResDto<QuestionSimpleResDto>> getSearchQuestion(User user, String keyword, String qType, Pageable pageable) {
         // ElasticSearch API Path
         String itemPath = "/search/searchQuestion";
 
@@ -145,11 +145,11 @@ public class SearchService {
                 return QuestionSimpleResDto.of(question, likeNum, commentNum, imgList, itemImgList, null);
             }).toList();
 
-            return PaginationResDto.<QuestionSimpleResDto>builder()
+            return CompletableFuture.completedFuture(PaginationResDto.<QuestionSimpleResDto>builder()
                     .page(searchQuestionPage.getNumber())
                     .hasNext(searchQuestionPage.hasNext())
                     .content(content)
-                    .build();
+                    .build());
 
         }else if(qType.equals("Find")){
             Page<QuestionFind> searchQuestionPage =
@@ -167,11 +167,11 @@ public class SearchService {
 
             }).toList();
 
-            return PaginationResDto.<QuestionSimpleResDto>builder()
+            return CompletableFuture.completedFuture(PaginationResDto.<QuestionSimpleResDto>builder()
                     .page(searchQuestionPage.getNumber())
                     .hasNext(searchQuestionPage.hasNext())
                     .content(content)
-                    .build();
+                    .build());
 
         }else if(qType.equals("How")){
             Page<QuestionHowabout> searchQuestionPage =
@@ -188,11 +188,11 @@ public class SearchService {
                     return QuestionSimpleResDto.of(question, likeNum, commentNum, null, null, null);
             }).toList();
 
-            return PaginationResDto.<QuestionSimpleResDto>builder()
+            return CompletableFuture.completedFuture(PaginationResDto.<QuestionSimpleResDto>builder()
                     .page(searchQuestionPage.getNumber())
                     .hasNext(searchQuestionPage.hasNext())
                     .content(content)
-                    .build();
+                    .build());
 
         }else if(qType.equals("Recommend")) {
             Page<QuestionRecommend> searchQuestionPage =
@@ -219,11 +219,11 @@ public class SearchService {
             // 서치 데이터 등록
             postSearchData(keyword);
 
-            return PaginationResDto.<QuestionSimpleResDto>builder()
+            return CompletableFuture.completedFuture(PaginationResDto.<QuestionSimpleResDto>builder()
                     .page(searchQuestionPage.getNumber())
                     .hasNext(searchQuestionPage.hasNext())
                     .content(content)
-                    .build();
+                    .build());
         }
 
         throw new QuestionTypeNotFoundException();
@@ -233,7 +233,9 @@ public class SearchService {
      * User 검색 with ElasticSearch
      */
     @Transactional
-    public PaginationResDto<UserSearchInfoDto> getSearchUser(User user, String keyword, Pageable pageable) {
+    @Async(value = "asyncThreadPoolExecutor")
+//    public PaginationResDto<UserSearchInfoDto> getSearchUser(User user, String keyword, Pageable pageable) {
+    public CompletableFuture<PaginationResDto<UserSearchInfoDto>> getSearchUser(User user, String keyword, Pageable pageable) {
         // ElasticSearch API Path
         String itemPath = "/search/searchUser";
 
@@ -258,72 +260,72 @@ public class SearchService {
         // 서치 데이터 등록
         postSearchData(keyword);
 
-        return PaginationResDto.<UserSearchInfoDto>builder()
+        return CompletableFuture.completedFuture(PaginationResDto.<UserSearchInfoDto>builder()
                 .page(searchUserPage.getNumber())
                 .hasNext(searchUserPage.hasNext())
                 .content(content)
-                .build();
+                .build());
     }
 
-    /**
-     * 토탈 검색 with ElasticSearch
-     */
-    @Transactional
-    public SearchTotalResDto getSearchTotal(User user, String keyword) {
-        final int itemSize = 9;
-        final int questionSize = 4;
-        final int userSize = 10;
-
-
-        // Item 검색
-        Pageable itemPageable = PageRequest.of(0, itemSize);
-        SearchFilterReqDto dto = SearchFilterReqDto.builder().build();
-
-        List<ItemSimpleResDto> searchItem = this.getSearchItem(user, keyword, dto, itemPageable).getContent();
-
-        // Question 검색 -> 찾아주세요 -> 이거 어때 -> 이 중에 뭐 살까 -> 추천해 줘 순서
-        Pageable questionPageable = PageRequest.of(0, questionSize);
-
-        List<QuestionSimpleResDto> result = this.getSearchQuestion(user, keyword, "Find", questionPageable).getContent().stream().toList();
-
-
-        if(result.size() < 4){
-            List<QuestionSimpleResDto> temp =
-                    this.getSearchQuestion(user, keyword, "How", questionPageable).getContent();
-
-            result = Stream.concat(result.stream(), temp.stream()).toList();
-
-        }
-
-
-        if(result.size() < 4){
-            List<QuestionSimpleResDto> temp =
-                    this.getSearchQuestion(user, keyword, "Buy", questionPageable).getContent();
-            result = Stream.concat(result.stream(), temp.stream()).toList();
-
-        }
-
-        if(result.size() < 4){
-            List<QuestionSimpleResDto> temp =
-                    this.getSearchQuestion(user, keyword, "Recommend", questionPageable).getContent();
-            result = Stream.concat(result.stream(), temp.stream()).toList();
-        }
-
-        List<QuestionSimpleResDto> searchQuestion = result;
-
-        // User 검색
-        Pageable userPageable = PageRequest.of(0, userSize);
-
-        List<UserSearchInfoDto> searchUser = this.getSearchUser(user, keyword, userPageable).getContent();
-
-        // 최근 검색 등록
-        postRecentSearch(user, keyword);
-
-        // 서치 데이터 등록
-        postSearchData(keyword);
-
-        return SearchTotalResDto.of(searchItem, searchQuestion, searchUser);
-    }
+//    /**
+//     * 토탈 검색 with ElasticSearch
+//     */
+//    @Transactional
+//    public SearchTotalResDto getSearchTotal(User user, String keyword) {
+//        final int itemSize = 9;
+//        final int questionSize = 4;
+//        final int userSize = 10;
+//
+//
+//        // Item 검색
+//        Pageable itemPageable = PageRequest.of(0, itemSize);
+//        SearchFilterReqDto dto = SearchFilterReqDto.builder().build();
+//
+//        List<ItemSimpleResDto> searchItem = this.getSearchItem(user, keyword, dto, itemPageable).getContent();
+//
+//        // Question 검색 -> 찾아주세요 -> 이거 어때 -> 이 중에 뭐 살까 -> 추천해 줘 순서
+//        Pageable questionPageable = PageRequest.of(0, questionSize);
+//
+//        List<QuestionSimpleResDto> result = this.getSearchQuestion(user, keyword, "Find", questionPageable).getContent().stream().toList();
+//
+//
+//        if(result.size() < 4){
+//            List<QuestionSimpleResDto> temp =
+//                    this.getSearchQuestion(user, keyword, "How", questionPageable).getContent();
+//
+//            result = Stream.concat(result.stream(), temp.stream()).toList();
+//
+//        }
+//
+//
+//        if(result.size() < 4){
+//            List<QuestionSimpleResDto> temp =
+//                    this.getSearchQuestion(user, keyword, "Buy", questionPageable).getContent();
+//            result = Stream.concat(result.stream(), temp.stream()).toList();
+//
+//        }
+//
+//        if(result.size() < 4){
+//            List<QuestionSimpleResDto> temp =
+//                    this.getSearchQuestion(user, keyword, "Recommend", questionPageable).getContent();
+//            result = Stream.concat(result.stream(), temp.stream()).toList();
+//        }
+//
+//        List<QuestionSimpleResDto> searchQuestion = result;
+//
+//        // User 검색
+//        Pageable userPageable = PageRequest.of(0, userSize);
+//
+//        List<UserSearchInfoDto> searchUser = this.getSearchUser(user, keyword, userPageable).getContent();
+//
+//        // 최근 검색 등록
+//        postRecentSearch(user, keyword);
+//
+//        // 서치 데이터 등록
+//        postSearchData(keyword);
+//
+//        return SearchTotalResDto.of(searchItem, searchQuestion, searchUser);
+//    }
 
     public SearchItemCountResDto getSearchItemCount(String keyword, SearchFilterReqDto dto) {
         // ElasticSearch API Path

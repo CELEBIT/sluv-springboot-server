@@ -4,6 +4,7 @@ import com.sluv.server.domain.item.dto.ItemSimpleResDto;
 import com.sluv.server.domain.question.dto.QuestionSimpleResDto;
 import com.sluv.server.domain.search.dto.*;
 import com.sluv.server.domain.search.service.SearchService;
+import com.sluv.server.domain.search.service.SearchTotalService;
 import com.sluv.server.domain.user.dto.UserSearchInfoDto;
 import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.global.common.response.PaginationResDto;
@@ -17,12 +18,14 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 @RestController
 @RequestMapping("/app/search")
 @RequiredArgsConstructor
 public class SearchController {
     private final SearchService searchService;
+    private final SearchTotalService searchTotalService;
 
     @Operation(
             summary = "*Item 검색",
@@ -37,10 +40,10 @@ public class SearchController {
     public ResponseEntity<SuccessDataResponse<PaginationResDto<ItemSimpleResDto>>> searchItem(@AuthenticationPrincipal User user,
                                                                          @RequestParam("keyword") String keyword,
                                                                          SearchFilterReqDto dto,
-                                                                         Pageable pageable){
+                                                                         Pageable pageable) throws ExecutionException, InterruptedException {
         return ResponseEntity.ok().body(
                 SuccessDataResponse.<PaginationResDto<ItemSimpleResDto>>builder()
-                        .result(searchService.getSearchItem(user, keyword, dto, pageable))
+                        .result(searchService.getSearchItem(user, keyword, dto, pageable).get())
                         .build()
         );
     }
@@ -58,10 +61,10 @@ public class SearchController {
     public ResponseEntity<SuccessDataResponse<PaginationResDto<QuestionSimpleResDto>>> searchQuestion(@AuthenticationPrincipal User user,
                                                                                  @RequestParam("keyword") String keyword,
                                                                                  @RequestParam("qtype") String qType,
-                                                                                 Pageable pageable){
+                                                                                 Pageable pageable) throws ExecutionException, InterruptedException {
         return ResponseEntity.ok().body(
                 SuccessDataResponse.<PaginationResDto<QuestionSimpleResDto>>builder()
-                            .result(searchService.getSearchQuestion(user, keyword, qType, pageable))
+                            .result(searchService.getSearchQuestion(user, keyword, qType, pageable).get())
                             .build()
         );
     }
@@ -78,10 +81,10 @@ public class SearchController {
     @GetMapping("/user")
     public ResponseEntity<SuccessDataResponse<PaginationResDto<UserSearchInfoDto>>> searchUser(@AuthenticationPrincipal User user,
                                                                           @RequestParam("keyword") String keyword,
-                                                                          Pageable pageable){
+                                                                          Pageable pageable) throws ExecutionException, InterruptedException {
         return ResponseEntity.ok().body(
                 SuccessDataResponse.<PaginationResDto<UserSearchInfoDto>>builder()
-                                .result(searchService.getSearchUser(user, keyword, pageable))
+                                .result(searchService.getSearchUser(user, keyword, pageable).get())
                                 .build()
         );
     }
@@ -97,10 +100,10 @@ public class SearchController {
     )
     @GetMapping("/total")
     public ResponseEntity<SuccessDataResponse<SearchTotalResDto>> searchTotal(@AuthenticationPrincipal User user,
-                                                                              @RequestParam("keyword") String keyword){
+                                                                              @RequestParam("keyword") String keyword) throws ExecutionException, InterruptedException {
         return ResponseEntity.ok().body(
                 SuccessDataResponse.<SearchTotalResDto>builder()
-                        .result(searchService.getSearchTotal(user, keyword))
+                        .result(searchTotalService.getSearchTotal(user, keyword))
                         .build()
         );
     }

@@ -11,4 +11,6 @@ public interface ClosetRepository extends JpaRepository<Closet, Long>, ClosetRep
     List<Closet> findAllByUserId(Long id);
 
     Long countByUserId(Long id);
+
+    Boolean existsByName(String name);
 }

@@ -160,4 +160,19 @@ public class    ClosetController {
                                 .build()
         );
     }
+    @Operation(
+            summary = "옷작 이름 중복 검사",
+            description = """ 
+                    옷작 이름 중복 검사
+                    """
+    )
+    @GetMapping("/check-name")
+    public ResponseEntity<SuccessDataResponse<ClosetNameCheckResDto>> checkClosetNameDuplicated(@RequestParam("name") String name){
+
+        return ResponseEntity.ok().body(
+                SuccessDataResponse.<ClosetNameCheckResDto>builder()
+                        .result(closetService.checkClosetNameDuplicated(name))
+                        .build()
+        );
+    }
 }

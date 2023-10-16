@@ -226,4 +226,13 @@ public class ClosetService {
                 closetResDtoList
         );
     }
+
+    /**
+     * 옷장 생성 전 이름 중복 체크 기능
+     */
+    public ClosetNameCheckResDto checkClosetNameDuplicated(String name) {
+        Boolean isDuplicated = closetRepository.existsByName(name);
+
+        return ClosetNameCheckResDto.of(isDuplicated);
+    }
 }

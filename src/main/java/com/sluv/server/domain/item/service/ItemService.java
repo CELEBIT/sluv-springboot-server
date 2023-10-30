@@ -44,6 +44,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class ItemService {
     private final ItemRepository itemRepository;
     private final ItemImgRepository itemImgRepository;
@@ -63,7 +64,7 @@ public class ItemService {
     private final ClosetRepository closetRepository;
     private final ItemScrapRepository itemScrapRepository;
 
-    @Transactional
+//    @Transactional
     public ItemPostResDto postItem(User user, ItemPostReqDto reqDto) {
 
         // 추가될 Celeb 확인
@@ -284,7 +285,7 @@ public class ItemService {
         );
     }
 
-    @Transactional
+//    @Transactional
     public void postItemLike(User user, Long itemId) {
         Item item = itemRepository.findById(itemId).orElseThrow(ItemNotFoundException::new);
 

@@ -108,7 +108,7 @@ public class Scheduler {
     /**
      * 주간 HOT 셀럽 아이템
      */
-    @Scheduled(cron = "0 0 0 * * MON") // 초 분 시 일 월 요일
+    @Scheduled(cron = "0 0 0 * * 1") // 초 분 시 일 월 요일
     @Transactional
     public void updateWeekHotItem(){
         log.info("WeekHotItem Update Time: {}", Calendar.getInstance().getTime());

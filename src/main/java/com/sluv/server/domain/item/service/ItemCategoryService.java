@@ -9,12 +9,16 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Objects;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class ItemCategoryService {
 
     private final ItemCategoryRepository itemCategoryRepository;
+
+    @Transactional(readOnly = true)
     public List<ItemCategoryParentResponseDto> getItemCategory(){
 
 

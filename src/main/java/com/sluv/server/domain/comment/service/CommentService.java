@@ -32,6 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class CommentService {
     private final CommentRepository commentRepository;
@@ -45,8 +46,7 @@ public class CommentService {
     private final ItemScrapRepository itemScrapRepository;
     private final ClosetRepository closetRepository;
 
-    @Transactional
-    public void postComment(User user, Long questionId, CommentPostReqDto dto){
+    public void postComment(User user, Long questionId, CommentPostReqDto dto) {
         /**
          *  1. Comment 등록
          *  2. CommentImg 등록
@@ -54,25 +54,23 @@ public class CommentService {
          */
         Question question = questionRepository.findById(questionId).orElseThrow(QuestionNotFoundException::new);
 
-
         // 1. Comment 등록
         Comment comment = commentRepository.save(
                 Comment.toEntity(user, question, dto.getContent())
         );
 
         // 2. CommentImg 등록
-        if(dto.getImgList() != null) {
+        if (dto.getImgList() != null) {
             saveCommentImg(dto, comment);
         }
 
         // 3. CommentItem 등록
-        if(dto.getItemList() != null) {
+        if (dto.getItemList() != null) {
             saveCommentItem(dto, comment);
         }
 
     }
 
-    @Transactional
     public void postSubComment(User user, Long questionId, Long commentId, CommentPostReqDto dto) {
         /**
          *  1. Comment 등록
@@ -90,17 +88,16 @@ public class CommentService {
         );
 
         // 2. CommentImg 등록
-        if(dto.getImgList() != null) {
+        if (dto.getImgList() != null) {
             saveCommentImg(dto, comment);
         }
 
         // 3. CommentItem 등록
-        if(dto.getItemList() != null) {
+        if (dto.getItemList() != null) {
             saveCommentItem(dto, comment);
         }
     }
 
-    @Transactional
     public void putComment(User user, Long commentId, CommentPostReqDto dto) {
         /**
          * 1. Comment의 content 수정
@@ -109,17 +106,17 @@ public class CommentService {
          */
         Comment comment = commentRepository.findById(commentId).orElseThrow(CommentNotFoundException::new);
 
-        if(!comment.getUser().getId().equals(user.getId())) {
+        if (!comment.getUser().getId().equals(user.getId())) {
             throw new UserNotMatchedException();
         }
-            // content 변경
-            comment.changeContent(dto.getContent());
+        // content 변경
+        comment.changeContent(dto.getContent());
 
-            // img 변경
-            saveCommentImg(dto, comment);
+        // img 변경
+        saveCommentImg(dto, comment);
 
-            // item 변경
-            saveCommentItem(dto, comment);
+        // item 변경
+        saveCommentItem(dto, comment);
 
 
     }
@@ -127,7 +124,7 @@ public class CommentService {
     private void saveCommentItem(CommentPostReqDto dto, Comment comment) {
         // 초기화
         commentItemRepository.deleteAllByCommentId(comment.getId());
-        if(dto.getItemList() != null) {
+        if (dto.getItemList() != null) {
             // dto로 부터 새로운 CommentItem 생성
             List<CommentItem> itemList = dto.getItemList().stream().map(itemReqDto -> {
                         Item item = itemRepository.findById(itemReqDto.getItemId()).orElseThrow(ItemNotFoundException::new);
@@ -145,7 +142,7 @@ public class CommentService {
         commentImgRepository.deleteAllByCommentId(comment.getId());
 
         // dto로 부터 새로운 CommentImg 생성
-        if(dto.getImgList() != null) {
+        if (dto.getImgList() != null) {
             List<CommentImg> imgList = dto.getImgList().stream().map(imgUrl ->
                     CommentImg.toEntity(comment, imgUrl)
             ).toList();
@@ -155,17 +152,15 @@ public class CommentService {
         }
     }
 
-
-    @Transactional
     public void postCommentLike(User user, Long commentId) {
         Boolean commentListStatus = commentLikeRepository.existsByUserIdAndCommentId(user.getId(), commentId);
 
-        if(!commentListStatus){
+        if (!commentListStatus) {
             Comment comment = commentRepository.findById(commentId).orElseThrow(CommentNotFoundException::new);
             commentLikeRepository.save(
                     CommentLike.toEntity(user, comment)
             );
-        }else{
+        } else {
             commentLikeRepository.deleteByUserIdAndCommentId(user.getId(), commentId);
         }
     }
@@ -173,8 +168,8 @@ public class CommentService {
     public void postCommentReport(User user, Long commentId, CommentReportPostReqDto dto) {
         Boolean reportStatus = commentReportRepository.existsByReporterIdAndCommentId(user.getId(), commentId);
 
-        if(reportStatus) {
-          throw new CommentReportDuplicateException();
+        if (reportStatus) {
+            throw new CommentReportDuplicateException();
         }
 
         Comment comment = commentRepository.findById(commentId).orElseThrow(CommentNotFoundException::new);
@@ -183,12 +178,11 @@ public class CommentService {
         );
     }
 
-    @Transactional
     public void deleteComment(User user, Long commentId) {
         Comment comment = commentRepository.findById(commentId).orElseThrow(CommentNotFoundException::new);
 
         // comment 작성자와 현재 User가 불일치 시 예외 처리
-        if(!comment.getUser().getId().equals(user.getId())){
+        if (!comment.getUser().getId().equals(user.getId())) {
             throw new UserNotMatchedException();
         }
 
@@ -200,13 +194,13 @@ public class CommentService {
 
     }
 
+    @Transactional(readOnly = true)
     public PaginationResDto<CommentResDto> getComment(User user, Long questionId, Pageable pageable) {
         // 해당 페이지 검색
         Page<Comment> commentPage = commentRepository.getAllQuestionComment(questionId, pageable);
 
         // Content 제작
         List<CommentResDto> content = getCommentResDtos(user, commentPage);
-
 
         return PaginationResDto.<CommentResDto>builder()
                 .page(commentPage.getNumber())
@@ -215,6 +209,7 @@ public class CommentService {
                 .build();
     }
 
+    @Transactional(readOnly = true)
     public SubCommentPageResDto<CommentResDto> getSubComment(User user, Long commentId, Pageable pageable) {
         // 대댓글 페이지 검색
         Page<Comment> commentPage = commentRepository.getAllSubComment(commentId, pageable);
@@ -223,9 +218,11 @@ public class CommentService {
         List<CommentResDto> content = getCommentResDtos(user, commentPage);
 
         // 남은 댓글 수. 총 댓글 수 - ((현재 페이지 +1)*페이지당 size)가 0보다 작으면 0, 아닐 경우 해당 값
-        long restCommentNum = commentPage.getTotalElements() - ((long) (commentPage.getNumber() + 1) * commentPage.getSize()) >= 0
-                ? commentPage.getTotalElements() - ((long) (commentPage.getNumber() + 1) * commentPage.getSize())
-                : 0;
+        long restCommentNum =
+                commentPage.getTotalElements() - ((long) (commentPage.getNumber() + 1) * commentPage.getSize()) >= 0
+                        ? commentPage.getTotalElements() - ((long) (commentPage.getNumber() + 1)
+                        * commentPage.getSize())
+                        : 0;
 
         return SubCommentPageResDto.of(commentPage, content, restCommentNum);
 
@@ -248,7 +245,8 @@ public class CommentService {
                     // 해당 Comment의 좋아요 수
                     Integer likeNum = commentLikeRepository.countByCommentId(comment.getId());
                     // 현재 유저의 해당 Comment 좋아요 여부
-                    Boolean likeStatus = commentLikeRepository.existsByUserIdAndCommentId(user.getId(), comment.getId());
+                    Boolean likeStatus = commentLikeRepository.existsByUserIdAndCommentId(user.getId(),
+                            comment.getId());
 
                     return CommentResDto.of(comment, user, imgList, itemList, likeNum, likeStatus);
                 }).toList();
@@ -256,6 +254,7 @@ public class CommentService {
 
     /**
      * CommentItem -> CommentItemResDto 변경하는 메소드
+     *
      * @param commentItem
      * @return CommentItemResDto
      */

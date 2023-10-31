@@ -39,6 +39,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class QuestionService {
     private final QuestionRepository questionRepository;
@@ -58,7 +59,7 @@ public class QuestionService {
     private final QuestionVoteRepository questionVoteRepository;
     private final DailyHotQuestionRepository dailyHotQuestionRepository;
 
-    @Transactional
+
     public QuestionPostResDto postQuestionFind(User user, QuestionFindPostReqDto dto) {
         /**
          * 1. 생성 or 수정
@@ -91,7 +92,6 @@ public class QuestionService {
 
     }
 
-    @Transactional
     public QuestionPostResDto postQuestionBuy(User user, QuestionBuyPostReqDto dto) {
         /**
          * 1. 생성 or 수정
@@ -115,7 +115,6 @@ public class QuestionService {
         return QuestionPostResDto.of(newQuestionBuy.getId());
     }
 
-    @Transactional
     public QuestionPostResDto postQuestionHowabout(User user, QuestionHowaboutPostReqDto dto) {
         /**
          * 1. 생성 or 수정
@@ -139,7 +138,6 @@ public class QuestionService {
         return QuestionPostResDto.of(newQuestionHowabout.getId());
     }
 
-    @Transactional
     public QuestionPostResDto postQuestionRecommend(User user, QuestionRecommendPostReqDto dto) {
         /**
          * 1. 생성 or 수정
@@ -212,15 +210,12 @@ public class QuestionService {
         }
     }
 
-
-    @Transactional
     public void deleteQuestion(Long questionId) {
         Question question = questionRepository.findById(questionId).orElseThrow(QuestionNotFoundException::new);
 
         question.changeQuestionStatus(QuestionStatus.DELETED);
     }
 
-    @Transactional
     public void postQuestionLike(User user, Long questionId) {
         // 해당 유저의 Question 게시물 like 여부 검색
         Boolean likeStatus = questionLikeRepository.existsByQuestionIdAndUserId(questionId, user.getId());
@@ -257,7 +252,6 @@ public class QuestionService {
         }
     }
 
-    @Transactional
     public QuestionGetDetailResDto getQuestionDetail(User user, Long questionId) {
         Question question = questionRepository.findById(questionId).orElseThrow(QuestionNotFoundException::new);
 
@@ -377,6 +371,7 @@ public class QuestionService {
     /**
      * builder에 VoteNum, VotePercent 탑재
      */
+    @Transactional(readOnly = true)
     private QuestionVoteDataDto getVoteData(Long questionId, Long sortOrder) {
 
 
@@ -432,7 +427,7 @@ public class QuestionService {
      * Question 상세보기 하단의 추천 게시글
      * TODO 게시글과 같은 셀럽/같은 그룹 로직 추가해야함 (23.06.22)
      */
-
+    @Transactional(readOnly = true)
     public List<QuestionSimpleResDto> getWaitQuestionBuy(User user, Long questionId) {
         List<Celeb> interestedCeleb = celebRepository.findInterestedCeleb(user);
 
@@ -448,7 +443,7 @@ public class QuestionService {
     /**
      * Wait QuestionRecommend 조회
      */
-
+    @Transactional(readOnly = true)
     public List<QuestionSimpleResDto> getWaitQuestionRecommend(User user, Long questionId) {
         return questionRepository.getWaitQuestionRecommend(user, questionId)
                 .stream()
@@ -462,7 +457,7 @@ public class QuestionService {
     /**
      * Wait QuestionHowabout 조회
      */
-
+    @Transactional(readOnly = true)
     public List<QuestionSimpleResDto> getWaitQuestionHowabout(User user, Long questionId) {
         return questionRepository.getWaitQuestionHowabout(user, questionId)
                 .stream()
@@ -476,7 +471,7 @@ public class QuestionService {
     /**
      * Wait QuestionFind 조회
      */
-
+    @Transactional(readOnly = true)
     public List<QuestionSimpleResDto> getWaitQuestionFind(User user, Long questionId) {
         List<Celeb> interestedCeleb = celebRepository.findInterestedCeleb(user);
 
@@ -489,7 +484,7 @@ public class QuestionService {
                   ).toList();
     }
 
-//    private QuestionSimpleResDto getQuestionSimpleResDto(Long questionId, String qType, String title, String content) {
+    @Transactional(readOnly = true)
     private QuestionSimpleResDto getQuestionSimpleResDto(Question question, String qType) {
 
         List<QuestionImgSimpleResDto> imgList = new ArrayList<>();
@@ -551,6 +546,7 @@ public class QuestionService {
     /**
      * Question 리스트를 최신순으로 조회
      */
+    @Transactional(readOnly = true)
     public PaginationResDto<QuestionSimpleResDto> getTotalQuestionList(Pageable pageable) {
         Page<Question> questionPage = questionRepository.getTotalQuestionList(pageable);
         List<QuestionSimpleResDto> content = questionPage.stream().map(question -> {
@@ -576,6 +572,7 @@ public class QuestionService {
                 .build();
     }
 
+    @Transactional(readOnly = true)
     public PaginationResDto<QuestionSimpleResDto> getQuestionBuyList(String voteStatus, Pageable pageable) {
         Page<QuestionBuy> questionPage = questionRepository.getQuestionBuyList(voteStatus, pageable);
         List<QuestionSimpleResDto> content = questionPage.stream().map(question ->
@@ -592,7 +589,7 @@ public class QuestionService {
     /**
      * QuestionFind 커뮤니티 게시글 조회.
      */
-
+    @Transactional(readOnly = true)
     public PaginationResDto<QuestionSimpleResDto> getQuestionFindList(Long celebId, Pageable pageable) {
 
         Page<QuestionFind> questionPage = questionRepository.getQuestionFindList(celebId, pageable);
@@ -608,6 +605,7 @@ public class QuestionService {
                 .build();
     }
 
+    @Transactional(readOnly = true)
     public PaginationResDto<QuestionSimpleResDto> getQuestionHowaboutList(Pageable pageable) {
         Page<QuestionHowabout> questionPage = questionRepository.getQuestionHowaboutList(pageable);
         List<QuestionSimpleResDto> content = questionPage.stream().map(question ->
@@ -621,7 +619,7 @@ public class QuestionService {
                 .build();
     }
 
-
+    @Transactional(readOnly = true)
     public PaginationResDto<QuestionSimpleResDto> getQuestionRecommendList(String hashtag, Pageable pageable) {
         Page<QuestionRecommend> questionPage = questionRepository.getQuestionRecommendList(hashtag, pageable);
         List<QuestionSimpleResDto> content = questionPage.stream().map(question ->
@@ -646,6 +644,7 @@ public class QuestionService {
     /**
      * 일일 Hot Question 조회 기능.
      */
+    @Transactional(readOnly = true)
     public List<QuestionHomeResDto> getDailyHotQuestionList() {
         List<Question> dailyHoyQuestionList = dailyHotQuestionRepository.findAll().stream()
                                                                     .map(DailyHotQuestion::getQuestion)
@@ -661,6 +660,7 @@ public class QuestionService {
 
     }
 
+    @Transactional(readOnly = true)
     private List<QuestionImgSimpleResDto> getQuestionImgSimpleList(Question question){
 
         // Question이 QuestionBuy인 경우 모든 이미지를 순서대로 조회
@@ -698,6 +698,7 @@ public class QuestionService {
     /**
      * 주간 Hot Question 조회 기능.
      */
+    @Transactional(readOnly = true)
     public PaginationResDto<QuestionSimpleResDto> getWeeklyHotQuestionList(Pageable pageable) {
         Page<Question> page = questionRepository.getWeeklyHotQuestion(pageable);
 

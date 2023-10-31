@@ -7,8 +7,10 @@ import com.sluv.server.domain.celeb.enums.NewCelebStatus;
 import com.sluv.server.domain.celeb.repository.NewCelebRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class NewCelebService {
 

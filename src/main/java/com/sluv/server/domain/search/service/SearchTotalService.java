@@ -35,7 +35,6 @@ public class SearchTotalService {
     /**
      * 토탈 검색 with ElasticSearch
      */
-    @Transactional
     public SearchTotalResDto getSearchTotal(User user, String keyword) throws ExecutionException, InterruptedException {
         final int itemSize = 9;
         final int questionSize = 4;

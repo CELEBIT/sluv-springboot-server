@@ -21,8 +21,10 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class CelebService {
 
@@ -30,6 +32,7 @@ public class CelebService {
     private final RecentSelectCelebRepository recentSearchCelebRepository;
     private final CelebCategoryRepository celebCategoryRepository;
 
+    @Transactional(readOnly = true)
     public PaginationResDto<CelebSearchResDto> searchCeleb(String celebName, Pageable pageable) {
 
         Page<Celeb> celebPage = celebRepository.searchCeleb(celebName, pageable);
@@ -40,22 +43,22 @@ public class CelebService {
 
         Stream<CelebSearchResDto> childCelebDtoStream = changeCelebSearchResDto(childCelebList).stream();
 
-
         List<Celeb> parentCelebList = celebPage.stream()
                 .filter(celeb -> celeb.getParent() == null)
                 .toList();
         Stream<CelebSearchResDto> parentCelebDtoStream = changeCelebSearchResDto(parentCelebList).stream();
 
-
         return PaginationResDto.<CelebSearchResDto>builder()
                 .page(celebPage.getNumber())
                 .hasNext(celebPage.hasNext())
-                .content(Stream.concat(childCelebDtoStream, parentCelebDtoStream).sorted(Comparator.comparing(CelebSearchResDto::getCelebTotalNameKr)).toList())
+                .content(Stream.concat(childCelebDtoStream, parentCelebDtoStream)
+                                .sorted(Comparator.comparing(CelebSearchResDto::getCelebTotalNameKr)).toList())
                 .build();
 
     }
 
-    public List<RecentSelectCelebResDto> getUserRecentSelectCeleb(User user){
+    @Transactional(readOnly = true)
+    public List<RecentSelectCelebResDto> getUserRecentSelectCeleb(User user) {
         List<RecentSelectCeleb> recentSelectCelebList = recentSearchCelebRepository.getRecentSelectCelebTop20(user);
 
         return recentSelectCelebList
@@ -64,38 +67,41 @@ public class CelebService {
                 .toList();
     }
 
-    public List<CelebSearchResDto> getTop10Celeb(){
-        return  changeCelebSearchResDto(celebRepository.findTop10Celeb());
+    @Transactional(readOnly = true)
+    public List<CelebSearchResDto> getTop10Celeb() {
+        return changeCelebSearchResDto(celebRepository.findTop10Celeb());
     }
 
     /**
      * Celeb 리스트를 CelebSearchResDto 리스트로 변경
      */
-    private List<CelebSearchResDto> changeCelebSearchResDto(List<Celeb> celebList){
+    private List<CelebSearchResDto> changeCelebSearchResDto(List<Celeb> celebList) {
         return celebList.stream()
                 .map(CelebSearchResDto::of)
                 .toList();
     }
 
+    @Transactional(readOnly = true)
     public List<CelebSearchByCategoryResDto> getCelebByCategory() {
         // Parent Id가 null인 CelebCategory를 모두 조회
         List<CelebCategory> categoryList = celebCategoryRepository.findAllByParentIdIsNull();
         changeCategoryOrder(categoryList);
 
         return categoryList.stream()
-                            .parallel()
-                            // 카테고리별 CelebSearchByCategoryResDto 생성
-                            .map(category ->  CelebSearchByCategoryResDto.of(category,
-                                            celebRepository.getCelebByCategory(category)
-                                            .stream()
-                                            // 셀럽별 CelebChipResDto 생성
-                                            .map(CelebChipResDto::of)
-                                            .toList()
-                                            )
-                            ).toList();
+                .parallel()
+                // 카테고리별 CelebSearchByCategoryResDto 생성
+                .map(category -> CelebSearchByCategoryResDto.of(category,
+                                celebRepository.getCelebByCategory(category)
+                                        .stream()
+                                        // 셀럽별 CelebChipResDto 생성
+                                        .map(CelebChipResDto::of)
+                                        .toList()
+                        )
+                ).toList();
 
     }
 
+    @Transactional(readOnly = true)
     public List<CelebSearchByCategoryResDto> searchInterestedCelebByName(String celebName) {
         // 1. Parent Celeb과 일치
         List<Celeb> celebByParent = celebRepository.searchInterestedCelebByParent(celebName);
@@ -112,10 +118,10 @@ public class CelebService {
         // Category별 맞는 celeb들을 골라내서 조립.
         return celebCategoryList.stream()
                 // 카테고리별 분류
-                .map(category ->{
-                             List<CelebChipResDto> eachCategoryCeleb =
-                                     // 카테고리에 맞는 셀럽 filtering
-                                     celebList.stream().filter(celeb -> {
+                .map(category -> {
+                    List<CelebChipResDto> eachCategoryCeleb =
+                            // 카테고리에 맞는 셀럽 filtering
+                            celebList.stream().filter(celeb -> {
                                         // ParentCategory가 있다면 ParentCategory. 없다면, CelebCategory.
                                         CelebCategory tempCategory = celeb.getCelebCategory().getParent() != null
                                                 ? celeb.getCelebCategory().getParent()
@@ -124,14 +130,15 @@ public class CelebService {
                                         return tempCategory == category;
                                         // Category에 맞게 분류된 celeb을 Dto로 변경
                                     }).map(CelebChipResDto::of)
-                             // 가나다 순으로 정렬
-                            .sorted(Comparator.comparing(CelebChipResDto::getCelebName))
-                            .toList();
+                                    // 가나다 순으로 정렬
+                                    .sorted(Comparator.comparing(CelebChipResDto::getCelebName))
+                                    .toList();
 
-                 return CelebSearchByCategoryResDto.of(category, eachCategoryCeleb);
+                    return CelebSearchByCategoryResDto.of(category, eachCategoryCeleb);
                 })
                 .toList();
     }
+
     /**
      * 가수 -> 배우 -> 방송인 -> 스포츠인 -> 인플루언서 순서로 변
      */

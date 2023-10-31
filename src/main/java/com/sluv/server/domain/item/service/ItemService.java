@@ -64,7 +64,6 @@ public class ItemService {
     private final ClosetRepository closetRepository;
     private final ItemScrapRepository itemScrapRepository;
 
-//    @Transactional
     public ItemPostResDto postItem(User user, ItemPostReqDto reqDto) {
 
         // 추가될 Celeb 확인
@@ -162,6 +161,7 @@ public class ItemService {
         return ItemPostResDto.of(newItem.getId());
     }
 
+    @Transactional(readOnly = true)
     public List<HotPlaceResDto> getTopPlace() {
 
         return itemRepository.findTopPlace().stream()
@@ -285,7 +285,6 @@ public class ItemService {
         );
     }
 
-//    @Transactional
     public void postItemLike(User user, Long itemId) {
         Item item = itemRepository.findById(itemId).orElseThrow(ItemNotFoundException::new);
 
@@ -308,6 +307,7 @@ public class ItemService {
         itemRepository.save(item);
     }
 
+    @Transactional(readOnly = true)
     public PaginationResDto<ItemSimpleResDto> getRecentItem(User user, Pageable pageable) {
         Page<Item> recentItemPage = itemRepository.getRecentItem(user, pageable);
 
@@ -316,6 +316,7 @@ public class ItemService {
 
     }
 
+    @Transactional(readOnly = true)
     public PaginationResDto<ItemSimpleResDto> getScrapItem(User user, Pageable pageable) {
         // User, Closet, Item 조인하여 ItemPage 조회
         Page<Item> itemPage = itemRepository.getAllScrapItem(user, pageable);
@@ -354,6 +355,7 @@ public class ItemService {
                 }).toList();
     }
 
+    @Transactional(readOnly = true)
     public PaginationResDto<ItemSimpleResDto> getRecommendItem(User user, Pageable pageable) {
         Page<Item> recommendItemPage = itemRepository.getRecommendItemPage(pageable);
 
@@ -372,6 +374,7 @@ public class ItemService {
     /**
      * 핫한 셀럽들이 선택한 여름나기 아이템 조회
      */
+    @Transactional(readOnly = true)
     public PaginationResDto<ItemSimpleResDto> getSummerItem(User user, Pageable pageable, SearchFilterReqDto dto) {
         // itemPage 조회
         Page<Item> itemPage = itemRepository.getCelebSummerItem(pageable, dto);
@@ -388,6 +391,7 @@ public class ItemService {
     /**
      * 지금 당장 구매가능한 아이템 조회
      */
+    @Transactional(readOnly = true)
     public PaginationResDto<ItemSimpleResDto> getNowBuyItem(User user, Pageable pageable, SearchFilterReqDto dto) {
         // itemPage 조회
         Page<Item> itemPage = itemRepository.getNowBuyItem(pageable, dto);
@@ -403,6 +407,7 @@ public class ItemService {
 
     }
 
+    @Transactional(readOnly = true)
     public PaginationResDto<ItemSimpleResDto> getNewItem(User user, Pageable pageable) {
         // itemPage 조회
         Page<Item> itemPage = itemRepository.getNewItem(pageable);
@@ -417,6 +422,7 @@ public class ItemService {
                 .build();
     }
 
+    @Transactional(readOnly = true)
     public PaginationResDto<ItemSimpleResDto> getLuxuryItem(User user, Pageable pageable, SearchFilterReqDto dto) {
         Page<Item> itemPage = itemRepository.getLuxuryItem(pageable, dto);
 
@@ -429,6 +435,7 @@ public class ItemService {
                 .build();
     }
 
+    @Transactional(readOnly = true)
     public PaginationResDto<ItemSimpleResDto> getEfficientItem(User user, Pageable pageable, SearchFilterReqDto dto) {
         Page<Item> itemPage = itemRepository.getEfficientItem(pageable, dto);
 
@@ -441,11 +448,13 @@ public class ItemService {
                 .build();
     }
 
+    @Transactional(readOnly = true)
     public List<ItemSimpleResDto> getWeekHotItem(User user) {
         List<Item> itemPage = itemRepository.getWeekHotItem();
         return convertItemToItemSimpleResDto(user, itemPage);
     }
 
+    @Transactional(readOnly = true)
     public List<ItemSimpleResDto> getDayHotItem(User user) {
         List<Item> itemPage = itemRepository.getDayHotItem();
         return convertItemToItemSimpleResDto(user, itemPage);
@@ -454,6 +463,7 @@ public class ItemService {
     /**
      * 요즘 핫한 셀럽의 Item 조회
      */
+    @Transactional(readOnly = true)
     public PaginationResDto<ItemSimpleResDto> getHotCelebItem(User user, Pageable pageable, SearchFilterReqDto dto) {
         Long celebId = 510L;
 
@@ -468,6 +478,7 @@ public class ItemService {
                 .build();
     }
 
+    @Transactional(readOnly = true)
     public List<ItemSimpleResDto> getCurationItem(User user) {
         List<Celeb> interestedCeleb = celebRepository.findInterestedCeleb(user);
         List<Item> itemList = itemRepository.getCurationItem(user, interestedCeleb);
@@ -475,6 +486,7 @@ public class ItemService {
         return convertItemToItemSimpleResDto(user, itemList);
     }
 
+    @Transactional(readOnly = true)
     public List<ItemSimpleResDto> getHowAboutItem(User user) {
         List<Celeb> interestedCeleb = celebRepository.findInterestedCeleb(user);
         List<Item> itemList = itemRepository.getHowAboutItem(user, interestedCeleb);

@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class PlaceRankService {
     private final PlaceRankRepository placeRankRepository;
@@ -23,16 +24,15 @@ public class PlaceRankService {
 
     }
 
-    @Transactional
     public void deleteAllPlace(User user) {
         placeRankRepository.deleteAllByUserId(user.getId());
     }
 
-    @Transactional
     public void deletePlace(User user, String placeName) {
         placeRankRepository.deleteByUserIdAndPlace(user.getId(), placeName);
     }
 
+    @Transactional(readOnly = true)
     public List<PlaceRankResDto> getRecentPlaceTop20(User user) {
         return placeRankRepository.getRecentPlaceTop20(user)
                             .stream()

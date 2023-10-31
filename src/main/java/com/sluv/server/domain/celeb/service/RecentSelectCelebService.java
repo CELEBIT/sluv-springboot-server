@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class RecentSelectCelebService {
     private final CelebRepository celebRepository;
@@ -41,12 +42,10 @@ public class RecentSelectCelebService {
         );
     }
 
-    @Transactional
     public void deleteAllRecentSelectCeleb(User user) {
         recentSelectCelebRepository.deleteAllByUserId(user.getId());
     }
 
-    @Transactional
     public void deleteRecentSelectCeleb(User user, Long celebId, String flag) {
         if(flag.equals("Y")){
             recentSelectCelebRepository.deleteByUserIdAndCelebId(user.getId(), celebId);

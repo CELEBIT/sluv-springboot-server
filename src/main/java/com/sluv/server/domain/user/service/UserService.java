@@ -51,8 +51,9 @@ import java.util.Objects;
 
 
 @Service
-@RequiredArgsConstructor
 @Slf4j
+@Transactional
+@RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
     private final CelebRepository celebRepository;
@@ -77,6 +78,7 @@ public class UserService {
     private final JwtProvider jwtProvider;
 
 
+    @Transactional(readOnly = true)
     public UserIdDto getUserIdByToken(HttpServletRequest request) {
         String token = jwtProvider.resolveToken(request);
 
@@ -84,9 +86,9 @@ public class UserService {
     }
 
     /**
-     * User가 선택한 관심 셀럽을 검색
-     * 관심 샐럼의 상위 카테고리를 기준으로 묶어서 Response
+     * User가 선택한 관심 셀럽을 검색 관심 샐럼의 상위 카테고리를 기준으로 묶어서 Response
      */
+    @Transactional(readOnly = true)
     public List<InterestedCelebCategoryResDto> getInterestedCelebByCategory(User user) {
         List<Celeb> interestedCelebList = celebRepository.findInterestedCeleb(user);
 
@@ -96,26 +98,25 @@ public class UserService {
         return categoryList.stream()
                 .parallel()
                 // 카테고리별 InterestedCelebCategoryResDto 생성
-                .map(category ->  {
-                        List<Celeb> categoryFilterCeleb = getCategoryFilterCeleb(interestedCelebList, category);
-                        return InterestedCelebCategoryResDto.of(category,
-                                convertInterestedCelebParentResDto(categoryFilterCeleb));
-                    }
+                .map(category -> {
+                            List<Celeb> categoryFilterCeleb = getCategoryFilterCeleb(interestedCelebList, category);
+                            return InterestedCelebCategoryResDto.of(category,
+                                    convertInterestedCelebParentResDto(categoryFilterCeleb));
+                        }
                 ).toList();
     }
 
-    @Transactional
     public void postUserFollow(User user, Long userId) {
         // target이 될 유저 검색
         User targetUser = userRepository.findById(userId)
-                                            .orElseThrow(UserNotFoundException::new);
+                .orElseThrow(UserNotFoundException::new);
 
         // Follow 여부 확인.
         Boolean followStatus = followRepository.getFollowStatus(user, targetUser);
 
-        if(followStatus) {
+        if (followStatus) {
             followRepository.deleteFollow(user, targetUser);
-        }else {
+        } else {
             // Follow 정보 등록.
             followRepository.save(
                     Follow.toEntity(user, targetUser)
@@ -127,6 +128,7 @@ public class UserService {
     /**
      * 관심셀럽 목록에서 category와 일치하는 Celeb을 분류
      */
+    @Transactional(readOnly = true)
     private List<Celeb> getCategoryFilterCeleb(List<Celeb> celebList, CelebCategory category) {
         return celebList
                 .stream()
@@ -148,7 +150,6 @@ public class UserService {
                 .map(InterestedCelebParentResDto::of).toList();
     }
 
-    @Transactional
     public void postInterestedCeleb(User user, InterestedCelebPostReqDto dto) {
         // 기존에 있는 해당 유저의 관심셀럽 초기화
         interestedCelebRepository.deleteAllByUserId(user.getId());
@@ -165,31 +166,31 @@ public class UserService {
         interestedCelebRepository.saveAll(interestedCelebList);
     }
 
-    @Transactional
     public void postUserProfile(User user, UserProfileReqDto dto) {
         User currentUser = userRepository.findById(user.getId()).orElseThrow(UserNotFoundException::new);
 
         // 닉네임 중복 검사
         Boolean nicknameExistsStatus = userRepository.existsByNickname(dto.getNickName());
-        if (nicknameExistsStatus){
+        if (nicknameExistsStatus) {
             throw new UserNicknameDuplicatedException();
         }
 
         currentUser.changeNickname(dto.getNickName());
         currentUser.changeProfileImgUrl(dto.getImgUrl());
 
-        if(currentUser.getUserStatus().equals(UserStatus.PENDING_PROFILE)){
+        if (currentUser.getUserStatus().equals(UserStatus.PENDING_PROFILE)) {
             currentUser.changeUserStatus(UserStatus.PENDING_CELEB);
         }
     }
 
+    @Transactional(readOnly = true)
     public UserMypageResDto getUserMypage(User user, Long userId) {
         User targetUser;
         Long itemCount = null;
         List<String> imgList = null;
         Long communityCount = null;
 
-        if(userId == null){ // 현재 유저일때
+        if (userId == null) { // 현재 유저일때
             targetUser = user;
 
             Long questionNum = questionRepository.countByUserId(targetUser.getId());
@@ -198,15 +199,15 @@ public class UserService {
             communityCount = questionNum + commentNum;
 
             imgList = itemRepository.getRecentTop2Item(targetUser)
-                                    .stream()
-                                    .map(item -> itemImgRepository.findMainImg(item.getId()).getItemImgUrl())
-                                    .toList();
+                    .stream()
+                    .map(item -> itemImgRepository.findMainImg(item.getId()).getItemImgUrl())
+                    .toList();
 
             itemCount = itemRepository.countByUserId(targetUser.getId());
 
-        }else{ // 특정 유저일때
+        } else { // 특정 유저일때
             targetUser = userRepository.findById(userId)
-                                            .orElseThrow(UserNotFoundException::new);
+                    .orElseThrow(UserNotFoundException::new);
         }
 
         Boolean followStatus = followRepository.getFollowStatus(user, targetUser);
@@ -220,9 +221,10 @@ public class UserService {
                 itemCount,
                 imgList,
                 communityCount
-                );
+        );
     }
 
+    @Transactional(readOnly = true)
     public PaginationResDto<ItemSimpleResDto> getUserItem(User user, Long userId, Pageable pageable) {
         Page<Item> itemPage = itemRepository.getUserAllItem(userId, pageable);
 
@@ -238,21 +240,23 @@ public class UserService {
                 .build();
     }
 
+    @Transactional(readOnly = true)
     private ItemSimpleResDto getItemSimpleResDto(Item item, List<Closet> closetList) {
         return ItemSimpleResDto.of(
-                    item,
-                    itemImgRepository.findMainImg(item.getId()),
-                    itemScrapRepository.getItemScrapStatus(item, closetList)
-                );
+                item,
+                itemImgRepository.findMainImg(item.getId()),
+                itemScrapRepository.getItemScrapStatus(item, closetList)
+        );
     }
 
+    @Transactional(readOnly = true)
     public PaginationResDto<ClosetResDto> getUserCloset(User user, Long userId, Pageable pageable) {
         Page<Closet> closetPage;
 
         // User 일치 여부에 따라 조회하는 Public Closet만 조회할지 결정
-        if(user.getId().equals(userId)){
+        if (user.getId().equals(userId)) {
             closetPage = closetRepository.getUserAllCloset(userId, pageable);
-        }else {
+        } else {
             closetPage = closetRepository.getUserAllPublicCloset(userId, pageable);
         }
 
@@ -260,7 +264,7 @@ public class UserService {
                 ClosetResDto.of(
                         closet,
                         itemScrapRepository.countByClosetId(closet.getId())
-                        )
+                )
         ).toList();
 
         return PaginationResDto.<ClosetResDto>builder()
@@ -270,6 +274,7 @@ public class UserService {
                 .build();
     }
 
+    @Transactional(readOnly = true)
     public PaginationCountResDto<ItemSimpleResDto> getUserRecentItem(User user, Pageable pageable) {
 
         Page<RecentItem> recentItemPage = recentItemRepository.getUserAllRecentItem(user, pageable);
@@ -281,13 +286,15 @@ public class UserService {
                 .map(recentItem -> getItemSimpleResDto(recentItem.getItem(), closetList))
                 .toList();
 
-        return new PaginationCountResDto<>(recentItemPage.hasNext(), recentItemPage.getNumber(), content, recentItemPage.getTotalElements());
+        return new PaginationCountResDto<>(recentItemPage.hasNext(), recentItemPage.getNumber(), content,
+                recentItemPage.getTotalElements());
 
     }
 
+    @Transactional(readOnly = true)
     public PaginationCountResDto<QuestionSimpleResDto> getUserRecentQuestion(User user, Pageable pageable) {
 
-        Page<RecentQuestion> recentQuestionPage =  recentQuestionRepository.getUserAllRecentQuestion(user, pageable);
+        Page<RecentQuestion> recentQuestionPage = recentQuestionRepository.getUserAllRecentQuestion(user, pageable);
 
         List<QuestionSimpleResDto> content = recentQuestionPage.stream().map(recentQuestion -> {
             Question question = questionRepository.findById(recentQuestion.getQuestion().getId())
@@ -296,7 +303,6 @@ public class UserService {
             List<QuestionImgSimpleResDto> itemImgList = null;
             List<String> categoryList = null;
             String celebName = null;
-
 
             if (recentQuestion.getQType().equals("Buy")) {
                 // 이미지 Dto 생성
@@ -307,8 +313,8 @@ public class UserService {
                 itemImgList = questionItemRepository.findAllByQuestionId(question.getId())
                         .stream()
                         .map(questionItem -> {
-                                ItemImg mainImg = itemImgRepository.findMainImg(questionItem.getItem().getId());
-                                return QuestionImgSimpleResDto.of(mainImg);
+                            ItemImg mainImg = itemImgRepository.findMainImg(questionItem.getItem().getId());
+                            return QuestionImgSimpleResDto.of(mainImg);
                         }).toList();
 
             } else if (recentQuestion.getQType().equals("How")) {
@@ -321,10 +327,11 @@ public class UserService {
             } else if (recentQuestion.getQType().equals("Find")) {
                 QuestionFind questionFind = (QuestionFind) question;
                 celebName = questionFind.getCeleb() != null
-                                ?questionFind.getCeleb().getParent() != null
-                                        ?questionFind.getCeleb().getParent().getCelebNameKr() + " " + questionFind.getCeleb().getCelebNameKr()
-                                        :questionFind.getCeleb().getCelebNameKr()
-                                :questionFind.getNewCeleb().getCelebName();
+                        ? questionFind.getCeleb().getParent() != null
+                        ? questionFind.getCeleb().getParent().getCelebNameKr() + " " + questionFind.getCeleb()
+                        .getCelebNameKr()
+                        : questionFind.getCeleb().getCelebNameKr()
+                        : questionFind.getNewCeleb().getCelebName();
             } else {
                 throw new QuestionTypeNotFoundException();
             }
@@ -339,7 +346,6 @@ public class UserService {
                     imgList, itemImgList, categoryList);
 
 
-
         }).toList();
 
         return new PaginationCountResDto<>(
@@ -350,6 +356,7 @@ public class UserService {
         );
     }
 
+    @Transactional(readOnly = true)
     public PaginationCountResDto<ItemSimpleResDto> getUserLikeItem(User user, Pageable pageable) {
         Page<Item> itemPage = itemRepository.getAllByUserLikeItem(user, pageable);
 
@@ -357,9 +364,11 @@ public class UserService {
 
         List<ItemSimpleResDto> content = itemPage.stream().map(item -> getItemSimpleResDto(item, closetList)).toList();
 
-        return new PaginationCountResDto<>(itemPage.hasNext(), itemPage.getNumber(), content, itemPage.getTotalElements());
+        return new PaginationCountResDto<>(itemPage.hasNext(), itemPage.getNumber(), content,
+                itemPage.getTotalElements());
     }
 
+    @Transactional(readOnly = true)
     public PaginationResDto<UserSearchInfoDto> getUserFollower(User user, Long userId, Pageable pageable) {
         // Follower 들 조회
         Page<User> followerPage = userRepository.getAllFollower(userId, pageable);
@@ -367,8 +376,8 @@ public class UserService {
         // UserSearchInfoDto로 가공
         List<UserSearchInfoDto> content = followerPage.stream().map(follower ->
                 UserSearchInfoDto.of(
-                    follower,
-                    followRepository.getFollowStatus(user, follower)
+                        follower,
+                        followRepository.getFollowStatus(user, follower)
                 )
         ).toList();
 
@@ -379,6 +388,7 @@ public class UserService {
                 .build();
     }
 
+    @Transactional(readOnly = true)
     public PaginationResDto<UserSearchInfoDto> getUserFollowing(User user, Long userId, Pageable pageable) {
         // Following 들 조회
         Page<User> followerPage = userRepository.getAllFollowing(userId, pageable);
@@ -414,12 +424,11 @@ public class UserService {
     /**
      * 유저가 좋아요한 Question 게시글 조회
      */
-
+    @Transactional(readOnly = true)
     public PaginationCountResDto<QuestionSimpleResDto> getUserLikeQuestion(User user, Pageable pageable) {
         Page<Question> questionPage = questionRepository.getUserLikeQuestion(user, pageable);
 
         List<QuestionSimpleResDto> content = questionPage.stream().map(this::dtoBuildByQuestionType).toList();
-
 
         return new PaginationCountResDto<>(
                 questionPage.hasNext(),
@@ -436,13 +445,14 @@ public class UserService {
         String celebName = null;
         List<String> categoryList = null;
 
-        if(question instanceof QuestionBuy){ // 1. question이 QuestionBuy 일 경우
+        if (question instanceof QuestionBuy) { // 1. question이 QuestionBuy 일 경우
             // 이미지 DTO 생성
             List<QuestionImgSimpleResDto> imgSimpleList = questionImgRepository.findAllByQuestionId(question.getId())
                     .stream()
                     .map(QuestionImgSimpleResDto::of).toList();
             // 아이템 이미지 DTO 생성
-            List<QuestionImgSimpleResDto> itemImgSimpleList = questionItemRepository.findAllByQuestionId(question.getId())
+            List<QuestionImgSimpleResDto> itemImgSimpleList = questionItemRepository.findAllByQuestionId(
+                            question.getId())
                     .stream()
                     .map(questionItem -> {
                         ItemImg mainImg = itemImgRepository.findMainImg(questionItem.getItem().getId());
@@ -456,10 +466,11 @@ public class UserService {
         } else if (question instanceof QuestionFind questionFind) { // 2. question이 QuestionFind 일 경우
             qType = "Find";
             celebName = questionFind.getCeleb() != null
-                        ?questionFind.getCeleb().getParent() != null
-                                ? questionFind.getCeleb().getParent().getCelebNameKr() + " " + questionFind.getCeleb().getCelebNameKr()
-                                : questionFind.getCeleb().getCelebNameKr()
-                        : questionFind.getNewCeleb().getCelebName();
+                    ? questionFind.getCeleb().getParent() != null
+                    ? questionFind.getCeleb().getParent().getCelebNameKr() + " " + questionFind.getCeleb()
+                    .getCelebNameKr()
+                    : questionFind.getCeleb().getCelebNameKr()
+                    : questionFind.getNewCeleb().getCelebName();
 
         } else if (question instanceof QuestionHowabout) { // 3. question이 QuestionHowabout 일 경우
             qType = "How";
@@ -471,7 +482,7 @@ public class UserService {
             qType = "Recommend";
             categoryList = categoryNameList;
 
-        }else{
+        } else {
             throw new QuestionTypeNotFoundException();
         }
 
@@ -488,7 +499,7 @@ public class UserService {
     /**
      * 유저가 좋아요한 댓글 목록 조회
      */
-
+    @Transactional(readOnly = true)
     public PaginationCountResDto<CommentSimpleResDto> getUserLikeComment(User user, Pageable pageable) {
         Page<Comment> commentPage = commentRepository.getUserAllLikeComment(user, pageable);
 
@@ -505,7 +516,7 @@ public class UserService {
     /**
      * 현재 유저가 업로드한 아이템 조회
      */
-
+    @Transactional(readOnly = true)
     public PaginationCountResDto<ItemSimpleResDto> getUserUploadItem(User user, Pageable pageable) {
         // 현재 유저가 업로드한 아이템 조회
         Page<Item> itemPage = itemRepository.getUserAllItem(user.getId(), pageable);
@@ -527,7 +538,7 @@ public class UserService {
     /**
      * 현재 유저가 업로그한 Question 조회
      */
-
+    @Transactional(readOnly = true)
     public PaginationCountResDto<QuestionSimpleResDto> getUserUploadQuestion(User user, Pageable pageable) {
         Page<Question> questionPage = questionRepository.getUserAllQuestion(user, pageable);
 
@@ -544,6 +555,7 @@ public class UserService {
     /**
      * 현재 유저가 업로그한 Comment 조회
      */
+    @Transactional(readOnly = true)
     public PaginationCountResDto<CommentSimpleResDto> getUserUploadComment(User user, Pageable pageable) {
         Page<Comment> commentPage = commentRepository.getUserAllComment(user, pageable);
 
@@ -557,6 +569,7 @@ public class UserService {
         );
     }
 
+    @Transactional(readOnly = true)
     public List<UserSearchInfoDto> getHotSluver(User user, Long celebId) {
         List<User> userList = userRepository.getHotSluver(user, celebId);
 
@@ -571,11 +584,9 @@ public class UserService {
     }
 
     /**
-     * 특정 유저가 선택한 관심 Celeb을 조회
-     * CelebCategory를 기준으로 그룹핑
-     * 카테고리를 기준으로 조회
+     * 특정 유저가 선택한 관심 Celeb을 조회 CelebCategory를 기준으로 그룹핑 카테고리를 기준으로 조회
      */
-
+    @Transactional(readOnly = true)
     public List<InterestedCelebCategoryResDto> getTargetUserInterestedCelebByCategory(Long userId) {
         User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
         List<Celeb> interestedCelebList = celebRepository.findInterestedCeleb(user);
@@ -586,7 +597,7 @@ public class UserService {
 
         return categoryList.stream()
                 // 카테고리별 InterestedCelebCategoryResDto 생성
-                .map(category ->  {
+                .map(category -> {
                             List<Celeb> categoryFilterCeleb = getCategoryFilterCeleb(interestedCelebList, category);
                             return InterestedCelebCategoryResDto.of(category,
                                     convertInterestedCelebParentResDto(categoryFilterCeleb));
@@ -608,17 +619,15 @@ public class UserService {
 
     public void checkUserStatue(User user) {
 
-        if (user.getUserStatus().equals(UserStatus.BLOCKED)){
+        if (user.getUserStatus().equals(UserStatus.BLOCKED)) {
             throw new UserBlockedException();
         }
     }
 
     /**
-     * 특정 유저가 선택한 관심 Celeb을 조회
-     * CelebCategory를 기준으로 그룹핑
-     * 유저가 등록한 순서대로 조회
+     * 특정 유저가 선택한 관심 Celeb을 조회 CelebCategory를 기준으로 그룹핑 유저가 등록한 순서대로 조회
      */
-
+    @Transactional(readOnly = true)
     public List<InterestedCelebParentResDto> getTargetUserInterestedCelebByPostTime(Long userId) {
         User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
         return celebRepository.findInterestedCeleb(user)
@@ -627,9 +636,9 @@ public class UserService {
     }
 
     /**
-     * User가 선택한 관심 셀럽을 검색
-     * 관심 셀럽 선택순서를 기준으로 조회
+     * User가 선택한 관심 셀럽을 검색 관심 셀럽 선택순서를 기준으로 조회
      */
+    @Transactional(readOnly = true)
     public List<InterestedCelebParentResDto> getInterestedCelebByPostTime(User user) {
         return celebRepository.findInterestedCeleb(user)
                 .stream()

@@ -12,8 +12,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class NoticeService {
     private final NoticeRepository noticeRepository;
@@ -21,6 +23,7 @@ public class NoticeService {
     /**
      * 공지사항 리스트 조회
      */
+    @Transactional(readOnly = true)
     public PaginationResDto<NoticeSimpleResDto> getAllNotice(Pageable pageable) {
         // 공지사항 리스트 Page 조회
         Page<Notice> noticePage = noticeRepository.getAllNotice(pageable);
@@ -40,6 +43,7 @@ public class NoticeService {
     /**
      * 공지사항 상세 조회
      */
+    @Transactional(readOnly = true)
     public NoticeDetailResDto getNoticeDetail(Long noticeId) {
 
         // noticeId에 해당하는 공지사항 조회

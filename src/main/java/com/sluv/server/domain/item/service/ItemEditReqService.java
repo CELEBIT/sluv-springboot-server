@@ -9,8 +9,10 @@ import com.sluv.server.domain.item.repository.ItemRepository;
 import com.sluv.server.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class ItemEditReqService {
     private final ItemEditReqRepository itemEditReqRepository;

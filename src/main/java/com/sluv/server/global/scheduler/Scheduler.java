@@ -21,8 +21,9 @@ import java.util.Calendar;
 import java.util.List;
 
 @Component
-@RequiredArgsConstructor
 @Slf4j
+@Transactional
+@RequiredArgsConstructor
 public class Scheduler {
     private final SearchDataRepository searchDataRepository;
     private final SearchRankRepository searchRankRepository;
@@ -38,7 +39,6 @@ public class Scheduler {
      * SearchRank 업데이트
      */
     @Scheduled(cron = "0 0 0 * * *") // 초 분 시 일 월 요일
-    @Transactional
     public void updateSearchRank(){
         log.info("SearchRank Update Time: {}", Calendar.getInstance().getTime());
 
@@ -63,7 +63,6 @@ public class Scheduler {
      * 럭셔리 아이템 업데이트
      */
     @Scheduled(cron = "0 0 0 * * *") // 초 분 시 일 월 요일
-    @Transactional
     public void updateLuxuryItem(){
         log.info("LuxuryItem Update Time: {}", Calendar.getInstance().getTime());
 
@@ -86,7 +85,6 @@ public class Scheduler {
      * 가성비 선물 아이템 업데이트
      */
     @Scheduled(cron = "0 0 0 * * *") // 초 분 시 일 월 요일
-    @Transactional
     public void updateEfficientItem(){
         log.info("EfficientItem Update Time: {}", Calendar.getInstance().getTime());
 
@@ -108,8 +106,7 @@ public class Scheduler {
     /**
      * 주간 HOT 셀럽 아이템
      */
-    @Scheduled(cron = "0 0 0 * * 1") // 초 분 시 일 월 요일
-    @Transactional
+    @Scheduled(cron = "0 0 0 * * MON") // 초 분 시 일 월 요일
     public void updateWeekHotItem(){
         log.info("WeekHotItem Update Time: {}", Calendar.getInstance().getTime());
 
@@ -132,7 +129,6 @@ public class Scheduler {
      * 일간 HOT 셀럽 아이템
      */
     @Scheduled(cron = "0 0 0 * * *") // 초 분 시 일 월 요일
-    @Transactional
     public void updateDayHotItem(){
         log.info("DayHotItem Update Time: {}", Calendar.getInstance().getTime());
 
@@ -155,7 +151,6 @@ public class Scheduler {
      * 일간 HOT Question
      */
     @Scheduled(cron = "0 0 0 * * *") // 초 분 시 일 월 요일
-    @Transactional
     public void updateDailyHotQuestion(){
         log.info("DailyHotQuestion Update Time: {}", Calendar.getInstance().getTime());
 

@@ -39,8 +39,9 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 @Service
-@RequiredArgsConstructor
 @Slf4j
+@Transactional
+@RequiredArgsConstructor
 public class SearchService {
 
     private final ItemRepository itemRepository;
@@ -65,7 +66,6 @@ public class SearchService {
     /**
      * Item 검색 with ElasticSearch
      */
-    @Transactional
     @Async(value = "asyncThreadPoolExecutor")
 //    public PaginationResDto<ItemSimpleResDto> getSearchItem(User user, String keyword, SearchFilterReqDto dto, Pageable pageable) {
     public CompletableFuture<PaginationResDto<ItemSimpleResDto>> getSearchItem(User user, String keyword, SearchFilterReqDto dto, Pageable pageable) {
@@ -106,7 +106,6 @@ public class SearchService {
     /**
      * Question 검색 with ElasticSearch
      */
-    @Transactional
     @Async(value = "asyncThreadPoolExecutor")
 //    public PaginationResDto<QuestionSimpleResDto> getSearchQuestion(User user, String keyword, String qType, Pageable pageable) {
     public CompletableFuture<PaginationResDto<QuestionSimpleResDto>> getSearchQuestion(User user, String keyword, String qType, Pageable pageable) {
@@ -232,7 +231,6 @@ public class SearchService {
     /**
      * User 검색 with ElasticSearch
      */
-    @Transactional
     @Async(value = "asyncThreadPoolExecutor")
 //    public PaginationResDto<UserSearchInfoDto> getSearchUser(User user, String keyword, Pageable pageable) {
     public CompletableFuture<PaginationResDto<UserSearchInfoDto>> getSearchUser(User user, String keyword, Pageable pageable) {
@@ -327,6 +325,7 @@ public class SearchService {
 //        return SearchTotalResDto.of(searchItem, searchQuestion, searchUser);
 //    }
 
+    @Transactional(readOnly = true)
     public SearchItemCountResDto getSearchItemCount(String keyword, SearchFilterReqDto dto) {
         // ElasticSearch API Path
         String itemPath = "/search/searchItem";
@@ -347,6 +346,7 @@ public class SearchService {
 
     }
 
+    @Transactional(readOnly = true)
     public List<RecentSearchChipResDto> getRecentSearch(User user) {
         List<RecentSearchChipResDto> result
                 = recentSearchRepository.getRecentSearch(user)
@@ -358,6 +358,7 @@ public class SearchService {
         return result;
     }
 
+    @Transactional(readOnly = true)
     public List<SearchKeywordResDto> getSearchRank() {
         List<SearchRank> searchRankList = searchRankRepository.findAllByOrderBySearchCountDesc();
         return searchRankList
@@ -375,6 +376,7 @@ public class SearchService {
 
     }
 
+    @Transactional(readOnly = true)
     public PaginationResDto<SearchKeywordResDto> getSearchKeyword(String keyword, Pageable pageable) {
         Page<SearchData> searchDataPage = searchDataRepository.getSearchKeyword(keyword, pageable);
 
@@ -394,7 +396,6 @@ public class SearchService {
     /**
      * 현재 유저의 RecentSearch 키워드 삭제
      */
-    @Transactional
     public void deleteSearchKeyword(User user, String keyword) {
         log.info("Delete {}'s Recent Search Keyword: {} ", user.getId(), keyword);
         recentSearchRepository.deleteByUserIdAndSearchWord(user.getId(), keyword);

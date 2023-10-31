@@ -39,6 +39,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class TempItemService {
     private final TempItemRepository tempItemRepository;
@@ -55,7 +56,6 @@ public class TempItemService {
     private final NewCelebRepository newCelebRepository;
 
 
-    @Transactional
     public Long postTempItem(User user, TempItemPostReqDto reqDto) {
         Celeb celeb = reqDto.getCelebId() != null ? celebRepository.findById(reqDto.getCelebId())
                 .orElseThrow(CelebNotFoundException::new)
@@ -122,6 +122,7 @@ public class TempItemService {
         return saveTempItem.getId();
     }
 
+    @Transactional(readOnly = true)
     public PaginationCountResDto<TempItemResDto> getTempItemList(User user, Pageable pageable){
 
         Page<TempItem> contentPage = tempItemRepository.getTempItemList(user, pageable);
@@ -174,7 +175,6 @@ public class TempItemService {
 
     }
 
-    @Transactional
     public void deleteTempItem(Long tempItemId){
         // 관련된 삭제
         // 1. tempItemImg 삭제
@@ -188,7 +188,6 @@ public class TempItemService {
         tempItemRepository.deleteById(tempItemId);
     }
 
-    @Transactional
     public void deleteAllTempItem(User user){
         // 1. 해당 유저의 모든 TempItem 조회
         List<TempItem> tempItemList = tempItemRepository.findAllExceptLast(user);

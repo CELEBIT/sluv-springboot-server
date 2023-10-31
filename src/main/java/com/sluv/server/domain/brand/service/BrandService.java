@@ -15,9 +15,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class BrandService {
     private final BrandRepository brandRepository;
@@ -25,7 +26,8 @@ public class BrandService {
     private final UserRepository userRepository;
 
 
-    public PaginationResDto<BrandSearchResDto> findAllBrand(String brandName, Pageable pageable){
+    @Transactional(readOnly = true)
+    public PaginationResDto<BrandSearchResDto> findAllBrand(String brandName, Pageable pageable) {
 
         Page<Brand> brandPage = brandRepository.findByAllBrandKrOrBrandEnStartingWith(brandName, pageable);
 
@@ -42,12 +44,13 @@ public class BrandService {
 
     }
 
+    @Transactional(readOnly = true)
     public List<BrandSearchResDto> findTopBrand() {
         return brandRepository.findTop10By().stream()
-                                            .map(BrandSearchResDto::of
-                                            ).toList();
+                .map(BrandSearchResDto::of).toList();
     }
 
+    @Transactional(readOnly = true)
     public List<RecentSelectBrandResDto> findRecentSelectBrand(User user) {
 
         List<RecentSelectBrand> recentSelectBrandList = recentSelectBrandRepository.getRecentSelectBrandTop20(user);

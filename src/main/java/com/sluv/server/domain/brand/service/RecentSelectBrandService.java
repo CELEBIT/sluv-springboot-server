@@ -15,16 +15,17 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class RecentSelectBrandService {
     private final BrandRepository brandRepository;
     private final NewBrandRepository newBrandRepository;
     private final RecentSelectBrandRepository recentSelectBrandRepository;
 
-    public void postRecentSelectBrand(User user, RecentSelectBrandReqDto dto){
+    public void postRecentSelectBrand(User user, RecentSelectBrandReqDto dto) {
         Brand brand = dto.getBrandId() != null
                 ? brandRepository.findById(dto.getBrandId())
-                                .orElseThrow(BrandNotFoundException::new)
+                .orElseThrow(BrandNotFoundException::new)
                 : null;
 
         NewBrand newBrand = dto.getNewBrandId() != null
@@ -37,16 +38,14 @@ public class RecentSelectBrandService {
         );
     }
 
-    @Transactional
     public void deleteAllRecentSelectBrand(User user) {
         recentSelectBrandRepository.deleteAllByUserId(user.getId());
     }
 
-    @Transactional
-    public void deleteRecentSelectBrand(User user, Long id, String flag){
-        if(flag.equals("Y")){
+    public void deleteRecentSelectBrand(User user, Long id, String flag) {
+        if (flag.equals("Y")) {
             recentSelectBrandRepository.deleteByUserIdAndBrandId(user.getId(), id);
-        }else{
+        } else {
             recentSelectBrandRepository.deleteByUserIdAndNewBrandId(user.getId(), id);
         }
     }

@@ -14,15 +14,18 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import org.springframework.transaction.annotation.Transactional;
 
 import static java.util.stream.Collectors.toList;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class HashtagService {
 
     private final HashtagRepository hashtagRepository;
 
+    @Transactional(readOnly = true)
     public PaginationResDto<HashtagResponseDto> getHashtag(String name, Pageable pageable){
         Page<Tuple> hashtagPage = hashtagRepository.findAllByContent(name, pageable);
         List<HashtagResponseDto> dtoList = hashtagPage

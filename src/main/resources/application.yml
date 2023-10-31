@@ -6,7 +6,7 @@ spring:
     password: ENC(2HaAZ8j7cAaYFkIcemnUifSA0UAtPFLt)
     hikari:
       connection-timeout: 30000
-      maximum-pool-size: 15
+      maximum-pool-size: 20
       max-lifetime: 35000
   jpa:
     properties:

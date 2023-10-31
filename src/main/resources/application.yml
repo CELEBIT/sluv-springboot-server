@@ -8,7 +8,6 @@ spring:
       connection-timeout: 30000
       maximum-pool-size: 10
       minimum-idle: 5
-      idle-timeout: 600000
   jpa:
     properties:
       hibernate:

@@ -24,12 +24,12 @@ public class ItemEditReq extends BaseEntity {
     @Column(name = "item_edit_req_id")
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "requester_id")
     @NotNull
     private User requester;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "item_id")
     @NotNull
     private Item item;

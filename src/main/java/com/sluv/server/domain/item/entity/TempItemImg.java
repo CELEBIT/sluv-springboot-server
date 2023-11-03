@@ -23,7 +23,7 @@ public class TempItemImg extends BaseEntity {
     @Column(name = "temp_item_img_id")
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "temp_item_id")
     @NotNull
     private TempItem tempItem;

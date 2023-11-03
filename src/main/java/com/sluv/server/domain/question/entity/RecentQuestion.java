@@ -23,14 +23,14 @@ public class RecentQuestion extends BaseEntity {
     @Column(name = "recent_question_id")
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "question_id")
     @NotNull
     private Question question;
 
     private String qType;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     @NotNull
     private User user;

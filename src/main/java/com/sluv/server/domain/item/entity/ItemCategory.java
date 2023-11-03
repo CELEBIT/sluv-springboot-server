@@ -26,7 +26,7 @@ public class ItemCategory extends BaseEntity {
     @Size(max = 50)
     private String name;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_id")
     private ItemCategory parent;
 

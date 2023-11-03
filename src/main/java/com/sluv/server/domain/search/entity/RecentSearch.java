@@ -22,7 +22,7 @@ public class RecentSearch extends BaseEntity {
     @Column(name = "recent_search_id")
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     @NotNull
     private User user;

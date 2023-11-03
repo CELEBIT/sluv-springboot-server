@@ -30,7 +30,7 @@ public class Closet extends BaseEntity {
     @Column(name = "closet_id")
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     @NotNull
     private User user;

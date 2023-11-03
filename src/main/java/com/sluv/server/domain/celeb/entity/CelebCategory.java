@@ -25,7 +25,7 @@ public class CelebCategory extends BaseEntity {
     @Column(name = "celeb_category_id")
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_id")
     private CelebCategory parent;
 

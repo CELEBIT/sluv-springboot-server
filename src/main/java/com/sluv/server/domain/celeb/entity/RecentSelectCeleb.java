@@ -21,15 +21,15 @@ public class RecentSelectCeleb extends BaseEntity {
     @Column(name = "recent_select_celeb_id")
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "celeb_id")
     private Celeb celeb;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "new_celeb_id")
     private NewCeleb newCeleb;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     @NotNull
     private User user;

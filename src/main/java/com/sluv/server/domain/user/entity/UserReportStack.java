@@ -17,7 +17,7 @@ public class UserReportStack extends BaseEntity {
     @Column(name = "user_report_stack_id")
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "reported_id")
     @NotNull
     private User reported;

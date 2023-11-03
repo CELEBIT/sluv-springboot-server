@@ -24,12 +24,12 @@ public class UserReport extends BaseEntity {
     @Column(name = "user_report_id")
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "reporter_id")
     @NotNull
     private User reporter;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "reported_id")
     @NotNull
     private User reported;

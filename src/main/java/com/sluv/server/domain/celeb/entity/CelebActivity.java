@@ -18,7 +18,7 @@ public class CelebActivity extends BaseEntity {
     @Column(name = "celeb_activity_id")
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "celeb_id")
     private Celeb celeb;
 

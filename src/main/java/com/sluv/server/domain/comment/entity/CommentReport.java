@@ -25,12 +25,12 @@ public class CommentReport extends BaseEntity {
     @Column(name = "comment_report_id")
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "comment_id")
     @NotNull
     private Comment comment;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "reporter_id")
     @NotNull
     private User reporter;

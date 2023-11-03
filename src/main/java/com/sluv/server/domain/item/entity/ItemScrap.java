@@ -21,12 +21,12 @@ public class ItemScrap extends BaseEntity {
     @Column(name = "item_scrap_id")
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "item_id")
     @NotNull
     private Item item;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "closet_id")
     @NotNull
     private Closet closet;

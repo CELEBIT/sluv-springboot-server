@@ -21,12 +21,12 @@ public class ItemHashtag extends BaseEntity {
     @Column(name = "item_hashtag_id")
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "item_id")
     @NotNull
     private Item item;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "hashtag_id")
     @NotNull
     private Hashtag hashtag;

@@ -21,7 +21,7 @@ public class DayHotItem extends BaseEntity {
     @Column(name = "day_hot_item_id")
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "item_id")
     @NotNull
     private Item item;

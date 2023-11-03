@@ -22,12 +22,12 @@ public class InterestedCeleb extends BaseEntity {
     @Column(name = "interested_celeb_id")
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     @NotNull
     private User user;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "celeb_id")
     @NotNull
     private Celeb celeb;

@@ -21,7 +21,7 @@ public class CommentImg extends BaseEntity {
     @Column(name = "comment_img_id")
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "comment_id")
     @NotNull
     private Comment comment;

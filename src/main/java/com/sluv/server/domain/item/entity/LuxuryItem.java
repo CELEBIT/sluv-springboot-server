@@ -22,7 +22,7 @@ public class LuxuryItem extends BaseEntity {
     @Column(name = "luxury_item_id")
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "item_id")
     @NotNull
     private Item item;

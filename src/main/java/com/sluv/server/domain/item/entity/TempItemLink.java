@@ -25,7 +25,7 @@ public class TempItemLink extends BaseEntity {
     @Column(name = "temp_item_link_id")
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "temp_item_id")
     @NotNull
     private TempItem tempItem;

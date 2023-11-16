@@ -11,10 +11,22 @@ import com.sluv.server.domain.item.repository.ItemRepository;
 import com.sluv.server.domain.item.repository.ItemScrapRepository;
 import com.sluv.server.domain.question.dto.QuestionImgSimpleResDto;
 import com.sluv.server.domain.question.dto.QuestionSimpleResDto;
-import com.sluv.server.domain.question.entity.*;
+import com.sluv.server.domain.question.entity.QuestionBuy;
+import com.sluv.server.domain.question.entity.QuestionFind;
+import com.sluv.server.domain.question.entity.QuestionHowabout;
+import com.sluv.server.domain.question.entity.QuestionItem;
+import com.sluv.server.domain.question.entity.QuestionRecommend;
+import com.sluv.server.domain.question.entity.QuestionRecommendCategory;
 import com.sluv.server.domain.question.exception.QuestionTypeNotFoundException;
-import com.sluv.server.domain.question.repository.*;
-import com.sluv.server.domain.search.dto.*;
+import com.sluv.server.domain.question.repository.QuestionImgRepository;
+import com.sluv.server.domain.question.repository.QuestionItemRepository;
+import com.sluv.server.domain.question.repository.QuestionLikeRepository;
+import com.sluv.server.domain.question.repository.QuestionRecommendCategoryRepository;
+import com.sluv.server.domain.question.repository.QuestionRepository;
+import com.sluv.server.domain.search.dto.RecentSearchChipResDto;
+import com.sluv.server.domain.search.dto.SearchFilterReqDto;
+import com.sluv.server.domain.search.dto.SearchItemCountResDto;
+import com.sluv.server.domain.search.dto.SearchKeywordResDto;
 import com.sluv.server.domain.search.entity.RecentSearch;
 import com.sluv.server.domain.search.entity.SearchData;
 import com.sluv.server.domain.search.entity.SearchRank;
@@ -27,6 +39,8 @@ import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.domain.user.repository.FollowRepository;
 import com.sluv.server.domain.user.repository.UserRepository;
 import com.sluv.server.global.common.response.PaginationResDto;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -34,9 +48,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-import java.util.concurrent.CompletableFuture;
 
 @Service
 @Slf4j
@@ -68,7 +79,9 @@ public class SearchService {
      */
     @Async(value = "asyncThreadPoolExecutor")
 //    public PaginationResDto<ItemSimpleResDto> getSearchItem(User user, String keyword, SearchFilterReqDto dto, Pageable pageable) {
-    public CompletableFuture<PaginationResDto<ItemSimpleResDto>> getSearchItem(User user, String keyword, SearchFilterReqDto dto, Pageable pageable) {
+    public CompletableFuture<PaginationResDto<ItemSimpleResDto>> getSearchItem(User user, String keyword,
+                                                                               SearchFilterReqDto dto,
+                                                                               Pageable pageable) {
         // ElasticSearch API Path
         String itemPath = "/search/searchItem";
 
@@ -108,7 +121,9 @@ public class SearchService {
      */
     @Async(value = "asyncThreadPoolExecutor")
 //    public PaginationResDto<QuestionSimpleResDto> getSearchQuestion(User user, String keyword, String qType, Pageable pageable) {
-    public CompletableFuture<PaginationResDto<QuestionSimpleResDto>> getSearchQuestion(User user, String keyword, String qType, Pageable pageable) {
+    public CompletableFuture<PaginationResDto<QuestionSimpleResDto>> getSearchQuestion(User user, String keyword,
+                                                                                       String qType,
+                                                                                       Pageable pageable) {
         // ElasticSearch API Path
         String itemPath = "/search/searchQuestion";
 
@@ -116,7 +131,7 @@ public class SearchService {
         List<Long> questionIdList = elasticSearchConnectUtil.connectElasticSearch(keyword, itemPath);
 
         // 조건에 맞는 Item Page 조회
-        if(qType.equals("Buy")){
+        if (qType.equals("Buy")) {
             Page<QuestionBuy> searchQuestionPage =
                     questionRepository.getSearchQuestionBuy(questionIdList, pageable);
 
@@ -125,10 +140,10 @@ public class SearchService {
                 // 해당 Question의 item 이미지 리스트 구하기
                 List<QuestionItem> questionItemList = questionItemRepository.findAllByQuestionId(question.getId());
                 List<QuestionImgSimpleResDto> itemImgList = questionItemList.stream()
-                                                .map(questionItem -> {
-                                                    ItemImg mainImg = itemImgRepository.findMainImg(questionItem.getItem().getId());
-                                                    return QuestionImgSimpleResDto.of(mainImg);
-                                                }).toList();
+                        .map(questionItem -> {
+                            ItemImg mainImg = itemImgRepository.findMainImg(questionItem.getItem().getId());
+                            return QuestionImgSimpleResDto.of(mainImg);
+                        }).toList();
 
                 // 해당 Question의 이미지 리스트 구하기
                 List<QuestionImgSimpleResDto> imgList = questionImgRepository.findAllByQuestionId(question.getId())
@@ -150,7 +165,7 @@ public class SearchService {
                     .content(content)
                     .build());
 
-        }else if(qType.equals("Find")){
+        } else if (qType.equals("Find")) {
             Page<QuestionFind> searchQuestionPage =
                     questionRepository.getSearchQuestionFind(questionIdList, pageable);
 
@@ -172,19 +187,19 @@ public class SearchService {
                     .content(content)
                     .build());
 
-        }else if(qType.equals("How")){
+        } else if (qType.equals("How")) {
             Page<QuestionHowabout> searchQuestionPage =
                     questionRepository.getSearchQuestionHowabout(questionIdList, pageable);
 
             List<QuestionSimpleResDto> content = searchQuestionPage.stream().map(question -> {
 
-                    // Question 좋아요 수
-                    Long likeNum = questionLikeRepository.countByQuestionId(question.getId());
+                // Question 좋아요 수
+                Long likeNum = questionLikeRepository.countByQuestionId(question.getId());
 
-                    // Question 댓글 수
-                    Long commentNum = commentRepository.countByQuestionId(question.getId());
+                // Question 댓글 수
+                Long commentNum = commentRepository.countByQuestionId(question.getId());
 
-                    return QuestionSimpleResDto.of(question, likeNum, commentNum, null, null, null);
+                return QuestionSimpleResDto.of(question, likeNum, commentNum, null, null, null);
             }).toList();
 
             return CompletableFuture.completedFuture(PaginationResDto.<QuestionSimpleResDto>builder()
@@ -193,7 +208,7 @@ public class SearchService {
                     .content(content)
                     .build());
 
-        }else if(qType.equals("Recommend")) {
+        } else if (qType.equals("Recommend")) {
             Page<QuestionRecommend> searchQuestionPage =
                     questionRepository.getSearchQuestionRecommend(questionIdList, pageable);
 
@@ -233,7 +248,8 @@ public class SearchService {
      */
     @Async(value = "asyncThreadPoolExecutor")
 //    public PaginationResDto<UserSearchInfoDto> getSearchUser(User user, String keyword, Pageable pageable) {
-    public CompletableFuture<PaginationResDto<UserSearchInfoDto>> getSearchUser(User user, String keyword, Pageable pageable) {
+    public CompletableFuture<PaginationResDto<UserSearchInfoDto>> getSearchUser(User user, String keyword,
+                                                                                Pageable pageable) {
         // ElasticSearch API Path
         String itemPath = "/search/searchUser";
 
@@ -242,7 +258,6 @@ public class SearchService {
 
         // 조건에 맞는 User Page 조회
         Page<User> searchUserPage = userRepository.getSearchUser(userIdList, pageable);
-
 
         // Cotent 조립
         List<UserSearchInfoDto> content = searchUserPage.stream().map(searchUser ->
@@ -334,11 +349,11 @@ public class SearchService {
         List<Long> itemIdList = elasticSearchConnectUtil.connectElasticSearch(keyword, itemPath);
 
         return SearchItemCountResDto.of(
-                    itemRepository.getSearchItemCount(itemIdList, dto)
-                );
+                itemRepository.getSearchItemCount(itemIdList, dto)
+        );
     }
 
-    private void postRecentSearch(User user, String keyword){
+    private void postRecentSearch(User user, String keyword) {
         RecentSearch recentSearch = RecentSearch.of(user, keyword);
 
         log.info("Post RecentSearch -> User: {}, Keyword: {}", user.getId(), keyword);
@@ -368,7 +383,7 @@ public class SearchService {
                 ).toList();
     }
 
-    private void postSearchData(String keyword){
+    private void postSearchData(String keyword) {
         SearchData searchData = SearchData.of(keyword);
 
         log.info("Post SearchData -> Keyword: {}", keyword);
@@ -383,8 +398,8 @@ public class SearchService {
         List<SearchKeywordResDto> content = searchDataPage.stream()
                 .map(searchData ->
                         SearchKeywordResDto.of(searchData.getSearchWord()
-                )
-        ).toList();
+                        )
+                ).toList();
 
         return PaginationResDto.<SearchKeywordResDto>builder()
                 .page(searchDataPage.getNumber())
@@ -399,5 +414,10 @@ public class SearchService {
     public void deleteSearchKeyword(User user, String keyword) {
         log.info("Delete {}'s Recent Search Keyword: {} ", user.getId(), keyword);
         recentSearchRepository.deleteByUserIdAndSearchWord(user.getId(), keyword);
+    }
+
+    public void deleteAllSearchKeyword(User user) {
+        log.info("Delete {}'s All Recent Search Keyword", user.getId());
+        recentSearchRepository.deleteAllByUserId(user.getId());
     }
 }

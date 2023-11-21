@@ -46,12 +46,9 @@ public class CelebService {
                 .toList();
         Stream<CelebSearchResDto> parentCelebDtoStream = changeCelebSearchResDto(parentCelebList).stream();
 
-        return PaginationResDto.<CelebSearchResDto>builder()
-                .page(celebPage.getNumber())
-                .hasNext(celebPage.hasNext())
-                .content(Stream.concat(childCelebDtoStream, parentCelebDtoStream)
-                        .sorted(Comparator.comparing(CelebSearchResDto::getCelebTotalNameKr)).toList())
-                .build();
+        return PaginationResDto.of(celebPage,
+                Stream.concat(childCelebDtoStream, parentCelebDtoStream)
+                        .sorted(Comparator.comparing(CelebSearchResDto::getCelebTotalNameKr)).toList());
 
     }
 

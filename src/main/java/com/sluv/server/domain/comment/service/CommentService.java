@@ -2,13 +2,24 @@ package com.sluv.server.domain.comment.service;
 
 import com.sluv.server.domain.closet.entity.Closet;
 import com.sluv.server.domain.closet.repository.ClosetRepository;
-import com.sluv.server.domain.comment.dto.*;
-import com.sluv.server.domain.comment.entity.*;
-import com.sluv.server.domain.comment.enums.CommentStatus;
+import com.sluv.server.domain.comment.dto.CommentImgDto;
+import com.sluv.server.domain.comment.dto.CommentItemResDto;
+import com.sluv.server.domain.comment.dto.CommentPostReqDto;
+import com.sluv.server.domain.comment.dto.CommentReportPostReqDto;
+import com.sluv.server.domain.comment.dto.CommentResDto;
+import com.sluv.server.domain.comment.dto.SubCommentPageResDto;
+import com.sluv.server.domain.comment.entity.Comment;
+import com.sluv.server.domain.comment.entity.CommentImg;
+import com.sluv.server.domain.comment.entity.CommentItem;
+import com.sluv.server.domain.comment.entity.CommentLike;
+import com.sluv.server.domain.comment.entity.CommentReport;
 import com.sluv.server.domain.comment.exception.CommentNotFoundException;
 import com.sluv.server.domain.comment.exception.CommentReportDuplicateException;
-import com.sluv.server.domain.comment.repository.*;
-import com.sluv.server.domain.item.dto.ItemSimpleResDto;
+import com.sluv.server.domain.comment.repository.CommentImgRepository;
+import com.sluv.server.domain.comment.repository.CommentItemRepository;
+import com.sluv.server.domain.comment.repository.CommentLikeRepository;
+import com.sluv.server.domain.comment.repository.CommentReportRepository;
+import com.sluv.server.domain.comment.repository.CommentRepository;
 import com.sluv.server.domain.item.entity.Item;
 import com.sluv.server.domain.item.entity.ItemImg;
 import com.sluv.server.domain.item.exception.ItemNotFoundException;
@@ -18,18 +29,15 @@ import com.sluv.server.domain.item.repository.ItemScrapRepository;
 import com.sluv.server.domain.question.entity.Question;
 import com.sluv.server.domain.question.exception.QuestionNotFoundException;
 import com.sluv.server.domain.question.repository.QuestionRepository;
-import com.sluv.server.domain.user.dto.UserInfoDto;
 import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.domain.user.exception.UserNotMatchedException;
-import com.sluv.server.global.common.enums.ReportStatus;
 import com.sluv.server.global.common.response.PaginationResDto;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @Transactional
@@ -202,11 +210,7 @@ public class CommentService {
         // Content 제작
         List<CommentResDto> content = getCommentResDtos(user, commentPage);
 
-        return PaginationResDto.<CommentResDto>builder()
-                .page(commentPage.getNumber())
-                .hasNext(commentPage.hasNext())
-                .content(content)
-                .build();
+        return PaginationResDto.of(commentPage, content);
     }
 
     @Transactional(readOnly = true)

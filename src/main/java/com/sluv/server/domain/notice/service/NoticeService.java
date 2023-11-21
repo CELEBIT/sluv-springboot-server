@@ -32,11 +32,7 @@ public class NoticeService {
                 .map(NoticeSimpleResDto::of)
                 .toList();
 
-        return PaginationResDto.<NoticeSimpleResDto>builder()
-                .page(noticePage.getNumber())
-                .hasNext(noticePage.hasNext())
-                .content(content)
-                .build();
+        return PaginationResDto.of(noticePage, content);
     }
 
     /**

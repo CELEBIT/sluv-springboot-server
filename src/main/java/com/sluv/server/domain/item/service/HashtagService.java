@@ -30,11 +30,7 @@ public class HashtagService {
                         HashtagResponseDto.of(data.get(0, Hashtag.class), data.get(1, Long.class))
                 ).toList();
 
-        return PaginationResDto.<HashtagResponseDto>builder()
-                .hasNext(hashtagPage.hasNext())
-                .page(hashtagPage.getNumber())
-                .content(dtoList)
-                .build();
+        return PaginationResDto.of(hashtagPage, dtoList);
     }
 
     public HashtagPostResponseDto postHashtag(HashtagRequestDto requestDto) {

@@ -593,11 +593,7 @@ public class QuestionService {
             return getQuestionSimpleResDto(question, qType);
         }).toList();
 
-        return PaginationResDto.<QuestionSimpleResDto>builder()
-                .page(questionPage.getNumber())
-                .hasNext(questionPage.hasNext())
-                .content(content)
-                .build();
+        return PaginationResDto.of(questionPage, content);
     }
 
     @Transactional(readOnly = true)
@@ -607,11 +603,7 @@ public class QuestionService {
                 getQuestionSimpleResDto(question, "Buy")
         ).toList();
 
-        return PaginationResDto.<QuestionSimpleResDto>builder()
-                .page(questionPage.getNumber())
-                .hasNext(questionPage.hasNext())
-                .content(content)
-                .build();
+        return PaginationResDto.of(questionPage, content);
     }
 
     /**
@@ -626,11 +618,7 @@ public class QuestionService {
                 getQuestionSimpleResDto(question, "Find")
         ).toList();
 
-        return PaginationResDto.<QuestionSimpleResDto>builder()
-                .page(questionPage.getNumber())
-                .hasNext(questionPage.hasNext())
-                .content(content)
-                .build();
+        return PaginationResDto.of(questionPage, content);
     }
 
     @Transactional(readOnly = true)
@@ -640,11 +628,7 @@ public class QuestionService {
                 getQuestionSimpleResDto(question, "How")
         ).toList();
 
-        return PaginationResDto.<QuestionSimpleResDto>builder()
-                .page(questionPage.getNumber())
-                .hasNext(questionPage.hasNext())
-                .content(content)
-                .build();
+        return PaginationResDto.of(questionPage, content);
     }
 
     @Transactional(readOnly = true)
@@ -654,11 +638,7 @@ public class QuestionService {
                 getQuestionSimpleResDto(question, "Recommend")
         ).toList();
 
-        return PaginationResDto.<QuestionSimpleResDto>builder()
-                .page(questionPage.getNumber())
-                .hasNext(questionPage.hasNext())
-                .content(content)
-                .build();
+        return PaginationResDto.of(questionPage, content);
     }
 
     private String getQuestionCelebName(QuestionFind questionFind) {
@@ -757,11 +737,7 @@ public class QuestionService {
             return QuestionSimpleResDto.of(question, likeNum, commentNum, imgList, itemImgList, categoryList);
         }).toList();
 
-        return PaginationResDto.<QuestionSimpleResDto>builder()
-                .page(page.getNumber())
-                .hasNext(page.hasNext())
-                .content(content)
-                .build();
+        return PaginationResDto.of(page, content);
     }
 }
 

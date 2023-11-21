@@ -229,8 +229,7 @@ public class UserService {
             return getItemSimpleResDto(item, closetList);
         }).toList();
 
-        return PaginationResDto.<ItemSimpleResDto>builder().page(itemPage.getNumber()).hasNext(itemPage.hasNext())
-                .content(content).build();
+        return PaginationResDto.of(itemPage, content);
     }
 
     @Transactional(readOnly = true)
@@ -253,8 +252,7 @@ public class UserService {
         List<ClosetResDto> content = closetPage.stream()
                 .map(closet -> ClosetResDto.of(closet, itemScrapRepository.countByClosetId(closet.getId()))).toList();
 
-        return PaginationResDto.<ClosetResDto>builder().page(closetPage.getNumber()).hasNext(closetPage.hasNext())
-                .content(content).build();
+        return PaginationResDto.of(closetPage, content);
     }
 
     @Transactional(readOnly = true)
@@ -349,8 +347,7 @@ public class UserService {
                 .map(follower -> UserSearchInfoDto.of(follower, followRepository.getFollowStatus(user, follower)))
                 .toList();
 
-        return PaginationResDto.<UserSearchInfoDto>builder().page(followerPage.getNumber())
-                .hasNext(followerPage.hasNext()).content(content).build();
+        return PaginationResDto.of(followerPage, content);
     }
 
     @Transactional(readOnly = true)
@@ -363,8 +360,7 @@ public class UserService {
                 .map(follower -> UserSearchInfoDto.of(follower, followRepository.getFollowStatus(user, follower)))
                 .toList();
 
-        return PaginationResDto.<UserSearchInfoDto>builder().page(followerPage.getNumber())
-                .hasNext(followerPage.hasNext()).content(content).build();
+        return PaginationResDto.of(followerPage, content);
     }
 
     public void patchUserProfileImg(User user, UserProfileImgReqDto dto) {

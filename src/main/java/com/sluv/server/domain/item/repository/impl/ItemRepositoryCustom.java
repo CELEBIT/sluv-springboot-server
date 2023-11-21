@@ -2,19 +2,20 @@ package com.sluv.server.domain.item.repository.impl;
 
 import com.sluv.server.domain.celeb.entity.Celeb;
 import com.sluv.server.domain.closet.entity.Closet;
+import com.sluv.server.domain.item.dto.ItemSimpleResDto;
 import com.sluv.server.domain.item.entity.Item;
 import com.sluv.server.domain.search.dto.SearchFilterReqDto;
 import com.sluv.server.domain.user.entity.User;
+import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import java.util.List;
-
 public interface ItemRepositoryCustom {
     List<String> findTopPlace();
+
     List<Item> findSameCelebItem(Item item, boolean celebJudge);
 
-    List<Item>  findSameBrandItem(Item item, boolean brandJudge);
+    List<Item> findSameBrandItem(Item item, boolean brandJudge);
 
     Page<Item> getRecentItem(User user, Pageable pageable);
 
@@ -59,7 +60,10 @@ public interface ItemRepositoryCustom {
     List<Item> updateDayHotItem();
 
     Page<Item> getHotCelebItem(Long celebId, Pageable pageable, SearchFilterReqDto dto);
+
     List<Item> getCurationItem(User user, List<Celeb> interestedCeleb);
 
     List<Item> getHowAboutItem(User user, List<Celeb> interestedCeleb);
+
+    List<ItemSimpleResDto> getItemSimpleResDto(User user, List<Item> items);
 }

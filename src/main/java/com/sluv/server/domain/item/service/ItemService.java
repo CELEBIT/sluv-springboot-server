@@ -55,12 +55,14 @@ import com.sluv.server.global.common.enums.ItemImgOrLinkStatus;
 import com.sluv.server.global.common.response.PaginationResDto;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 @Transactional
 public class ItemService {
@@ -248,18 +250,18 @@ public class ItemService {
 
         // 11. 같은 셀럽 아이템 리스트
         boolean celebJudge = item.getCeleb() != null;
-        List<ItemSimpleResDto> sameCelebItemList = convertItemToItemSimpleResDto(
+        List<ItemSimpleResDto> sameCelebItemList = itemRepository.getItemSimpleResDto(
                 user, itemRepository.findSameCelebItem(item, celebJudge)
         );
 
         // 12. 같은 브랜드 아이템 리스트
         boolean brandJudge = item.getBrand() != null;
-        List<ItemSimpleResDto> sameBrandItemList = convertItemToItemSimpleResDto(
+        List<ItemSimpleResDto> sameBrandItemList = itemRepository.getItemSimpleResDto(
                 user, itemRepository.findSameBrandItem(item, brandJudge)
         );
 
         // 13. 다른 스러버들이 함께 보관한 아이템 리스트
-        List<ItemSimpleResDto> sameClosetItemList = convertItemToItemSimpleResDto(
+        List<ItemSimpleResDto> sameClosetItemList = itemRepository.getItemSimpleResDto(
                 user, getClosetItemList(item)
         );
 
@@ -339,13 +341,9 @@ public class ItemService {
 
     private PaginationResDto<ItemSimpleResDto> convertItemSimplePageDto(User user, Pageable pageable, Page<Item> page) {
         // ItemPage에서 ItemSameResDto 생성
-        List<ItemSimpleResDto> content = convertItemToItemSimpleResDto(user, page.getContent());
+        List<ItemSimpleResDto> content = itemRepository.getItemSimpleResDto(user, page.getContent());
 
-        return PaginationResDto.<ItemSimpleResDto>builder()
-                .page(page.getNumber())
-                .hasNext(page.hasNext())
-                .content(content)
-                .build();
+        return PaginationResDto.of(page, content);
     }
 
     private List<Item> getClosetItemList(Item item) {
@@ -356,30 +354,14 @@ public class ItemService {
         return itemRepository.getSameClosetItems(item, recentAddClosetList);
     }
 
-    private List<ItemSimpleResDto> convertItemToItemSimpleResDto(User user, List<Item> itemList) {
-        // User의 모든 Closet 조회
-        List<Closet> closetList = closetRepository.findAllByUserId(user.getId());
-
-        return itemList.stream()
-                .map(item -> {
-                    ItemImg itemImg = itemImgRepository.findMainImg(item.getId());
-                    Boolean scrapStatus = itemScrapRepository.getItemScrapStatus(item, closetList);
-                    return ItemSimpleResDto.of(item, itemImg, scrapStatus);
-                }).toList();
-    }
-
     @Transactional(readOnly = true)
     public PaginationResDto<ItemSimpleResDto> getRecommendItem(User user, Pageable pageable) {
         Page<Item> recommendItemPage = itemRepository.getRecommendItemPage(pageable);
 
         List<ItemSimpleResDto> content =
-                convertItemToItemSimpleResDto(user, recommendItemPage.getContent());
+                itemRepository.getItemSimpleResDto(user, recommendItemPage.getContent());
 
-        return PaginationResDto.<ItemSimpleResDto>builder()
-                .page(recommendItemPage.getNumber())
-                .hasNext(recommendItemPage.hasNext())
-                .content(content)
-                .build();
+        return PaginationResDto.of(recommendItemPage, content);
     }
 
     /**
@@ -390,13 +372,9 @@ public class ItemService {
         // itemPage 조회
         Page<Item> itemPage = itemRepository.getCelebSummerItem(pageable, dto);
         // Content 조립
-        List<ItemSimpleResDto> content = convertItemToItemSimpleResDto(user, itemPage.getContent());
+        List<ItemSimpleResDto> content = itemRepository.getItemSimpleResDto(user, itemPage.getContent());
 
-        return PaginationResDto.<ItemSimpleResDto>builder()
-                .page(itemPage.getNumber())
-                .hasNext(itemPage.hasNext())
-                .content(content)
-                .build();
+        return PaginationResDto.of(itemPage, content);
     }
 
     /**
@@ -408,13 +386,9 @@ public class ItemService {
         Page<Item> itemPage = itemRepository.getNowBuyItem(pageable, dto);
 
         // Content 조립
-        List<ItemSimpleResDto> content = convertItemToItemSimpleResDto(user, itemPage.getContent());
+        List<ItemSimpleResDto> content = itemRepository.getItemSimpleResDto(user, itemPage.getContent());
 
-        return PaginationResDto.<ItemSimpleResDto>builder()
-                .page(itemPage.getNumber())
-                .hasNext(itemPage.hasNext())
-                .content(content)
-                .build();
+        return PaginationResDto.of(itemPage, content);
 
     }
 
@@ -424,51 +398,38 @@ public class ItemService {
         Page<Item> itemPage = itemRepository.getNewItem(pageable);
 
         // Content 조립
-        List<ItemSimpleResDto> content = convertItemToItemSimpleResDto(user, itemPage.getContent());
+        List<ItemSimpleResDto> content = itemRepository.getItemSimpleResDto(user, itemPage.getContent());
 
-        return PaginationResDto.<ItemSimpleResDto>builder()
-                .page(itemPage.getNumber())
-                .hasNext(itemPage.hasNext())
-                .content(content)
-                .build();
+        return PaginationResDto.of(itemPage, content);
     }
 
     @Transactional(readOnly = true)
     public PaginationResDto<ItemSimpleResDto> getLuxuryItem(User user, Pageable pageable, SearchFilterReqDto dto) {
         Page<Item> itemPage = itemRepository.getLuxuryItem(pageable, dto);
 
-        List<ItemSimpleResDto> content = convertItemToItemSimpleResDto(user, itemPage.getContent());
+        List<ItemSimpleResDto> content = itemRepository.getItemSimpleResDto(user, itemPage.getContent());
 
-        return PaginationResDto.<ItemSimpleResDto>builder()
-                .page(itemPage.getNumber())
-                .hasNext(itemPage.hasNext())
-                .content(content)
-                .build();
+        return PaginationResDto.of(itemPage, content);
     }
 
     @Transactional(readOnly = true)
-    public PaginationResDto<ItemSimpleResDto> getEfficientItem(User user, Pageable pageable, SearchFilterReqDto dto) {
-        Page<Item> itemPage = itemRepository.getEfficientItem(pageable, dto);
-
-        List<ItemSimpleResDto> content = convertItemToItemSimpleResDto(user, itemPage.getContent());
-
-        return PaginationResDto.<ItemSimpleResDto>builder()
-                .page(itemPage.getNumber())
-                .hasNext(itemPage.hasNext())
-                .content(content)
-                .build();
+    public PaginationResDto<ItemSimpleResDto> getEfficientItem(User user, Pageable pageable,
+                                                               SearchFilterReqDto filterReqDto) {
+        Page<Item> itemPage = itemRepository.getEfficientItem(pageable, filterReqDto);
+        List<ItemSimpleResDto> content = itemRepository.getItemSimpleResDto(user, itemPage.getContent());
+        return PaginationResDto.of(itemPage, content);
     }
 
     @Transactional(readOnly = true)
     public List<ItemSimpleResDto> getWeekHotItem(User user) {
         List<Item> itemPage = itemRepository.getWeekHotItem();
-        return convertItemToItemSimpleResDto(user, itemPage);
+        return itemRepository.getItemSimpleResDto(user, itemPage);
     }
 
     @Transactional(readOnly = true)
     public List<ItemSimpleResDto> getDayHotItem(User user) {
         List<Item> itemPage = itemRepository.getDayHotItem();
-        return convertItemToItemSimpleResDto(user, itemPage);
+        return itemRepository.getItemSimpleResDto(user, itemPage);
     }
 
     /**
@@ -480,13 +441,9 @@ public class ItemService {
 
         Page<Item> itemPage = itemRepository.getHotCelebItem(celebId, pageable, dto);
 
-        List<ItemSimpleResDto> content = convertItemToItemSimpleResDto(user, itemPage.getContent());
+        List<ItemSimpleResDto> content = itemRepository.getItemSimpleResDto(user, itemPage.getContent());
 
-        return PaginationResDto.<ItemSimpleResDto>builder()
-                .page(itemPage.getNumber())
-                .hasNext(itemPage.hasNext())
-                .content(content)
-                .build();
+        return PaginationResDto.of(itemPage, content);
     }
 
     @Transactional(readOnly = true)
@@ -494,7 +451,7 @@ public class ItemService {
         List<Celeb> interestedCeleb = celebRepository.findInterestedCeleb(user);
         List<Item> itemList = itemRepository.getCurationItem(user, interestedCeleb);
 
-        return convertItemToItemSimpleResDto(user, itemList);
+        return itemRepository.getItemSimpleResDto(user, itemList);
     }
 
     @Transactional(readOnly = true)
@@ -502,6 +459,6 @@ public class ItemService {
         List<Celeb> interestedCeleb = celebRepository.findInterestedCeleb(user);
         List<Item> itemList = itemRepository.getHowAboutItem(user, interestedCeleb);
 
-        return convertItemToItemSimpleResDto(user, itemList);
+        return itemRepository.getItemSimpleResDto(user, itemList);
     }
 }

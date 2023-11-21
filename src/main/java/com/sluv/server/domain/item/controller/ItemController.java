@@ -417,11 +417,11 @@ public class ItemController {
     public ResponseEntity<SuccessDataResponse<PaginationResDto<ItemSimpleResDto>>> getEfficientItem(
             @AuthenticationPrincipal User user,
             Pageable pageable,
-            SearchFilterReqDto dto) {
+            SearchFilterReqDto filterReqDto) {
 
         return ResponseEntity.ok().body(
                 SuccessDataResponse.<PaginationResDto<ItemSimpleResDto>>builder()
-                        .result(itemService.getEfficientItem(user, pageable, dto))
+                        .result(itemService.getEfficientItem(user, pageable, filterReqDto))
                         .build()
         );
     }

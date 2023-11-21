@@ -253,20 +253,20 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
     /**
      * 검색 필터링 쿼리 추가
      */
-    private JPAQuery<Item> addFilterWhere(JPAQuery<Item> query, SearchFilterReqDto dto) {
+    private JPAQuery<Item> addFilterWhere(JPAQuery<Item> query, SearchFilterReqDto filterReqDto) {
         // Category Filtering
-        if (dto.getCategoryId() != null) {
-            query.where(item.category.id.eq(dto.getCategoryId()));
+        if (filterReqDto.getCategoryId() != null) {
+            query.where(item.category.id.eq(filterReqDto.getCategoryId()));
         }
         // Price Filtering
-        if (dto.getMinPrice() != null && dto.getMaxPrice() != null) {
-            query.where(item.price.between(dto.getMinPrice(), dto.getMaxPrice()));
-        } else if (dto.getMinPrice() != null) {
-            query.where(item.price.goe(dto.getMinPrice()));
+        if (filterReqDto.getMinPrice() != null && filterReqDto.getMaxPrice() != null) {
+            query.where(item.price.between(filterReqDto.getMinPrice(), filterReqDto.getMaxPrice()));
+        } else if (filterReqDto.getMinPrice() != null) {
+            query.where(item.price.goe(filterReqDto.getMinPrice()));
         }
         // Color Filtering
-        if (dto.getColor() != null) {
-            query.where(item.color.eq(dto.getColor()));
+        if (filterReqDto.getColor() != null) {
+            query.where(item.color.eq(filterReqDto.getColor()));
         }
         return query;
     }
@@ -530,29 +530,29 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
      * 가성비 선물 아이템 조회
      */
     @Override
-    public Page<Item> getEfficientItem(Pageable pageable, SearchFilterReqDto dto) {
-        JPAQuery<Item> query = jpaQueryFactory.select(item)
-                .from(efficientItem)
-                .leftJoin(efficientItem.item, item)
-                .leftJoin(itemLike).on(itemLike.item.eq(item))
-                .leftJoin(itemScrap).on(itemScrap.item.eq(item))
+    public Page<Item> getEfficientItem(Pageable pageable, SearchFilterReqDto filterReqDto) {
+        log.info("가성비 좋은 선물 아이템 조회 Query");
+        JPAQuery<Item> query = jpaQueryFactory.selectFrom(item)
+                .leftJoin(efficientItem).on(efficientItem.item.eq(item)).fetchJoin()
+                .leftJoin(itemLike).on(itemLike.item.eq(item)).fetchJoin()
+                .leftJoin(itemScrap).on(itemScrap.item.eq(item)).fetchJoin()
                 .groupBy(item);
 
-        addFilterWhere(query, dto);
+        addFilterWhere(query, filterReqDto);
 
         List<Item> content = query.orderBy(getSearchItemOrderHot(pageable.getSort()))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
 
-        JPAQuery<Item> countQuery = jpaQueryFactory.select(item)
-                .from(efficientItem)
-                .leftJoin(efficientItem.item, item)
-                .leftJoin(itemLike).on(itemLike.item.eq(item))
-                .leftJoin(itemScrap).on(itemScrap.item.eq(item))
+        log.info("가성비 좋은 선물 아이템 조회 Count Query");
+        JPAQuery<Item> countQuery = jpaQueryFactory.selectFrom(item)
+                .leftJoin(efficientItem).on(efficientItem.item.eq(item)).fetchJoin()
+                .leftJoin(itemLike).on(itemLike.item.eq(item)).fetchJoin()
+                .leftJoin(itemScrap).on(itemScrap.item.eq(item)).fetchJoin()
                 .groupBy(item);
 
-        addFilterWhere(countQuery, dto);
+        addFilterWhere(countQuery, filterReqDto);
 
         return PageableExecutionUtils.getPage(content, pageable, () -> countQuery.fetch().size());
     }

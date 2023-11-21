@@ -1,6 +1,15 @@
 package com.sluv.server.domain.question.controller;
 
-import com.sluv.server.domain.question.dto.*;
+import com.sluv.server.domain.question.dto.QuestionBuyPostReqDto;
+import com.sluv.server.domain.question.dto.QuestionFindPostReqDto;
+import com.sluv.server.domain.question.dto.QuestionGetDetailResDto;
+import com.sluv.server.domain.question.dto.QuestionHomeResDto;
+import com.sluv.server.domain.question.dto.QuestionHowaboutPostReqDto;
+import com.sluv.server.domain.question.dto.QuestionPostResDto;
+import com.sluv.server.domain.question.dto.QuestionRecommendPostReqDto;
+import com.sluv.server.domain.question.dto.QuestionReportReqDto;
+import com.sluv.server.domain.question.dto.QuestionSimpleResDto;
+import com.sluv.server.domain.question.dto.QuestionVoteReqDto;
 import com.sluv.server.domain.question.exception.QuestionTypeNotFoundException;
 import com.sluv.server.domain.question.service.QuestionService;
 import com.sluv.server.domain.user.entity.User;
@@ -13,14 +22,20 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.Nullable;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
@@ -41,7 +56,8 @@ public class QuestionController {
             @ApiResponse(responseCode = "5001", description = "DB 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @PostMapping("/find")
-    public ResponseEntity<SuccessDataResponse<QuestionPostResDto>> postFind(@AuthenticationPrincipal User user, @RequestBody QuestionFindPostReqDto dto){
+    public ResponseEntity<SuccessDataResponse<QuestionPostResDto>> postFind(@AuthenticationPrincipal User user,
+                                                                            @RequestBody QuestionFindPostReqDto dto) {
 
         return ResponseEntity.ok().body(
                 SuccessDataResponse.<QuestionPostResDto>builder()
@@ -63,7 +79,8 @@ public class QuestionController {
             @ApiResponse(responseCode = "5001", description = "DB 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @PostMapping("/buy")
-    public ResponseEntity<SuccessDataResponse<QuestionPostResDto>> postBuy(@AuthenticationPrincipal User user, @RequestBody QuestionBuyPostReqDto dto){
+    public ResponseEntity<SuccessDataResponse<QuestionPostResDto>> postBuy(@AuthenticationPrincipal User user,
+                                                                           @RequestBody QuestionBuyPostReqDto dto) {
 
         return ResponseEntity.ok().body(
                 SuccessDataResponse.<QuestionPostResDto>builder()
@@ -85,7 +102,8 @@ public class QuestionController {
             @ApiResponse(responseCode = "5001", description = "DB 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @PostMapping("/how-about")
-    public ResponseEntity<SuccessDataResponse<QuestionPostResDto>> postHowabout(@AuthenticationPrincipal User user, @RequestBody QuestionHowaboutPostReqDto dto){
+    public ResponseEntity<SuccessDataResponse<QuestionPostResDto>> postHowabout(@AuthenticationPrincipal User user,
+                                                                                @RequestBody QuestionHowaboutPostReqDto dto) {
 
         return ResponseEntity.ok().body(
                 SuccessDataResponse.<QuestionPostResDto>builder()
@@ -93,6 +111,7 @@ public class QuestionController {
                         .build()
         );
     }
+
     @Operation(
             summary = "*추천해 줘 게시글 등록",
             description = "추천해 줘 게시글을 등록하는 기능" +
@@ -106,7 +125,8 @@ public class QuestionController {
             @ApiResponse(responseCode = "5001", description = "DB 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @PostMapping("/recommend")
-    public ResponseEntity<SuccessDataResponse<QuestionPostResDto>> postRecommend(@AuthenticationPrincipal User user, @RequestBody QuestionRecommendPostReqDto dto){
+    public ResponseEntity<SuccessDataResponse<QuestionPostResDto>> postRecommend(@AuthenticationPrincipal User user,
+                                                                                 @RequestBody QuestionRecommendPostReqDto dto) {
 
         return ResponseEntity.ok().body(
                 SuccessDataResponse.<QuestionPostResDto>builder()
@@ -127,10 +147,10 @@ public class QuestionController {
             @ApiResponse(responseCode = "5001", description = "DB 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @DeleteMapping("/{questionId}")
-    public ResponseEntity<SuccessResponse> deleteQuestion(@PathVariable("questionId") Long questionId){
+    public ResponseEntity<SuccessResponse> deleteQuestion(@PathVariable("questionId") Long questionId) {
         questionService.deleteQuestion(questionId);
         return ResponseEntity.ok().body(
-               new SuccessResponse()
+                new SuccessResponse()
         );
     }
 
@@ -145,7 +165,8 @@ public class QuestionController {
             @ApiResponse(responseCode = "5001", description = "DB 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @PostMapping("/{questionId}/like")
-    public ResponseEntity<SuccessResponse> postQuestionLike(@AuthenticationPrincipal User user, @PathVariable("questionId") Long questionId){
+    public ResponseEntity<SuccessResponse> postQuestionLike(@AuthenticationPrincipal User user,
+                                                            @PathVariable("questionId") Long questionId) {
         questionService.postQuestionLike(user, questionId);
         return ResponseEntity.ok().body(
                 new SuccessResponse()
@@ -164,7 +185,9 @@ public class QuestionController {
             @ApiResponse(responseCode = "5001", description = "DB 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @PostMapping("/{questionId}/report")
-    public ResponseEntity<SuccessResponse> postQuestionReport(@AuthenticationPrincipal User user, @PathVariable("questionId") Long questionId, @RequestBody QuestionReportReqDto dto){
+    public ResponseEntity<SuccessResponse> postQuestionReport(@AuthenticationPrincipal User user,
+                                                              @PathVariable("questionId") Long questionId,
+                                                              @RequestBody QuestionReportReqDto dto) {
         questionService.postQuestionReport(user, questionId, dto);
         return ResponseEntity.ok().body(
                 new SuccessResponse()
@@ -182,16 +205,18 @@ public class QuestionController {
             @ApiResponse(responseCode = "5001", description = "DB 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @GetMapping("/{questionId}")
-    public ResponseEntity<SuccessDataResponse<QuestionGetDetailResDto>> postQuestionReport(@AuthenticationPrincipal User user, @PathVariable("questionId") Long questionId){
+    public ResponseEntity<SuccessDataResponse<QuestionGetDetailResDto>> postQuestionReport(
+            @AuthenticationPrincipal User user, @PathVariable("questionId") Long questionId) {
 
         return ResponseEntity.ok().body(
                 SuccessDataResponse.<QuestionGetDetailResDto>builder()
                         .result(
-                            questionService.getQuestionDetail(user, questionId)
+                                questionService.getQuestionDetail(user, questionId)
                         )
                         .build()
         );
     }
+
     @Operation(
             summary = "*QuestionBuy 게시글 투표",
             description = """
@@ -204,7 +229,7 @@ public class QuestionController {
     @PostMapping("/{questionId}/vote")
     public ResponseEntity<SuccessResponse> postQuestionVote(@AuthenticationPrincipal User user,
                                                             @PathVariable("questionId") Long questionId,
-                                                            @RequestBody QuestionVoteReqDto dto){
+                                                            @RequestBody QuestionVoteReqDto dto) {
 
         questionService.postQuestionVote(user, questionId, dto);
 
@@ -222,9 +247,10 @@ public class QuestionController {
                     """
     )
     @GetMapping("/wait")
-    public ResponseEntity<SuccessDataResponse<List<QuestionSimpleResDto>>> getWaitQuestionBuy(@AuthenticationPrincipal User user,
-                                                                                              @RequestParam("questionId") Long questionId,
-                                                                                              @RequestParam("qType") String qType){
+    public ResponseEntity<SuccessDataResponse<List<QuestionSimpleResDto>>> getWaitQuestionBuy(
+            @AuthenticationPrincipal User user,
+            @RequestParam("questionId") Long questionId,
+            @RequestParam("qType") String qType) {
         List<QuestionSimpleResDto> result = switch (qType) {
             case "Buy" -> questionService.getWaitQuestionBuy(user, questionId);
             case "Find" -> questionService.getWaitQuestionFind(user, questionId);
@@ -249,7 +275,8 @@ public class QuestionController {
                     """
     )
     @GetMapping("/list")
-    public ResponseEntity<SuccessDataResponse<PaginationResDto<QuestionSimpleResDto>>> getQuestionList(@Nullable @RequestParam("qType") String qType, Pageable pageable){
+    public ResponseEntity<SuccessDataResponse<PaginationResDto<QuestionSimpleResDto>>> getQuestionList(
+            @Nullable @RequestParam("qType") String qType, Pageable pageable) {
         PaginationResDto<QuestionSimpleResDto> result = switch (qType) {
             case "Total" -> questionService.getTotalQuestionList(pageable);
             case "Buy" -> questionService.getQuestionBuyList(null, pageable);
@@ -275,7 +302,8 @@ public class QuestionController {
                     """
     )
     @GetMapping("/total")
-    public ResponseEntity<SuccessDataResponse<PaginationResDto<QuestionSimpleResDto>>> getQuestionTotalList(Pageable pageable){
+    public ResponseEntity<SuccessDataResponse<PaginationResDto<QuestionSimpleResDto>>> getQuestionTotalList(
+            Pageable pageable) {
 
         return ResponseEntity.ok().body(
                 SuccessDataResponse.<PaginationResDto<QuestionSimpleResDto>>builder()
@@ -294,7 +322,8 @@ public class QuestionController {
                     """
     )
     @GetMapping("/find")
-    public ResponseEntity<SuccessDataResponse<PaginationResDto<QuestionSimpleResDto>>> getQuestionFindList(@Nullable @RequestParam("celebId") Long celebId, Pageable pageable){
+    public ResponseEntity<SuccessDataResponse<PaginationResDto<QuestionSimpleResDto>>> getQuestionFindList(
+            @Nullable @RequestParam("celebId") Long celebId, Pageable pageable) {
 
         return ResponseEntity.ok().body(
                 SuccessDataResponse.<PaginationResDto<QuestionSimpleResDto>>builder()
@@ -317,7 +346,8 @@ public class QuestionController {
                     """
     )
     @GetMapping("/buy")
-    public ResponseEntity<SuccessDataResponse<PaginationResDto<QuestionSimpleResDto>>> getQuestionBuyList(@Nullable @RequestParam("voteStatus") String voteStatus, Pageable pageable){
+    public ResponseEntity<SuccessDataResponse<PaginationResDto<QuestionSimpleResDto>>> getQuestionBuyList(
+            @Nullable @RequestParam("voteStatus") String voteStatus, Pageable pageable) {
 
         return ResponseEntity.ok().body(
                 SuccessDataResponse.<PaginationResDto<QuestionSimpleResDto>>builder()
@@ -335,7 +365,8 @@ public class QuestionController {
                     """
     )
     @GetMapping("/howabout")
-    public ResponseEntity<SuccessDataResponse<PaginationResDto<QuestionSimpleResDto>>> getQuestionHowaboutList(Pageable pageable){
+    public ResponseEntity<SuccessDataResponse<PaginationResDto<QuestionSimpleResDto>>> getQuestionHowaboutList(
+            Pageable pageable) {
 
         return ResponseEntity.ok().body(
                 SuccessDataResponse.<PaginationResDto<QuestionSimpleResDto>>builder()
@@ -354,7 +385,8 @@ public class QuestionController {
                     """
     )
     @GetMapping("/recommend")
-    public ResponseEntity<SuccessDataResponse<PaginationResDto<QuestionSimpleResDto>>> getQuestionRecommendList(@Nullable @RequestParam String hashtag, Pageable pageable){
+    public ResponseEntity<SuccessDataResponse<PaginationResDto<QuestionSimpleResDto>>> getQuestionRecommendList(
+            @Nullable @RequestParam String hashtag, Pageable pageable) {
 
         return ResponseEntity.ok().body(
                 SuccessDataResponse.<PaginationResDto<QuestionSimpleResDto>>builder()
@@ -374,7 +406,7 @@ public class QuestionController {
                     """
     )
     @GetMapping("/dailyhot")
-    public ResponseEntity<SuccessDataResponse<List<QuestionHomeResDto>>> getDailyHotQuestionList(){
+    public ResponseEntity<SuccessDataResponse<List<QuestionHomeResDto>>> getDailyHotQuestionList() {
 
         return ResponseEntity.ok().body(
                 SuccessDataResponse.<List<QuestionHomeResDto>>builder()
@@ -393,7 +425,8 @@ public class QuestionController {
                     """
     )
     @GetMapping("/weeklyhot")
-    public ResponseEntity<SuccessDataResponse<PaginationResDto<QuestionSimpleResDto>>> getWeeklyHotQuestionList(Pageable pageable){
+    public ResponseEntity<SuccessDataResponse<PaginationResDto<QuestionSimpleResDto>>> getWeeklyHotQuestionList(
+            Pageable pageable) {
 
         return ResponseEntity.ok().body(
                 SuccessDataResponse.<PaginationResDto<QuestionSimpleResDto>>builder()

@@ -5,11 +5,10 @@ import com.sluv.server.domain.item.dto.PlaceRankResDto;
 import com.sluv.server.domain.item.entity.PlaceRank;
 import com.sluv.server.domain.item.repository.PlaceRankRepository;
 import com.sluv.server.domain.user.entity.User;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @Transactional
@@ -35,7 +34,7 @@ public class PlaceRankService {
     @Transactional(readOnly = true)
     public List<PlaceRankResDto> getRecentPlaceTop20(User user) {
         return placeRankRepository.getRecentPlaceTop20(user)
-                            .stream()
-                            .map(PlaceRankResDto::of).toList();
+                .stream()
+                .map(PlaceRankResDto::of).toList();
     }
 }

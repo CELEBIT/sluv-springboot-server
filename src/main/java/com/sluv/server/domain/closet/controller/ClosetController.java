@@ -1,6 +1,10 @@
 package com.sluv.server.domain.closet.controller;
 
-import com.sluv.server.domain.closet.dto.*;
+import com.sluv.server.domain.closet.dto.ClosetDetailResDto;
+import com.sluv.server.domain.closet.dto.ClosetItemSelectReqDto;
+import com.sluv.server.domain.closet.dto.ClosetListCountResDto;
+import com.sluv.server.domain.closet.dto.ClosetNameCheckResDto;
+import com.sluv.server.domain.closet.dto.ClosetReqDto;
 import com.sluv.server.domain.closet.service.ClosetService;
 import com.sluv.server.domain.item.dto.ItemSimpleResDto;
 import com.sluv.server.domain.user.entity.User;
@@ -11,14 +15,21 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/app/closet")
 @RequiredArgsConstructor
-public class    ClosetController {
+public class ClosetController {
     private final ClosetService closetService;
 
     @Operation(
@@ -27,7 +38,8 @@ public class    ClosetController {
                     "\n User Id Token 필요"
     )
     @PostMapping("")
-    public ResponseEntity<SuccessResponse> postCloset(@AuthenticationPrincipal User user, @RequestBody ClosetReqDto dto){
+    public ResponseEntity<SuccessResponse> postCloset(@AuthenticationPrincipal User user,
+                                                      @RequestBody ClosetReqDto dto) {
 
         closetService.postCloset(user, dto);
         return ResponseEntity.ok().body(
@@ -41,12 +53,15 @@ public class    ClosetController {
                     "\n User Id Token 필요 -> 소유자인지 확인"
     )
     @PutMapping("/{closetId}")
-    public ResponseEntity<SuccessResponse> patchCloset(@AuthenticationPrincipal User user, @PathVariable("closetId") Long closetId , @RequestBody ClosetReqDto dto){
+    public ResponseEntity<SuccessResponse> patchCloset(@AuthenticationPrincipal User user,
+                                                       @PathVariable("closetId") Long closetId,
+                                                       @RequestBody ClosetReqDto dto) {
         closetService.patchCloset(user, closetId, dto);
         return ResponseEntity.ok().body(
                 new SuccessResponse()
         );
     }
+
     @Operation(
             summary = "*옷장 삭제",
             description = "사용자 옷장을 삭제" +
@@ -55,12 +70,14 @@ public class    ClosetController {
                     "\n 삭제 시 Closet 데이터를 을 DB에서 제거"
     )
     @DeleteMapping("/{closetId}")
-    public ResponseEntity<SuccessResponse> deleteCloset(@AuthenticationPrincipal User user, @PathVariable("closetId") Long closetId){
+    public ResponseEntity<SuccessResponse> deleteCloset(@AuthenticationPrincipal User user,
+                                                        @PathVariable("closetId") Long closetId) {
         closetService.deleteCloset(user, closetId);
         return ResponseEntity.ok().body(
                 new SuccessResponse()
         );
     }
+
     @Operation(
             summary = "*옷장에 아이템 스크랩(저장하기)",
             description = """ 
@@ -71,12 +88,15 @@ public class    ClosetController {
                     """
     )
     @PostMapping("/{itemId}/scrap/{closetId}")
-    public ResponseEntity<SuccessResponse> postItemScrapToCloset(@AuthenticationPrincipal User user, @PathVariable("itemId") Long itemId, @PathVariable("closetId") Long closetId){
+    public ResponseEntity<SuccessResponse> postItemScrapToCloset(@AuthenticationPrincipal User user,
+                                                                 @PathVariable("itemId") Long itemId,
+                                                                 @PathVariable("closetId") Long closetId) {
         closetService.postItemScrapToCloset(user, itemId, closetId);
         return ResponseEntity.ok().body(
                 new SuccessResponse()
         );
     }
+
     @Operation(
             summary = "*옷장에 편집하기로 선택한 Item들을 삭제",
             description = """ 
@@ -85,12 +105,15 @@ public class    ClosetController {
                     """
     )
     @PatchMapping("/{closetId}/items")
-    public ResponseEntity<SuccessResponse> patchItems(@AuthenticationPrincipal User user, @PathVariable("closetId") Long closetId, @RequestBody ClosetItemSelectReqDto dto){
+    public ResponseEntity<SuccessResponse> patchItems(@AuthenticationPrincipal User user,
+                                                      @PathVariable("closetId") Long closetId,
+                                                      @RequestBody ClosetItemSelectReqDto dto) {
         closetService.patchItems(user, closetId, dto);
         return ResponseEntity.ok().body(
                 new SuccessResponse()
         );
     }
+
     @Operation(
             summary = "*아이템 게시글에서 북마크 버튼으로 삭제 시",
             description = """ 
@@ -99,7 +122,8 @@ public class    ClosetController {
                     """
     )
     @DeleteMapping("/{itemId}/scrap")
-    public ResponseEntity<SuccessResponse> deleteItemScrapFromCloset(@AuthenticationPrincipal User user, @PathVariable("itemId") Long itemId){
+    public ResponseEntity<SuccessResponse> deleteItemScrapFromCloset(@AuthenticationPrincipal User user,
+                                                                     @PathVariable("itemId") Long itemId) {
         closetService.deleteItemScrapFromCloset(user, itemId);
         return ResponseEntity.ok().body(
                 new SuccessResponse()
@@ -118,12 +142,13 @@ public class    ClosetController {
     public ResponseEntity<SuccessResponse> patchSaveCloset(@AuthenticationPrincipal User user,
                                                            @PathVariable("fromClosetId") Long fromClosetId,
                                                            @PathVariable("toClosetId") Long toClosetId,
-                                                           @RequestBody ClosetItemSelectReqDto dto){
+                                                           @RequestBody ClosetItemSelectReqDto dto) {
         closetService.patchSaveCloset(user, fromClosetId, toClosetId, dto);
         return ResponseEntity.ok().body(
                 new SuccessResponse()
         );
     }
+
     @Operation(
             summary = "*현재 유저의 특정 옷장 상세조회",
             description = """ 
@@ -137,12 +162,13 @@ public class    ClosetController {
     @GetMapping("/{closetId}")
     public ResponseEntity<ClosetDetailResDto<ItemSimpleResDto>> getClosetDetails(@AuthenticationPrincipal User user,
                                                                                  @PathVariable("closetId") Long closetId,
-                                                                                 Pageable pageable){
+                                                                                 Pageable pageable) {
 
         return ResponseEntity.ok().body(
                 closetService.getClosetDetails(user, closetId, pageable)
         );
     }
+
     @Operation(
             summary = "*현재 유저의 옷장 리스트 조회",
             description = """ 
@@ -152,14 +178,16 @@ public class    ClosetController {
                     """
     )
     @GetMapping("/list")
-    public ResponseEntity<SuccessDataResponse<ClosetListCountResDto>> getClosetList(@AuthenticationPrincipal User user){
+    public ResponseEntity<SuccessDataResponse<ClosetListCountResDto>> getClosetList(
+            @AuthenticationPrincipal User user) {
 
         return ResponseEntity.ok().body(
                 SuccessDataResponse.<ClosetListCountResDto>builder()
-                                .result(closetService.getClosetList(user))
-                                .build()
+                        .result(closetService.getClosetList(user))
+                        .build()
         );
     }
+
     @Operation(
             summary = "옷작 이름 중복 검사",
             description = """ 
@@ -167,7 +195,8 @@ public class    ClosetController {
                     """
     )
     @GetMapping("/check-name")
-    public ResponseEntity<SuccessDataResponse<ClosetNameCheckResDto>> checkClosetNameDuplicated(@RequestParam("name") String name){
+    public ResponseEntity<SuccessDataResponse<ClosetNameCheckResDto>> checkClosetNameDuplicated(
+            @RequestParam("name") String name) {
 
         return ResponseEntity.ok().body(
                 SuccessDataResponse.<ClosetNameCheckResDto>builder()

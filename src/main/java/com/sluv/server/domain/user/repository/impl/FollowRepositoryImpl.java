@@ -1,14 +1,15 @@
 package com.sluv.server.domain.user.repository.impl;
 
+import static com.sluv.server.domain.user.entity.QFollow.follow;
+
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sluv.server.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
 
-import static com.sluv.server.domain.user.entity.QFollow.follow;
-
 @RequiredArgsConstructor
-public class FollowRepositoryImpl implements FollowRepositoryCustom{
+public class FollowRepositoryImpl implements FollowRepositoryCustom {
     private final JPAQueryFactory jpaQueryFactory;
+
     @Override
     public Boolean getFollowStatus(User user, User targetUser) {
 

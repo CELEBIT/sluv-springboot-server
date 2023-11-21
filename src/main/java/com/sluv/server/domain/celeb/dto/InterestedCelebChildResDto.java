@@ -2,7 +2,11 @@ package com.sluv.server.domain.celeb.dto;
 
 import com.sluv.server.domain.celeb.entity.Celeb;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Data
 @Getter
@@ -17,7 +21,7 @@ public class InterestedCelebChildResDto {
     @Schema(description = "Celeb 카테고리 이름")
     private String celebCategory;
 
-    public static InterestedCelebChildResDto of(Celeb celeb){
+    public static InterestedCelebChildResDto of(Celeb celeb) {
         return InterestedCelebChildResDto.builder()
                 .id(celeb.getId())
                 .celebNameKr(celeb.getCelebNameKr())

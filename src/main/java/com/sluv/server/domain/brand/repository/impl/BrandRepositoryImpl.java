@@ -1,30 +1,28 @@
 package com.sluv.server.domain.brand.repository.impl;
 
+import static com.sluv.server.domain.brand.entity.QBrand.brand;
+import static com.sluv.server.domain.brand.entity.QRecentSelectBrand.recentSelectBrand;
+
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sluv.server.domain.brand.entity.Brand;
-import com.sluv.server.domain.brand.entity.QRecentSelectBrand;
 import com.sluv.server.domain.user.entity.User;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
 
-import java.util.List;
-
-import static com.sluv.server.domain.brand.entity.QBrand.brand;
-import static com.sluv.server.domain.brand.entity.QRecentSelectBrand.recentSelectBrand;
-
 @RequiredArgsConstructor
-public class BrandRepositoryImpl implements BrandRepositoryCustom{
+public class BrandRepositoryImpl implements BrandRepositoryCustom {
     private final JPAQueryFactory jpaQueryFactory;
 
     @Override
-    public Page<Brand> findByAllBrandKrOrBrandEnStartingWith(String brandName, Pageable pageable){
+    public Page<Brand> findByAllBrandKrOrBrandEnStartingWith(String brandName, Pageable pageable) {
         List<Brand> contents = jpaQueryFactory.selectFrom(brand)
-                .where(brand.brandKr.like(brandName+"%")
-                        .or(brand.brandEn.like(brandName+"%"))
+                .where(brand.brandKr.like(brandName + "%")
+                        .or(brand.brandEn.like(brandName + "%"))
                 )
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -36,8 +34,7 @@ public class BrandRepositoryImpl implements BrandRepositoryCustom{
                         .or(brand.brandEn.like(brandName + "%"))
                 );
 
-
-        return PageableExecutionUtils.getPage(contents, pageable, ()-> countQuery.fetch().size());
+        return PageableExecutionUtils.getPage(contents, pageable, () -> countQuery.fetch().size());
     }
 
     @Override

@@ -17,7 +17,7 @@ public class CommentImgDto {
     @Schema(description = "Comment 이미지 순서")
     private Integer sortOrder;
 
-    public static CommentImgDto of(CommentImg commentImg){
+    public static CommentImgDto of(CommentImg commentImg) {
         return CommentImgDto.builder()
                 .imgUrl(commentImg.getImgUrl())
                 .sortOrder(commentImg.getSortOrder())

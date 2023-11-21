@@ -1,6 +1,5 @@
 package com.sluv.server.global.s3;
 
-import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.global.common.response.ErrorResponse;
 import com.sluv.server.global.common.response.SuccessDataResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -10,8 +9,10 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
@@ -30,7 +31,8 @@ public class AWSS3Controller {
             @ApiResponse(responseCode = "5001", description = "DB 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @PostMapping("/user")
-    public ResponseEntity<SuccessDataResponse<PreSingedUrlResDto>> getUserProfileUrl(@RequestParam ImgExtension imgExtension){
+    public ResponseEntity<SuccessDataResponse<PreSingedUrlResDto>> getUserProfileUrl(
+            @RequestParam ImgExtension imgExtension) {
         return ResponseEntity.ok().body(
                 SuccessDataResponse.<PreSingedUrlResDto>builder()
                         .result(
@@ -51,7 +53,8 @@ public class AWSS3Controller {
             @ApiResponse(responseCode = "5001", description = "DB 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @PostMapping("/item")
-    public ResponseEntity<SuccessDataResponse<PreSingedUrlResDto>> getItemImgUrl(@RequestParam ImgExtension imgExtension){
+    public ResponseEntity<SuccessDataResponse<PreSingedUrlResDto>> getItemImgUrl(
+            @RequestParam ImgExtension imgExtension) {
         return ResponseEntity.ok().body(
                 SuccessDataResponse.<PreSingedUrlResDto>builder()
                         .result(
@@ -72,7 +75,8 @@ public class AWSS3Controller {
             @ApiResponse(responseCode = "5001", description = "DB 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @PostMapping("/question")
-    public ResponseEntity<SuccessDataResponse<PreSingedUrlResDto>> getQuestionImgUrl(@RequestParam ImgExtension imgExtension){
+    public ResponseEntity<SuccessDataResponse<PreSingedUrlResDto>> getQuestionImgUrl(
+            @RequestParam ImgExtension imgExtension) {
         return ResponseEntity.ok().body(
                 SuccessDataResponse.<PreSingedUrlResDto>builder()
                         .result(
@@ -93,7 +97,8 @@ public class AWSS3Controller {
             @ApiResponse(responseCode = "5001", description = "DB 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @PostMapping("/comment")
-    public ResponseEntity<SuccessDataResponse<PreSingedUrlResDto>> getCommentImgUrl(@RequestParam ImgExtension imgExtension){
+    public ResponseEntity<SuccessDataResponse<PreSingedUrlResDto>> getCommentImgUrl(
+            @RequestParam ImgExtension imgExtension) {
         return ResponseEntity.ok().body(
                 SuccessDataResponse.<PreSingedUrlResDto>builder()
                         .result(
@@ -114,7 +119,8 @@ public class AWSS3Controller {
             @ApiResponse(responseCode = "5001", description = "DB 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @PostMapping("/closet")
-    public ResponseEntity<SuccessDataResponse<PreSingedUrlResDto>> getClosetImgUrl(@RequestParam ImgExtension imgExtension){
+    public ResponseEntity<SuccessDataResponse<PreSingedUrlResDto>> getClosetImgUrl(
+            @RequestParam ImgExtension imgExtension) {
         return ResponseEntity.ok().body(
                 SuccessDataResponse.<PreSingedUrlResDto>builder()
                         .result(

@@ -19,7 +19,7 @@ public class NewCelebController {
 
 
     @PostMapping("")
-    public ResponseEntity<SuccessDataResponse<NewCelebPostResDto>> postNewCeleb(@RequestBody NewCelebPostReqDto dto){
+    public ResponseEntity<SuccessDataResponse<NewCelebPostResDto>> postNewCeleb(@RequestBody NewCelebPostReqDto dto) {
         return ResponseEntity.ok().body(
                 SuccessDataResponse.<NewCelebPostResDto>builder()
                         .result(newCelebService.postNewCeleb(dto))

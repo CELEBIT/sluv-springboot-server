@@ -1,9 +1,9 @@
 package com.sluv.server.global.config.security;
 
-import com.sluv.server.global.jwt.filter.ExceptionHandlerFilter;
-import com.sluv.server.global.jwt.filter.JwtAuthenticationFilter;
 import com.sluv.server.global.jwt.JwtProvider;
 import com.sluv.server.global.jwt.exception.CustomAuthenticationEntryPoint;
+import com.sluv.server.global.jwt.filter.ExceptionHandlerFilter;
+import com.sluv.server.global.jwt.filter.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -55,7 +55,7 @@ public class SpringSecurityConfig {
     };
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .csrf().disable()
                 .cors()
@@ -70,20 +70,16 @@ public class SpringSecurityConfig {
                 .httpBasic().disable()
 
                 .authorizeHttpRequests((request) -> request // 허용 범위 설정
-                                .requestMatchers(HttpMethod.OPTIONS, "/**/*").permitAll()
-                                .requestMatchers(HttpMethod.GET, "/app/item/category").permitAll()
-                                 .requestMatchers(HttpMethod.GET, "/app/item/hashtag").permitAll()
-                                .requestMatchers(AUTH_URL).authenticated() // 허용범위
+                        .requestMatchers(HttpMethod.OPTIONS, "/**/*").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/app/item/category").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/app/item/hashtag").permitAll()
+                        .requestMatchers(AUTH_URL).authenticated() // 허용범위
                         .anyRequest().permitAll()
                 )
                 .exceptionHandling().authenticationEntryPoint(customAuthenticationEntryPoint)
                 .and()
                 .addFilterBefore(new JwtAuthenticationFilter(jwtProvider), UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(exceptionHandlerFilter, JwtAuthenticationFilter.class);
-
-
-
-
 
         return http.build();
     }

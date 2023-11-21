@@ -1,31 +1,53 @@
 package com.sluv.server.domain.item.controller;
 
-import com.sluv.server.domain.item.dto.*;
+import com.sluv.server.domain.item.dto.ItemDetailResDto;
+import com.sluv.server.domain.item.dto.ItemEditReqDto;
+import com.sluv.server.domain.item.dto.ItemPostReqDto;
+import com.sluv.server.domain.item.dto.ItemPostResDto;
+import com.sluv.server.domain.item.dto.ItemReportReqDto;
+import com.sluv.server.domain.item.dto.ItemSimpleResDto;
+import com.sluv.server.domain.item.dto.TempItemPostReqDto;
+import com.sluv.server.domain.item.dto.TempItemPostResDto;
+import com.sluv.server.domain.item.dto.TempItemResDto;
 import com.sluv.server.domain.item.exception.StandardNotFoundException;
-import com.sluv.server.domain.item.service.*;
+import com.sluv.server.domain.item.service.ItemEditReqService;
+import com.sluv.server.domain.item.service.ItemReportService;
+import com.sluv.server.domain.item.service.ItemService;
+import com.sluv.server.domain.item.service.TempItemService;
 import com.sluv.server.domain.search.dto.SearchFilterReqDto;
 import com.sluv.server.domain.user.entity.User;
-import com.sluv.server.global.common.response.*;
+import com.sluv.server.global.common.response.ErrorResponse;
+import com.sluv.server.global.common.response.PaginationCountResDto;
+import com.sluv.server.global.common.response.PaginationResDto;
+import com.sluv.server.global.common.response.SuccessDataResponse;
+import com.sluv.server.global.common.response.SuccessResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/app/item")
+@Slf4j
 public class ItemController {
 
     private final ItemService itemService;
-    private final PlaceRankService placeRankService;
     private final TempItemService tempItemService;
     private final ItemEditReqService itemEditReqService;
     private final ItemReportService itemReportService;
@@ -40,7 +62,8 @@ public class ItemController {
             @ApiResponse(responseCode = "5001", description = "DB 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @PostMapping("")
-    public ResponseEntity<SuccessDataResponse<ItemPostResDto>> postItem(@AuthenticationPrincipal User user, @RequestBody ItemPostReqDto reqDto){
+    public ResponseEntity<SuccessDataResponse<ItemPostResDto>> postItem(@AuthenticationPrincipal User user,
+                                                                        @RequestBody ItemPostReqDto reqDto) {
 
         return ResponseEntity.ok().body(
                 SuccessDataResponse.<ItemPostResDto>builder()
@@ -59,18 +82,20 @@ public class ItemController {
             @ApiResponse(responseCode = "5001", description = "DB 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @PostMapping("/temp")
-    public ResponseEntity<SuccessDataResponse<TempItemPostResDto>> postTempItem(@AuthenticationPrincipal User user, @RequestBody TempItemPostReqDto reqDto){
+    public ResponseEntity<SuccessDataResponse<TempItemPostResDto>> postTempItem(@AuthenticationPrincipal User user,
+                                                                                @RequestBody TempItemPostReqDto reqDto) {
 
         return ResponseEntity.ok().body(
                 SuccessDataResponse.<TempItemPostResDto>builder()
                         .result(
                                 TempItemPostResDto.of(
-                                                tempItemService.postTempItem(user, reqDto)
+                                        tempItemService.postTempItem(user, reqDto)
                                 )
                         )
-                .build()
+                        .build()
         );
     }
+
     @Operation(
             summary = "*임시저장 아이템 리스트 조회",
             description = "사용자의 임시저장 아이템 리스트 조회"
@@ -81,7 +106,8 @@ public class ItemController {
             @ApiResponse(responseCode = "5001", description = "DB 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @GetMapping("/temp")
-    public ResponseEntity<SuccessDataResponse<PaginationCountResDto<TempItemResDto>>> getTempItemList(@AuthenticationPrincipal User user, Pageable pageable){
+    public ResponseEntity<SuccessDataResponse<PaginationCountResDto<TempItemResDto>>> getTempItemList(
+            @AuthenticationPrincipal User user, Pageable pageable) {
 
         return ResponseEntity.ok().body(
                 SuccessDataResponse.<PaginationCountResDto<TempItemResDto>>builder()
@@ -100,7 +126,7 @@ public class ItemController {
             @ApiResponse(responseCode = "5001", description = "DB 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @DeleteMapping("/temp/{tempItemId}")
-    public ResponseEntity<SuccessResponse> deleteTempItem(@PathVariable Long tempItemId){
+    public ResponseEntity<SuccessResponse> deleteTempItem(@PathVariable Long tempItemId) {
         tempItemService.deleteTempItem(tempItemId);
         return ResponseEntity.ok().body(new SuccessResponse());
     }
@@ -115,7 +141,7 @@ public class ItemController {
             @ApiResponse(responseCode = "5001", description = "DB 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @DeleteMapping("/temp")
-    public ResponseEntity<SuccessResponse> deleteAllTempItem(@AuthenticationPrincipal User user){
+    public ResponseEntity<SuccessResponse> deleteAllTempItem(@AuthenticationPrincipal User user) {
         tempItemService.deleteAllTempItem(user);
         return ResponseEntity.ok().body(new SuccessResponse());
     }
@@ -128,7 +154,7 @@ public class ItemController {
                     같은 셀럽 아이템 리스트 -> 10개
                     같은 브랜드 아이템 리스트 -> 10개
                     다른 스러버들이 함께 보관한 아이템 리스트 -> 10개
-                    
+                                        
                     1. 같은 셀럽의 아이템 -> 셀럽을 기준으로 최신 아이템 검색
                     2. 같은 브랜드의 아이템 -> 브랜드를 기준으로 최신 아이템 검색
                     3. 함께 스크랩한 아이템 
@@ -144,7 +170,8 @@ public class ItemController {
             @ApiResponse(responseCode = "5001", description = "DB 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @GetMapping("/{itemId}")
-    public ResponseEntity<SuccessDataResponse<ItemDetailResDto>> getItemDetail(@AuthenticationPrincipal User user, @PathVariable("itemId") Long itemId){
+    public ResponseEntity<SuccessDataResponse<ItemDetailResDto>> getItemDetail(@AuthenticationPrincipal User user,
+                                                                               @PathVariable("itemId") Long itemId) {
 
         return ResponseEntity.ok().body(
                 SuccessDataResponse.<ItemDetailResDto>builder()
@@ -154,6 +181,7 @@ public class ItemController {
                         .build()
         );
     }
+
     @Operation(
             summary = "아이템 게시글 좋아요",
             description = "특정 아이템 게시글에 좋아요, 취소 기능 API." +
@@ -165,12 +193,14 @@ public class ItemController {
             @ApiResponse(responseCode = "5001", description = "DB 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @PostMapping("/{itemId}/like")
-    public ResponseEntity<SuccessResponse> postItemLike(@AuthenticationPrincipal User user, @PathVariable("itemId") Long itemId){
+    public ResponseEntity<SuccessResponse> postItemLike(@AuthenticationPrincipal User user,
+                                                        @PathVariable("itemId") Long itemId) {
         itemService.postItemLike(user, itemId);
         return ResponseEntity.ok().body(
                 new SuccessResponse()
         );
     }
+
     @Operation(
             summary = "아이템 게시글 삭제",
             description = "특정 아이템 게시글을 삭제 기능 API."
@@ -181,12 +211,13 @@ public class ItemController {
             @ApiResponse(responseCode = "5001", description = "DB 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @DeleteMapping("/{itemId}")
-    public ResponseEntity<SuccessResponse> deleteItemLike(@PathVariable("itemId") Long itemId){
+    public ResponseEntity<SuccessResponse> deleteItemLike(@PathVariable("itemId") Long itemId) {
         itemService.deleteItem(itemId);
         return ResponseEntity.ok().body(
                 new SuccessResponse()
         );
     }
+
     @Operation(
             summary = "*아이템 게시글 수정 요청",
             description = "유저가 특정 아이템 게시글의 내용을 수정 요청" +
@@ -198,7 +229,9 @@ public class ItemController {
             @ApiResponse(responseCode = "5001", description = "DB 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @PostMapping("/{itemId}/edit-req")
-    public ResponseEntity<SuccessResponse> postItemEdit(@AuthenticationPrincipal User user, @PathVariable(name = "itemId") Long itemId, @RequestBody ItemEditReqDto dto) {
+    public ResponseEntity<SuccessResponse> postItemEdit(@AuthenticationPrincipal User user,
+                                                        @PathVariable(name = "itemId") Long itemId,
+                                                        @RequestBody ItemEditReqDto dto) {
         itemEditReqService.postItemEdit(user, itemId, dto);
         return ResponseEntity.ok().body(
                 new SuccessResponse()
@@ -216,7 +249,9 @@ public class ItemController {
             @ApiResponse(responseCode = "5001", description = "DB 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @PostMapping("/{itemId}/report")
-    public ResponseEntity<SuccessResponse> postItemReport(@AuthenticationPrincipal User user, @PathVariable(name = "itemId") Long itemId, @RequestBody ItemReportReqDto dto) {
+    public ResponseEntity<SuccessResponse> postItemReport(@AuthenticationPrincipal User user,
+                                                          @PathVariable(name = "itemId") Long itemId,
+                                                          @RequestBody ItemReportReqDto dto) {
         itemReportService.postItemReport(user, itemId, dto);
         return ResponseEntity.ok().body(
                 new SuccessResponse()
@@ -233,7 +268,8 @@ public class ItemController {
                     """
     )
     @GetMapping("/recent")
-    public ResponseEntity<SuccessDataResponse<PaginationResDto<ItemSimpleResDto>>> getRecentItem(@AuthenticationPrincipal User user, Pageable pageable) {
+    public ResponseEntity<SuccessDataResponse<PaginationResDto<ItemSimpleResDto>>> getRecentItem(
+            @AuthenticationPrincipal User user, Pageable pageable) {
 
         return ResponseEntity.ok().body(
                 SuccessDataResponse.<PaginationResDto<ItemSimpleResDto>>builder()
@@ -241,6 +277,7 @@ public class ItemController {
                         .build()
         );
     }
+
     @Operation(
             summary = "*찜한 아이템 조회",
             description = """
@@ -251,7 +288,8 @@ public class ItemController {
                     """
     )
     @GetMapping("/scrap")
-    public ResponseEntity<SuccessDataResponse<PaginationResDto<ItemSimpleResDto>>> getScrapItem(@AuthenticationPrincipal User user, Pageable pageable) {
+    public ResponseEntity<SuccessDataResponse<PaginationResDto<ItemSimpleResDto>>> getScrapItem(
+            @AuthenticationPrincipal User user, Pageable pageable) {
 
         return ResponseEntity.ok().body(
                 SuccessDataResponse.<PaginationResDto<ItemSimpleResDto>>builder()
@@ -259,6 +297,7 @@ public class ItemController {
                         .build()
         );
     }
+
     @Operation(
             summary = "*유저별 추천 인기 아이템 조회",
             description = """
@@ -270,8 +309,9 @@ public class ItemController {
                     """
     )
     @GetMapping("/recommend")
-    public ResponseEntity<SuccessDataResponse<PaginationResDto<ItemSimpleResDto>>> getRecommendItem(@AuthenticationPrincipal User user, Pageable pageable) {
-
+    public ResponseEntity<SuccessDataResponse<PaginationResDto<ItemSimpleResDto>>> getRecommendItem(
+            @AuthenticationPrincipal User user, Pageable pageable) {
+        log.info("유저별 추천 인기 아이템 조회");
         return ResponseEntity.ok().body(
                 SuccessDataResponse.<PaginationResDto<ItemSimpleResDto>>builder()
                         .result(itemService.getRecommendItem(user, pageable))
@@ -290,10 +330,11 @@ public class ItemController {
                     """
     )
     @GetMapping("/summer")
-    public ResponseEntity<SuccessDataResponse<PaginationResDto<ItemSimpleResDto>>> getSummerItem(@AuthenticationPrincipal User user,
-                                                                                                 Pageable pageable,
-                                                                                                 SearchFilterReqDto dto) {
-
+    public ResponseEntity<SuccessDataResponse<PaginationResDto<ItemSimpleResDto>>> getSummerItem(
+            @AuthenticationPrincipal User user,
+            Pageable pageable,
+            SearchFilterReqDto dto) {
+        log.info("핫한 셀럽들이 선택한 여름나기 아이템 조회");
         return ResponseEntity.ok().body(
                 SuccessDataResponse.<PaginationResDto<ItemSimpleResDto>>builder()
                         .result(itemService.getSummerItem(user, pageable, dto))
@@ -311,10 +352,11 @@ public class ItemController {
                     """
     )
     @GetMapping("/nowBuy")
-    public ResponseEntity<SuccessDataResponse<PaginationResDto<ItemSimpleResDto>>> getNowBuyItem(@AuthenticationPrincipal User user,
-                                                                                                 Pageable pageable,
-                                                                                                 SearchFilterReqDto dto) {
-
+    public ResponseEntity<SuccessDataResponse<PaginationResDto<ItemSimpleResDto>>> getNowBuyItem(
+            @AuthenticationPrincipal User user,
+            Pageable pageable,
+            SearchFilterReqDto dto) {
+        log.info("지금 당장 구매가능한 아이템 조회");
         return ResponseEntity.ok().body(
                 SuccessDataResponse.<PaginationResDto<ItemSimpleResDto>>builder()
                         .result(itemService.getNowBuyItem(user, pageable, dto))
@@ -331,9 +373,10 @@ public class ItemController {
                     """
     )
     @GetMapping("/new")
-    public ResponseEntity<SuccessDataResponse<PaginationResDto<ItemSimpleResDto>>> getNewItem(@AuthenticationPrincipal User user,
-                                                                                                 Pageable pageable) {
-
+    public ResponseEntity<SuccessDataResponse<PaginationResDto<ItemSimpleResDto>>> getNewItem(
+            @AuthenticationPrincipal User user,
+            Pageable pageable) {
+        log.info("최신 등록 아이템 조회");
         return ResponseEntity.ok().body(
                 SuccessDataResponse.<PaginationResDto<ItemSimpleResDto>>builder()
                         .result(itemService.getNewItem(user, pageable))
@@ -350,10 +393,11 @@ public class ItemController {
                     """
     )
     @GetMapping("/luxury")
-    public ResponseEntity<SuccessDataResponse<PaginationResDto<ItemSimpleResDto>>> getLuxuryItem(@AuthenticationPrincipal User user,
-                                                                                              Pageable pageable,
-                                                                                              SearchFilterReqDto dto) {
-
+    public ResponseEntity<SuccessDataResponse<PaginationResDto<ItemSimpleResDto>>> getLuxuryItem(
+            @AuthenticationPrincipal User user,
+            Pageable pageable,
+            SearchFilterReqDto dto) {
+        log.info("주목해야할 럭셔리 무드 아이템 조회");
         return ResponseEntity.ok().body(
                 SuccessDataResponse.<PaginationResDto<ItemSimpleResDto>>builder()
                         .result(itemService.getLuxuryItem(user, pageable, dto))
@@ -370,9 +414,10 @@ public class ItemController {
                     """
     )
     @GetMapping("/efficient")
-    public ResponseEntity<SuccessDataResponse<PaginationResDto<ItemSimpleResDto>>> getEfficientItem(@AuthenticationPrincipal User user,
-                                                                                                 Pageable pageable,
-                                                                                                 SearchFilterReqDto dto) {
+    public ResponseEntity<SuccessDataResponse<PaginationResDto<ItemSimpleResDto>>> getEfficientItem(
+            @AuthenticationPrincipal User user,
+            Pageable pageable,
+            SearchFilterReqDto dto) {
 
         return ResponseEntity.ok().body(
                 SuccessDataResponse.<PaginationResDto<ItemSimpleResDto>>builder()
@@ -392,13 +437,13 @@ public class ItemController {
     @GetMapping("/hotItem")
     public ResponseEntity<SuccessDataResponse<List<ItemSimpleResDto>>> getHotItem(@AuthenticationPrincipal User user,
                                                                                   @RequestParam("standard") String standard) {
-
+        log.info("일간 주간 핫 아이템 조회: {}", standard);
         List<ItemSimpleResDto> result;
-        if(standard.equals("주간")){
+        if (standard.equals("주간")) {
             result = itemService.getWeekHotItem(user);
         } else if (standard.equals("일간")) {
             result = itemService.getDayHotItem(user);
-        }else{
+        } else {
             throw new StandardNotFoundException();
         }
 
@@ -421,9 +466,9 @@ public class ItemController {
                     """
     )
     @GetMapping("/hotCeleb")
-    public ResponseEntity<SuccessDataResponse<PaginationResDto<ItemSimpleResDto>>> getHotCelebItem(@AuthenticationPrincipal User user, Pageable pageable, SearchFilterReqDto dto) {
-
-
+    public ResponseEntity<SuccessDataResponse<PaginationResDto<ItemSimpleResDto>>> getHotCelebItem(
+            @AuthenticationPrincipal User user, Pageable pageable, SearchFilterReqDto dto) {
+        log.info("요즘 핫셀럽 아이템 조회");
         return ResponseEntity.ok().body(
                 SuccessDataResponse.<PaginationResDto<ItemSimpleResDto>>builder()
                         .result(itemService.getHotCelebItem(user, pageable, dto))
@@ -444,9 +489,9 @@ public class ItemController {
                     """
     )
     @GetMapping("/curation")
-    public ResponseEntity<SuccessDataResponse<List<ItemSimpleResDto>>> getCurationItem(@AuthenticationPrincipal User user) {
-
-
+    public ResponseEntity<SuccessDataResponse<List<ItemSimpleResDto>>> getCurationItem(
+            @AuthenticationPrincipal User user) {
+        log.info("큐레이션 아이템 조회");
         return ResponseEntity.ok().body(
                 SuccessDataResponse.<List<ItemSimpleResDto>>builder()
                         .result(itemService.getCurationItem(user))
@@ -467,9 +512,9 @@ public class ItemController {
                     """
     )
     @GetMapping("/howabout")
-    public ResponseEntity<SuccessDataResponse<List<ItemSimpleResDto>>> getHowAboutItem(@AuthenticationPrincipal User user) {
-
-
+    public ResponseEntity<SuccessDataResponse<List<ItemSimpleResDto>>> getHowAboutItem(
+            @AuthenticationPrincipal User user) {
+        log.info("이 아이템은 어때요 아이템 조회");
         return ResponseEntity.ok().body(
                 SuccessDataResponse.<List<ItemSimpleResDto>>builder()
                         .result(itemService.getHowAboutItem(user))

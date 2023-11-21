@@ -34,6 +34,8 @@ jasypt:
 logging:
   level:
     org.hibernate.SQL: debug
+#      com.zaxxer.hikari.HikariConfig: DEBUG
+#      com.zaxxer.hikari.HikariDataSource: DEBUG
 
 jwt:
   header: Authorization

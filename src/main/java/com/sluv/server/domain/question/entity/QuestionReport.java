@@ -3,10 +3,19 @@ package com.sluv.server.domain.question.entity;
 import com.sluv.server.domain.question.dto.QuestionReportReqDto;
 import com.sluv.server.domain.question.enums.QuestionReportReason;
 import com.sluv.server.domain.user.entity.User;
-import com.sluv.server.domain.user.enums.UserReportReason;
 import com.sluv.server.global.common.entity.BaseEntity;
 import com.sluv.server.global.common.enums.ReportStatus;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -22,7 +31,8 @@ import lombok.NoArgsConstructor;
 @Table(name = "question_report")
 public class QuestionReport extends BaseEntity {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "question_report_id")
     private Long id;
 

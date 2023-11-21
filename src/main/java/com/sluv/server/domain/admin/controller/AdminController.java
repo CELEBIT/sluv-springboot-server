@@ -12,10 +12,10 @@ public class AdminController {
     private final AdminRepository adminRepository;
 
     @GetMapping("/admin")
-    public void test(){
+    public void test() {
 
         adminRepository.save(Admin.builder()
-                        .id(2L)
+                .id(2L)
                 .pwd("4321")
                 .userName("junker")
                 .build());

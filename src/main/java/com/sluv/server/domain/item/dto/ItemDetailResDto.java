@@ -1,23 +1,17 @@
 package com.sluv.server.domain.item.dto;
 
 import com.sluv.server.domain.brand.dto.BrandSearchResDto;
-import com.sluv.server.domain.brand.entity.Brand;
-import com.sluv.server.domain.brand.entity.NewBrand;
 import com.sluv.server.domain.celeb.dto.CelebSearchResDto;
-import com.sluv.server.domain.celeb.entity.Celeb;
-import com.sluv.server.domain.celeb.entity.NewCeleb;
 import com.sluv.server.domain.item.entity.Item;
-import com.sluv.server.domain.item.entity.ItemCategory;
 import com.sluv.server.domain.user.dto.UserInfoDto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Size;
+import java.time.LocalDateTime;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.time.LocalDateTime;
-import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -94,9 +88,12 @@ public class ItemDetailResDto {
                                       BrandSearchResDto brand, String newBrandName, ItemCategoryDto itemCategory,
                                       Integer likeNum, Boolean likeStatus, Integer scrapNum, Boolean scrapStatus,
                                       Long viewNum, UserInfoDto writerInfo, Boolean followStatus, Boolean hasMine,
-                                      List<ItemImgResDto> imgList, List<ItemLinkResDto> linkList, List<HashtagResponseDto> hashtagList,
-                                      List<ItemSimpleResDto> sameCelebItemList, List<ItemSimpleResDto> sameBrandItemList, List<ItemSimpleResDto> otherSluverItemList
-                                      ){
+                                      List<ItemImgResDto> imgList, List<ItemLinkResDto> linkList,
+                                      List<HashtagResponseDto> hashtagList,
+                                      List<ItemSimpleResDto> sameCelebItemList,
+                                      List<ItemSimpleResDto> sameBrandItemList,
+                                      List<ItemSimpleResDto> otherSluverItemList
+    ) {
 
         return ItemDetailResDto.builder()
                 .imgList(imgList)
@@ -126,13 +123,6 @@ public class ItemDetailResDto {
                 .hasMine(hasMine)
                 .build();
     }
-
-
-
-
-
-
-
 
 
 }

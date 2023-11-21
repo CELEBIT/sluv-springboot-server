@@ -14,7 +14,7 @@ public class ItemPostResDto {
     @Schema(description = "아이템 Id1")
     private Long itemId;
 
-    public static ItemPostResDto of(Long itemId){
+    public static ItemPostResDto of(Long itemId) {
         return ItemPostResDto.builder()
                 .itemId(itemId)
                 .build();

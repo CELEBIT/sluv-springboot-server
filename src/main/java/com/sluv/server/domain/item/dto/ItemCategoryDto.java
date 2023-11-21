@@ -19,19 +19,19 @@ public class ItemCategoryDto {
     @Schema(description = "아이템 상위 카테고리 이름")
     private String parentName;
 
-    public static ItemCategoryDto of(ItemCategory itemCategory){
+    public static ItemCategoryDto of(ItemCategory itemCategory) {
         return ItemCategoryDto.builder()
                 .id(itemCategory.getId())
                 .name(itemCategory.getName())
                 .parentId(
                         itemCategory.getParent() != null
-                        ? itemCategory.getParent().getId()
-                        : null
+                                ? itemCategory.getParent().getId()
+                                : null
                 )
                 .parentName(
                         itemCategory.getParent() != null
-                        ? itemCategory.getParent().getName()
-                        : null
+                                ? itemCategory.getParent().getName()
+                                : null
                 )
                 .build();
     }

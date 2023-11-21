@@ -6,12 +6,11 @@ import com.sluv.server.domain.notice.entity.Notice;
 import com.sluv.server.domain.notice.exception.NoticeNotFoundException;
 import com.sluv.server.domain.notice.repository.NoticeRepository;
 import com.sluv.server.global.common.response.PaginationResDto;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
@@ -30,8 +29,8 @@ public class NoticeService {
 
         // Content가 될 Dto 제작
         List<NoticeSimpleResDto> content = noticePage.stream()
-                                                        .map(NoticeSimpleResDto::of)
-                                                        .toList();
+                .map(NoticeSimpleResDto::of)
+                .toList();
 
         return PaginationResDto.<NoticeSimpleResDto>builder()
                 .page(noticePage.getNumber())

@@ -14,7 +14,7 @@ public class TempItemPostResDto {
     @Schema(description = "TempItem Id")
     private Long tempItemId;
 
-    public static TempItemPostResDto of(Long tempItemId){
+    public static TempItemPostResDto of(Long tempItemId) {
         return TempItemPostResDto.builder()
                 .tempItemId(tempItemId)
                 .build();

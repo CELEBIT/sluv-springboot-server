@@ -1,14 +1,12 @@
 package com.sluv.server.domain.user.dto;
 
-import com.sluv.server.domain.celeb.dto.InterestedCelebResDto;
 import com.sluv.server.domain.user.entity.User;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -39,7 +37,7 @@ public class UserMypageResDto {
                                       Long itemCount,
                                       List<String> imgList,
                                       Long communityCount
-                                      ){
+    ) {
 
         return UserMypageResDto.builder()
                 .userInfo(UserInfoDto.of(user))

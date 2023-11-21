@@ -22,10 +22,10 @@ public class RecentSelectCelebService {
     private final NewCelebRepository newCelebRepository;
     private final RecentSelectCelebRepository recentSelectCelebRepository;
 
-    public void postRecentSelectCeleb(User user, RecentSelectCelebReqDto dto){
+    public void postRecentSelectCeleb(User user, RecentSelectCelebReqDto dto) {
         Celeb celeb = dto.getCelebId() != null
                 ? celebRepository.findById(dto.getCelebId())
-                                .orElseThrow(CelebNotFoundException::new)
+                .orElseThrow(CelebNotFoundException::new)
                 : null;
 
         NewCeleb newCeleb = dto.getNewCelebId() != null
@@ -47,9 +47,9 @@ public class RecentSelectCelebService {
     }
 
     public void deleteRecentSelectCeleb(User user, Long celebId, String flag) {
-        if(flag.equals("Y")){
+        if (flag.equals("Y")) {
             recentSelectCelebRepository.deleteByUserIdAndCelebId(user.getId(), celebId);
-        }else{
+        } else {
             recentSelectCelebRepository.deleteByUserIdAndNewCelebId(user.getId(), celebId);
         }
     }

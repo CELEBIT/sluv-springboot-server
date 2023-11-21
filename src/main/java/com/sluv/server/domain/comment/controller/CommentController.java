@@ -19,7 +19,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
@@ -38,7 +45,9 @@ public class CommentController {
             @ApiResponse(responseCode = "5001", description = "DB 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @PostMapping("/{questionId}")
-    public ResponseEntity<SuccessResponse> postComment(@AuthenticationPrincipal User user, @PathVariable("questionId") Long questionId, @RequestBody CommentPostReqDto dto){
+    public ResponseEntity<SuccessResponse> postComment(@AuthenticationPrincipal User user,
+                                                       @PathVariable("questionId") Long questionId,
+                                                       @RequestBody CommentPostReqDto dto) {
         commentService.postComment(user, questionId, dto);
         return ResponseEntity.ok().body(
                 new SuccessResponse()
@@ -59,7 +68,7 @@ public class CommentController {
     public ResponseEntity<SuccessResponse> postSubComment(@AuthenticationPrincipal User user,
                                                           @PathVariable("questionId") Long questionId,
                                                           @PathVariable("commentId") Long commentId,
-                                                          @RequestBody CommentPostReqDto dto){
+                                                          @RequestBody CommentPostReqDto dto) {
         commentService.postSubComment(user, questionId, commentId, dto);
         return ResponseEntity.ok().body(
                 new SuccessResponse()
@@ -78,8 +87,8 @@ public class CommentController {
     })
     @PutMapping("/{commentId}")
     public ResponseEntity<SuccessResponse> putComment(@AuthenticationPrincipal User user,
-                                                             @PathVariable("commentId") Long commentId,
-                                                             @RequestBody CommentPostReqDto dto){
+                                                      @PathVariable("commentId") Long commentId,
+                                                      @RequestBody CommentPostReqDto dto) {
         commentService.putComment(user, commentId, dto);
         return ResponseEntity.ok().body(
                 new SuccessResponse()
@@ -99,7 +108,7 @@ public class CommentController {
     })
     @PostMapping("/{commentId}/like")
     public ResponseEntity<SuccessResponse> postCommentLike(@AuthenticationPrincipal User user,
-                                                      @PathVariable("commentId") Long commentId ){
+                                                           @PathVariable("commentId") Long commentId) {
         commentService.postCommentLike(user, commentId);
         return ResponseEntity.ok().body(
                 new SuccessResponse()
@@ -119,8 +128,8 @@ public class CommentController {
     })
     @PostMapping("/{commentId}/report")
     public ResponseEntity<SuccessResponse> postCommentReport(@AuthenticationPrincipal User user,
-                                                      @PathVariable("commentId") Long commentId,
-                                                      @RequestBody CommentReportPostReqDto dto){
+                                                             @PathVariable("commentId") Long commentId,
+                                                             @RequestBody CommentReportPostReqDto dto) {
         commentService.postCommentReport(user, commentId, dto);
         return ResponseEntity.ok().body(
                 new SuccessResponse()
@@ -136,7 +145,7 @@ public class CommentController {
     )
     @DeleteMapping("/{commentId}")
     public ResponseEntity<SuccessResponse> deleteComment(@AuthenticationPrincipal User user,
-                                                             @PathVariable("commentId") Long commentId ){
+                                                         @PathVariable("commentId") Long commentId) {
         commentService.deleteComment(user, commentId);
         return ResponseEntity.ok().body(
                 new SuccessResponse()
@@ -149,9 +158,10 @@ public class CommentController {
                     "\n Pagination 적용"
     )
     @GetMapping("/{questionId}")
-    public ResponseEntity<SuccessDataResponse<PaginationResDto<CommentResDto>>> getComment(@AuthenticationPrincipal User user,
-                                                                                           @PathVariable("questionId") Long questionId,
-                                                                                           Pageable pageable){
+    public ResponseEntity<SuccessDataResponse<PaginationResDto<CommentResDto>>> getComment(
+            @AuthenticationPrincipal User user,
+            @PathVariable("questionId") Long questionId,
+            Pageable pageable) {
         return ResponseEntity.ok().body(
                 SuccessDataResponse.<PaginationResDto<CommentResDto>>builder()
                         .result(commentService.getComment(user, questionId, pageable))
@@ -166,9 +176,10 @@ public class CommentController {
                     "\n restCommentNum으로 남은 댓글의 수를 전달"
     )
     @GetMapping("/{commentId}/subcomment")
-    public ResponseEntity<SuccessDataResponse<SubCommentPageResDto<CommentResDto>>> getSubComment(@AuthenticationPrincipal User user,
-                                                                                                  @PathVariable("commentId") Long commentId,
-                                                                                                  Pageable pageable){
+    public ResponseEntity<SuccessDataResponse<SubCommentPageResDto<CommentResDto>>> getSubComment(
+            @AuthenticationPrincipal User user,
+            @PathVariable("commentId") Long commentId,
+            Pageable pageable) {
         return ResponseEntity.ok().body(
                 SuccessDataResponse.<SubCommentPageResDto<CommentResDto>>builder()
                         .result(commentService.getSubComment(user, commentId, pageable))

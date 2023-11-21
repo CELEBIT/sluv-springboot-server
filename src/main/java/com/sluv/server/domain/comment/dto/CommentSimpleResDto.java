@@ -22,7 +22,7 @@ public class CommentSimpleResDto {
     @Schema(description = "Comment 상태")
     private CommentStatus commentStatus;
 
-    public static CommentSimpleResDto of(Comment comment){
+    public static CommentSimpleResDto of(Comment comment) {
         return CommentSimpleResDto.builder()
                 .id(comment.getId())
                 .questionTitle(comment.getQuestion().getTitle())

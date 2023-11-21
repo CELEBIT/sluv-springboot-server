@@ -1,7 +1,9 @@
 package com.sluv.server.domain.user.service;
 
 import com.sluv.server.domain.auth.exception.UserBlockedException;
-import com.sluv.server.domain.celeb.dto.*;
+import com.sluv.server.domain.celeb.dto.InterestedCelebCategoryResDto;
+import com.sluv.server.domain.celeb.dto.InterestedCelebParentResDto;
+import com.sluv.server.domain.celeb.dto.InterestedCelebPostReqDto;
 import com.sluv.server.domain.celeb.entity.Celeb;
 import com.sluv.server.domain.celeb.entity.CelebCategory;
 import com.sluv.server.domain.celeb.entity.InterestedCeleb;
@@ -19,14 +21,33 @@ import com.sluv.server.domain.item.dto.ItemSimpleResDto;
 import com.sluv.server.domain.item.entity.Item;
 import com.sluv.server.domain.item.entity.ItemImg;
 import com.sluv.server.domain.item.entity.RecentItem;
-import com.sluv.server.domain.item.repository.*;
+import com.sluv.server.domain.item.repository.ItemImgRepository;
+import com.sluv.server.domain.item.repository.ItemLikeRepository;
+import com.sluv.server.domain.item.repository.ItemRepository;
+import com.sluv.server.domain.item.repository.ItemScrapRepository;
+import com.sluv.server.domain.item.repository.RecentItemRepository;
 import com.sluv.server.domain.question.dto.QuestionImgSimpleResDto;
 import com.sluv.server.domain.question.dto.QuestionSimpleResDto;
-import com.sluv.server.domain.question.entity.*;
+import com.sluv.server.domain.question.entity.Question;
+import com.sluv.server.domain.question.entity.QuestionBuy;
+import com.sluv.server.domain.question.entity.QuestionFind;
+import com.sluv.server.domain.question.entity.QuestionHowabout;
+import com.sluv.server.domain.question.entity.QuestionRecommend;
+import com.sluv.server.domain.question.entity.QuestionRecommendCategory;
+import com.sluv.server.domain.question.entity.RecentQuestion;
 import com.sluv.server.domain.question.exception.QuestionNotFoundException;
 import com.sluv.server.domain.question.exception.QuestionTypeNotFoundException;
-import com.sluv.server.domain.question.repository.*;
-import com.sluv.server.domain.user.dto.*;
+import com.sluv.server.domain.question.repository.QuestionImgRepository;
+import com.sluv.server.domain.question.repository.QuestionItemRepository;
+import com.sluv.server.domain.question.repository.QuestionLikeRepository;
+import com.sluv.server.domain.question.repository.QuestionRecommendCategoryRepository;
+import com.sluv.server.domain.question.repository.QuestionRepository;
+import com.sluv.server.domain.question.repository.RecentQuestionRepository;
+import com.sluv.server.domain.user.dto.UserIdDto;
+import com.sluv.server.domain.user.dto.UserMypageResDto;
+import com.sluv.server.domain.user.dto.UserProfileImgReqDto;
+import com.sluv.server.domain.user.dto.UserProfileReqDto;
+import com.sluv.server.domain.user.dto.UserSearchInfoDto;
 import com.sluv.server.domain.user.entity.Follow;
 import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.domain.user.enums.UserStatus;
@@ -38,16 +59,15 @@ import com.sluv.server.global.common.response.PaginationCountResDto;
 import com.sluv.server.global.common.response.PaginationResDto;
 import com.sluv.server.global.jwt.JwtProvider;
 import jakarta.servlet.http.HttpServletRequest;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Comparator;
-import java.util.List;
-import java.util.Objects;
 
 
 @Service
@@ -95,21 +115,18 @@ public class UserService {
         List<CelebCategory> categoryList = celebCategoryRepository.findAllByParentIdIsNull();
         changeCategoryOrder(categoryList);
 
-        return categoryList.stream()
-                .parallel()
+        return categoryList.stream().parallel()
                 // 카테고리별 InterestedCelebCategoryResDto 생성
                 .map(category -> {
-                            List<Celeb> categoryFilterCeleb = getCategoryFilterCeleb(interestedCelebList, category);
-                            return InterestedCelebCategoryResDto.of(category,
-                                    convertInterestedCelebParentResDto(categoryFilterCeleb));
-                        }
-                ).toList();
+                    List<Celeb> categoryFilterCeleb = getCategoryFilterCeleb(interestedCelebList, category);
+                    return InterestedCelebCategoryResDto.of(category,
+                            convertInterestedCelebParentResDto(categoryFilterCeleb));
+                }).toList();
     }
 
     public void postUserFollow(User user, Long userId) {
         // target이 될 유저 검색
-        User targetUser = userRepository.findById(userId)
-                .orElseThrow(UserNotFoundException::new);
+        User targetUser = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
 
         // Follow 여부 확인.
         Boolean followStatus = followRepository.getFollowStatus(user, targetUser);
@@ -118,9 +135,7 @@ public class UserService {
             followRepository.deleteFollow(user, targetUser);
         } else {
             // Follow 정보 등록.
-            followRepository.save(
-                    Follow.toEntity(user, targetUser)
-            );
+            followRepository.save(Follow.toEntity(user, targetUser));
         }
 
     }
@@ -130,24 +145,18 @@ public class UserService {
      */
     @Transactional(readOnly = true)
     private List<Celeb> getCategoryFilterCeleb(List<Celeb> celebList, CelebCategory category) {
-        return celebList
-                .stream()
-                .filter(celeb ->
-                        // interestedCeleb의 상위 카테고리 id와 카테고리별 묶을 카테고리의 아이디가 일치하는 것만 filtering
-                        Objects.equals(celeb.getCelebCategory().getParent() != null
-                                        ? celeb.getCelebCategory().getParent().getId()
-                                        : celeb.getCelebCategory().getId()
-                                , category.getId())
-                ).toList();
+        return celebList.stream().filter(celeb ->
+                // interestedCeleb의 상위 카테고리 id와 카테고리별 묶을 카테고리의 아이디가 일치하는 것만 filtering
+                Objects.equals(
+                        celeb.getCelebCategory().getParent() != null ? celeb.getCelebCategory().getParent().getId()
+                                : celeb.getCelebCategory().getId(), category.getId())).toList();
     }
 
     /**
      * 관심셀럽 목록에서 category와 일치하는 Celeb을 분류
      */
     private List<InterestedCelebParentResDto> convertInterestedCelebParentResDto(List<Celeb> celebList) {
-        return celebList
-                .stream()
-                .map(InterestedCelebParentResDto::of).toList();
+        return celebList.stream().map(InterestedCelebParentResDto::of).toList();
     }
 
     public void postInterestedCeleb(User user, InterestedCelebPostReqDto dto) {
@@ -156,12 +165,8 @@ public class UserService {
 
         // 초기화 상태에서 다시 추가.
         List<InterestedCeleb> interestedCelebList = dto.getCelebIdList().stream()
-                .map(celeb ->
-                        InterestedCeleb.toEntity(
-                                user,
-                                celebRepository.findById(celeb).orElseThrow(CelebNotFoundException::new)
-                        )
-                ).toList();
+                .map(celeb -> InterestedCeleb.toEntity(user,
+                        celebRepository.findById(celeb).orElseThrow(CelebNotFoundException::new))).toList();
 
         interestedCelebRepository.saveAll(interestedCelebList);
     }
@@ -198,30 +203,21 @@ public class UserService {
 
             communityCount = questionNum + commentNum;
 
-            imgList = itemRepository.getRecentTop2Item(targetUser)
-                    .stream()
-                    .map(item -> itemImgRepository.findMainImg(item.getId()).getItemImgUrl())
-                    .toList();
+            imgList = itemRepository.getRecentTop2Item(targetUser).stream()
+                    .map(item -> itemImgRepository.findMainImg(item.getId()).getItemImgUrl()).toList();
 
             itemCount = itemRepository.countByUserId(targetUser.getId());
 
         } else { // 특정 유저일때
-            targetUser = userRepository.findById(userId)
-                    .orElseThrow(UserNotFoundException::new);
+            targetUser = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
         }
 
         Boolean followStatus = followRepository.getFollowStatus(user, targetUser);
         Long followerCount = followRepository.getFollowerCount(targetUser);
         Long followingCount = followRepository.getFollowingCount(targetUser);
 
-        return UserMypageResDto.of(targetUser,
-                followStatus,
-                followerCount,
-                followingCount,
-                itemCount,
-                imgList,
-                communityCount
-        );
+        return UserMypageResDto.of(targetUser, followStatus, followerCount, followingCount, itemCount, imgList,
+                communityCount);
     }
 
     @Transactional(readOnly = true)
@@ -233,20 +229,14 @@ public class UserService {
             return getItemSimpleResDto(item, closetList);
         }).toList();
 
-        return PaginationResDto.<ItemSimpleResDto>builder()
-                .page(itemPage.getNumber())
-                .hasNext(itemPage.hasNext())
-                .content(content)
-                .build();
+        return PaginationResDto.<ItemSimpleResDto>builder().page(itemPage.getNumber()).hasNext(itemPage.hasNext())
+                .content(content).build();
     }
 
     @Transactional(readOnly = true)
     private ItemSimpleResDto getItemSimpleResDto(Item item, List<Closet> closetList) {
-        return ItemSimpleResDto.of(
-                item,
-                itemImgRepository.findMainImg(item.getId()),
-                itemScrapRepository.getItemScrapStatus(item, closetList)
-        );
+        return ItemSimpleResDto.of(item, itemImgRepository.findMainImg(item.getId()),
+                itemScrapRepository.getItemScrapStatus(item, closetList));
     }
 
     @Transactional(readOnly = true)
@@ -260,18 +250,11 @@ public class UserService {
             closetPage = closetRepository.getUserAllPublicCloset(userId, pageable);
         }
 
-        List<ClosetResDto> content = closetPage.stream().map(closet ->
-                ClosetResDto.of(
-                        closet,
-                        itemScrapRepository.countByClosetId(closet.getId())
-                )
-        ).toList();
+        List<ClosetResDto> content = closetPage.stream()
+                .map(closet -> ClosetResDto.of(closet, itemScrapRepository.countByClosetId(closet.getId()))).toList();
 
-        return PaginationResDto.<ClosetResDto>builder()
-                .page(closetPage.getNumber())
-                .hasNext(closetPage.hasNext())
-                .content(content)
-                .build();
+        return PaginationResDto.<ClosetResDto>builder().page(closetPage.getNumber()).hasNext(closetPage.hasNext())
+                .content(content).build();
     }
 
     @Transactional(readOnly = true)
@@ -281,10 +264,8 @@ public class UserService {
 
         List<Closet> closetList = closetRepository.findAllByUserId(user.getId());
 
-        List<ItemSimpleResDto> content = recentItemPage
-                .stream()
-                .map(recentItem -> getItemSimpleResDto(recentItem.getItem(), closetList))
-                .toList();
+        List<ItemSimpleResDto> content = recentItemPage.stream()
+                .map(recentItem -> getItemSimpleResDto(recentItem.getItem(), closetList)).toList();
 
         return new PaginationCountResDto<>(recentItemPage.hasNext(), recentItemPage.getNumber(), content,
                 recentItemPage.getTotalElements());
@@ -306,12 +287,10 @@ public class UserService {
 
             if (recentQuestion.getQType().equals("Buy")) {
                 // 이미지 Dto 생성
-                imgList = questionImgRepository.findAllByQuestionId(question.getId())
-                        .stream()
+                imgList = questionImgRepository.findAllByQuestionId(question.getId()).stream()
                         .map(QuestionImgSimpleResDto::of).toList();
                 // 아이템 이미지 Dto 생성
-                itemImgList = questionItemRepository.findAllByQuestionId(question.getId())
-                        .stream()
+                itemImgList = questionItemRepository.findAllByQuestionId(question.getId()).stream()
                         .map(questionItem -> {
                             ItemImg mainImg = itemImgRepository.findMainImg(questionItem.getItem().getId());
                             return QuestionImgSimpleResDto.of(mainImg);
@@ -321,16 +300,13 @@ public class UserService {
 
             } else if (recentQuestion.getQType().equals("Recommend")) {
                 // Question 카테고리
-                categoryList = questionRecommendCategoryRepository.findAllByQuestionId(question.getId())
-                        .stream()
+                categoryList = questionRecommendCategoryRepository.findAllByQuestionId(question.getId()).stream()
                         .map(QuestionRecommendCategory::getName).toList();
             } else if (recentQuestion.getQType().equals("Find")) {
                 QuestionFind questionFind = (QuestionFind) question;
-                celebName = questionFind.getCeleb() != null
-                        ? questionFind.getCeleb().getParent() != null
-                        ? questionFind.getCeleb().getParent().getCelebNameKr() + " " + questionFind.getCeleb()
-                        .getCelebNameKr()
-                        : questionFind.getCeleb().getCelebNameKr()
+                celebName = questionFind.getCeleb() != null ? questionFind.getCeleb().getParent() != null ?
+                        questionFind.getCeleb().getParent().getCelebNameKr() + " " + questionFind.getCeleb()
+                                .getCelebNameKr() : questionFind.getCeleb().getCelebNameKr()
                         : questionFind.getNewCeleb().getCelebName();
             } else {
                 throw new QuestionTypeNotFoundException();
@@ -342,18 +318,13 @@ public class UserService {
             // Question 댓글 수
             Long commentNum = commentRepository.countByQuestionId(question.getId());
 
-            return QuestionSimpleResDto.of(question, likeNum, commentNum,
-                    imgList, itemImgList, categoryList);
+            return QuestionSimpleResDto.of(question, likeNum, commentNum, imgList, itemImgList, categoryList);
 
 
         }).toList();
 
-        return new PaginationCountResDto<>(
-                recentQuestionPage.hasNext(),
-                recentQuestionPage.getNumber(),
-                content,
-                recentQuestionPage.getTotalElements()
-        );
+        return new PaginationCountResDto<>(recentQuestionPage.hasNext(), recentQuestionPage.getNumber(), content,
+                recentQuestionPage.getTotalElements());
     }
 
     @Transactional(readOnly = true)
@@ -374,18 +345,12 @@ public class UserService {
         Page<User> followerPage = userRepository.getAllFollower(userId, pageable);
 
         // UserSearchInfoDto로 가공
-        List<UserSearchInfoDto> content = followerPage.stream().map(follower ->
-                UserSearchInfoDto.of(
-                        follower,
-                        followRepository.getFollowStatus(user, follower)
-                )
-        ).toList();
+        List<UserSearchInfoDto> content = followerPage.stream()
+                .map(follower -> UserSearchInfoDto.of(follower, followRepository.getFollowStatus(user, follower)))
+                .toList();
 
-        return PaginationResDto.<UserSearchInfoDto>builder()
-                .page(followerPage.getNumber())
-                .hasNext(followerPage.hasNext())
-                .content(content)
-                .build();
+        return PaginationResDto.<UserSearchInfoDto>builder().page(followerPage.getNumber())
+                .hasNext(followerPage.hasNext()).content(content).build();
     }
 
     @Transactional(readOnly = true)
@@ -394,18 +359,12 @@ public class UserService {
         Page<User> followerPage = userRepository.getAllFollowing(userId, pageable);
 
         // UserSearchInfoDto로 가공
-        List<UserSearchInfoDto> content = followerPage.stream().map(follower ->
-                UserSearchInfoDto.of(
-                        follower,
-                        followRepository.getFollowStatus(user, follower)
-                )
-        ).toList();
+        List<UserSearchInfoDto> content = followerPage.stream()
+                .map(follower -> UserSearchInfoDto.of(follower, followRepository.getFollowStatus(user, follower)))
+                .toList();
 
-        return PaginationResDto.<UserSearchInfoDto>builder()
-                .page(followerPage.getNumber())
-                .hasNext(followerPage.hasNext())
-                .content(content)
-                .build();
+        return PaginationResDto.<UserSearchInfoDto>builder().page(followerPage.getNumber())
+                .hasNext(followerPage.hasNext()).content(content).build();
     }
 
     public void patchUserProfileImg(User user, UserProfileImgReqDto dto) {
@@ -430,12 +389,8 @@ public class UserService {
 
         List<QuestionSimpleResDto> content = questionPage.stream().map(this::dtoBuildByQuestionType).toList();
 
-        return new PaginationCountResDto<>(
-                questionPage.hasNext(),
-                questionPage.getNumber(),
-                content,
-                questionPage.getTotalElements()
-        );
+        return new PaginationCountResDto<>(questionPage.hasNext(), questionPage.getNumber(), content,
+                questionPage.getTotalElements());
     }
 
     private QuestionSimpleResDto dtoBuildByQuestionType(Question question) {
@@ -448,16 +403,13 @@ public class UserService {
         if (question instanceof QuestionBuy) { // 1. question이 QuestionBuy 일 경우
             // 이미지 DTO 생성
             List<QuestionImgSimpleResDto> imgSimpleList = questionImgRepository.findAllByQuestionId(question.getId())
-                    .stream()
-                    .map(QuestionImgSimpleResDto::of).toList();
+                    .stream().map(QuestionImgSimpleResDto::of).toList();
             // 아이템 이미지 DTO 생성
             List<QuestionImgSimpleResDto> itemImgSimpleList = questionItemRepository.findAllByQuestionId(
-                            question.getId())
-                    .stream()
-                    .map(questionItem -> {
-                        ItemImg mainImg = itemImgRepository.findMainImg(questionItem.getItem().getId());
-                        return QuestionImgSimpleResDto.of(mainImg);
-                    }).toList();
+                    question.getId()).stream().map(questionItem -> {
+                ItemImg mainImg = itemImgRepository.findMainImg(questionItem.getItem().getId());
+                return QuestionImgSimpleResDto.of(mainImg);
+            }).toList();
 
             qType = "Buy";
             imgList = imgSimpleList;
@@ -465,11 +417,9 @@ public class UserService {
 
         } else if (question instanceof QuestionFind questionFind) { // 2. question이 QuestionFind 일 경우
             qType = "Find";
-            celebName = questionFind.getCeleb() != null
-                    ? questionFind.getCeleb().getParent() != null
-                    ? questionFind.getCeleb().getParent().getCelebNameKr() + " " + questionFind.getCeleb()
-                    .getCelebNameKr()
-                    : questionFind.getCeleb().getCelebNameKr()
+            celebName = questionFind.getCeleb() != null ? questionFind.getCeleb().getParent() != null ?
+                    questionFind.getCeleb().getParent().getCelebNameKr() + " " + questionFind.getCeleb()
+                            .getCelebNameKr() : questionFind.getCeleb().getCelebNameKr()
                     : questionFind.getNewCeleb().getCelebName();
 
         } else if (question instanceof QuestionHowabout) { // 3. question이 QuestionHowabout 일 경우
@@ -477,8 +427,7 @@ public class UserService {
 
         } else if (question instanceof QuestionRecommend) { // 4. question이 QuestionRecommend 일 경우
             List<String> categoryNameList = questionRecommendCategoryRepository.findAllByQuestionId(question.getId())
-                    .stream()
-                    .map(QuestionRecommendCategory::getName).toList();
+                    .stream().map(QuestionRecommendCategory::getName).toList();
             qType = "Recommend";
             categoryList = categoryNameList;
 
@@ -492,8 +441,7 @@ public class UserService {
         // Question 댓글 수
         Long commentNum = commentRepository.countByQuestionId(question.getId());
 
-        return QuestionSimpleResDto.of(question, likeNum, commentNum,
-                imgList, itemImgList, categoryList);
+        return QuestionSimpleResDto.of(question, likeNum, commentNum, imgList, itemImgList, categoryList);
     }
 
     /**
@@ -505,12 +453,8 @@ public class UserService {
 
         List<CommentSimpleResDto> content = commentPage.stream().map(CommentSimpleResDto::of).toList();
 
-        return new PaginationCountResDto<>(
-                commentPage.hasNext(),
-                commentPage.getNumber(),
-                content,
-                commentPage.getTotalElements()
-        );
+        return new PaginationCountResDto<>(commentPage.hasNext(), commentPage.getNumber(), content,
+                commentPage.getTotalElements());
     }
 
     /**
@@ -523,16 +467,10 @@ public class UserService {
         // 현재 유저의 옷장 검색
         List<Closet> closetList = closetRepository.findAllByUserId(user.getId());
         // content 제작
-        List<ItemSimpleResDto> content = itemPage.stream().map(item ->
-                getItemSimpleResDto(item, closetList)
-        ).toList();
+        List<ItemSimpleResDto> content = itemPage.stream().map(item -> getItemSimpleResDto(item, closetList)).toList();
 
-        return new PaginationCountResDto<>(
-                itemPage.hasNext(),
-                itemPage.getNumber(),
-                content,
-                itemPage.getTotalElements()
-        );
+        return new PaginationCountResDto<>(itemPage.hasNext(), itemPage.getNumber(), content,
+                itemPage.getTotalElements());
     }
 
     /**
@@ -544,12 +482,8 @@ public class UserService {
 
         List<QuestionSimpleResDto> content = questionPage.stream().map(this::dtoBuildByQuestionType).toList();
 
-        return new PaginationCountResDto<>(
-                questionPage.hasNext(),
-                questionPage.getNumber(),
-                content,
-                questionPage.getTotalElements()
-        );
+        return new PaginationCountResDto<>(questionPage.hasNext(), questionPage.getNumber(), content,
+                questionPage.getTotalElements());
     }
 
     /**
@@ -561,24 +495,16 @@ public class UserService {
 
         List<CommentSimpleResDto> content = commentPage.stream().map(CommentSimpleResDto::of).toList();
 
-        return new PaginationCountResDto<>(
-                commentPage.hasNext(),
-                commentPage.getNumber(),
-                content,
-                commentPage.getTotalElements()
-        );
+        return new PaginationCountResDto<>(commentPage.hasNext(), commentPage.getNumber(), content,
+                commentPage.getTotalElements());
     }
 
     @Transactional(readOnly = true)
     public List<UserSearchInfoDto> getHotSluver(User user, Long celebId) {
         List<User> userList = userRepository.getHotSluver(user, celebId);
 
-        return userList.stream().map(_user ->
-                UserSearchInfoDto.of(
-                        _user,
-                        followRepository.getFollowStatus(user, _user)
-                )
-        ).toList();
+        return userList.stream()
+                .map(_user -> UserSearchInfoDto.of(_user, followRepository.getFollowStatus(user, _user))).toList();
 
 
     }
@@ -598,11 +524,10 @@ public class UserService {
         return categoryList.stream()
                 // 카테고리별 InterestedCelebCategoryResDto 생성
                 .map(category -> {
-                            List<Celeb> categoryFilterCeleb = getCategoryFilterCeleb(interestedCelebList, category);
-                            return InterestedCelebCategoryResDto.of(category,
-                                    convertInterestedCelebParentResDto(categoryFilterCeleb));
-                        }
-                ).toList();
+                    List<Celeb> categoryFilterCeleb = getCategoryFilterCeleb(interestedCelebList, category);
+                    return InterestedCelebCategoryResDto.of(category,
+                            convertInterestedCelebParentResDto(categoryFilterCeleb));
+                }).toList();
     }
 
     /**
@@ -630,9 +555,7 @@ public class UserService {
     @Transactional(readOnly = true)
     public List<InterestedCelebParentResDto> getTargetUserInterestedCelebByPostTime(Long userId) {
         User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
-        return celebRepository.findInterestedCeleb(user)
-                .stream()
-                .map(InterestedCelebParentResDto::of).toList();
+        return celebRepository.findInterestedCeleb(user).stream().map(InterestedCelebParentResDto::of).toList();
     }
 
     /**
@@ -640,8 +563,6 @@ public class UserService {
      */
     @Transactional(readOnly = true)
     public List<InterestedCelebParentResDto> getInterestedCelebByPostTime(User user) {
-        return celebRepository.findInterestedCeleb(user)
-                .stream()
-                .map(InterestedCelebParentResDto::of).toList();
+        return celebRepository.findInterestedCeleb(user).stream().map(InterestedCelebParentResDto::of).toList();
     }
 }

@@ -3,7 +3,17 @@ package com.sluv.server.domain.item.entity;
 import com.sluv.server.domain.item.dto.ItemImgResDto;
 import com.sluv.server.global.common.entity.BaseEntity;
 import com.sluv.server.global.common.enums.ItemImgOrLinkStatus;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -19,7 +29,8 @@ import org.hibernate.annotations.ColumnDefault;
 @Table(name = "temp_item_img")
 public class TempItemImg extends BaseEntity {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "temp_item_img_id")
     private Long id;
 

@@ -26,19 +26,20 @@ public class QuestionItemResDto {
     @Schema(description = "순서")
     private Integer sortOrder;
 
-    public static QuestionItemResDto of(QuestionItem questionItem, ItemSimpleResDto itemSimpleResDto, QuestionVoteDataDto voteDataDto){
+    public static QuestionItemResDto of(QuestionItem questionItem, ItemSimpleResDto itemSimpleResDto,
+                                        QuestionVoteDataDto voteDataDto) {
         return QuestionItemResDto.builder()
                 .item(itemSimpleResDto)
                 .description(questionItem.getDescription())
                 .voteNum(
                         voteDataDto != null
-                        ? voteDataDto.getVoteNum()
-                        : null
+                                ? voteDataDto.getVoteNum()
+                                : null
                 )
                 .votePercent(
                         voteDataDto != null
-                        ? voteDataDto.getVotePercent()
-                        : null
+                                ? voteDataDto.getVotePercent()
+                                : null
                 )
                 .representFlag(questionItem.getRepresentFlag())
                 .sortOrder(questionItem.getSortOrder())

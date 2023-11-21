@@ -15,7 +15,7 @@ public class QuestionItemReqDto {
     private Long itemId;
     @Schema(description = "Question item 설명")
     private String description;
-//    @Schema(description = "Question item 투표수")
+    //    @Schema(description = "Question item 투표수")
 //    private Long vote;
     @Schema(description = "대표 여부")
     private Boolean representFlag;

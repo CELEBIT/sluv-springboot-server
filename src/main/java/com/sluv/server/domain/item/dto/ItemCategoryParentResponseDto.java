@@ -2,9 +2,12 @@ package com.sluv.server.domain.item.dto;
 
 import com.sluv.server.domain.item.entity.ItemCategory;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.*;
-
 import java.util.List;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Data
 @Getter
@@ -21,7 +24,7 @@ public class ItemCategoryParentResponseDto {
     private List<ItemCategoryChildResponseDto> subCategoryList;
 
     public static ItemCategoryParentResponseDto of(ItemCategory itemCategory,
-                                                   List<ItemCategoryChildResponseDto> subCategoryList){
+                                                   List<ItemCategoryChildResponseDto> subCategoryList) {
 
         return ItemCategoryParentResponseDto.builder()
                 .id(itemCategory.getId())

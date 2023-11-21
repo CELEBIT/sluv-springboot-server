@@ -18,17 +18,17 @@ public class QuestionImgSimpleResDto {
     @Schema(description = "이미지 순서")
     private Long sortOrder;
 
-    public static QuestionImgSimpleResDto of(QuestionImg questionImg){
+    public static QuestionImgSimpleResDto of(QuestionImg questionImg) {
         return QuestionImgSimpleResDto.builder()
                 .imgUrl(questionImg.getImgUrl())
-                .sortOrder( (long) questionImg.getSortOrder())
+                .sortOrder((long) questionImg.getSortOrder())
                 .build();
     }
 
-    public static QuestionImgSimpleResDto of(ItemImg itemImg){
+    public static QuestionImgSimpleResDto of(ItemImg itemImg) {
         return QuestionImgSimpleResDto.builder()
                 .imgUrl(itemImg.getItemImgUrl())
-                .sortOrder( (long) itemImg.getSortOrder())
+                .sortOrder((long) itemImg.getSortOrder())
                 .build();
     }
 }

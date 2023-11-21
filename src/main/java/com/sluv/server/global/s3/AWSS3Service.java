@@ -5,15 +5,13 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.Headers;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
-import com.sluv.server.domain.user.entity.User;
+import java.net.URL;
+import java.util.Date;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-
-import java.net.URL;
-import java.util.Date;
-import java.util.UUID;
 
 
 @Service
@@ -30,10 +28,7 @@ public class AWSS3Service {
     private String baseUrl = "";
 
     /**
-     * user profile
-     * item image
-     * 커뮤니티 이미지
-     * 클로젯 커버
+     * user profile item image 커뮤니티 이미지 클로젯 커버
      */
     public PreSingedUrlResDto forUserProfile(ImgExtension imgExtension) {
         String fixedExtension = imgExtension.getUploadExtension();
@@ -47,6 +42,7 @@ public class AWSS3Service {
                 .key(fileName)
                 .build();
     }
+
     public PreSingedUrlResDto forItem(ImgExtension imgExtension) {
         String fixedExtension = imgExtension.getUploadExtension();
         String fileName = getForItemFileName(fixedExtension);
@@ -60,6 +56,7 @@ public class AWSS3Service {
                 .key(fileName)
                 .build();
     }
+
     public PreSingedUrlResDto forCommunityPost(ImgExtension imgExtension) {
         String fixedExtension = imgExtension.getUploadExtension();
         String fileName = getForCommunityPostFileName(fixedExtension);
@@ -72,6 +69,7 @@ public class AWSS3Service {
                 .key(fileName)
                 .build();
     }
+
     public PreSingedUrlResDto forCommunityComment(ImgExtension imgExtension) {
         String fixedExtension = imgExtension.getUploadExtension();
         String fileName = getForCommunityCommentFileName(fixedExtension);
@@ -99,6 +97,7 @@ public class AWSS3Service {
                 .key(fileName)
                 .build();
     }
+
     // 유저 프로필
     private String getForUserProfileFileName(String imgExtension) {
         return baseUrl + "/user/profile/" + UUID.randomUUID() + "." + imgExtension;
@@ -124,7 +123,8 @@ public class AWSS3Service {
         return baseUrl + "/closet/" + UUID.randomUUID() + "." + imgExtension;
     }
 
-    private GeneratePresignedUrlRequest getGeneratePreSignedUrlRequest(String bucket, String fileName, String imgExtension) {
+    private GeneratePresignedUrlRequest getGeneratePreSignedUrlRequest(String bucket, String fileName,
+                                                                       String imgExtension) {
         GeneratePresignedUrlRequest generatePresignedUrlRequest =
                 new GeneratePresignedUrlRequest(bucket, fileName)
                         .withMethod(HttpMethod.PUT)

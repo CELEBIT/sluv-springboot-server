@@ -1,26 +1,24 @@
 package com.sluv.server.domain.celeb.service;
 
-import com.sluv.server.domain.celeb.dto.*;
+import com.sluv.server.domain.celeb.dto.CelebChipResDto;
+import com.sluv.server.domain.celeb.dto.CelebSearchByCategoryResDto;
+import com.sluv.server.domain.celeb.dto.CelebSearchResDto;
+import com.sluv.server.domain.celeb.dto.RecentSelectCelebResDto;
 import com.sluv.server.domain.celeb.entity.Celeb;
 import com.sluv.server.domain.celeb.entity.CelebCategory;
-import com.sluv.server.domain.celeb.entity.InterestedCeleb;
 import com.sluv.server.domain.celeb.entity.RecentSelectCeleb;
 import com.sluv.server.domain.celeb.repository.CelebCategoryRepository;
 import com.sluv.server.domain.celeb.repository.CelebRepository;
 import com.sluv.server.domain.celeb.repository.RecentSelectCelebRepository;
 import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.global.common.response.PaginationResDto;
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
-
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
@@ -52,7 +50,7 @@ public class CelebService {
                 .page(celebPage.getNumber())
                 .hasNext(celebPage.hasNext())
                 .content(Stream.concat(childCelebDtoStream, parentCelebDtoStream)
-                                .sorted(Comparator.comparing(CelebSearchResDto::getCelebTotalNameKr)).toList())
+                        .sorted(Comparator.comparing(CelebSearchResDto::getCelebTotalNameKr)).toList())
                 .build();
 
     }

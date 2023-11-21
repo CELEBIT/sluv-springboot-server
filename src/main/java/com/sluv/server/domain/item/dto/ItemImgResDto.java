@@ -18,7 +18,7 @@ public class ItemImgResDto {
     @Schema(description = "이미지 순서")
     private Integer sortOrder;
 
-    public static ItemImgResDto of(ItemImg itemImg){
+    public static ItemImgResDto of(ItemImg itemImg) {
         return ItemImgResDto.builder()
                 .imgUrl(itemImg.getItemImgUrl())
                 .representFlag(itemImg.getRepresentFlag())
@@ -26,7 +26,7 @@ public class ItemImgResDto {
                 .build();
     }
 
-    public static ItemImgResDto of(TempItemImg tempItemImg){
+    public static ItemImgResDto of(TempItemImg tempItemImg) {
         return ItemImgResDto.builder()
                 .imgUrl(tempItemImg.getTempItemImgUrl())
                 .representFlag(tempItemImg.getRepresentFlag())

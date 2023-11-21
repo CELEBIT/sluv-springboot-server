@@ -24,7 +24,7 @@ public class UserSearchInfoDto {
     @Schema(description = "현재 사용자의 팔로우 여부")
     private Boolean followStatus;
 
-    public static UserSearchInfoDto of(User user, Boolean followStatus){
+    public static UserSearchInfoDto of(User user, Boolean followStatus) {
         return UserSearchInfoDto.builder()
                 .id(user.getId())
                 .nickName(user.getNickname())

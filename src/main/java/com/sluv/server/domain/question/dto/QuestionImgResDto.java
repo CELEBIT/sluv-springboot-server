@@ -25,7 +25,7 @@ public class QuestionImgResDto {
     @Schema(description = "순서")
     private Integer sortOrder;
 
-    public static QuestionImgResDto of(QuestionImg questionImg, QuestionVoteDataDto voteDataDto){
+    public static QuestionImgResDto of(QuestionImg questionImg, QuestionVoteDataDto voteDataDto) {
         return QuestionImgResDto.builder()
                 .imgUrl(questionImg.getImgUrl())
                 .description(questionImg.getDescription())

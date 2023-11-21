@@ -15,7 +15,7 @@ public class PlaceRankResDto {
     @Schema(description = "입력한 장소 이름")
     private String placeName;
 
-    public static PlaceRankResDto of(PlaceRank placeRank){
+    public static PlaceRankResDto of(PlaceRank placeRank) {
         return PlaceRankResDto.builder()
                 .placeName(placeRank.getPlace())
                 .build();

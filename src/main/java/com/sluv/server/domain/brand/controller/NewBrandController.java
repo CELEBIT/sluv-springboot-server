@@ -19,7 +19,7 @@ public class NewBrandController {
 
 
     @PostMapping("")
-    public ResponseEntity<SuccessDataResponse<NewBrandPostResDto>> postNewBrand(@RequestBody NewBrandPostReqDto dto){
+    public ResponseEntity<SuccessDataResponse<NewBrandPostResDto>> postNewBrand(@RequestBody NewBrandPostReqDto dto) {
         return ResponseEntity.ok().body(
                 SuccessDataResponse.<NewBrandPostResDto>builder()
                         .result(newBrandService.postNewBrand(dto))

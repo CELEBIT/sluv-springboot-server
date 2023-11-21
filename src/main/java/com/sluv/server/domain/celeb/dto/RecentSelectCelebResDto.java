@@ -23,14 +23,14 @@ public class RecentSelectCelebResDto {
     @Schema(description = "셀럽(Y)과 뉴셀럽(N)을 구분하는 플래그")
     private String flag;
 
-    public static RecentSelectCelebResDto of(RecentSelectCeleb recentSelectCeleb){
+    public static RecentSelectCelebResDto of(RecentSelectCeleb recentSelectCeleb) {
         Long celebChildId;
         Long celebParentId;
         String celebChildName;
         String celebParentName;
 
-        String flag = recentSelectCeleb.getCeleb() != null ? "Y" :"N";
-        if(flag.equals("Y")){
+        String flag = recentSelectCeleb.getCeleb() != null ? "Y" : "N";
+        if (flag.equals("Y")) {
             celebChildId = recentSelectCeleb.getCeleb().getId();
             celebParentId = recentSelectCeleb.getCeleb().getParent() != null
                     ? recentSelectCeleb.getCeleb().getParent().getId()
@@ -39,7 +39,7 @@ public class RecentSelectCelebResDto {
             celebParentName = recentSelectCeleb.getCeleb().getParent() != null
                     ? recentSelectCeleb.getCeleb().getParent().getCelebNameKr()
                     : null;
-        }else{
+        } else {
             celebChildId = recentSelectCeleb.getNewCeleb().getId();
             celebParentId = null;
             celebChildName = recentSelectCeleb.getNewCeleb().getCelebName();

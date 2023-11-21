@@ -3,7 +3,15 @@ package com.sluv.server.domain.comment.entity;
 import com.sluv.server.domain.comment.dto.CommentItemReqDto;
 import com.sluv.server.domain.item.entity.Item;
 import com.sluv.server.global.common.entity.BaseEntity;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -18,7 +26,8 @@ import lombok.NoArgsConstructor;
 @Table(name = "comment_item")
 public class CommentItem extends BaseEntity {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "comment_item_id")
     private Long id;
 
@@ -34,7 +43,7 @@ public class CommentItem extends BaseEntity {
 
     private Integer sortOrder;
 
-    public static CommentItem toEntity(Comment comment, Item item, CommentItemReqDto dto){
+    public static CommentItem toEntity(Comment comment, Item item, CommentItemReqDto dto) {
         return CommentItem.builder()
                 .comment(comment)
                 .item(item)

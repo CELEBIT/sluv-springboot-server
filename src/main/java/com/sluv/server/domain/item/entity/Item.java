@@ -8,15 +8,24 @@ import com.sluv.server.domain.item.dto.ItemPostReqDto;
 import com.sluv.server.domain.item.enums.ItemStatus;
 import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.global.common.entity.BaseEntity;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -26,7 +35,8 @@ import java.time.LocalDateTime;
 @Table(name = "item")
 public class Item extends BaseEntity {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "item_id")
     private Long id;
 
@@ -132,14 +142,16 @@ public class Item extends BaseEntity {
 
     }
 
-    public void increaseViewNum(){
+    public void increaseViewNum() {
         this.viewNum++;
     }
-    public void decreaseViewNum(){
+
+    public void decreaseViewNum() {
         // 레디스 적용전 임시
         this.viewNum--;
     }
-    public void changeStatus(ItemStatus itemStatus){
+
+    public void changeStatus(ItemStatus itemStatus) {
         this.itemStatus = itemStatus;
     }
 }

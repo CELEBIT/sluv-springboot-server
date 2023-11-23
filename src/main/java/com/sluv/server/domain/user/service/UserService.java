@@ -115,7 +115,7 @@ public class UserService {
         List<CelebCategory> categoryList = celebCategoryRepository.findAllByParentIdIsNull();
         changeCategoryOrder(categoryList);
 
-        return categoryList.stream().parallel()
+        return categoryList.stream()
                 // 카테고리별 InterestedCelebCategoryResDto 생성
                 .map(category -> {
                     List<Celeb> categoryFilterCeleb = getCategoryFilterCeleb(interestedCelebList, category);
@@ -144,7 +144,7 @@ public class UserService {
      * 관심셀럽 목록에서 category와 일치하는 Celeb을 분류
      */
     @Transactional(readOnly = true)
-    private List<Celeb> getCategoryFilterCeleb(List<Celeb> celebList, CelebCategory category) {
+    public List<Celeb> getCategoryFilterCeleb(List<Celeb> celebList, CelebCategory category) {
         return celebList.stream().filter(celeb ->
                 // interestedCeleb의 상위 카테고리 id와 카테고리별 묶을 카테고리의 아이디가 일치하는 것만 filtering
                 Objects.equals(

@@ -1,6 +1,7 @@
 package com.sluv.server.domain.celeb.repository.Impl;
 
 import static com.sluv.server.domain.celeb.entity.QCeleb.celeb;
+import static com.sluv.server.domain.celeb.entity.QCelebCategory.celebCategory;
 import static com.sluv.server.domain.celeb.entity.QInterestedCeleb.interestedCeleb;
 import static com.sluv.server.domain.celeb.entity.QRecentSelectCeleb.recentSelectCeleb;
 
@@ -26,8 +27,9 @@ public class CelebRepositoryImpl implements CelebRepositoryCustom {
     @Override
     public List<Celeb> findInterestedCeleb(User _user) {
         log.info("유저 {}의 관심셀럽 조회", _user.getId());
-        return jpaQueryFactory.select(interestedCeleb.celeb)
-                .from(interestedCeleb)
+        return jpaQueryFactory.selectFrom(celeb)
+                .leftJoin(celebCategory).on(celeb.celebCategory.eq(celebCategory)).fetchJoin()
+                .leftJoin(interestedCeleb).on(interestedCeleb.celeb.eq(celeb)).fetchJoin()
                 .where(interestedCeleb.user.eq(_user))
                 .orderBy(interestedCeleb.createdAt.desc())
                 .fetch();

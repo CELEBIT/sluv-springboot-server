@@ -29,6 +29,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.annotation.Nullable;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -44,6 +45,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
+@Slf4j
 @RequestMapping("/app/user")
 public class UserController {
     private final UserService userService;
@@ -478,7 +480,7 @@ public class UserController {
     @GetMapping("/hotSluver")
     public ResponseEntity<SuccessDataResponse<List<UserSearchInfoDto>>> getHotSluver(@AuthenticationPrincipal User user,
                                                                                      @Nullable @RequestParam("celebId") Long celebId) {
-
+        log.info("이번주 인기 스러버 조회");
         return ResponseEntity.ok().body(
                 SuccessDataResponse.<List<UserSearchInfoDto>>builder()
                         .result(userService.getHotSluver(user, celebId))

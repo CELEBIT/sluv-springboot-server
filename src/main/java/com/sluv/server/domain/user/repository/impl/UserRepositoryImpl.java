@@ -94,22 +94,19 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
     @Override
     public List<User> getHotSluver(User _user, Long celebId) {
 
-        JPAQuery<User> query = jpaQueryFactory.select(user)
-                .from(user)
-                .leftJoin(follow).on(follow.followee.id.eq(user.id))
-                .leftJoin(item).on(item.user.id.eq(user.id))
-//                .leftJoin(itemLike).on(itemLike.item.user.id.eq(user.id))
-//                .leftJoin(questionLike).on(questionLike.question.user.id.eq(user.id))
-//                .leftJoin(commentLike).on(commentLike.comment.user.id.eq(user.id))
+        JPAQuery<User> query = jpaQueryFactory.selectFrom(user)
+                .leftJoin(follow).on(follow.followee.eq(user)).fetchJoin()
+                .leftJoin(item).on(item.user.eq(user)).fetchJoin()
+//                .leftJoin(itemLike).on(itemLike.item.user.eq(user)).fetchJoin()
+//                .leftJoin(questionLike).on(questionLike.question.user.eq(user)).fetchJoin()
+//                .leftJoin(commentLike).on(commentLike.comment.user.eq(user)).fetchJoin()
                 .where(user.userStatus.eq(ACTIVE))
                 .groupBy(user);
 
         if (celebId != null) {
             List<User> userList;
-            System.out.println("이익");
-            userList = jpaQueryFactory.select(user)
-                    .from(interestedCeleb)
-                    .leftJoin(interestedCeleb.user, user)
+            userList = jpaQueryFactory.selectFrom(user)
+                    .leftJoin(interestedCeleb).on(interestedCeleb.user.eq(user)).fetchJoin()
                     .where(interestedCeleb.celeb.id.eq(celebId))
                     .fetch();
 

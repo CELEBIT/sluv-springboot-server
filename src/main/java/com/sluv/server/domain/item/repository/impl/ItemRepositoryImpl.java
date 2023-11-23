@@ -674,11 +674,12 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
      */
     @Override
     public List<Item> getCurationItem(User user, List<Celeb> interestedCeleb) {
+        log.info("큐레이션 아이템 조회 Query");
         LocalDateTime now = LocalDateTime.now();
 
         List<Item> content = jpaQueryFactory.selectFrom(item)
-                .leftJoin(itemLike).on(itemLike.item.eq(item))
-                .leftJoin(itemScrap).on(itemScrap.item.eq(item))
+                .leftJoin(itemLike).on(itemLike.item.eq(item)).fetchJoin()
+                .leftJoin(itemScrap).on(itemScrap.item.eq(item)).fetchJoin()
                 .where(item.itemStatus.eq(ACTIVE)
                         .and(item.celeb.in(interestedCeleb)
                                 .or(item.celeb.parent.in(interestedCeleb)))
@@ -693,19 +694,24 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
 
         List<Item> result = content;
 
+        // 관심 셀럽의 아이템이 10개가 채워지지 않는 경우 최신 아이템으로 채움.
         if (content.size() < 10) {
-            List<Item> additionalContent = jpaQueryFactory.selectFrom(item)
-                    .where(item.itemStatus.eq(ACTIVE)
-                            .and(item.notIn(content))
-                    )
-                    .orderBy(item.createdAt.desc())
-                    .limit(10 - content.size())
-                    .fetch();
-
+            log.info("10개가 채워지지 않아 남은 것을 채우는 Query");
+            List<Item> additionalContent = getRecentPostItemsNotInContent(content, 10 - content.size());
             result = Stream.concat(content.stream(), additionalContent.stream()).toList();
         }
 
         return result;
+    }
+
+    private List<Item> getRecentPostItemsNotInContent(List<Item> content, int count) {
+        return jpaQueryFactory.selectFrom(item)
+                .where(item.itemStatus.eq(ACTIVE)
+                        .and(item.notIn(content))
+                )
+                .orderBy(item.createdAt.desc())
+                .limit(count)
+                .fetch();
     }
 
     /**

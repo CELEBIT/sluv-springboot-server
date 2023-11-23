@@ -12,10 +12,12 @@ import com.sluv.server.domain.user.entity.User;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
 
+@Slf4j
 @RequiredArgsConstructor
 public class CelebRepositoryImpl implements CelebRepositoryCustom {
 
@@ -23,7 +25,7 @@ public class CelebRepositoryImpl implements CelebRepositoryCustom {
 
     @Override
     public List<Celeb> findInterestedCeleb(User _user) {
-
+        log.info("유저 {}의 관심셀럽 조회", _user.getId());
         return jpaQueryFactory.select(interestedCeleb.celeb)
                 .from(interestedCeleb)
                 .where(interestedCeleb.user.eq(_user))

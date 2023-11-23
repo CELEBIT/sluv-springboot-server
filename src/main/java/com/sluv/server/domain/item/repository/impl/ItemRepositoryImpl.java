@@ -590,11 +590,11 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
      */
     @Override
     public List<Item> getWeekHotItem() {
+        log.info("주간 셀럽 핫 아이템 조회 쿼리");
         return jpaQueryFactory.select(item)
                 .from(weekHotItem)
-                .leftJoin(weekHotItem.item, item)
+                .leftJoin(item).on(weekHotItem.item.eq(item)).fetchJoin()
                 .where(item.itemStatus.eq(ACTIVE))
-                .groupBy(item)
                 .fetch();
     }
 
@@ -603,11 +603,11 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
      */
     @Override
     public List<Item> getDayHotItem() {
+        log.info("일간 셀럽 핫 아이템 조회 쿼리");
         return jpaQueryFactory.select(item)
                 .from(dayHotItem)
-                .leftJoin(dayHotItem.item, item)
+                .leftJoin(item).on(dayHotItem.item.eq(item)).fetchJoin()
                 .where(item.itemStatus.eq(ACTIVE))
-                .groupBy(item)
                 .fetch();
     }
 

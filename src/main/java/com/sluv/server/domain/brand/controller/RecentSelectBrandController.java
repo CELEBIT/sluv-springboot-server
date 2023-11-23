@@ -15,6 +15,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -27,6 +28,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@Slf4j
 @RequiredArgsConstructor
 @RequestMapping("/app/brand/recent")
 public class RecentSelectBrandController {
@@ -67,6 +69,8 @@ public class RecentSelectBrandController {
     @PostMapping("")
     public ResponseEntity<SuccessResponse> postRecentSelectBrand(@AuthenticationPrincipal User user,
                                                                  @RequestBody RecentSelectBrandReqDto dto) {
+        log.info("유저의 최근 선택한 브랜드 등록. 유저 : {}, Brand {}, NewBrand {}",
+                user.getId(), dto.getBrandId(), dto.getNewBrandId());
 
         recentSelectBrandService.postRecentSelectBrand(user, dto);
 
@@ -86,8 +90,8 @@ public class RecentSelectBrandController {
     })
     @DeleteMapping("")
     public ResponseEntity<SuccessResponse> deleteAllRecentSelectBrand(@AuthenticationPrincipal User user) {
+        log.info("유저의 최근 선택한 브랜드 모두 삭제. 유저 : {}", user.getId());
         recentSelectBrandService.deleteAllRecentSelectBrand(user);
-
         return ResponseEntity.ok().body(
                 new SuccessResponse()
         );
@@ -106,6 +110,7 @@ public class RecentSelectBrandController {
     public ResponseEntity<SuccessResponse> deleteRecentSelectBrand(@AuthenticationPrincipal User user,
                                                                    @PathVariable("brandId") Long brandId,
                                                                    @RequestParam("flag") String flag) {
+        log.info("유저의 최근 선택한 브랜드 삭제. 유저 : {}, 브랜드 : {}, 플래그 : {}", user.getId(), brandId, flag);
         recentSelectBrandService.deleteRecentSelectBrand(user, brandId, flag);
         return ResponseEntity.ok().body(
                 new SuccessResponse()

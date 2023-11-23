@@ -382,12 +382,8 @@ public class ItemService {
      */
     @Transactional(readOnly = true)
     public PaginationResDto<ItemSimpleResDto> getNowBuyItem(User user, Pageable pageable, SearchFilterReqDto dto) {
-        // itemPage 조회
         Page<Item> itemPage = itemRepository.getNowBuyItem(pageable, dto);
-
-        // Content 조립
         List<ItemSimpleResDto> content = itemRepository.getItemSimpleResDto(user, itemPage.getContent());
-
         return PaginationResDto.of(itemPage, content);
 
     }

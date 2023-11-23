@@ -422,14 +422,14 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
     }
 
     /**
-     * 핫한 셀럽들이 선택한 여름나기 아이템
+     * 당장 구매할 수 있는 아이템.
      */
     @Override
     public Page<Item> getNowBuyItem(Pageable pageable, SearchFilterReqDto dto) {
-        JPAQuery<Item> query = jpaQueryFactory.select(item)
-                .from(itemLink)
-                .leftJoin(itemLink.item, item)
-                .where(item.itemStatus.eq(ACTIVE))
+        log.info("지금 당장 구매 가능한 아이템 조회 Query");
+        JPAQuery<Item> query = jpaQueryFactory.selectFrom(item)
+                .leftJoin(itemLink).on(itemLink.item.eq(item)).fetchJoin()
+                .where(item.itemStatus.eq(ACTIVE).and(itemLink.item.isNotNull()))
                 .groupBy(item)
                 .orderBy(item.whenDiscovery.desc());
         // Filter 추가
@@ -442,15 +442,15 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
                 .fetch();
 
         // Count Query
-        JPAQuery<Item> countQuery = jpaQueryFactory.select(item)
-                .from(itemLink)
-                .leftJoin(itemLink.item, item)
-                .where(item.itemStatus.eq(ACTIVE))
+        JPAQuery<Item> countQuery = jpaQueryFactory.selectFrom(item)
+                .leftJoin(itemLink).on(itemLink.item.eq(item)).fetchJoin()
+                .where(item.itemStatus.eq(ACTIVE).and(itemLink.item.isNotNull()))
                 .groupBy(item)
                 .orderBy(item.whenDiscovery.desc());
         // Filter 추가
         addFilterWhere(countQuery, dto);
 
+        log.info("지금 당장 구매 가능한 아이템 조회 Count Query");
         return PageableExecutionUtils.getPage(content, pageable, () -> countQuery.fetch().size());
     }
 

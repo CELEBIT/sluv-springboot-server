@@ -14,6 +14,7 @@ import static com.sluv.server.domain.item.entity.QItemScrap.itemScrap;
 import static com.sluv.server.domain.item.entity.QLuxuryItem.luxuryItem;
 import static com.sluv.server.domain.item.entity.QRecentItem.recentItem;
 import static com.sluv.server.domain.item.entity.QWeekHotItem.weekHotItem;
+import static com.sluv.server.domain.item.enums.ItemNumberConfig.이_아이템은_어때요_개수;
 import static com.sluv.server.domain.item.enums.ItemStatus.ACTIVE;
 import static com.sluv.server.domain.user.entity.QUser.user;
 
@@ -719,6 +720,7 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
      */
     @Override
     public List<Item> getHowAboutItem(User _user, List<Celeb> interestedCelebList) {
+        log.info("동일한 관심셀럽을 가진 유저 목록 조회");
         List<User> userList = jpaQueryFactory.select(user)
                 .from(interestedCeleb)
                 .leftJoin(interestedCeleb.user, user)
@@ -726,7 +728,7 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
                         .and(interestedCeleb.user.userStatus.eq(UserStatus.ACTIVE))
                 )
                 .fetch();
-
+        log.info("유저가 좋아요한 아이템 추천");
         return jpaQueryFactory.select(item)
                 .from(itemLike)
                 .leftJoin(itemLike.item, item)
@@ -735,7 +737,7 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
                 )
                 .orderBy(itemLike.count().desc())
                 .groupBy(item)
-                .limit(4)
+                .limit(이_아이템은_어때요_개수.getNumber())
                 .fetch();
 
     }

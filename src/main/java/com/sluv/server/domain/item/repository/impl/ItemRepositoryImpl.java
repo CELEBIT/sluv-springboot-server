@@ -487,11 +487,11 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
 
     @Override
     public Page<Item> getLuxuryItem(Pageable pageable, SearchFilterReqDto dto) {
-        JPAQuery<Item> query = jpaQueryFactory.select(item)
-                .from(luxuryItem)
-                .leftJoin(luxuryItem.item, item)
-                .leftJoin(itemLike).on(itemLike.item.eq(item))
-                .leftJoin(itemScrap).on(itemScrap.item.eq(item))
+        log.info("럭셔리 아이템 조회 Query");
+        JPAQuery<Item> query = jpaQueryFactory.selectFrom(item)
+                .leftJoin(luxuryItem).on(luxuryItem.item.eq(item)).fetchJoin()
+                .leftJoin(itemLike).on(itemLike.item.eq(item)).fetchJoin()
+                .leftJoin(itemScrap).on(itemScrap.item.eq(item)).fetchJoin()
                 .groupBy(item);
 
         addFilterWhere(query, dto);
@@ -501,12 +501,12 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
                 .limit(pageable.getPageSize())
                 .fetch();
 
+        log.info("럭셔리 아이템 조회 Count Query");
         // Count Query
-        JPAQuery<Item> countQuery = jpaQueryFactory.select(item)
-                .from(luxuryItem)
-                .leftJoin(luxuryItem.item, item)
-                .leftJoin(itemLike).on(itemLike.item.eq(item))
-                .leftJoin(itemScrap).on(itemScrap.item.eq(item))
+        JPAQuery<Item> countQuery = jpaQueryFactory.selectFrom(item)
+                .leftJoin(luxuryItem).on(luxuryItem.item.eq(item)).fetchJoin()
+                .leftJoin(itemLike).on(itemLike.item.eq(item)).fetchJoin()
+                .leftJoin(itemScrap).on(itemScrap.item.eq(item)).fetchJoin()
                 .groupBy(item);
 
         addFilterWhere(countQuery, dto);

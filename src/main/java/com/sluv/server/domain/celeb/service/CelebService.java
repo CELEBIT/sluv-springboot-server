@@ -96,6 +96,18 @@ public class CelebService {
 
     }
 
+    /**
+     * 가수 -> 배우 -> 방송인 -> 스포츠인 -> 인플루언서 순서로 변
+     */
+
+    private void changeCategoryOrder(List<CelebCategory> categoryList) {
+        categoryList.sort(Comparator.comparing(CelebCategory::getName));
+
+        CelebCategory tempCategory = categoryList.get(1);
+        categoryList.set(1, categoryList.get(2));
+        categoryList.set(2, tempCategory);
+    }
+
     @Transactional(readOnly = true)
     public List<CelebSearchByCategoryResDto> searchInterestedCelebByName(String celebName) {
         // 1. Parent Celeb과 일치
@@ -134,15 +146,4 @@ public class CelebService {
                 .toList();
     }
 
-    /**
-     * 가수 -> 배우 -> 방송인 -> 스포츠인 -> 인플루언서 순서로 변
-     */
-
-    private void changeCategoryOrder(List<CelebCategory> categoryList) {
-        categoryList.sort(Comparator.comparing(CelebCategory::getName));
-
-        CelebCategory tempCategory = categoryList.get(1);
-        categoryList.set(1, categoryList.get(2));
-        categoryList.set(2, tempCategory);
-    }
 }

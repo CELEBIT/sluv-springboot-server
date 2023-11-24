@@ -9,12 +9,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@Transactional
 @RequiredArgsConstructor
 public class NewCelebService {
 
     private final NewCelebRepository newCelebRepository;
 
+    @Transactional
     public NewCelebPostResDto postNewCeleb(NewCelebPostReqDto dto) {
         NewCeleb newCeleb = newCelebRepository.save(
                 NewCeleb.toEntity(dto)

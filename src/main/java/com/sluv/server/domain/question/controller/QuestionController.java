@@ -58,7 +58,6 @@ public class QuestionController {
     @PostMapping("/find")
     public ResponseEntity<SuccessDataResponse<QuestionPostResDto>> postFind(@AuthenticationPrincipal User user,
                                                                             @RequestBody QuestionFindPostReqDto dto) {
-
         return ResponseEntity.ok().body(
                 SuccessDataResponse.<QuestionPostResDto>builder()
                         .result(questionService.postQuestionFind(user, dto))

@@ -65,13 +65,14 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@Transactional
+@Slf4j
 @RequiredArgsConstructor
 public class QuestionService {
     private final QuestionRepository questionRepository;
@@ -92,6 +93,7 @@ public class QuestionService {
     private final DailyHotQuestionRepository dailyHotQuestionRepository;
 
 
+    @Transactional
     public QuestionPostResDto postQuestionFind(User user, QuestionFindPostReqDto dto) {
         /**
          * 1. 생성 or 수정
@@ -99,6 +101,8 @@ public class QuestionService {
          * 3. QuestionImg 저장
          * 4. QuestionItem 저장
          */
+        log.info("찾아주세요 게시글 등록 or 수정 - 사용자 : {}, 질문 게시글 : {}, 질문 게시글 제목 : {}",
+                user.getId(), dto.getId() == null ? null : dto.getId(), dto.getTitle());
         // 1. 생성 or 수정
         Celeb celeb = null;
         if (dto.getCelebId() != null) {
@@ -124,6 +128,7 @@ public class QuestionService {
 
     }
 
+    @Transactional
     public QuestionPostResDto postQuestionBuy(User user, QuestionBuyPostReqDto dto) {
         /**
          * 1. 생성 or 수정
@@ -131,6 +136,8 @@ public class QuestionService {
          * 3. QuestionImg 저장
          * 4. QuestionItem 저장
          */
+        log.info("이 중에 뭐 살까 게시글 등록 or 수정 - 사용자 : {}, 질문 게시글 : {}, 질문 게시글 제목 : {}",
+                user.getId(), dto.getId() == null ? null : dto.getId(), dto.getTitle());
 
         // 1. 생성 or 수정
         QuestionBuy questionBuy = QuestionBuy.toEntity(user, dto);
@@ -147,6 +154,7 @@ public class QuestionService {
         return QuestionPostResDto.of(newQuestionBuy.getId());
     }
 
+    @Transactional
     public QuestionPostResDto postQuestionHowabout(User user, QuestionHowaboutPostReqDto dto) {
         /**
          * 1. 생성 or 수정
@@ -154,6 +162,9 @@ public class QuestionService {
          * 3. QuestionImg 저장
          * 4. QuestionItem 저장
          */
+
+        log.info("이거 어때 게시글 등록 or 수정 - 사용자 : {}, 질문 게시글 : {}, 질문 게시글 제목 : {}",
+                user.getId(), dto.getId() == null ? null : dto.getId(), dto.getTitle());
 
         // 1. 생성 or 수정
         QuestionHowabout questionHowabout = QuestionHowabout.toEntity(user, dto);
@@ -170,6 +181,7 @@ public class QuestionService {
         return QuestionPostResDto.of(newQuestionHowabout.getId());
     }
 
+    @Transactional
     public QuestionPostResDto postQuestionRecommend(User user, QuestionRecommendPostReqDto dto) {
         /**
          * 1. 생성 or 수정
@@ -178,7 +190,8 @@ public class QuestionService {
          * 3. QuestionImg 저장
          * 4. QuestionItem 저장
          */
-
+        log.info("추천해줘 게시글 등록 or 수정 - 사용자 : {}, 질문 게시글 : {}, 질문 게시글 제목 : {}",
+                user.getId(), dto.getId() == null ? null : dto.getId(), dto.getTitle());
         // 1. 생성 or 수정
         QuestionRecommend questionRecommend = QuestionRecommend.toEntity(user, dto);
 
@@ -241,13 +254,16 @@ public class QuestionService {
         }
     }
 
+    @Transactional
     public void deleteQuestion(Long questionId) {
+        log.info("질문 게시글 삭제 - 질문 게시글 : {}", questionId);
         Question question = questionRepository.findById(questionId).orElseThrow(QuestionNotFoundException::new);
-
         question.changeQuestionStatus(QuestionStatus.DELETED);
     }
 
+    @Transactional
     public void postQuestionLike(User user, Long questionId) {
+        log.info("질문 게시글 좋아요 - 사용자 : {}, 질문 게시글 : {}", user.getId(), questionId);
         // 해당 유저의 Question 게시물 like 여부 검색
         Boolean likeStatus = questionLikeRepository.existsByQuestionIdAndUserId(questionId, user.getId());
         Question question = questionRepository.findById(questionId).orElseThrow(QuestionNotFoundException::new);
@@ -266,7 +282,9 @@ public class QuestionService {
 
     }
 
+    @Transactional
     public void postQuestionReport(User user, Long questionId, QuestionReportReqDto dto) {
+        log.info("질문 게시글 신고 - 사용자 : {}, 질문 게시글 : {}, 사유 : {}", user.getId(), questionId, dto.getReason());
         Boolean reportExist = questionReportRepository.existsByQuestionIdAndReporterId(questionId, user.getId());
 
         if (!reportExist) {
@@ -283,6 +301,7 @@ public class QuestionService {
         }
     }
 
+    @Transactional
     public QuestionGetDetailResDto getQuestionDetail(User user, Long questionId) {
         Question question = questionRepository.findById(questionId).orElseThrow(QuestionNotFoundException::new);
 
@@ -402,7 +421,6 @@ public class QuestionService {
     /**
      * builder에 VoteNum, VotePercent 탑재
      */
-    @Transactional(readOnly = true)
     private QuestionVoteDataDto getVoteData(Long questionId, Long sortOrder) {
 
         // 해당 SortOrder의 투표 수
@@ -423,14 +441,15 @@ public class QuestionService {
      */
     private Double getVotePercent(Long voteNum, Long totalVoteNum) {
         double div = (double) voteNum / (double) totalVoteNum;
-
         return Math.round(div * 1000) / 10.0;
     }
 
     /**
      * QuestionBuy 등록 및 취소
      */
+    @Transactional
     public void postQuestionVote(User user, Long questionId, QuestionVoteReqDto dto) {
+        log.info("질문 게시글 투표 - 사용자 : {}, 질문 게시글 : {}, 투표 : {}", user.getId(), questionId, dto.getVoteSortOrder());
         QuestionVote questionVote = questionVoteRepository.findByQuestionIdAndUserId(questionId, user.getId())
                 .orElse(null);
 
@@ -515,7 +534,6 @@ public class QuestionService {
                 ).toList();
     }
 
-    @Transactional(readOnly = true)
     private QuestionSimpleResDto getQuestionSimpleResDto(Question question, String qType) {
 
         List<QuestionImgSimpleResDto> imgList = new ArrayList<>();

@@ -61,11 +61,11 @@ public class Closet extends BaseEntity {
     @Column(length = 45, columnDefinition = "varchar(45) default 'PUBLIC'")
     private ClosetStatus closetStatus;
 
-    public void changeClosetCover(String name, String coverImgUrl, ClosetColor color, ClosetStatus closetStatus) {
-        this.name = name;
-        this.coverImgUrl = coverImgUrl;
-        this.color = color;
-        this.closetStatus = closetStatus;
+    public void changeCloset(ClosetReqDto dto) {
+        this.name = dto.getName();
+        this.coverImgUrl = dto.getCoverImgUrl();
+        this.color = dto.getColorScheme();
+        this.closetStatus = dto.getClosetStatus();
     }
 
     public static Closet toEntity(User user, ClosetReqDto dto) {

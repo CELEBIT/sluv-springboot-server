@@ -150,24 +150,41 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
     }
 
     @Override
-    public Page<Item> getClosetItems(Closet _closet, Pageable pageable) {
-        List<Item> content = jpaQueryFactory.select(item)
-                .from(itemScrap)
-                .leftJoin(itemScrap.item, item)
-                .where(itemScrap.closet.eq(_closet))
+    public Page<ItemSimpleResDto> getClosetItems(Closet closets, Pageable pageable) {
+//        List<Item> content = jpaQueryFactory.select(item)
+//                .from(itemScrap)
+//                .leftJoin(itemScrap.item, item)
+//                .where(itemScrap.closet.eq(closets))
+//                .offset(pageable.getOffset())
+//                .limit(pageable.getPageSize())
+//                .orderBy(itemScrap.createdAt.desc())
+//                .fetch();
+
+        List<Tuple> content = jpaQueryFactory.select(item, itemImg, itemScrap)
+                .from(item)
+                .leftJoin(item.brand, brand).fetchJoin()
+                .leftJoin(item.celeb, celeb).fetchJoin()
+                .leftJoin(itemImg).on(itemImg.item.eq(item)).fetchJoin()
+                .leftJoin(itemScrap).on(itemScrap.item.eq(item).and(itemScrap.closet.in(closets))).fetchJoin()
+                .where(itemScrap.closet.eq(closets).and(itemImg.representFlag.eq(true)))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .orderBy(itemScrap.createdAt.desc())
                 .fetch();
 
         // Count Query
-        JPAQuery<Item> countJPAQuery = jpaQueryFactory.select(item)
-                .from(itemScrap)
-                .leftJoin(itemScrap.item, item)
-                .where(itemScrap.closet.eq(_closet))
+        JPAQuery<Tuple> countJPAQuery = jpaQueryFactory.select(item, itemImg, itemScrap)
+                .from(item)
+                .leftJoin(item.brand, brand).fetchJoin()
+                .leftJoin(item.celeb, celeb).fetchJoin()
+                .leftJoin(itemImg).on(itemImg.item.eq(item)).fetchJoin()
+                .leftJoin(itemScrap).on(itemScrap.item.eq(item).and(itemScrap.closet.in(closets))).fetchJoin()
+                .where(itemScrap.closet.eq(closets).and(itemImg.representFlag.eq(true)))
                 .orderBy(itemScrap.createdAt.desc());
 
-        return PageableExecutionUtils.getPage(content, pageable, () -> countJPAQuery.fetch().size());
+        return PageableExecutionUtils.getPage(content.stream()
+                .map(tuple -> ItemSimpleResDto.of(tuple.get(item), tuple.get(itemImg), tuple.get(itemScrap) != null))
+                .toList(), pageable, () -> countJPAQuery.fetch().size());
     }
 
     @Override

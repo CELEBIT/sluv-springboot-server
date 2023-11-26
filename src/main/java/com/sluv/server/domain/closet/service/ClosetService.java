@@ -14,7 +14,6 @@ import com.sluv.server.domain.closet.exception.ClosetNotFoundException;
 import com.sluv.server.domain.closet.repository.ClosetRepository;
 import com.sluv.server.domain.item.dto.ItemSimpleResDto;
 import com.sluv.server.domain.item.entity.Item;
-import com.sluv.server.domain.item.entity.ItemImg;
 import com.sluv.server.domain.item.entity.ItemScrap;
 import com.sluv.server.domain.item.exception.ItemNotFoundException;
 import com.sluv.server.domain.item.repository.ItemImgRepository;
@@ -178,39 +177,13 @@ public class ClosetService {
     @Transactional(readOnly = true)
     public ClosetDetailResDto<ItemSimpleResDto> getClosetDetails(User user, Long closetId, Pageable pageable) {
         Closet closet = closetRepository.findById(closetId).orElseThrow(ClosetNotFoundException::new);
-
         if (!closet.getUser().getId().equals(user.getId())) {
-            log.info("User did Not Matched. User Id: {}, Closet Owner Id : {}", user.getId(), closet.getUser().getId());
+            log.info("User did Not Matched. User Id: {}, Closet Owner Id : {}", user.getId(),
+                    closet.getUser().getId());
             throw new UserNotMatchedException();
         }
-
-        Page<Item> itemPage = itemRepository.getClosetItems(closet, pageable);
-
-        List<ItemSimpleResDto> content = getItemContent(user, itemPage);
-
-        return ClosetDetailResDto.<ItemSimpleResDto>builder()
-                .hasNext(itemPage.hasNext())
-                .page(itemPage.getNumber())
-                .content(content)
-                .id(closet.getId())
-                .coverImgUrl(closet.getCoverImgUrl())
-                .name(closet.getName())
-                .closetStatus(closet.getClosetStatus())
-                .colorScheme(closet.getColor())
-                .itemNum(itemPage.getTotalElements())
-                .build();
-
-    }
-
-    private List<ItemSimpleResDto> getItemContent(User user, Page<Item> itemPage) {
-        List<Closet> closetList = closetRepository.findAllByUserId(user.getId());
-
-        return itemPage.stream()
-                .map(item -> {
-                    ItemImg mainImg = itemImgRepository.findMainImg(item.getId());
-                    Boolean itemScrapStatus = itemScrapRepository.getItemScrapStatus(item, closetList);
-                    return ItemSimpleResDto.of(item, mainImg, itemScrapStatus);
-                }).toList();
+        Page<ItemSimpleResDto> itemPage = itemRepository.getClosetItems(closet, pageable);
+        return ClosetDetailResDto.of(itemPage, closet);
     }
 
     @Transactional(readOnly = true)

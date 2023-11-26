@@ -21,7 +21,7 @@ public interface ItemRepositoryCustom {
 
     Page<Item> getAllScrapItem(User user, Pageable pageable);
 
-    Page<Item> getClosetItems(Closet closet, Pageable pageable);
+    Page<ItemSimpleResDto> getClosetItems(Closet closet, Pageable pageable);
 
     List<Item> getSameClosetItems(Item item, List<Closet> closetList);
 

@@ -188,19 +188,8 @@ public class ClosetService {
 
     @Transactional(readOnly = true)
     public ClosetListCountResDto getClosetList(User user) {
-        List<Closet> closetList = closetRepository.findAllByUserId(user.getId());
-
-        List<ClosetResDto> closetResDtoList = closetList
-                .stream().map(closet -> ClosetResDto.of(
-                                closet,
-                                itemScrapRepository.countByClosetId(closet.getId())
-                        )
-                ).toList();
-
-        return ClosetListCountResDto.of(
-                closetRepository.countByUserId(user.getId()),
-                closetResDtoList
-        );
+        List<ClosetResDto> closetResDtos = closetRepository.getUserClosetList(user);
+        return ClosetListCountResDto.of(closetRepository.countByUserId(user.getId()), closetResDtos);
     }
 
     /**

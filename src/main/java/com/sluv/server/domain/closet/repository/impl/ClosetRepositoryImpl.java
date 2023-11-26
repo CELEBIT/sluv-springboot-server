@@ -1,19 +1,21 @@
 package com.sluv.server.domain.closet.repository.impl;
 
+import static com.sluv.server.domain.closet.entity.QCloset.closet;
+import static com.sluv.server.domain.item.entity.QItemScrap.itemScrap;
+
+import com.querydsl.core.Tuple;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.sluv.server.domain.closet.dto.ClosetResDto;
 import com.sluv.server.domain.closet.entity.Closet;
 import com.sluv.server.domain.closet.enums.ClosetStatus;
 import com.sluv.server.domain.item.entity.Item;
+import com.sluv.server.domain.user.entity.User;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
-
-import java.util.List;
-
-import static com.sluv.server.domain.closet.entity.QCloset.closet;
-import static com.sluv.server.domain.item.entity.QItemScrap.itemScrap;
 
 @RequiredArgsConstructor
 public class ClosetRepositoryImpl implements ClosetRepositoryCustom {
@@ -71,5 +73,19 @@ public class ClosetRepositoryImpl implements ClosetRepositoryCustom {
                 .orderBy(closet.id.desc());
 
         return PageableExecutionUtils.getPage(content, pageable, () -> query.fetch().size());
+    }
+
+    @Override
+    public List<ClosetResDto> getUserClosetList(User user) {
+        List<Tuple> content = jpaQueryFactory.select(closet, itemScrap.count())
+                .from(closet)
+                .leftJoin(itemScrap).on(itemScrap.closet.eq(closet))
+                .where(closet.user.eq(user))
+                .groupBy(closet)
+                .fetch();
+
+        return content.stream()
+                .map(tuple -> ClosetResDto.of(tuple.get(closet), tuple.get(itemScrap.count())))
+                .toList();
     }
 }

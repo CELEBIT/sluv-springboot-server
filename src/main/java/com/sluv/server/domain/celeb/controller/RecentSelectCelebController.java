@@ -1,7 +1,7 @@
 package com.sluv.server.domain.celeb.controller;
 
-import com.sluv.server.domain.celeb.dto.RecentSelectCelebResDto;
 import com.sluv.server.domain.celeb.dto.RecentSelectCelebReqDto;
+import com.sluv.server.domain.celeb.dto.RecentSelectCelebResDto;
 import com.sluv.server.domain.celeb.service.CelebService;
 import com.sluv.server.domain.celeb.service.RecentSelectCelebService;
 import com.sluv.server.domain.user.entity.User;
@@ -9,18 +9,22 @@ import com.sluv.server.global.common.response.ErrorResponse;
 import com.sluv.server.global.common.response.SuccessDataResponse;
 import com.sluv.server.global.common.response.SuccessResponse;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
@@ -39,7 +43,8 @@ public class RecentSelectCelebController {
             @ApiResponse(responseCode = "5001", description = "DB 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @GetMapping("")
-    public ResponseEntity<SuccessDataResponse<List<RecentSelectCelebResDto>>> getRecentSelectCeleb(@AuthenticationPrincipal User user){
+    public ResponseEntity<SuccessDataResponse<List<RecentSelectCelebResDto>>> getRecentSelectCeleb(
+            @AuthenticationPrincipal User user) {
 
         return ResponseEntity.ok().body(
                 SuccessDataResponse.<List<RecentSelectCelebResDto>>builder()
@@ -58,7 +63,8 @@ public class RecentSelectCelebController {
             @ApiResponse(responseCode = "5001", description = "DB 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @PostMapping("")
-    public ResponseEntity<SuccessResponse> postRecentSelectCeleb(@AuthenticationPrincipal User user, @RequestBody RecentSelectCelebReqDto dto ){
+    public ResponseEntity<SuccessResponse> postRecentSelectCeleb(@AuthenticationPrincipal User user,
+                                                                 @RequestBody RecentSelectCelebReqDto dto) {
 
         recentSelectCelebService.postRecentSelectCeleb(user, dto);
 
@@ -66,6 +72,7 @@ public class RecentSelectCelebController {
                 new SuccessResponse()
         );
     }
+
     @Operation(
             summary = "*유저가 최근 선택한 셀럽 모두 삭제",
             description = "유저가 최근 선택한 셀럽 모두 삭제 API"
@@ -76,13 +83,14 @@ public class RecentSelectCelebController {
             @ApiResponse(responseCode = "5001", description = "DB 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @DeleteMapping("")
-    public ResponseEntity<SuccessResponse> deleteAllRecentSelectCeleb(@AuthenticationPrincipal User user){
+    public ResponseEntity<SuccessResponse> deleteAllRecentSelectCeleb(@AuthenticationPrincipal User user) {
         recentSelectCelebService.deleteAllRecentSelectCeleb(user);
 
         return ResponseEntity.ok().body(
                 new SuccessResponse()
         );
     }
+
     @Operation(
             summary = "*유저의 특정 [최근 선택한 셀럽] 삭제",
             description = "유저의 특정 [최근 선택한 셀럽] 삭제 API"
@@ -93,7 +101,9 @@ public class RecentSelectCelebController {
             @ApiResponse(responseCode = "5001", description = "DB 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @DeleteMapping("/{celebId}")
-    public ResponseEntity<SuccessResponse> deleteRecentSelectCeleb(@AuthenticationPrincipal User user, @PathVariable("celebId") Long celebId, @RequestParam("flag") String flag){
+    public ResponseEntity<SuccessResponse> deleteRecentSelectCeleb(@AuthenticationPrincipal User user,
+                                                                   @PathVariable("celebId") Long celebId,
+                                                                   @RequestParam("flag") String flag) {
         recentSelectCelebService.deleteRecentSelectCeleb(user, celebId, flag);
 
         return ResponseEntity.ok().body(

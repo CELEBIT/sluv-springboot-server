@@ -1,16 +1,15 @@
 package com.sluv.server.domain.item.repository.impl;
 
+import static com.sluv.server.domain.item.entity.QPlaceRank.placeRank;
+
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sluv.server.domain.item.entity.PlaceRank;
 import com.sluv.server.domain.user.entity.User;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 
-import java.util.List;
-
-import static com.sluv.server.domain.item.entity.QPlaceRank.placeRank;
-
 @RequiredArgsConstructor
-public class PlaceRankRepositoryImpl implements PlaceRankRepositoryCustom{
+public class PlaceRankRepositoryImpl implements PlaceRankRepositoryCustom {
 
     private final JPAQueryFactory jpaQueryFactory;
 

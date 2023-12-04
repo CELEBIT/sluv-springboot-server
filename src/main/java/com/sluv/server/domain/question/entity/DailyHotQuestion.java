@@ -23,7 +23,7 @@ public class DailyHotQuestion extends BaseEntity {
     @Column(name = "daily_hot_question_id")
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "question_id")
     @NotNull
     private Question question;

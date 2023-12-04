@@ -1,30 +1,24 @@
 package com.sluv.server.domain.user.repository.impl;
 
+import static com.sluv.server.domain.celeb.entity.QInterestedCeleb.interestedCeleb;
+import static com.sluv.server.domain.item.entity.QItem.item;
+import static com.sluv.server.domain.user.entity.QFollow.follow;
+import static com.sluv.server.domain.user.entity.QUser.user;
+import static com.sluv.server.domain.user.enums.UserStatus.ACTIVE;
+
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.sluv.server.domain.celeb.entity.Celeb;
-import com.sluv.server.domain.user.entity.QUser;
 import com.sluv.server.domain.user.entity.User;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
 
-import java.util.List;
-
-import static com.sluv.server.domain.celeb.entity.QCeleb.celeb;
-import static com.sluv.server.domain.celeb.entity.QInterestedCeleb.interestedCeleb;
-import static com.sluv.server.domain.comment.entity.QCommentLike.commentLike;
-import static com.sluv.server.domain.item.entity.QItem.item;
-import static com.sluv.server.domain.item.entity.QItemLike.itemLike;
-import static com.sluv.server.domain.question.entity.QQuestionLike.questionLike;
-import static com.sluv.server.domain.user.entity.QFollow.follow;
-import static com.sluv.server.domain.user.entity.QUser.user;
-import static com.sluv.server.domain.user.enums.UserStatus.ACTIVE;
-
 @RequiredArgsConstructor
-public class UserRepositoryImpl implements UserRepositoryCustom{
+public class UserRepositoryImpl implements UserRepositoryCustom {
     private final JPAQueryFactory jpaQueryFactory;
+
     @Override
     public Page<User> getSearchUser(List<Long> userIdList, Pageable pageable) {
         List<User> content = jpaQueryFactory.selectFrom(user)
@@ -43,13 +37,11 @@ public class UserRepositoryImpl implements UserRepositoryCustom{
                 )
                 .orderBy(user.createdAt.desc());// 추후 예정
 
-
         return PageableExecutionUtils.getPage(content, pageable, () -> countJPAQuery.fetch().size());
     }
 
     /**
      * 특정 유저의 팔로워 조회
-     *
      */
     @Override
     public Page<User> getAllFollower(Long userId, Pageable pageable) {
@@ -74,7 +66,6 @@ public class UserRepositoryImpl implements UserRepositoryCustom{
 
     /**
      * 특정 유저가 팔로잉하고 있는 유저 조회
-     *
      */
     @Override
     public Page<User> getAllFollowing(Long userId, Pageable pageable) {
@@ -99,28 +90,23 @@ public class UserRepositoryImpl implements UserRepositoryCustom{
 
     /**
      * 전체 / 셀럽 별 인기 스러버 조회
-     *
      */
     @Override
     public List<User> getHotSluver(User _user, Long celebId) {
 
-        JPAQuery<User> query = jpaQueryFactory.select(user)
-                .from(user)
-                .leftJoin(follow).on(follow.followee.id.eq(user.id))
-                .leftJoin(item).on(item.user.id.eq(user.id))
-//                .leftJoin(itemLike).on(itemLike.item.user.id.eq(user.id))
-//                .leftJoin(questionLike).on(questionLike.question.user.id.eq(user.id))
-//                .leftJoin(commentLike).on(commentLike.comment.user.id.eq(user.id))
+        JPAQuery<User> query = jpaQueryFactory.selectFrom(user)
+                .leftJoin(follow).on(follow.followee.eq(user)).fetchJoin()
+                .leftJoin(item).on(item.user.eq(user)).fetchJoin()
+//                .leftJoin(itemLike).on(itemLike.item.user.eq(user)).fetchJoin()
+//                .leftJoin(questionLike).on(questionLike.question.user.eq(user)).fetchJoin()
+//                .leftJoin(commentLike).on(commentLike.comment.user.eq(user)).fetchJoin()
                 .where(user.userStatus.eq(ACTIVE))
                 .groupBy(user);
 
-
-        if(celebId != null){
+        if (celebId != null) {
             List<User> userList;
-            System.out.println("이익");
-            userList = jpaQueryFactory.select(user)
-                    .from(interestedCeleb)
-                    .leftJoin(interestedCeleb.user, user)
+            userList = jpaQueryFactory.selectFrom(user)
+                    .leftJoin(interestedCeleb).on(interestedCeleb.user.eq(user)).fetchJoin()
                     .where(interestedCeleb.celeb.id.eq(celebId))
                     .fetch();
 

@@ -21,7 +21,6 @@ public class SwaggerConfig {
                 .title("Sluv")
                 .description("Sluv Swagger");
 
-
         // SecuritySecheme명
         String jwtSchemeName = "AccessToken";
         // API 요청헤더에 인증정보 포함
@@ -41,7 +40,7 @@ public class SwaggerConfig {
     }
 
     @Bean
-    public GroupedOpenApi allGroup(){
+    public GroupedOpenApi allGroup() {
         return GroupedOpenApi.builder()
                 .group("All")
                 .pathsToMatch("/**")
@@ -49,7 +48,7 @@ public class SwaggerConfig {
     }
 
     @Bean
-    public GroupedOpenApi appGroup(){
+    public GroupedOpenApi appGroup() {
         return GroupedOpenApi.builder()
                 .group("App")
                 .pathsToMatch("/app/**")
@@ -57,7 +56,7 @@ public class SwaggerConfig {
     }
 
     @Bean
-    public GroupedOpenApi authGroup(){
+    public GroupedOpenApi authGroup() {
         return GroupedOpenApi.builder()
                 .group("Auth")
                 .pathsToMatch("/app/auth/**")
@@ -65,7 +64,7 @@ public class SwaggerConfig {
     }
 
     @Bean
-    public GroupedOpenApi brandGroup(){
+    public GroupedOpenApi brandGroup() {
         return GroupedOpenApi.builder()
                 .group("Brand")
                 .pathsToMatch("/app/brand/**")
@@ -73,7 +72,7 @@ public class SwaggerConfig {
     }
 
     @Bean
-    public GroupedOpenApi celebGroup(){
+    public GroupedOpenApi celebGroup() {
         return GroupedOpenApi.builder()
                 .group("Celeb")
                 .pathsToMatch("/app/celeb/**")
@@ -81,7 +80,7 @@ public class SwaggerConfig {
     }
 
     @Bean
-    public GroupedOpenApi closetGroup(){
+    public GroupedOpenApi closetGroup() {
         return GroupedOpenApi.builder()
                 .group("Closet")
                 .pathsToMatch("/app/closet/**")
@@ -89,7 +88,7 @@ public class SwaggerConfig {
     }
 
     @Bean
-    public GroupedOpenApi commentGroup(){
+    public GroupedOpenApi commentGroup() {
         return GroupedOpenApi.builder()
                 .group("Comment")
                 .pathsToMatch("/app/comment/**")
@@ -97,7 +96,7 @@ public class SwaggerConfig {
     }
 
     @Bean
-    public GroupedOpenApi itemGroup(){
+    public GroupedOpenApi itemGroup() {
         return GroupedOpenApi.builder()
                 .group("Item")
                 .pathsToMatch("/app/item/**")
@@ -105,7 +104,7 @@ public class SwaggerConfig {
     }
 
     @Bean
-    public GroupedOpenApi questionGroup(){
+    public GroupedOpenApi questionGroup() {
         return GroupedOpenApi.builder()
                 .group("Question")
                 .pathsToMatch("/app/question/**")
@@ -113,7 +112,7 @@ public class SwaggerConfig {
     }
 
     @Bean
-    public GroupedOpenApi searchGroup(){
+    public GroupedOpenApi searchGroup() {
         return GroupedOpenApi.builder()
                 .group("Search")
                 .pathsToMatch("/app/search/**")
@@ -121,7 +120,7 @@ public class SwaggerConfig {
     }
 
     @Bean
-    public GroupedOpenApi userGroup(){
+    public GroupedOpenApi userGroup() {
         return GroupedOpenApi.builder()
                 .group("User")
                 .pathsToMatch("/app/user/**")
@@ -129,7 +128,7 @@ public class SwaggerConfig {
     }
 
     @Bean
-    public GroupedOpenApi s3Group(){
+    public GroupedOpenApi s3Group() {
         return GroupedOpenApi.builder()
                 .group("S3")
                 .pathsToMatch("/app/s3/**")

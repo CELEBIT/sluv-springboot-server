@@ -1,5 +1,7 @@
 package com.sluv.server.domain.auth.service;
 
+import static com.sluv.server.domain.auth.enums.SnsType.GOOGLE;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -11,7 +13,6 @@ import com.sluv.server.domain.user.dto.UserIdDto;
 import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.domain.user.exception.UserNotFoundException;
 import com.sluv.server.domain.user.repository.UserRepository;
-
 import com.sluv.server.global.jwt.JwtProvider;
 import com.sluv.server.global.jwt.exception.InvalidateTokenException;
 import lombok.RequiredArgsConstructor;
@@ -22,9 +23,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
-
-import static com.sluv.server.domain.auth.enums.SnsType.GOOGLE;
-import static com.sluv.server.domain.auth.enums.SnsType.KAKAO;
 
 
 @Service
@@ -73,7 +71,7 @@ public class KakaoUserService {
             );
 
             return convertResponseToSocialUserInfoDto(response);
-        }catch (Exception e){
+        } catch (Exception e) {
             throw new InvalidateTokenException();
         }
     }
@@ -85,7 +83,8 @@ public class KakaoUserService {
      * @return SocialUserInfoDto
      * @throws JsonProcessingException
      */
-    private static SocialUserInfoDto convertResponseToSocialUserInfoDto(ResponseEntity<String> response) throws JsonProcessingException {
+    private static SocialUserInfoDto convertResponseToSocialUserInfoDto(ResponseEntity<String> response)
+            throws JsonProcessingException {
         // responseBody에 있는 정보를 꺼냄
         String responseBody = response.getBody();
 
@@ -97,16 +96,16 @@ public class KakaoUserService {
                 .get("profile_image").asText();
 
         String gender;
-        try{
+        try {
             gender = jsonNode.get("kakao_account").get("gender").asText();
-        }catch (Exception e){
+        } catch (Exception e) {
             gender = null;
         }
 
         String ageRange;
-        try{
+        try {
             ageRange = jsonNode.get("kakao_account").get("age_range").asText();
-        }catch (Exception e){
+        } catch (Exception e) {
             ageRange = null;
         }
 
@@ -128,12 +127,12 @@ public class KakaoUserService {
     private User registerKakaoUserIfNeed(SocialUserInfoDto userInfoDto) {
         User user = userRepository.findByEmail(userInfoDto.getEmail()).orElse(null);
 
-        if(user == null) {
+        if (user == null) {
             userRepository.save(
                     User.toEntity(userInfoDto, GOOGLE)
             );
             user = userRepository.findByEmail(userInfoDto.getEmail())
-                                            .orElseThrow(UserNotFoundException::new);
+                    .orElseThrow(UserNotFoundException::new);
 
             // 생성과 동시에 기본 Closet 생성
             closetService.postBasicCloset(user);

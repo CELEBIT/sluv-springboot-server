@@ -9,11 +9,13 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
@@ -33,7 +35,8 @@ public class CelebActivityController {
             @ApiResponse(responseCode = "5001", description = "DB 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @GetMapping("/{celebId}")
-    public ResponseEntity<SuccessDataResponse<List<CelebActivityResDto>>> getCelebActivity(@PathVariable("celebId") Long celebId){
+    public ResponseEntity<SuccessDataResponse<List<CelebActivityResDto>>> getCelebActivity(
+            @PathVariable("celebId") Long celebId) {
 
         return ResponseEntity.ok().body(
                 SuccessDataResponse.<List<CelebActivityResDto>>builder()

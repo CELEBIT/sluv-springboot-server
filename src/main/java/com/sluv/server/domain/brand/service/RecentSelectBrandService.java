@@ -11,17 +11,19 @@ import com.sluv.server.domain.brand.repository.NewBrandRepository;
 import com.sluv.server.domain.brand.repository.RecentSelectBrandRepository;
 import com.sluv.server.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@Transactional
+@Slf4j
 @RequiredArgsConstructor
 public class RecentSelectBrandService {
     private final BrandRepository brandRepository;
     private final NewBrandRepository newBrandRepository;
     private final RecentSelectBrandRepository recentSelectBrandRepository;
 
+    @Transactional
     public void postRecentSelectBrand(User user, RecentSelectBrandReqDto dto) {
         Brand brand = dto.getBrandId() != null
                 ? brandRepository.findById(dto.getBrandId())
@@ -38,10 +40,12 @@ public class RecentSelectBrandService {
         );
     }
 
+    @Transactional
     public void deleteAllRecentSelectBrand(User user) {
         recentSelectBrandRepository.deleteAllByUserId(user.getId());
     }
 
+    @Transactional
     public void deleteRecentSelectBrand(User user, Long id, String flag) {
         if (flag.equals("Y")) {
             recentSelectBrandRepository.deleteByUserIdAndBrandId(user.getId(), id);

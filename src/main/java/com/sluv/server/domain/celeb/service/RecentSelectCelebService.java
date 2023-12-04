@@ -15,17 +15,17 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@Transactional
 @RequiredArgsConstructor
 public class RecentSelectCelebService {
     private final CelebRepository celebRepository;
     private final NewCelebRepository newCelebRepository;
     private final RecentSelectCelebRepository recentSelectCelebRepository;
 
-    public void postRecentSelectCeleb(User user, RecentSelectCelebReqDto dto){
+    @Transactional
+    public void postRecentSelectCeleb(User user, RecentSelectCelebReqDto dto) {
         Celeb celeb = dto.getCelebId() != null
                 ? celebRepository.findById(dto.getCelebId())
-                                .orElseThrow(CelebNotFoundException::new)
+                .orElseThrow(CelebNotFoundException::new)
                 : null;
 
         NewCeleb newCeleb = dto.getNewCelebId() != null
@@ -42,14 +42,16 @@ public class RecentSelectCelebService {
         );
     }
 
+    @Transactional
     public void deleteAllRecentSelectCeleb(User user) {
         recentSelectCelebRepository.deleteAllByUserId(user.getId());
     }
 
+    @Transactional
     public void deleteRecentSelectCeleb(User user, Long celebId, String flag) {
-        if(flag.equals("Y")){
+        if (flag.equals("Y")) {
             recentSelectCelebRepository.deleteByUserIdAndCelebId(user.getId(), celebId);
-        }else{
+        } else {
             recentSelectCelebRepository.deleteByUserIdAndNewCelebId(user.getId(), celebId);
         }
     }

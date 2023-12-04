@@ -7,7 +7,6 @@ import com.sluv.server.domain.user.exception.UserNotFoundException;
 import com.sluv.server.domain.user.exception.UserReportDuplicateException;
 import com.sluv.server.domain.user.repository.UserReportRepository;
 import com.sluv.server.domain.user.repository.UserRepository;
-import com.sluv.server.global.common.enums.ReportStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,9 +26,9 @@ public class UserReportService {
         boolean existence = userReportRepository.findExistence(user, target);
 
         // 중복 신고라면 Exception 발생
-        if(existence){
+        if (existence) {
             throw new UserReportDuplicateException();
-        }else {
+        } else {
             // 중복이 아니라면 신고 접수
             userReportRepository.save(
                     UserReport.toEntity(user, target, dto)

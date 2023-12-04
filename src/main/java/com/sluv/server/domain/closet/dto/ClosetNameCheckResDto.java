@@ -6,8 +6,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -16,7 +14,7 @@ public class ClosetNameCheckResDto {
     @Schema(description = "Closet의 이름이 중복인지 확인")
     Boolean isDuplicated;
 
-    public static ClosetNameCheckResDto of(Boolean checkStatus){
+    public static ClosetNameCheckResDto of(Boolean checkStatus) {
         return ClosetNameCheckResDto.builder()
                 .isDuplicated(checkStatus)
                 .build();

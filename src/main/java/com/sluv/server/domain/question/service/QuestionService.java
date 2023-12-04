@@ -8,38 +8,71 @@ import com.sluv.server.domain.celeb.repository.NewCelebRepository;
 import com.sluv.server.domain.closet.entity.Closet;
 import com.sluv.server.domain.closet.repository.ClosetRepository;
 import com.sluv.server.domain.comment.repository.CommentRepository;
-import com.sluv.server.domain.item.entity.ItemImg;
-import com.sluv.server.domain.item.repository.ItemScrapRepository;
-import com.sluv.server.domain.question.dto.QuestionItemResDto;
 import com.sluv.server.domain.item.dto.ItemSimpleResDto;
 import com.sluv.server.domain.item.entity.Item;
+import com.sluv.server.domain.item.entity.ItemImg;
 import com.sluv.server.domain.item.exception.ItemNotFoundException;
 import com.sluv.server.domain.item.repository.ItemImgRepository;
 import com.sluv.server.domain.item.repository.ItemRepository;
-import com.sluv.server.domain.question.dto.*;
-import com.sluv.server.domain.question.entity.*;
+import com.sluv.server.domain.item.repository.ItemScrapRepository;
+import com.sluv.server.domain.question.dto.QuestionBuyPostReqDto;
+import com.sluv.server.domain.question.dto.QuestionFindPostReqDto;
+import com.sluv.server.domain.question.dto.QuestionGetDetailResDto;
+import com.sluv.server.domain.question.dto.QuestionHomeResDto;
+import com.sluv.server.domain.question.dto.QuestionHowaboutPostReqDto;
+import com.sluv.server.domain.question.dto.QuestionImgReqDto;
+import com.sluv.server.domain.question.dto.QuestionImgResDto;
+import com.sluv.server.domain.question.dto.QuestionImgSimpleResDto;
+import com.sluv.server.domain.question.dto.QuestionItemReqDto;
+import com.sluv.server.domain.question.dto.QuestionItemResDto;
+import com.sluv.server.domain.question.dto.QuestionPostResDto;
+import com.sluv.server.domain.question.dto.QuestionRecommendPostReqDto;
+import com.sluv.server.domain.question.dto.QuestionReportReqDto;
+import com.sluv.server.domain.question.dto.QuestionSimpleResDto;
+import com.sluv.server.domain.question.dto.QuestionVoteDataDto;
+import com.sluv.server.domain.question.dto.QuestionVoteReqDto;
+import com.sluv.server.domain.question.entity.DailyHotQuestion;
+import com.sluv.server.domain.question.entity.Question;
+import com.sluv.server.domain.question.entity.QuestionBuy;
+import com.sluv.server.domain.question.entity.QuestionFind;
+import com.sluv.server.domain.question.entity.QuestionHowabout;
+import com.sluv.server.domain.question.entity.QuestionImg;
+import com.sluv.server.domain.question.entity.QuestionItem;
+import com.sluv.server.domain.question.entity.QuestionLike;
+import com.sluv.server.domain.question.entity.QuestionRecommend;
+import com.sluv.server.domain.question.entity.QuestionRecommendCategory;
+import com.sluv.server.domain.question.entity.QuestionReport;
+import com.sluv.server.domain.question.entity.QuestionVote;
+import com.sluv.server.domain.question.entity.RecentQuestion;
 import com.sluv.server.domain.question.enums.QuestionStatus;
 import com.sluv.server.domain.question.exception.QuestionNotFoundException;
 import com.sluv.server.domain.question.exception.QuestionReportDuplicateException;
 import com.sluv.server.domain.question.exception.QuestionTypeNotFoundException;
-import com.sluv.server.domain.question.repository.*;
-import com.sluv.server.domain.user.dto.UserInfoDto;
+import com.sluv.server.domain.question.repository.DailyHotQuestionRepository;
+import com.sluv.server.domain.question.repository.QuestionImgRepository;
+import com.sluv.server.domain.question.repository.QuestionItemRepository;
+import com.sluv.server.domain.question.repository.QuestionLikeRepository;
+import com.sluv.server.domain.question.repository.QuestionRecommendCategoryRepository;
+import com.sluv.server.domain.question.repository.QuestionReportRepository;
+import com.sluv.server.domain.question.repository.QuestionRepository;
+import com.sluv.server.domain.question.repository.QuestionVoteRepository;
+import com.sluv.server.domain.question.repository.RecentQuestionRepository;
 import com.sluv.server.domain.user.entity.User;
-import com.sluv.server.global.common.enums.ItemImgOrLinkStatus;
-import com.sluv.server.global.common.enums.ReportStatus;
 import com.sluv.server.global.common.response.PaginationResDto;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.checkerframework.checker.units.qual.A;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
-import java.util.*;
-
 @Service
-@Transactional
+@Slf4j
 @RequiredArgsConstructor
 public class QuestionService {
     private final QuestionRepository questionRepository;
@@ -60,6 +93,7 @@ public class QuestionService {
     private final DailyHotQuestionRepository dailyHotQuestionRepository;
 
 
+    @Transactional
     public QuestionPostResDto postQuestionFind(User user, QuestionFindPostReqDto dto) {
         /**
          * 1. 생성 or 수정
@@ -67,13 +101,15 @@ public class QuestionService {
          * 3. QuestionImg 저장
          * 4. QuestionItem 저장
          */
+        log.info("찾아주세요 게시글 등록 or 수정 - 사용자 : {}, 질문 게시글 : {}, 질문 게시글 제목 : {}",
+                user.getId(), dto.getId() == null ? null : dto.getId(), dto.getTitle());
         // 1. 생성 or 수정
         Celeb celeb = null;
-        if(dto.getCelebId() != null) {
-           celeb = celebRepository.findById(dto.getCelebId()).orElse(null);
+        if (dto.getCelebId() != null) {
+            celeb = celebRepository.findById(dto.getCelebId()).orElse(null);
         }
         NewCeleb newCeleb = null;
-        if(dto.getNewCelebId() != null) {
+        if (dto.getNewCelebId() != null) {
             newCeleb = newCelebRepository.findById(dto.getNewCelebId()).orElse(null);
         }
 
@@ -92,6 +128,7 @@ public class QuestionService {
 
     }
 
+    @Transactional
     public QuestionPostResDto postQuestionBuy(User user, QuestionBuyPostReqDto dto) {
         /**
          * 1. 생성 or 수정
@@ -99,6 +136,8 @@ public class QuestionService {
          * 3. QuestionImg 저장
          * 4. QuestionItem 저장
          */
+        log.info("이 중에 뭐 살까 게시글 등록 or 수정 - 사용자 : {}, 질문 게시글 : {}, 질문 게시글 제목 : {}",
+                user.getId(), dto.getId() == null ? null : dto.getId(), dto.getTitle());
 
         // 1. 생성 or 수정
         QuestionBuy questionBuy = QuestionBuy.toEntity(user, dto);
@@ -115,6 +154,7 @@ public class QuestionService {
         return QuestionPostResDto.of(newQuestionBuy.getId());
     }
 
+    @Transactional
     public QuestionPostResDto postQuestionHowabout(User user, QuestionHowaboutPostReqDto dto) {
         /**
          * 1. 생성 or 수정
@@ -122,6 +162,9 @@ public class QuestionService {
          * 3. QuestionImg 저장
          * 4. QuestionItem 저장
          */
+
+        log.info("이거 어때 게시글 등록 or 수정 - 사용자 : {}, 질문 게시글 : {}, 질문 게시글 제목 : {}",
+                user.getId(), dto.getId() == null ? null : dto.getId(), dto.getTitle());
 
         // 1. 생성 or 수정
         QuestionHowabout questionHowabout = QuestionHowabout.toEntity(user, dto);
@@ -138,6 +181,7 @@ public class QuestionService {
         return QuestionPostResDto.of(newQuestionHowabout.getId());
     }
 
+    @Transactional
     public QuestionPostResDto postQuestionRecommend(User user, QuestionRecommendPostReqDto dto) {
         /**
          * 1. 생성 or 수정
@@ -146,7 +190,8 @@ public class QuestionService {
          * 3. QuestionImg 저장
          * 4. QuestionItem 저장
          */
-
+        log.info("추천해줘 게시글 등록 or 수정 - 사용자 : {}, 질문 게시글 : {}, 질문 게시글 제목 : {}",
+                user.getId(), dto.getId() == null ? null : dto.getId(), dto.getTitle());
         // 1. 생성 or 수정
         QuestionRecommend questionRecommend = QuestionRecommend.toEntity(user, dto);
 
@@ -158,9 +203,9 @@ public class QuestionService {
         questionRecommendCategoryRepository.deleteAllByQuestionId(newQuestionRecommend.getId());
 
         List<QuestionRecommendCategory> recommendCategoryList = dto.getCategoryNameList().stream()
-                        .map(categoryName ->
-                                QuestionRecommendCategory.toEntity(newQuestionRecommend, categoryName)
-                        ).toList();
+                .map(categoryName ->
+                        QuestionRecommendCategory.toEntity(newQuestionRecommend, categoryName)
+                ).toList();
 
         questionRecommendCategoryRepository.saveAll(recommendCategoryList);
 
@@ -177,11 +222,11 @@ public class QuestionService {
     /**
      * Question Img 저장 메소드
      */
-    private void postQuestionImgs(List<QuestionImgReqDto> dtoList, Question question){
+    private void postQuestionImgs(List<QuestionImgReqDto> dtoList, Question question) {
         // Question에 대한 Img 초기화
         questionImgRepository.deleteAllByQuestionId(question.getId());
 
-        if(dtoList != null) {
+        if (dtoList != null) {
             // Question Img들 추가
             List<QuestionImg> imgList = dtoList.stream()
                     .map(imgDto -> QuestionImg.toEntity(question, imgDto))
@@ -193,12 +238,11 @@ public class QuestionService {
 
     /**
      * Questim Item 저장 메소드
-     *
      */
-    private void postQuestionItems(List<QuestionItemReqDto> dtoList, Question question){
+    private void postQuestionItems(List<QuestionItemReqDto> dtoList, Question question) {
         // Question에 대한 Item 초기화
         questionItemRepository.deleteAllByQuestionId(question.getId());
-        if(dtoList != null) {
+        if (dtoList != null) {
             // Question Item들 추가
             List<QuestionItem> itemList = dtoList.stream().map(itemDto -> {
                         Item item = itemRepository.findById(itemDto.getItemId()).orElseThrow(ItemNotFoundException::new);
@@ -210,21 +254,24 @@ public class QuestionService {
         }
     }
 
+    @Transactional
     public void deleteQuestion(Long questionId) {
+        log.info("질문 게시글 삭제 - 질문 게시글 : {}", questionId);
         Question question = questionRepository.findById(questionId).orElseThrow(QuestionNotFoundException::new);
-
         question.changeQuestionStatus(QuestionStatus.DELETED);
     }
 
+    @Transactional
     public void postQuestionLike(User user, Long questionId) {
+        log.info("질문 게시글 좋아요 - 사용자 : {}, 질문 게시글 : {}", user.getId(), questionId);
         // 해당 유저의 Question 게시물 like 여부 검색
         Boolean likeStatus = questionLikeRepository.existsByQuestionIdAndUserId(questionId, user.getId());
         Question question = questionRepository.findById(questionId).orElseThrow(QuestionNotFoundException::new);
 
-        if(likeStatus) {
+        if (likeStatus) {
             // like가 있다면 삭제
             questionLikeRepository.deleteByQuestionIdAndUserId(questionId, user.getId());
-        }else {
+        } else {
             // like가 없다면 등록
 
             questionLikeRepository.save(
@@ -235,10 +282,12 @@ public class QuestionService {
 
     }
 
+    @Transactional
     public void postQuestionReport(User user, Long questionId, QuestionReportReqDto dto) {
+        log.info("질문 게시글 신고 - 사용자 : {}, 질문 게시글 : {}, 사유 : {}", user.getId(), questionId, dto.getReason());
         Boolean reportExist = questionReportRepository.existsByQuestionIdAndReporterId(questionId, user.getId());
 
-        if(!reportExist) {
+        if (!reportExist) {
             // 신고 내역이 없다면 신고 등록.
             Question question = questionRepository.findById(questionId).orElseThrow(QuestionNotFoundException::new);
 
@@ -246,25 +295,26 @@ public class QuestionService {
                     QuestionReport.toEntity(user, question, dto)
             );
 
-        }else{
+        } else {
             // 신고 내역이 있다면 중복 신고 방지.
             throw new QuestionReportDuplicateException();
         }
     }
 
+    @Transactional
     public QuestionGetDetailResDto getQuestionDetail(User user, Long questionId) {
         Question question = questionRepository.findById(questionId).orElseThrow(QuestionNotFoundException::new);
 
         // Question Type 분류
         String qType;
-        if(question != null){
-            if (question instanceof QuestionFind){
+        if (question != null) {
+            if (question instanceof QuestionFind) {
                 qType = "Find";
-            }else if(question instanceof QuestionBuy){
+            } else if (question instanceof QuestionBuy) {
                 qType = "Buy";
-            }else if(question instanceof QuestionHowabout){
+            } else if (question instanceof QuestionHowabout) {
                 qType = "How";
-            }else if(question instanceof QuestionRecommend){
+            } else if (question instanceof QuestionRecommend) {
                 qType = "Recommend";
             } else {
                 qType = null;
@@ -277,37 +327,37 @@ public class QuestionService {
         User writer = question.getUser();
 
         // Question img List
-        List<QuestionImgResDto> questionImgList= questionImgRepository.findAllByQuestionId(questionId).
-                                                            stream()
-                                                            .map(questionImg -> {
-                                                                QuestionVoteDataDto voteDataDto = null;
-                                                                // QuestionBuy 라면
-                                                                if(qType != null && qType.equals("Buy")){
-                                                                    voteDataDto = getVoteData(questionId, (long) questionImg.getSortOrder());
-                                                                }
+        List<QuestionImgResDto> questionImgList = questionImgRepository.findAllByQuestionId(questionId).
+                stream()
+                .map(questionImg -> {
+                            QuestionVoteDataDto voteDataDto = null;
+                            // QuestionBuy 라면
+                            if (qType != null && qType.equals("Buy")) {
+                                voteDataDto = getVoteData(questionId, (long) questionImg.getSortOrder());
+                            }
 
-                                                                return  QuestionImgResDto.of(questionImg, voteDataDto);
-                                                            }
-                                                            ).toList();
+                            return QuestionImgResDto.of(questionImg, voteDataDto);
+                        }
+                ).toList();
 
         // Question Item List
         List<QuestionItemResDto> questionItemList = questionItemRepository.findAllByQuestionId(questionId)
-                                            .stream()
-                                            .map(questionItem -> {
-                                                List<Closet> closetList = closetRepository.findAllByUserId(user.getId());
-                                                ItemSimpleResDto itemSimpleResDto = ItemSimpleResDto.of(
-                                                                        questionItem.getItem(),
-                                                                        itemImgRepository.findMainImg(questionItem.getItem().getId()),
-                                                                        itemScrapRepository.getItemScrapStatus(questionItem.getItem(),closetList)
-                                                                );
-                                                QuestionVoteDataDto questionVoteDataDto = null;
-                                                // QuestionBuy일 경우 투표수 추가.
-                                                if(qType != null & qType.equals("Buy")){
-                                                    questionVoteDataDto = getVoteData(questionId, (long) questionItem.getSortOrder());
-                                                }
+                .stream()
+                .map(questionItem -> {
+                    List<Closet> closetList = closetRepository.findAllByUserId(user.getId());
+                    ItemSimpleResDto itemSimpleResDto = ItemSimpleResDto.of(
+                            questionItem.getItem(),
+                            itemImgRepository.findMainImg(questionItem.getItem().getId()),
+                            itemScrapRepository.getItemScrapStatus(questionItem.getItem(), closetList)
+                    );
+                    QuestionVoteDataDto questionVoteDataDto = null;
+                    // QuestionBuy일 경우 투표수 추가.
+                    if (qType != null & qType.equals("Buy")) {
+                        questionVoteDataDto = getVoteData(questionId, (long) questionItem.getSortOrder());
+                    }
 
-                                                return QuestionItemResDto.of(questionItem, itemSimpleResDto, questionVoteDataDto);
-                                            }).toList();
+                    return QuestionItemResDto.of(questionItem, itemSimpleResDto, questionVoteDataDto);
+                }).toList();
 
         // Question Like Num Count
         Long questionLikeNum = questionLikeRepository.countByQuestionId(questionId);
@@ -371,9 +421,7 @@ public class QuestionService {
     /**
      * builder에 VoteNum, VotePercent 탑재
      */
-    @Transactional(readOnly = true)
     private QuestionVoteDataDto getVoteData(Long questionId, Long sortOrder) {
-
 
         // 해당 SortOrder의 투표 수
         Long voteNum = questionVoteRepository.countByQuestionIdAndVoteSortOrder(questionId, sortOrder);
@@ -381,41 +429,43 @@ public class QuestionService {
         Long totalVoteNum = questionVoteRepository.countByQuestionId(questionId);
 
         return QuestionVoteDataDto.of(
-                    voteNum,
-                    totalVoteNum != 0
-                    ? getVotePercent(voteNum, totalVoteNum)
-                    : 0
-                );
+                voteNum,
+                totalVoteNum != 0
+                        ? getVotePercent(voteNum, totalVoteNum)
+                        : 0
+        );
     }
 
     /**
      * QuestionVote 퍼센트 계산.
      */
-    private Double getVotePercent(Long voteNum, Long totalVoteNum){
+    private Double getVotePercent(Long voteNum, Long totalVoteNum) {
         double div = (double) voteNum / (double) totalVoteNum;
-
-        return Math.round( div * 1000 ) / 10.0;
+        return Math.round(div * 1000) / 10.0;
     }
 
     /**
      * QuestionBuy 등록 및 취소
      */
+    @Transactional
     public void postQuestionVote(User user, Long questionId, QuestionVoteReqDto dto) {
-        QuestionVote questionVote = questionVoteRepository.findByQuestionIdAndUserId(questionId, user.getId()).orElse(null);
+        log.info("질문 게시글 투표 - 사용자 : {}, 질문 게시글 : {}, 투표 : {}", user.getId(), questionId, dto.getVoteSortOrder());
+        QuestionVote questionVote = questionVoteRepository.findByQuestionIdAndUserId(questionId, user.getId())
+                .orElse(null);
 
-        if(questionVote == null){
+        if (questionVote == null) {
             // 투표 등록
 
             // Question 검색
             Question question = questionRepository.findById(questionId)
-                                                    .orElseThrow(QuestionNotFoundException::new);
+                    .orElseThrow(QuestionNotFoundException::new);
 
             // QuestionVote 생성 및 저장
             questionVoteRepository.save(
                     QuestionVote.toEntity(question, user, dto)
             );
 
-        }else{
+        } else {
             // 투표 취소
 
             // 해당 QuestionVote 삭제.
@@ -434,9 +484,9 @@ public class QuestionService {
         return questionRepository.getWaitQuestionBuy(user, questionId, interestedCeleb)
                 .stream()
                 .map(questionBuy ->
-                    getQuestionSimpleResDto(questionBuy,
-                            "Buy"
-                    )
+                        getQuestionSimpleResDto(questionBuy,
+                                "Buy"
+                        )
                 ).toList();
     }
 
@@ -448,9 +498,9 @@ public class QuestionService {
         return questionRepository.getWaitQuestionRecommend(user, questionId)
                 .stream()
                 .map(questionRecommend ->
-                    getQuestionSimpleResDto(questionRecommend,
-                            "Recommend"
-                    )
+                        getQuestionSimpleResDto(questionRecommend,
+                                "Recommend"
+                        )
                 ).toList();
     }
 
@@ -462,9 +512,9 @@ public class QuestionService {
         return questionRepository.getWaitQuestionHowabout(user, questionId)
                 .stream()
                 .map(questionHowabout ->
-                    getQuestionSimpleResDto(questionHowabout,
-                            "How"
-                    )
+                        getQuestionSimpleResDto(questionHowabout,
+                                "How"
+                        )
                 ).toList();
     }
 
@@ -480,11 +530,10 @@ public class QuestionService {
                 .map(questionFind ->
                         getQuestionSimpleResDto(questionFind,
                                 "Find"
-                                )
-                  ).toList();
+                        )
+                ).toList();
     }
 
-    @Transactional(readOnly = true)
     private QuestionSimpleResDto getQuestionSimpleResDto(Question question, String qType) {
 
         List<QuestionImgSimpleResDto> imgList = new ArrayList<>();
@@ -492,8 +541,7 @@ public class QuestionService {
         String celebName = null;
         List<String> categoryNameList = null;
 
-
-        if(!qType.equals("Buy")) {
+        if (!qType.equals("Buy")) {
             // 이미지 URL
             QuestionImg questionImg = questionImgRepository.findByQuestionIdAndRepresentFlag(question.getId(), true);
 
@@ -511,7 +559,7 @@ public class QuestionService {
                 imgList.add(QuestionImgSimpleResDto.of(mainImg));
             }
 
-        }else{
+        } else {
             // 이미지 URL
             imgList = questionImgRepository.findAllByQuestionId(question.getId())
                     .stream()
@@ -526,7 +574,7 @@ public class QuestionService {
                     }).toList();
         }
 
-        if(qType.equals("Recommend")){
+        if (qType.equals("Recommend")) {
             categoryNameList = questionRecommendCategoryRepository.findAllByQuestionId(question.getId()).stream()
                     .map(QuestionRecommendCategory::getName).toList();
         }
@@ -536,8 +584,6 @@ public class QuestionService {
 
         // Question 댓글 수
         Long commentNum = commentRepository.countByQuestionId(question.getId());
-
-
 
         return QuestionSimpleResDto.of(question, likeNum, commentNum,
                 imgList, itemImgList, categoryNameList);
@@ -565,25 +611,17 @@ public class QuestionService {
             return getQuestionSimpleResDto(question, qType);
         }).toList();
 
-        return PaginationResDto.<QuestionSimpleResDto>builder()
-                .page(questionPage.getNumber())
-                .hasNext(questionPage.hasNext())
-                .content(content)
-                .build();
+        return PaginationResDto.of(questionPage, content);
     }
 
     @Transactional(readOnly = true)
     public PaginationResDto<QuestionSimpleResDto> getQuestionBuyList(String voteStatus, Pageable pageable) {
         Page<QuestionBuy> questionPage = questionRepository.getQuestionBuyList(voteStatus, pageable);
         List<QuestionSimpleResDto> content = questionPage.stream().map(question ->
-            getQuestionSimpleResDto(question, "Buy")
+                getQuestionSimpleResDto(question, "Buy")
         ).toList();
 
-        return PaginationResDto.<QuestionSimpleResDto>builder()
-                .page(questionPage.getNumber())
-                .hasNext(questionPage.hasNext())
-                .content(content)
-                .build();
+        return PaginationResDto.of(questionPage, content);
     }
 
     /**
@@ -595,14 +633,10 @@ public class QuestionService {
         Page<QuestionFind> questionPage = questionRepository.getQuestionFindList(celebId, pageable);
 
         List<QuestionSimpleResDto> content = questionPage.stream().map(question ->
-            getQuestionSimpleResDto(question, "Find")
+                getQuestionSimpleResDto(question, "Find")
         ).toList();
 
-        return PaginationResDto.<QuestionSimpleResDto>builder()
-                .page(questionPage.getNumber())
-                .hasNext(questionPage.hasNext())
-                .content(content)
-                .build();
+        return PaginationResDto.of(questionPage, content);
     }
 
     @Transactional(readOnly = true)
@@ -612,11 +646,7 @@ public class QuestionService {
                 getQuestionSimpleResDto(question, "How")
         ).toList();
 
-        return PaginationResDto.<QuestionSimpleResDto>builder()
-                .page(questionPage.getNumber())
-                .hasNext(questionPage.hasNext())
-                .content(content)
-                .build();
+        return PaginationResDto.of(questionPage, content);
     }
 
     @Transactional(readOnly = true)
@@ -626,19 +656,15 @@ public class QuestionService {
                 getQuestionSimpleResDto(question, "Recommend")
         ).toList();
 
-        return PaginationResDto.<QuestionSimpleResDto>builder()
-                .page(questionPage.getNumber())
-                .hasNext(questionPage.hasNext())
-                .content(content)
-                .build();
+        return PaginationResDto.of(questionPage, content);
     }
 
-    private String getQuestionCelebName(QuestionFind questionFind){
+    private String getQuestionCelebName(QuestionFind questionFind) {
         return questionFind.getCeleb() != null
-                    ?questionFind.getCeleb().getParent() != null
-                            ?questionFind.getCeleb().getParent().getCelebNameKr() + " " + questionFind.getCeleb().getCelebNameKr()
-                            :questionFind.getCeleb().getCelebNameKr()
-                    : questionFind.getNewCeleb().getCelebName();
+                ? questionFind.getCeleb().getParent() != null
+                ? questionFind.getCeleb().getParent().getCelebNameKr() + " " + questionFind.getCeleb().getCelebNameKr()
+                : questionFind.getCeleb().getCelebNameKr()
+                : questionFind.getNewCeleb().getCelebName();
     }
 
     /**
@@ -647,8 +673,8 @@ public class QuestionService {
     @Transactional(readOnly = true)
     public List<QuestionHomeResDto> getDailyHotQuestionList() {
         List<Question> dailyHoyQuestionList = dailyHotQuestionRepository.findAll().stream()
-                                                                    .map(DailyHotQuestion::getQuestion)
-                                                                    .toList();
+                .map(DailyHotQuestion::getQuestion)
+                .toList();
 
         List<QuestionHomeResDto> result = dailyHoyQuestionList.stream().map(question -> {
             List<QuestionImgSimpleResDto> questionImgSimpleList = getQuestionImgSimpleList(question);
@@ -661,14 +687,15 @@ public class QuestionService {
     }
 
     @Transactional(readOnly = true)
-    private List<QuestionImgSimpleResDto> getQuestionImgSimpleList(Question question){
+    private List<QuestionImgSimpleResDto> getQuestionImgSimpleList(Question question) {
 
         // Question이 QuestionBuy인 경우 모든 이미지를 순서대로 조회
-        if(question instanceof QuestionBuy){
+        if (question instanceof QuestionBuy) {
             List<QuestionImgSimpleResDto> result = new ArrayList<>();
 
             List<QuestionImg> questionImgList = questionImgRepository.findAllByQuestionId(question.getId());
-            List<ItemImg> questionItemImgList = questionItemRepository.findAllByQuestionId(question.getId()).stream().map(questionItem -> itemImgRepository.findMainImg(questionItem.getItem().getId())).toList();
+            List<ItemImg> questionItemImgList = questionItemRepository.findAllByQuestionId(question.getId()).stream()
+                    .map(questionItem -> itemImgRepository.findMainImg(questionItem.getItem().getId())).toList();
 
             questionImgList.forEach(questionImg -> result.add(QuestionImgSimpleResDto.of(questionImg)));
             questionItemImgList.forEach(itemImg -> result.add(QuestionImgSimpleResDto.of(itemImg)));
@@ -676,7 +703,7 @@ public class QuestionService {
             result.sort(Comparator.comparing(QuestionImgSimpleResDto::getSortOrder));
 
             return result;
-        }else{// 그 외에는 대표이미지만 조화
+        } else {// 그 외에는 대표이미지만 조화
 
             QuestionImg questionImg = questionImgRepository.findByQuestionIdAndRepresentFlag(question.getId(), true);
             QuestionItem questionItem = questionItemRepository.findByQuestionIdAndRepresentFlag(question.getId(), true);
@@ -685,7 +712,7 @@ public class QuestionService {
 
             if (questionImg != null) {
                 imgUrl = questionImg.getImgUrl();
-            } else if(questionItem != null) {
+            } else if (questionItem != null) {
                 imgUrl = itemImgRepository.findMainImg(questionItem.getItem().getId()).getItemImgUrl();
             }
 
@@ -722,20 +749,13 @@ public class QuestionService {
                     )
                     .toList();
 
-
             Long commentNum = commentRepository.countByQuestionId(question.getId());
             Long likeNum = questionLikeRepository.countByQuestionId(question.getId());
-
 
             return QuestionSimpleResDto.of(question, likeNum, commentNum, imgList, itemImgList, categoryList);
         }).toList();
 
-
-        return PaginationResDto.<QuestionSimpleResDto>builder()
-                .page(page.getNumber())
-                .hasNext(page.hasNext())
-                .content(content)
-                .build();
+        return PaginationResDto.of(page, content);
     }
 }
 

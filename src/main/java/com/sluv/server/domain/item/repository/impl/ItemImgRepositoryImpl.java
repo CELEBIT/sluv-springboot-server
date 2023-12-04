@@ -1,13 +1,13 @@
 package com.sluv.server.domain.item.repository.impl;
 
+import static com.sluv.server.domain.item.entity.QItemImg.itemImg;
+
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sluv.server.domain.item.entity.ItemImg;
 import lombok.RequiredArgsConstructor;
 
-import static com.sluv.server.domain.item.entity.QItemImg.itemImg;
-
 @RequiredArgsConstructor
-public class ItemImgRepositoryImpl implements ItemImgRepositoryCustom{
+public class ItemImgRepositoryImpl implements ItemImgRepositoryCustom {
 
     private final JPAQueryFactory jpaQueryFactory;
 

@@ -1,42 +1,48 @@
 package com.sluv.server.domain.item.repository.impl;
 
-import com.querydsl.core.types.OrderSpecifier;
-import com.querydsl.jpa.impl.JPAQuery;
-import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.sluv.server.domain.celeb.entity.Celeb;
-import com.sluv.server.domain.closet.entity.Closet;
-import com.sluv.server.domain.item.entity.Item;
-import com.sluv.server.domain.search.dto.SearchFilterReqDto;
-import com.sluv.server.domain.user.entity.User;
-import com.sluv.server.domain.user.enums.UserStatus;
-import lombok.RequiredArgsConstructor;
-import org.springframework.cglib.core.Local;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.support.PageableExecutionUtils;
-
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Stream;
-
+import static com.sluv.server.domain.brand.entity.QBrand.brand;
+import static com.sluv.server.domain.celeb.entity.QCeleb.celeb;
 import static com.sluv.server.domain.celeb.entity.QInterestedCeleb.interestedCeleb;
 import static com.sluv.server.domain.closet.entity.QCloset.closet;
+import static com.sluv.server.domain.item.entity.QDayHotItem.dayHotItem;
 import static com.sluv.server.domain.item.entity.QEfficientItem.efficientItem;
 import static com.sluv.server.domain.item.entity.QItem.item;
+import static com.sluv.server.domain.item.entity.QItemImg.itemImg;
 import static com.sluv.server.domain.item.entity.QItemLike.itemLike;
 import static com.sluv.server.domain.item.entity.QItemLink.itemLink;
 import static com.sluv.server.domain.item.entity.QItemScrap.itemScrap;
 import static com.sluv.server.domain.item.entity.QLuxuryItem.luxuryItem;
 import static com.sluv.server.domain.item.entity.QRecentItem.recentItem;
 import static com.sluv.server.domain.item.entity.QWeekHotItem.weekHotItem;
-import static com.sluv.server.domain.item.entity.QDayHotItem.dayHotItem;
+import static com.sluv.server.domain.item.enums.ItemNumberConfig.이_아이템은_어때요_개수;
 import static com.sluv.server.domain.item.enums.ItemStatus.ACTIVE;
 import static com.sluv.server.domain.user.entity.QUser.user;
 
+import com.querydsl.core.Tuple;
+import com.querydsl.core.types.OrderSpecifier;
+import com.querydsl.jpa.impl.JPAQuery;
+import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.sluv.server.domain.celeb.entity.Celeb;
+import com.sluv.server.domain.closet.entity.Closet;
+import com.sluv.server.domain.item.dto.ItemSimpleResDto;
+import com.sluv.server.domain.item.entity.Item;
+import com.sluv.server.domain.search.dto.SearchFilterReqDto;
+import com.sluv.server.domain.user.entity.User;
+import com.sluv.server.domain.user.enums.UserStatus;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Stream;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.support.PageableExecutionUtils;
+
+@Slf4j
 @RequiredArgsConstructor
-public class ItemRepositoryImpl implements ItemRepositoryCustom{
+public class ItemRepositoryImpl implements ItemRepositoryCustom {
 
     private final JPAQueryFactory jpaQueryFactory;
 
@@ -53,12 +59,12 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom{
     @Override
     public List<Item> findSameCelebItem(Item _item, boolean celebJudge) {
         JPAQuery<Item> query = jpaQueryFactory.selectFrom(item);
-        if(celebJudge){
+        if (celebJudge) {
             query = query
-                .where(item.celeb.eq(_item.getCeleb())
-                        .and(item.ne(_item))
-                );
-        }else{
+                    .where(item.celeb.eq(_item.getCeleb())
+                            .and(item.ne(_item))
+                    );
+        } else {
             query = query
                     .where(item.newCeleb.eq(_item.getNewCeleb())
                             .and(item.ne(_item))
@@ -75,12 +81,12 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom{
     public List<Item> findSameBrandItem(Item _item, boolean brandJudge) {
         JPAQuery<Item> query = jpaQueryFactory.selectFrom(item);
 
-        if(brandJudge){
+        if (brandJudge) {
             query = query
                     .where(item.brand.eq(_item.getBrand())
                             .and(item.ne(_item))
                     );
-        }else{
+        } else {
             query = query
                     .where(item.newBrand.eq(_item.getNewBrand())
                             .and(item.ne(_item))
@@ -144,24 +150,41 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom{
     }
 
     @Override
-    public Page<Item> getClosetItems(Closet _closet, Pageable pageable) {
-        List<Item> content = jpaQueryFactory.select(item)
-                .from(itemScrap)
-                .leftJoin(itemScrap.item, item)
-                .where(itemScrap.closet.eq(_closet))
+    public Page<ItemSimpleResDto> getClosetItems(Closet closets, Pageable pageable) {
+//        List<Item> content = jpaQueryFactory.select(item)
+//                .from(itemScrap)
+//                .leftJoin(itemScrap.item, item)
+//                .where(itemScrap.closet.eq(closets))
+//                .offset(pageable.getOffset())
+//                .limit(pageable.getPageSize())
+//                .orderBy(itemScrap.createdAt.desc())
+//                .fetch();
+
+        List<Tuple> content = jpaQueryFactory.select(item, itemImg, itemScrap)
+                .from(item)
+                .leftJoin(item.brand, brand).fetchJoin()
+                .leftJoin(item.celeb, celeb).fetchJoin()
+                .leftJoin(itemImg).on(itemImg.item.eq(item)).fetchJoin()
+                .leftJoin(itemScrap).on(itemScrap.item.eq(item).and(itemScrap.closet.in(closets))).fetchJoin()
+                .where(itemScrap.closet.eq(closets).and(itemImg.representFlag.eq(true)))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .orderBy(itemScrap.createdAt.desc())
                 .fetch();
 
         // Count Query
-        JPAQuery<Item> countJPAQuery = jpaQueryFactory.select(item)
-                .from(itemScrap)
-                .leftJoin(itemScrap.item, item)
-                .where(itemScrap.closet.eq(_closet))
+        JPAQuery<Tuple> countJPAQuery = jpaQueryFactory.select(item, itemImg, itemScrap)
+                .from(item)
+                .leftJoin(item.brand, brand).fetchJoin()
+                .leftJoin(item.celeb, celeb).fetchJoin()
+                .leftJoin(itemImg).on(itemImg.item.eq(item)).fetchJoin()
+                .leftJoin(itemScrap).on(itemScrap.item.eq(item).and(itemScrap.closet.in(closets))).fetchJoin()
+                .where(itemScrap.closet.eq(closets).and(itemImg.representFlag.eq(true)))
                 .orderBy(itemScrap.createdAt.desc());
 
-        return PageableExecutionUtils.getPage(content, pageable, () -> countJPAQuery.fetch().size());
+        return PageableExecutionUtils.getPage(content.stream()
+                .map(tuple -> ItemSimpleResDto.of(tuple.get(item), tuple.get(itemImg), tuple.get(itemScrap) != null))
+                .toList(), pageable, () -> countJPAQuery.fetch().size());
     }
 
     @Override
@@ -222,7 +245,6 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom{
                 .orderBy(item.whenDiscovery.desc())
                 .fetch();
 
-
         // Count Query
         JPAQuery<Item> countJPAQuery = jpaQueryFactory.select(item)
                 .from(item)
@@ -231,7 +253,6 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom{
                 .groupBy(item)
                 .orderBy(itemLike.count().add(itemScrap.count()).add(item.viewNum).desc())
                 .orderBy(item.whenDiscovery.desc());
-
 
         return PageableExecutionUtils.getPage(content, pageable, () -> countJPAQuery.fetch().size());
     }
@@ -250,20 +271,20 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom{
     /**
      * 검색 필터링 쿼리 추가
      */
-    private JPAQuery<Item> addFilterWhere(JPAQuery<Item> query, SearchFilterReqDto dto){
+    private JPAQuery<Item> addFilterWhere(JPAQuery<Item> query, SearchFilterReqDto filterReqDto) {
         // Category Filtering
-        if (dto.getCategoryId() != null){
-            query.where(item.category.id.eq(dto.getCategoryId()));
+        if (filterReqDto.getCategoryId() != null) {
+            query.where(item.category.id.eq(filterReqDto.getCategoryId()));
         }
         // Price Filtering
-        if(dto.getMinPrice() != null && dto.getMaxPrice() != null){
-            query.where(item.price.between(dto.getMinPrice(), dto.getMaxPrice()));
-        }else if(dto.getMinPrice() != null){
-            query.where(item.price.goe(dto.getMinPrice()));
+        if (filterReqDto.getMinPrice() != null && filterReqDto.getMaxPrice() != null) {
+            query.where(item.price.between(filterReqDto.getMinPrice(), filterReqDto.getMaxPrice()));
+        } else if (filterReqDto.getMinPrice() != null) {
+            query.where(item.price.goe(filterReqDto.getMinPrice()));
         }
         // Color Filtering
-        if(dto.getColor() != null){
-            query.where(item.color.eq(dto.getColor()));
+        if (filterReqDto.getColor() != null) {
+            query.where(item.color.eq(filterReqDto.getColor()));
         }
         return query;
     }
@@ -288,7 +309,7 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom{
 
                 orderSpecifiers.add(orderSpecifier);
             }
-        }else{
+        } else {
             orderSpecifiers.add(item.whenDiscovery.desc());
         }
 
@@ -317,7 +338,7 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom{
 
                 orderSpecifiers.add(orderSpecifier);
             }
-        }else{
+        } else {
             orderSpecifiers.add(itemLike.count().add(itemScrap.count()).add(item.viewNum).desc());
         }
 
@@ -352,7 +373,6 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom{
         JPAQuery<Item> query = jpaQueryFactory.selectFrom(item)
                 .where(item.user.id.eq(userId).and(item.itemStatus.eq(ACTIVE)))
                 .orderBy(item.id.desc());
-
 
         return PageableExecutionUtils.getPage(content, pageable, () -> query.fetch().size());
     }
@@ -394,15 +414,14 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom{
         categortIdList.add(42L); // 스킨케어
         categortIdList.add(44L); // 헤어&바디
 
-
         JPAQuery<Item> query = jpaQueryFactory.selectFrom(item)
                 .where(item.category.id.in(categortIdList)
                         .and(item.itemStatus.eq(ACTIVE))
                 )
                 .orderBy(getSearchItemOrder(pageable.getSort()));
-            // Filter 추가
+        // Filter 추가
         addFilterWhere(query, dto);
-            // Pagination 추가
+        // Pagination 추가
         List<Item> content = query
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -414,22 +433,21 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom{
                         .and(item.itemStatus.eq(ACTIVE))
                 )
                 .orderBy(getSearchItemOrder(pageable.getSort()));
-            // Filter 추가
+        // Filter 추가
         addFilterWhere(countQuery, dto);
-
 
         return PageableExecutionUtils.getPage(content, pageable, () -> countQuery.fetch().size());
     }
 
     /**
-     * 핫한 셀럽들이 선택한 여름나기 아이템
+     * 당장 구매할 수 있는 아이템.
      */
     @Override
     public Page<Item> getNowBuyItem(Pageable pageable, SearchFilterReqDto dto) {
-        JPAQuery<Item> query = jpaQueryFactory.select(item)
-                .from(itemLink)
-                .leftJoin(itemLink.item, item)
-                .where(item.itemStatus.eq(ACTIVE))
+        log.info("지금 당장 구매 가능한 아이템 조회 Query");
+        JPAQuery<Item> query = jpaQueryFactory.selectFrom(item)
+                .leftJoin(itemLink).on(itemLink.item.eq(item)).fetchJoin()
+                .where(item.itemStatus.eq(ACTIVE).and(itemLink.item.isNotNull()))
                 .groupBy(item)
                 .orderBy(item.whenDiscovery.desc());
         // Filter 추가
@@ -442,16 +460,15 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom{
                 .fetch();
 
         // Count Query
-        JPAQuery<Item> countQuery = jpaQueryFactory.select(item)
-                .from(itemLink)
-                .leftJoin(itemLink.item, item)
-                .where(item.itemStatus.eq(ACTIVE))
+        JPAQuery<Item> countQuery = jpaQueryFactory.selectFrom(item)
+                .leftJoin(itemLink).on(itemLink.item.eq(item)).fetchJoin()
+                .where(item.itemStatus.eq(ACTIVE).and(itemLink.item.isNotNull()))
                 .groupBy(item)
                 .orderBy(item.whenDiscovery.desc());
         // Filter 추가
         addFilterWhere(countQuery, dto);
 
-
+        log.info("지금 당장 구매 가능한 아이템 조회 Count Query");
         return PageableExecutionUtils.getPage(content, pageable, () -> countQuery.fetch().size());
     }
 
@@ -487,13 +504,12 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom{
 
     @Override
     public Page<Item> getLuxuryItem(Pageable pageable, SearchFilterReqDto dto) {
-        JPAQuery<Item> query = jpaQueryFactory.select(item)
-                .from(luxuryItem)
-                .leftJoin(luxuryItem.item, item)
-                .leftJoin(itemLike).on(itemLike.item.eq(item))
-                .leftJoin(itemScrap).on(itemScrap.item.eq(item))
+        log.info("럭셔리 아이템 조회 Query");
+        JPAQuery<Item> query = jpaQueryFactory.selectFrom(item)
+                .leftJoin(luxuryItem).on(luxuryItem.item.eq(item)).fetchJoin()
+                .leftJoin(itemLike).on(itemLike.item.eq(item)).fetchJoin()
+                .leftJoin(itemScrap).on(itemScrap.item.eq(item)).fetchJoin()
                 .groupBy(item);
-
 
         addFilterWhere(query, dto);
 
@@ -502,12 +518,12 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom{
                 .limit(pageable.getPageSize())
                 .fetch();
 
+        log.info("럭셔리 아이템 조회 Count Query");
         // Count Query
-        JPAQuery<Item> countQuery = jpaQueryFactory.select(item)
-                .from(luxuryItem)
-                .leftJoin(luxuryItem.item, item)
-                .leftJoin(itemLike).on(itemLike.item.eq(item))
-                .leftJoin(itemScrap).on(itemScrap.item.eq(item))
+        JPAQuery<Item> countQuery = jpaQueryFactory.selectFrom(item)
+                .leftJoin(luxuryItem).on(luxuryItem.item.eq(item)).fetchJoin()
+                .leftJoin(itemLike).on(itemLike.item.eq(item)).fetchJoin()
+                .leftJoin(itemScrap).on(itemScrap.item.eq(item)).fetchJoin()
                 .groupBy(item);
 
         addFilterWhere(countQuery, dto);
@@ -520,42 +536,41 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom{
      */
     @Override
     public List<Item> updateLuxuryItem() {
-        return  jpaQueryFactory.select(item)
+        return jpaQueryFactory.select(item)
                 .from(item)
                 .where(item.itemStatus.eq(ACTIVE)
                         .and(item.price.goe(1000000))
                 )
                 .fetch();
     }
+
     /**
      * 가성비 선물 아이템 조회
      */
     @Override
-    public Page<Item> getEfficientItem(Pageable pageable, SearchFilterReqDto dto) {
-        JPAQuery<Item> query = jpaQueryFactory.select(item)
-                .from(efficientItem)
-                .leftJoin(efficientItem.item, item)
-                .leftJoin(itemLike).on(itemLike.item.eq(item))
-                .leftJoin(itemScrap).on(itemScrap.item.eq(item))
+    public Page<Item> getEfficientItem(Pageable pageable, SearchFilterReqDto filterReqDto) {
+        log.info("가성비 좋은 선물 아이템 조회 Query");
+        JPAQuery<Item> query = jpaQueryFactory.selectFrom(item)
+                .leftJoin(efficientItem).on(efficientItem.item.eq(item)).fetchJoin()
+                .leftJoin(itemLike).on(itemLike.item.eq(item)).fetchJoin()
+                .leftJoin(itemScrap).on(itemScrap.item.eq(item)).fetchJoin()
                 .groupBy(item);
 
-
-        addFilterWhere(query, dto);
+        addFilterWhere(query, filterReqDto);
 
         List<Item> content = query.orderBy(getSearchItemOrderHot(pageable.getSort()))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
 
-        // Count Query
-        JPAQuery<Item> countQuery = jpaQueryFactory.select(item)
-                .from(efficientItem)
-                .leftJoin(efficientItem.item, item)
-                .leftJoin(itemLike).on(itemLike.item.eq(item))
-                .leftJoin(itemScrap).on(itemScrap.item.eq(item))
+        log.info("가성비 좋은 선물 아이템 조회 Count Query");
+        JPAQuery<Item> countQuery = jpaQueryFactory.selectFrom(item)
+                .leftJoin(efficientItem).on(efficientItem.item.eq(item)).fetchJoin()
+                .leftJoin(itemLike).on(itemLike.item.eq(item)).fetchJoin()
+                .leftJoin(itemScrap).on(itemScrap.item.eq(item)).fetchJoin()
                 .groupBy(item);
 
-        addFilterWhere(countQuery, dto);
+        addFilterWhere(countQuery, filterReqDto);
 
         return PageableExecutionUtils.getPage(content, pageable, () -> countQuery.fetch().size());
     }
@@ -565,7 +580,7 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom{
      */
     @Override
     public List<Item> updateEfficientItem() {
-        return  jpaQueryFactory.select(item)
+        return jpaQueryFactory.select(item)
                 .from(item)
                 .where(item.itemStatus.eq(ACTIVE)
                         .and(item.price.loe(100000))
@@ -578,7 +593,7 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom{
      */
     @Override
     public List<Item> updateWeekHotItem() {
-        return  jpaQueryFactory.selectFrom(item)
+        return jpaQueryFactory.selectFrom(item)
                 .leftJoin(itemLike).on(itemLike.item.eq(item))
                 .leftJoin(itemScrap).on(itemScrap.item.eq(item))
                 .where(item.itemStatus.eq(ACTIVE))
@@ -587,16 +602,17 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom{
                 .limit(21)
                 .fetch();
     }
+
     /**
      * 주간 HOT 아이템 조회
      */
     @Override
     public List<Item> getWeekHotItem() {
+        log.info("주간 셀럽 핫 아이템 조회 쿼리");
         return jpaQueryFactory.select(item)
                 .from(weekHotItem)
-                .leftJoin(weekHotItem.item, item)
+                .leftJoin(item).on(weekHotItem.item.eq(item)).fetchJoin()
                 .where(item.itemStatus.eq(ACTIVE))
-                .groupBy(item)
                 .fetch();
     }
 
@@ -605,11 +621,11 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom{
      */
     @Override
     public List<Item> getDayHotItem() {
+        log.info("일간 셀럽 핫 아이템 조회 쿼리");
         return jpaQueryFactory.select(item)
                 .from(dayHotItem)
-                .leftJoin(dayHotItem.item, item)
+                .leftJoin(item).on(dayHotItem.item.eq(item)).fetchJoin()
                 .where(item.itemStatus.eq(ACTIVE))
-                .groupBy(item)
                 .fetch();
     }
 
@@ -618,7 +634,7 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom{
      */
     @Override
     public List<Item> updateDayHotItem() {
-        return  jpaQueryFactory.selectFrom(item)
+        return jpaQueryFactory.selectFrom(item)
                 .leftJoin(itemLike).on(itemLike.item.eq(item))
                 .leftJoin(itemScrap).on(itemScrap.item.eq(item))
                 .where(item.itemStatus.eq(ACTIVE))
@@ -676,11 +692,12 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom{
      */
     @Override
     public List<Item> getCurationItem(User user, List<Celeb> interestedCeleb) {
+        log.info("큐레이션 아이템 조회 Query");
         LocalDateTime now = LocalDateTime.now();
 
         List<Item> content = jpaQueryFactory.selectFrom(item)
-                .leftJoin(itemLike).on(itemLike.item.eq(item))
-                .leftJoin(itemScrap).on(itemScrap.item.eq(item))
+                .leftJoin(itemLike).on(itemLike.item.eq(item)).fetchJoin()
+                .leftJoin(itemScrap).on(itemScrap.item.eq(item)).fetchJoin()
                 .where(item.itemStatus.eq(ACTIVE)
                         .and(item.celeb.in(interestedCeleb)
                                 .or(item.celeb.parent.in(interestedCeleb)))
@@ -695,21 +712,24 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom{
 
         List<Item> result = content;
 
-        if(content.size() < 10){
-            System.out.println("dkdkdkkdkkr: " + content.size());
-            List<Item> additionalContent = jpaQueryFactory.selectFrom(item)
-                    .where(item.itemStatus.eq(ACTIVE)
-                            .and(item.notIn(content))
-                    )
-                    .orderBy(item.createdAt.desc())
-                    .limit(10 - content.size())
-                    .fetch();
-
+        // 관심 셀럽의 아이템이 10개가 채워지지 않는 경우 최신 아이템으로 채움.
+        if (content.size() < 10) {
+            log.info("10개가 채워지지 않아 남은 것을 채우는 Query");
+            List<Item> additionalContent = getRecentPostItemsNotInContent(content, 10 - content.size());
             result = Stream.concat(content.stream(), additionalContent.stream()).toList();
         }
 
-
         return result;
+    }
+
+    private List<Item> getRecentPostItemsNotInContent(List<Item> content, int count) {
+        return jpaQueryFactory.selectFrom(item)
+                .where(item.itemStatus.eq(ACTIVE)
+                        .and(item.notIn(content))
+                )
+                .orderBy(item.createdAt.desc())
+                .limit(count)
+                .fetch();
     }
 
     /**
@@ -717,15 +737,15 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom{
      */
     @Override
     public List<Item> getHowAboutItem(User _user, List<Celeb> interestedCelebList) {
+        log.info("동일한 관심셀럽을 가진 유저 목록 조회");
         List<User> userList = jpaQueryFactory.select(user)
-                        .from(interestedCeleb)
-                        .leftJoin(interestedCeleb.user, user)
-                        .where(interestedCeleb.celeb.in(interestedCelebList)
-                                .and(interestedCeleb.user.userStatus.eq(UserStatus.ACTIVE))
-                        )
-                        .fetch();
-
-
+                .from(interestedCeleb)
+                .leftJoin(interestedCeleb.user, user)
+                .where(interestedCeleb.celeb.in(interestedCelebList)
+                        .and(interestedCeleb.user.userStatus.eq(UserStatus.ACTIVE))
+                )
+                .fetch();
+        log.info("유저가 좋아요한 아이템 추천");
         return jpaQueryFactory.select(item)
                 .from(itemLike)
                 .leftJoin(itemLike.item, item)
@@ -734,8 +754,30 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom{
                 )
                 .orderBy(itemLike.count().desc())
                 .groupBy(item)
-                .limit(4)
+                .limit(이_아이템은_어때요_개수.getNumber())
                 .fetch();
 
+    }
+
+    @Override
+    public List<ItemSimpleResDto> getItemSimpleResDto(User user, List<Item> items) {
+        log.info("User의 Closet을 모두 검색");
+        List<Closet> closets = jpaQueryFactory.selectFrom(closet)
+                .where(closet.user.eq(user))
+                .fetch();
+
+        List<Tuple> content = jpaQueryFactory.select(item, itemImg, itemScrap)
+                .from(item)
+                .leftJoin(item.brand, brand).fetchJoin()
+                .leftJoin(item.celeb, celeb).fetchJoin()
+                .leftJoin(itemImg).on(itemImg.item.eq(item)).fetchJoin()
+                .leftJoin(itemScrap).on(itemScrap.item.eq(item).and(itemScrap.closet.in(closets))).fetchJoin()
+                .where(item.in(items))
+                .fetch();
+
+        return content.stream()
+                .map(tuple -> ItemSimpleResDto.of(tuple.get(item), tuple.get(itemImg),
+                        tuple.get(itemScrap) != null))
+                .toList();
     }
 }

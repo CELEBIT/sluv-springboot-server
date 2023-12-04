@@ -9,11 +9,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@Transactional
 @RequiredArgsConstructor
 public class NewBrandService {
     private final NewBrandRepository newBrandRepository;
 
+    @Transactional
     public NewBrandPostResDto postNewBrand(NewBrandPostReqDto dto) {
 
         NewBrand newBrand = newBrandRepository.save(NewBrand.toEntity(dto));

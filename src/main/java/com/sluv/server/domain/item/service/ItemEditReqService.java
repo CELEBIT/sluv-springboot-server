@@ -18,7 +18,7 @@ public class ItemEditReqService {
     private final ItemEditReqRepository itemEditReqRepository;
     private final ItemRepository itemRepository;
 
-    public void postItemEdit(User user, Long itemId, ItemEditReqDto dto){
+    public void postItemEdit(User user, Long itemId, ItemEditReqDto dto) {
         Item item = itemRepository.findById(itemId).orElseThrow(ItemNotFoundException::new);
 
         itemEditReqRepository.save(

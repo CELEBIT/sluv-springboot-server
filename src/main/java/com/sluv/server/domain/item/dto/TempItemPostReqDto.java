@@ -1,13 +1,12 @@
 package com.sluv.server.domain.item.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.time.LocalDateTime;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.time.LocalDateTime;
-import java.util.List;
 
 
 @Data
@@ -16,8 +15,7 @@ import java.util.List;
 @Builder
 public class TempItemPostReqDto {
     /**
-     * 착용사진, 셀럽, 아이템 종류, 브랜드, 상품명, 금액대
-     * 날짜, 장소, 추가 정보, 구매 링크
+     * 착용사진, 셀럽, 아이템 종류, 브랜드, 상품명, 금액대 날짜, 장소, 추가 정보, 구매 링크
      */
 
     @Schema(description = "tempItem id(PK)")

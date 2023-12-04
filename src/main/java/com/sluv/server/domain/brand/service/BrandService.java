@@ -9,16 +9,14 @@ import com.sluv.server.domain.brand.repository.RecentSelectBrandRepository;
 import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.domain.user.repository.UserRepository;
 import com.sluv.server.global.common.response.PaginationResDto;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@Transactional
 @RequiredArgsConstructor
 public class BrandService {
     private final BrandRepository brandRepository;
@@ -35,13 +33,7 @@ public class BrandService {
                 .map(BrandSearchResDto::of)
                 .toList();
 
-        return PaginationResDto.<BrandSearchResDto>builder()
-                .hasNext(brandPage.hasNext())
-                .page(brandPage.getNumber())
-                .content(dtoList)
-                .build();
-
-
+        return PaginationResDto.of(brandPage, dtoList);
     }
 
     @Transactional(readOnly = true)

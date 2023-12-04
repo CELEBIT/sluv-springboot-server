@@ -27,7 +27,7 @@ public class ClosetResDto {
     @Schema(description = "해당 Closet의 Item 개수")
     private Long itemNum;
 
-    public static ClosetResDto of(Closet closet, Long itemNum){
+    public static ClosetResDto of(Closet closet, Long itemNum) {
         return ClosetResDto.builder()
                 .id(closet.getId())
                 .name(closet.getName())

@@ -4,7 +4,17 @@ import com.sluv.server.domain.user.dto.UserReportReqDto;
 import com.sluv.server.domain.user.enums.UserReportReason;
 import com.sluv.server.global.common.entity.BaseEntity;
 import com.sluv.server.global.common.enums.ReportStatus;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -20,16 +30,17 @@ import lombok.NoArgsConstructor;
 @Table(name = "user_report")
 public class UserReport extends BaseEntity {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_report_id")
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "reporter_id")
     @NotNull
     private User reporter;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "reported_id")
     @NotNull
     private User reported;
@@ -45,7 +56,7 @@ public class UserReport extends BaseEntity {
     @Column(length = 45, columnDefinition = "varchar(45) default 'WAITING'")
     private ReportStatus reportStatus;
 
-    public static UserReport toEntity(User reporter, User target, UserReportReqDto dto){
+    public static UserReport toEntity(User reporter, User target, UserReportReqDto dto) {
         return UserReport.builder()
                 .reporter(reporter)
                 .reported(target)

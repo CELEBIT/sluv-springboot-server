@@ -1,8 +1,16 @@
 package com.sluv.server.global.scheduler;
 
 import com.querydsl.core.Tuple;
-import com.sluv.server.domain.item.entity.*;
-import com.sluv.server.domain.item.repository.*;
+import com.sluv.server.domain.item.entity.DayHotItem;
+import com.sluv.server.domain.item.entity.EfficientItem;
+import com.sluv.server.domain.item.entity.Item;
+import com.sluv.server.domain.item.entity.LuxuryItem;
+import com.sluv.server.domain.item.entity.WeekHotItem;
+import com.sluv.server.domain.item.repository.DayHotItemRepository;
+import com.sluv.server.domain.item.repository.EfficientItemRepository;
+import com.sluv.server.domain.item.repository.ItemRepository;
+import com.sluv.server.domain.item.repository.LuxuryItemRepository;
+import com.sluv.server.domain.item.repository.WeekHotItemRepository;
 import com.sluv.server.domain.question.entity.DailyHotQuestion;
 import com.sluv.server.domain.question.entity.Question;
 import com.sluv.server.domain.question.repository.DailyHotQuestionRepository;
@@ -11,14 +19,13 @@ import com.sluv.server.domain.search.entity.SearchData;
 import com.sluv.server.domain.search.entity.SearchRank;
 import com.sluv.server.domain.search.repository.SearchDataRepository;
 import com.sluv.server.domain.search.repository.SearchRankRepository;
+import java.util.Calendar;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Calendar;
-import java.util.List;
 
 @Component
 @Slf4j
@@ -39,7 +46,7 @@ public class Scheduler {
      * SearchRank 업데이트
      */
     @Scheduled(cron = "0 0 0 * * *") // 초 분 시 일 월 요일
-    public void updateSearchRank(){
+    public void updateSearchRank() {
         log.info("SearchRank Update Time: {}", Calendar.getInstance().getTime());
 
         log.info("Delete Old SearchRank Data");
@@ -63,7 +70,7 @@ public class Scheduler {
      * 럭셔리 아이템 업데이트
      */
     @Scheduled(cron = "0 0 0 * * *") // 초 분 시 일 월 요일
-    public void updateLuxuryItem(){
+    public void updateLuxuryItem() {
         log.info("LuxuryItem Update Time: {}", Calendar.getInstance().getTime());
 
         log.info("Delete Old LuxuryItem Data");
@@ -85,7 +92,7 @@ public class Scheduler {
      * 가성비 선물 아이템 업데이트
      */
     @Scheduled(cron = "0 0 0 * * *") // 초 분 시 일 월 요일
-    public void updateEfficientItem(){
+    public void updateEfficientItem() {
         log.info("EfficientItem Update Time: {}", Calendar.getInstance().getTime());
 
         log.info("Delete Old EfficientItem Data");
@@ -107,7 +114,7 @@ public class Scheduler {
      * 주간 HOT 셀럽 아이템
      */
     @Scheduled(cron = "0 0 0 * * MON") // 초 분 시 일 월 요일
-    public void updateWeekHotItem(){
+    public void updateWeekHotItem() {
         log.info("WeekHotItem Update Time: {}", Calendar.getInstance().getTime());
 
         log.info("Delete Old WeekHotItem Data");
@@ -129,7 +136,7 @@ public class Scheduler {
      * 일간 HOT 셀럽 아이템
      */
     @Scheduled(cron = "0 0 0 * * *") // 초 분 시 일 월 요일
-    public void updateDayHotItem(){
+    public void updateDayHotItem() {
         log.info("DayHotItem Update Time: {}", Calendar.getInstance().getTime());
 
         log.info("Delete Old DayHotItem Data");
@@ -151,7 +158,7 @@ public class Scheduler {
      * 일간 HOT Question
      */
     @Scheduled(cron = "0 0 0 * * *") // 초 분 시 일 월 요일
-    public void updateDailyHotQuestion(){
+    public void updateDailyHotQuestion() {
         log.info("DailyHotQuestion Update Time: {}", Calendar.getInstance().getTime());
 
         log.info("Delete Old DailyHotQuestion Data");

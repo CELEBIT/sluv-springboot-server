@@ -19,7 +19,7 @@ public class UserInfoDto {
     @Schema(description = "사용자 이미지 URL")
     private String profileImgUrl;
 
-    public static UserInfoDto of(User user){
+    public static UserInfoDto of(User user) {
         return UserInfoDto.builder()
                 .id(user.getId())
                 .nickName(user.getNickname())

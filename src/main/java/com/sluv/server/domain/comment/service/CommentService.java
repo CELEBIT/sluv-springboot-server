@@ -2,13 +2,24 @@ package com.sluv.server.domain.comment.service;
 
 import com.sluv.server.domain.closet.entity.Closet;
 import com.sluv.server.domain.closet.repository.ClosetRepository;
-import com.sluv.server.domain.comment.dto.*;
-import com.sluv.server.domain.comment.entity.*;
-import com.sluv.server.domain.comment.enums.CommentStatus;
+import com.sluv.server.domain.comment.dto.CommentImgDto;
+import com.sluv.server.domain.comment.dto.CommentItemResDto;
+import com.sluv.server.domain.comment.dto.CommentPostReqDto;
+import com.sluv.server.domain.comment.dto.CommentReportPostReqDto;
+import com.sluv.server.domain.comment.dto.CommentResDto;
+import com.sluv.server.domain.comment.dto.SubCommentPageResDto;
+import com.sluv.server.domain.comment.entity.Comment;
+import com.sluv.server.domain.comment.entity.CommentImg;
+import com.sluv.server.domain.comment.entity.CommentItem;
+import com.sluv.server.domain.comment.entity.CommentLike;
+import com.sluv.server.domain.comment.entity.CommentReport;
 import com.sluv.server.domain.comment.exception.CommentNotFoundException;
 import com.sluv.server.domain.comment.exception.CommentReportDuplicateException;
-import com.sluv.server.domain.comment.repository.*;
-import com.sluv.server.domain.item.dto.ItemSimpleResDto;
+import com.sluv.server.domain.comment.repository.CommentImgRepository;
+import com.sluv.server.domain.comment.repository.CommentItemRepository;
+import com.sluv.server.domain.comment.repository.CommentLikeRepository;
+import com.sluv.server.domain.comment.repository.CommentReportRepository;
+import com.sluv.server.domain.comment.repository.CommentRepository;
 import com.sluv.server.domain.item.entity.Item;
 import com.sluv.server.domain.item.entity.ItemImg;
 import com.sluv.server.domain.item.exception.ItemNotFoundException;
@@ -18,21 +29,19 @@ import com.sluv.server.domain.item.repository.ItemScrapRepository;
 import com.sluv.server.domain.question.entity.Question;
 import com.sluv.server.domain.question.exception.QuestionNotFoundException;
 import com.sluv.server.domain.question.repository.QuestionRepository;
-import com.sluv.server.domain.user.dto.UserInfoDto;
 import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.domain.user.exception.UserNotMatchedException;
-import com.sluv.server.global.common.enums.ReportStatus;
 import com.sluv.server.global.common.response.PaginationResDto;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-
 @Service
-@Transactional
+@Slf4j
 @RequiredArgsConstructor
 public class CommentService {
     private final CommentRepository commentRepository;
@@ -46,40 +55,25 @@ public class CommentService {
     private final ItemScrapRepository itemScrapRepository;
     private final ClosetRepository closetRepository;
 
+    @Transactional
     public void postComment(User user, Long questionId, CommentPostReqDto dto) {
-        /**
-         *  1. Comment 등록
-         *  2. CommentImg 등록
-         *  3. CommentItem 등록
-         */
+        log.info("댓글 등록 - 사용자 : {}, 질문 게시글 : {}, 댓글 내용 {}", user.getId(), questionId, dto.getContent());
         Question question = questionRepository.findById(questionId).orElseThrow(QuestionNotFoundException::new);
 
-        // 1. Comment 등록
         Comment comment = commentRepository.save(
                 Comment.toEntity(user, question, dto.getContent())
         );
 
-        // 2. CommentImg 등록
-        if (dto.getImgList() != null) {
-            saveCommentImg(dto, comment);
-        }
-
-        // 3. CommentItem 등록
-        if (dto.getItemList() != null) {
-            saveCommentItem(dto, comment);
-        }
-
+        saveCommentImgAndItem(dto, comment);
     }
 
+    @Transactional
     public void postSubComment(User user, Long questionId, Long commentId, CommentPostReqDto dto) {
-        /**
-         *  1. Comment 등록
-         *  2. CommentImg 등록
-         *  3. CommentItem 등록
-         */
+        log.info("대댓글 등록 - 사용자 : {}, 질문 게시글 : {}, 상위 댓글 : {}, 댓글 내용 {}",
+                user.getId(), questionId, commentId, dto.getContent());
+
         Question question = questionRepository.findById(questionId).orElseThrow(QuestionNotFoundException::new);
 
-        // 1. Comment 등록
         // Parent Comment 조회
         Comment parentComment = commentRepository.findById(commentId).orElseThrow(CommentNotFoundException::new);
 
@@ -87,38 +81,22 @@ public class CommentService {
                 Comment.toEntity(user, question, dto.getContent(), parentComment)
         );
 
-        // 2. CommentImg 등록
+        saveCommentImgAndItem(dto, comment);
+    }
+
+    /**
+     * 댓글에 이미지 및 아이템 등록. Dto에 이미지 및 아이템이 존재한다면 등록 메소드 호출.
+     */
+    private void saveCommentImgAndItem(CommentPostReqDto dto, Comment comment) {
+        // 1. CommentImg 등록
         if (dto.getImgList() != null) {
             saveCommentImg(dto, comment);
         }
 
-        // 3. CommentItem 등록
+        // 2. CommentItem 등록
         if (dto.getItemList() != null) {
             saveCommentItem(dto, comment);
         }
-    }
-
-    public void putComment(User user, Long commentId, CommentPostReqDto dto) {
-        /**
-         * 1. Comment의 content 수정
-         * 2. Comment와 관련된 img 초기화 후 재등록
-         * 3. Comment와 관련된 item 초기화 후 재등록
-         */
-        Comment comment = commentRepository.findById(commentId).orElseThrow(CommentNotFoundException::new);
-
-        if (!comment.getUser().getId().equals(user.getId())) {
-            throw new UserNotMatchedException();
-        }
-        // content 변경
-        comment.changeContent(dto.getContent());
-
-        // img 변경
-        saveCommentImg(dto, comment);
-
-        // item 변경
-        saveCommentItem(dto, comment);
-
-
     }
 
     private void saveCommentItem(CommentPostReqDto dto, Comment comment) {
@@ -152,7 +130,29 @@ public class CommentService {
         }
     }
 
+    @Transactional
+    public void putComment(User user, Long commentId, CommentPostReqDto dto) {
+        /**
+         * 1. Comment의 content 수정
+         * 2. Comment와 관련된 img 초기화 후 재등록
+         * 3. Comment와 관련된 item 초기화 후 재등록
+         */
+        log.info("댓글 수정 - 사용자 : {}. 댓글 : {}", user.getId(), commentId);
+        Comment comment = commentRepository.findById(commentId).orElseThrow(CommentNotFoundException::new);
+
+        if (!comment.getUser().getId().equals(user.getId())) {
+            throw new UserNotMatchedException();
+        }
+        // content 변경
+        comment.changeContent(dto.getContent());
+
+        saveCommentImgAndItem(dto, comment);
+
+    }
+
+    @Transactional
     public void postCommentLike(User user, Long commentId) {
+        log.info("댓글 삭제 - 사용자 : {}, 댓글 : {}", user.getId(), commentId);
         Boolean commentListStatus = commentLikeRepository.existsByUserIdAndCommentId(user.getId(), commentId);
 
         if (!commentListStatus) {
@@ -165,7 +165,9 @@ public class CommentService {
         }
     }
 
+    @Transactional
     public void postCommentReport(User user, Long commentId, CommentReportPostReqDto dto) {
+        log.info("댓글 신고 - 사용자 : {}, 신고 댓글 : {}", user.getId(), commentId);
         Boolean reportStatus = commentReportRepository.existsByReporterIdAndCommentId(user.getId(), commentId);
 
         if (reportStatus) {
@@ -178,7 +180,9 @@ public class CommentService {
         );
     }
 
+    @Transactional
     public void deleteComment(User user, Long commentId) {
+        log.info("댓글 삭제 - 사용자 : {}, 댓글 : {}", user.getId(), commentId);
         Comment comment = commentRepository.findById(commentId).orElseThrow(CommentNotFoundException::new);
 
         // comment 작성자와 현재 User가 불일치 시 예외 처리
@@ -202,11 +206,7 @@ public class CommentService {
         // Content 제작
         List<CommentResDto> content = getCommentResDtos(user, commentPage);
 
-        return PaginationResDto.<CommentResDto>builder()
-                .page(commentPage.getNumber())
-                .hasNext(commentPage.hasNext())
-                .content(content)
-                .build();
+        return PaginationResDto.of(commentPage, content);
     }
 
     @Transactional(readOnly = true)

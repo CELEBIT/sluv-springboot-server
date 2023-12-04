@@ -14,7 +14,7 @@ public class SearchKeywordResDto {
     @Schema(description = "키워드")
     private String keyword;
 
-    public static SearchKeywordResDto of(String keyword){
+    public static SearchKeywordResDto of(String keyword) {
         return SearchKeywordResDto.builder()
                 .keyword(keyword)
                 .build();

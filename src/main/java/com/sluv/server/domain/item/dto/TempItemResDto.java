@@ -7,13 +7,12 @@ import com.sluv.server.domain.celeb.dto.NewCelebPostResDto;
 import com.sluv.server.domain.item.entity.TempItem;
 import com.sluv.server.domain.item.entity.hashtag.Hashtag;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.time.LocalDateTime;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.time.LocalDateTime;
-import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -21,8 +20,7 @@ import java.util.List;
 @Builder
 public class TempItemResDto {
     /**
-     * 착용사진, 셀럽, 아이템 종류, 브랜드, 상품명, 금액대
-     * 날짜, 장소, 추가 정보, 구매 링크
+     * 착용사진, 셀럽, 아이템 종류, 브랜드, 상품명, 금액대 날짜, 장소, 추가 정보, 구매 링크
      */
 
     @Schema(description = "item Id")
@@ -62,8 +60,9 @@ public class TempItemResDto {
 
     public static TempItemResDto of(TempItem tempItem, CelebDto celeb, NewCelebPostResDto newCeleb,
                                     Brand brand, NewBrandPostResDto newBrand, ItemCategoryDto itemCategory,
-                                    List<ItemImgResDto> imgList, List<ItemLinkResDto> linkList, List<Hashtag> hashtagList
-                                    ){
+                                    List<ItemImgResDto> imgList, List<ItemLinkResDto> linkList,
+                                    List<Hashtag> hashtagList
+    ) {
 
         return TempItemResDto.builder()
                 .id(tempItem.getId())

@@ -4,21 +4,24 @@ import com.sluv.server.domain.auth.dto.SocialUserInfoDto;
 import com.sluv.server.domain.auth.enums.SnsType;
 import com.sluv.server.domain.user.enums.UserStatus;
 import com.sluv.server.global.common.entity.BaseEntity;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import java.util.Collection;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicInsert;
-
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-
-import java.util.Collection;
-
-import static com.sluv.server.domain.auth.enums.SnsType.APPLE;
 
 
 @Entity
@@ -30,7 +33,8 @@ import static com.sluv.server.domain.auth.enums.SnsType.APPLE;
 @Table(name = "user")
 public class User extends BaseEntity implements UserDetails {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
     private Long id;
     @NotNull
@@ -54,7 +58,7 @@ public class User extends BaseEntity implements UserDetails {
     @Column(length = 45, columnDefinition = "varchar(45) default 'PENDING_PROFILE'")
     private UserStatus userStatus;
 
-    public static User toEntity(SocialUserInfoDto userInfoDto, SnsType snsType){
+    public static User toEntity(SocialUserInfoDto userInfoDto, SnsType snsType) {
         return User.builder()
                 .email(userInfoDto.getEmail())
                 .snsType(snsType)
@@ -64,14 +68,15 @@ public class User extends BaseEntity implements UserDetails {
                 .build();
     }
 
-    public void changeProfileImgUrl(String profileImgUrl){
+    public void changeProfileImgUrl(String profileImgUrl) {
         this.profileImgUrl = profileImgUrl;
     }
 
-    public void changeNickname(String nickname){
+    public void changeNickname(String nickname) {
         this.nickname = nickname;
     }
-    public void changeUserStatus(UserStatus userStatus){
+
+    public void changeUserStatus(UserStatus userStatus) {
         this.userStatus = userStatus;
     }
 

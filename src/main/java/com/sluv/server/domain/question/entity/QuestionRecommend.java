@@ -13,18 +13,19 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @DiscriminatorValue("Recommend")
-public class QuestionRecommend extends Question{
+public class QuestionRecommend extends Question {
     @Builder
-    public QuestionRecommend(Long id, User user, String title, String content, Long searchNum, QuestionStatus questionStatus) {
+    public QuestionRecommend(Long id, User user, String title, String content, Long searchNum,
+                             QuestionStatus questionStatus) {
         super(id, user, title, content, searchNum, questionStatus);
     }
 
-    public static QuestionRecommend toEntity(User user, QuestionRecommendPostReqDto postReqDto){
+    public static QuestionRecommend toEntity(User user, QuestionRecommendPostReqDto postReqDto) {
         QuestionRecommendBuilder builder = QuestionRecommend.builder();
 
-        if(postReqDto.getId() != null){
+        if (postReqDto.getId() != null) {
             builder
-                .id(postReqDto.getId());
+                    .id(postReqDto.getId());
         }
 
         return builder

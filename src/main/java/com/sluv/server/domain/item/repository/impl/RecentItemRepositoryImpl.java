@@ -1,20 +1,19 @@
 package com.sluv.server.domain.item.repository.impl;
 
+import static com.sluv.server.domain.item.entity.QRecentItem.recentItem;
+
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sluv.server.domain.item.entity.RecentItem;
 import com.sluv.server.domain.user.entity.User;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
 
-import java.util.List;
-
-import static com.sluv.server.domain.item.entity.QRecentItem.recentItem;
-
 @RequiredArgsConstructor
-public class RecentItemRepositoryImpl implements RecentItemRepositoryCustom{
+public class RecentItemRepositoryImpl implements RecentItemRepositoryCustom {
     private final JPAQueryFactory jpaQueryFactory;
 
     @Override

@@ -1,30 +1,27 @@
 package com.sluv.server.domain.celeb.service;
 
-import com.sluv.server.domain.celeb.dto.*;
+import com.sluv.server.domain.celeb.dto.CelebChipResDto;
+import com.sluv.server.domain.celeb.dto.CelebSearchByCategoryResDto;
+import com.sluv.server.domain.celeb.dto.CelebSearchResDto;
+import com.sluv.server.domain.celeb.dto.RecentSelectCelebResDto;
 import com.sluv.server.domain.celeb.entity.Celeb;
 import com.sluv.server.domain.celeb.entity.CelebCategory;
-import com.sluv.server.domain.celeb.entity.InterestedCeleb;
 import com.sluv.server.domain.celeb.entity.RecentSelectCeleb;
 import com.sluv.server.domain.celeb.repository.CelebCategoryRepository;
 import com.sluv.server.domain.celeb.repository.CelebRepository;
 import com.sluv.server.domain.celeb.repository.RecentSelectCelebRepository;
 import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.global.common.response.PaginationResDto;
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
-
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@Transactional
 @RequiredArgsConstructor
 public class CelebService {
 
@@ -48,12 +45,9 @@ public class CelebService {
                 .toList();
         Stream<CelebSearchResDto> parentCelebDtoStream = changeCelebSearchResDto(parentCelebList).stream();
 
-        return PaginationResDto.<CelebSearchResDto>builder()
-                .page(celebPage.getNumber())
-                .hasNext(celebPage.hasNext())
-                .content(Stream.concat(childCelebDtoStream, parentCelebDtoStream)
-                                .sorted(Comparator.comparing(CelebSearchResDto::getCelebTotalNameKr)).toList())
-                .build();
+        return PaginationResDto.of(celebPage,
+                Stream.concat(childCelebDtoStream, parentCelebDtoStream)
+                        .sorted(Comparator.comparing(CelebSearchResDto::getCelebTotalNameKr)).toList());
 
     }
 
@@ -101,6 +95,18 @@ public class CelebService {
 
     }
 
+    /**
+     * 가수 -> 배우 -> 방송인 -> 스포츠인 -> 인플루언서 순서로 변
+     */
+
+    private void changeCategoryOrder(List<CelebCategory> categoryList) {
+        categoryList.sort(Comparator.comparing(CelebCategory::getName));
+
+        CelebCategory tempCategory = categoryList.get(1);
+        categoryList.set(1, categoryList.get(2));
+        categoryList.set(2, tempCategory);
+    }
+
     @Transactional(readOnly = true)
     public List<CelebSearchByCategoryResDto> searchInterestedCelebByName(String celebName) {
         // 1. Parent Celeb과 일치
@@ -139,15 +145,4 @@ public class CelebService {
                 .toList();
     }
 
-    /**
-     * 가수 -> 배우 -> 방송인 -> 스포츠인 -> 인플루언서 순서로 변
-     */
-
-    private void changeCategoryOrder(List<CelebCategory> categoryList) {
-        categoryList.sort(Comparator.comparing(CelebCategory::getName));
-
-        CelebCategory tempCategory = categoryList.get(1);
-        categoryList.set(1, categoryList.get(2));
-        categoryList.set(2, tempCategory);
-    }
 }

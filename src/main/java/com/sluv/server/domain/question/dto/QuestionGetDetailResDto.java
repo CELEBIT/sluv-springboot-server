@@ -5,13 +5,12 @@ import com.sluv.server.domain.question.entity.Question;
 import com.sluv.server.domain.user.dto.UserInfoDto;
 import com.sluv.server.domain.user.entity.User;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.time.LocalDateTime;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.time.LocalDateTime;
-import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -61,12 +60,13 @@ public class QuestionGetDetailResDto {
     // Question Recommend
     @Schema(description = "QuestionRecommend Category 리스트")
     private List<String> recommendCategoryList;
+
     public static QuestionGetDetailResDto of(Question question, String qType, User user,
                                              List<QuestionImgResDto> imgList, List<QuestionItemResDto> itemList,
                                              Long likeNum, Long commentNum, Boolean hasLike, Boolean hasMine,
                                              CelebChipResDto celeb, CelebChipResDto newCeleb,
                                              LocalDateTime voteEndTime, Long totalVoteNum, Long voteStatus,
-                                             List<String> recommendCategoryList){
+                                             List<String> recommendCategoryList) {
 
         UserInfoDto writer = UserInfoDto.of(user);
 

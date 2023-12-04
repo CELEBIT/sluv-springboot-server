@@ -1,14 +1,14 @@
 package com.sluv.server.domain.item.repository.impl;
 
+import static com.sluv.server.domain.item.entity.QItemReport.itemReport;
+
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sluv.server.domain.item.entity.Item;
 import com.sluv.server.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
 
-import static com.sluv.server.domain.item.entity.QItemReport.itemReport;
-
 @RequiredArgsConstructor
-public class ItemReportRepositoryImpl implements ItemReportRepositoryCustom{
+public class ItemReportRepositoryImpl implements ItemReportRepositoryCustom {
     private final JPAQueryFactory jpaQueryFactory;
 
     @Override

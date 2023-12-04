@@ -6,25 +6,26 @@ import com.sluv.server.domain.user.exception.UserNotFoundException;
 import com.sluv.server.domain.user.repository.UserRepository;
 import com.sluv.server.global.jwt.exception.ExpiredTokenException;
 import com.sluv.server.global.jwt.exception.InvalidateTokenException;
-import io.jsonwebtoken.*;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
+import java.nio.charset.StandardCharsets;
+import java.security.Key;
+import java.util.Base64;
+import java.util.Date;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
-
-import java.nio.charset.StandardCharsets;
-
-import java.security.Key;
-
-import java.util.Base64;
-import java.util.Date;
 
 
 @Component
@@ -41,18 +42,21 @@ public class JwtProvider {
 
     @Value("${jwt.type}")
     private String tokenType;
+
     @PostConstruct
-    protected void init(){
+    protected void init() {
         secretKey = Base64.getEncoder().encodeToString(secretKey.getBytes(StandardCharsets.UTF_8));
     }
+
     private Key getSigninKey(String secretKey) {
         byte[] keyBytes = secretKey.getBytes(StandardCharsets.UTF_8);
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public Authentication getAuthentication(String _token){
+    public Authentication getAuthentication(String _token) {
         String token = _token.split(tokenType + " ")[1];
-        UserDetails user = userRepository.findById(Long.valueOf(this.getUserId(token).toString())).orElseThrow(UserNotFoundException::new);
+        UserDetails user = userRepository.findById(Long.valueOf(this.getUserId(token).toString()))
+                .orElseThrow(UserNotFoundException::new);
 
         return new UsernamePasswordAuthenticationToken(user, "", user.getAuthorities());
     }
@@ -63,7 +67,7 @@ public class JwtProvider {
      * @param user
      * @return Access Token
      */
-    public String createAccessToken(UserIdDto user){
+    public String createAccessToken(UserIdDto user) {
         Long id = user.getId();
 
         Claims claims = Jwts.claims().setSubject(id.toString());
@@ -83,7 +87,7 @@ public class JwtProvider {
      * @param token
      * @return user's id
      */
-    public Long getUserId(String token){
+    public Long getUserId(String token) {
         String info = Jwts.parserBuilder()
                 .setSigningKey(secretKey.getBytes()).build()
                 .parseClaimsJws(token)
@@ -98,7 +102,7 @@ public class JwtProvider {
      * @param request
      * @return token
      */
-    public String resolveToken(HttpServletRequest request){
+    public String resolveToken(HttpServletRequest request) {
         return request.getHeader("Authorization");
     }
 
@@ -109,7 +113,7 @@ public class JwtProvider {
      * @return true or false
      * @throws ExpiredTokenException
      */
-    public boolean validateToken(String _token){
+    public boolean validateToken(String _token) {
         try {
             String token = _token.split(tokenType + " ")[1];
             Jwts.parserBuilder().setSigningKey(secretKey.getBytes()).build()

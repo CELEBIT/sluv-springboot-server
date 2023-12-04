@@ -4,10 +4,6 @@ spring:
     url: ENC(XBdZAlksr2c2pgnH40ymItqXY8zpLmeXNK6MEYeuE8BCFSp4XLNu4yyCQPQ8OttHU7ppx3cNsLJwDpV9syGSdSFX8GWNhcEfiIhy6A3MGoIOLha03HwmkTmosHFNOMdtMLSLZUllfXU=)
     username: ENC(gh46WFclECYl96UilXt8Lw==)
     password: ENC(2HaAZ8j7cAaYFkIcemnUifSA0UAtPFLt)
-    hikari:
-      connection-timeout: 30000
-      maximum-pool-size: 30
-      max-lifetime: 35000
   jpa:
     properties:
       hibernate:
@@ -34,6 +30,8 @@ jasypt:
 logging:
   level:
     org.hibernate.SQL: debug
+#      com.zaxxer.hikari.HikariConfig: DEBUG
+#      com.zaxxer.hikari.HikariDataSource: DEBUG
 
 jwt:
   header: Authorization

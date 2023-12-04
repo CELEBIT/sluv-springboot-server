@@ -109,11 +109,7 @@ public class SearchService {
         // 서치 데이터 등록
         postSearchData(keyword);
 
-        return CompletableFuture.completedFuture(PaginationResDto.<ItemSimpleResDto>builder()
-                .page(searchItemPage.getNumber())
-                .hasNext(searchItemPage.hasNext())
-                .content(content)
-                .build());
+        return CompletableFuture.completedFuture(PaginationResDto.of(searchItemPage, content));
     }
 
     /**
@@ -159,11 +155,7 @@ public class SearchService {
                 return QuestionSimpleResDto.of(question, likeNum, commentNum, imgList, itemImgList, null);
             }).toList();
 
-            return CompletableFuture.completedFuture(PaginationResDto.<QuestionSimpleResDto>builder()
-                    .page(searchQuestionPage.getNumber())
-                    .hasNext(searchQuestionPage.hasNext())
-                    .content(content)
-                    .build());
+            return CompletableFuture.completedFuture(PaginationResDto.of(searchQuestionPage, content));
 
         } else if (qType.equals("Find")) {
             Page<QuestionFind> searchQuestionPage =
@@ -181,11 +173,7 @@ public class SearchService {
 
             }).toList();
 
-            return CompletableFuture.completedFuture(PaginationResDto.<QuestionSimpleResDto>builder()
-                    .page(searchQuestionPage.getNumber())
-                    .hasNext(searchQuestionPage.hasNext())
-                    .content(content)
-                    .build());
+            return CompletableFuture.completedFuture(PaginationResDto.of(searchQuestionPage, content));
 
         } else if (qType.equals("How")) {
             Page<QuestionHowabout> searchQuestionPage =
@@ -202,11 +190,7 @@ public class SearchService {
                 return QuestionSimpleResDto.of(question, likeNum, commentNum, null, null, null);
             }).toList();
 
-            return CompletableFuture.completedFuture(PaginationResDto.<QuestionSimpleResDto>builder()
-                    .page(searchQuestionPage.getNumber())
-                    .hasNext(searchQuestionPage.hasNext())
-                    .content(content)
-                    .build());
+            return CompletableFuture.completedFuture(PaginationResDto.of(searchQuestionPage, content));
 
         } else if (qType.equals("Recommend")) {
             Page<QuestionRecommend> searchQuestionPage =
@@ -233,11 +217,7 @@ public class SearchService {
             // 서치 데이터 등록
             postSearchData(keyword);
 
-            return CompletableFuture.completedFuture(PaginationResDto.<QuestionSimpleResDto>builder()
-                    .page(searchQuestionPage.getNumber())
-                    .hasNext(searchQuestionPage.hasNext())
-                    .content(content)
-                    .build());
+            return CompletableFuture.completedFuture(PaginationResDto.of(searchQuestionPage, content));
         }
 
         throw new QuestionTypeNotFoundException();
@@ -273,11 +253,7 @@ public class SearchService {
         // 서치 데이터 등록
         postSearchData(keyword);
 
-        return CompletableFuture.completedFuture(PaginationResDto.<UserSearchInfoDto>builder()
-                .page(searchUserPage.getNumber())
-                .hasNext(searchUserPage.hasNext())
-                .content(content)
-                .build());
+        return CompletableFuture.completedFuture(PaginationResDto.of(searchUserPage, content));
     }
 
 //    /**
@@ -401,11 +377,7 @@ public class SearchService {
                         )
                 ).toList();
 
-        return PaginationResDto.<SearchKeywordResDto>builder()
-                .page(searchDataPage.getNumber())
-                .hasNext(searchDataPage.hasNext())
-                .content(content)
-                .build();
+        return PaginationResDto.of(searchDataPage, content);
     }
 
     /**

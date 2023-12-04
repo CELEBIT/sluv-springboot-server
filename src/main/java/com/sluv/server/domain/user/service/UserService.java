@@ -19,9 +19,11 @@ import com.sluv.server.domain.question.mapper.QuestionDtoMapper;
 import com.sluv.server.domain.question.repository.QuestionRepository;
 import com.sluv.server.domain.user.dto.UserMypageResDto;
 import com.sluv.server.domain.user.dto.UserProfileImgReqDto;
+import com.sluv.server.domain.user.dto.UserProfileReqDto;
 import com.sluv.server.domain.user.dto.UserSearchInfoDto;
 import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.domain.user.enums.UserStatus;
+import com.sluv.server.domain.user.exception.UserNicknameDuplicatedException;
 import com.sluv.server.domain.user.exception.UserNotFoundException;
 import com.sluv.server.domain.user.repository.FollowRepository;
 import com.sluv.server.domain.user.repository.UserRepository;
@@ -52,6 +54,23 @@ public class UserService {
     private final ItemDtoMapper itemDtoMapper;
     private final QuestionDtoMapper questionDtoMapper;
 
+    @Transactional
+    public void postUserProfile(User user, UserProfileReqDto dto) {
+        User currentUser = userRepository.findById(user.getId()).orElseThrow(UserNotFoundException::new);
+
+        // 닉네임 중복 검사
+        Boolean nicknameExistsStatus = userRepository.existsByNickname(dto.getNickName());
+        if (nicknameExistsStatus) {
+            throw new UserNicknameDuplicatedException();
+        }
+
+        currentUser.changeNickname(dto.getNickName());
+        currentUser.changeProfileImgUrl(dto.getImgUrl());
+
+        if (currentUser.getUserStatus().equals(UserStatus.PENDING_PROFILE)) {
+            currentUser.changeUserStatus(UserStatus.PENDING_CELEB);
+        }
+    }
 
     @Transactional(readOnly = true)
     public UserMypageResDto getUserMypage(User user, Long userId) {

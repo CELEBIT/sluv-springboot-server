@@ -3,7 +3,7 @@ package com.sluv.server.domain.user.controller;
 import com.sluv.server.domain.item.dto.ItemSimpleResDto;
 import com.sluv.server.domain.question.dto.QuestionSimpleResDto;
 import com.sluv.server.domain.user.entity.User;
-import com.sluv.server.domain.user.service.UserService;
+import com.sluv.server.domain.user.service.UserRecentService;
 import com.sluv.server.global.common.response.PaginationCountResDto;
 import com.sluv.server.global.common.response.SuccessDataResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/app/user")
 @RequiredArgsConstructor
 public class UserRecentController {
-    private final UserService userService;
+    private final UserRecentService userRecentService;
 
     @Operation(
             summary = "유저의 최근 본 아이템 조회",
@@ -38,7 +38,7 @@ public class UserRecentController {
 
         return ResponseEntity.ok().body(
                 SuccessDataResponse.<PaginationCountResDto<ItemSimpleResDto>>builder()
-                        .result(userService.getUserRecentItem(user, pageable))
+                        .result(userRecentService.getUserRecentItem(user, pageable))
                         .build()
         );
     }
@@ -58,7 +58,7 @@ public class UserRecentController {
 
         return ResponseEntity.ok().body(
                 SuccessDataResponse.<PaginationCountResDto<QuestionSimpleResDto>>builder()
-                        .result(userService.getUserRecentQuestion(user, pageable))
+                        .result(userRecentService.getUserRecentQuestion(user, pageable))
                         .build()
         );
     }

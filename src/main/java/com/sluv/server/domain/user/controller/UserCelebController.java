@@ -4,7 +4,7 @@ import com.sluv.server.domain.celeb.dto.InterestedCelebCategoryResDto;
 import com.sluv.server.domain.celeb.dto.InterestedCelebParentResDto;
 import com.sluv.server.domain.celeb.dto.InterestedCelebPostReqDto;
 import com.sluv.server.domain.user.entity.User;
-import com.sluv.server.domain.user.service.UserService;
+import com.sluv.server.domain.user.service.UserCelebService;
 import com.sluv.server.global.common.response.ErrorResponse;
 import com.sluv.server.global.common.response.SuccessDataResponse;
 import com.sluv.server.global.common.response.SuccessResponse;
@@ -30,7 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/app/user")
 @RequiredArgsConstructor
 public class UserCelebController {
-    private final UserService userService;
+    private final UserCelebService userCelebService;
 
     @Operation(
             summary = "*현재 유저의 관심 샐럽을 카테고리를 기준으로 조회",
@@ -46,7 +46,7 @@ public class UserCelebController {
             @AuthenticationPrincipal User user) {
 
         return ResponseEntity.ok().body(SuccessDataResponse.<List<InterestedCelebCategoryResDto>>builder()
-                .result(userService.getInterestedCelebByCategory(user))
+                .result(userCelebService.getInterestedCelebByCategory(user))
                 .build());
     }
 
@@ -65,7 +65,7 @@ public class UserCelebController {
     @PostMapping("/celeb")
     public ResponseEntity<SuccessResponse> postInterestedCeleb(@AuthenticationPrincipal User user,
                                                                @RequestBody InterestedCelebPostReqDto dto) {
-        userService.postInterestedCeleb(user, dto);
+        userCelebService.postInterestedCeleb(user, dto);
         return ResponseEntity.ok().body(
                 new SuccessResponse()
         );
@@ -80,7 +80,7 @@ public class UserCelebController {
             @AuthenticationPrincipal User user) {
 
         return ResponseEntity.ok().body(SuccessDataResponse.<List<InterestedCelebParentResDto>>builder()
-                .result(userService.getInterestedCelebByPostTime(user))
+                .result(userCelebService.getInterestedCelebByPostTime(user))
                 .build());
     }
 
@@ -93,7 +93,7 @@ public class UserCelebController {
             @PathVariable("userId") Long userId) {
 
         return ResponseEntity.ok().body(SuccessDataResponse.<List<InterestedCelebParentResDto>>builder()
-                .result(userService.getTargetUserInterestedCelebByPostTime(userId))
+                .result(userCelebService.getTargetUserInterestedCelebByPostTime(userId))
                 .build());
     }
 
@@ -106,7 +106,7 @@ public class UserCelebController {
             @PathVariable("userId") Long userId) {
 
         return ResponseEntity.ok().body(SuccessDataResponse.<List<InterestedCelebCategoryResDto>>builder()
-                .result(userService.getTargetUserInterestedCelebByCategory(userId))
+                .result(userCelebService.getTargetUserInterestedCelebByCategory(userId))
                 .build());
     }
 

@@ -2,7 +2,7 @@ package com.sluv.server.domain.user.controller;
 
 import com.sluv.server.domain.user.dto.UserSearchInfoDto;
 import com.sluv.server.domain.user.entity.User;
-import com.sluv.server.domain.user.service.UserService;
+import com.sluv.server.domain.user.service.FollowService;
 import com.sluv.server.global.common.response.ErrorResponse;
 import com.sluv.server.global.common.response.PaginationResDto;
 import com.sluv.server.global.common.response.SuccessDataResponse;
@@ -29,7 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class FollowController {
 
-    private final UserService userService;
+    private final FollowService followService;
 
     @Operation(
             summary = "*유저 팔로우/팔로잉",
@@ -44,7 +44,7 @@ public class FollowController {
     @PostMapping("/{userId}/follow")
     public ResponseEntity<SuccessResponse> postUserFollow(@AuthenticationPrincipal User user,
                                                           @PathVariable(name = "userId") Long userId) {
-        userService.postUserFollow(user, userId);
+        followService.postUserFollow(user, userId);
         return ResponseEntity.ok().body(
                 new SuccessResponse()
         );
@@ -65,7 +65,7 @@ public class FollowController {
 
         return ResponseEntity.ok().body(
                 SuccessDataResponse.<PaginationResDto<UserSearchInfoDto>>builder()
-                        .result(userService.getUserFollower(user, userId, pageable))
+                        .result(followService.getUserFollower(user, userId, pageable))
                         .build()
         );
     }
@@ -85,7 +85,7 @@ public class FollowController {
 
         return ResponseEntity.ok().body(
                 SuccessDataResponse.<PaginationResDto<UserSearchInfoDto>>builder()
-                        .result(userService.getUserFollowing(user, userId, pageable))
+                        .result(followService.getUserFollowing(user, userId, pageable))
                         .build()
         );
     }
@@ -104,7 +104,7 @@ public class FollowController {
 
         return ResponseEntity.ok().body(
                 SuccessDataResponse.<PaginationResDto<UserSearchInfoDto>>builder()
-                        .result(userService.getUserFollower(user, user.getId(), pageable))
+                        .result(followService.getUserFollower(user, user.getId(), pageable))
                         .build()
         );
     }
@@ -123,7 +123,7 @@ public class FollowController {
 
         return ResponseEntity.ok().body(
                 SuccessDataResponse.<PaginationResDto<UserSearchInfoDto>>builder()
-                        .result(userService.getUserFollowing(user, user.getId(), pageable))
+                        .result(followService.getUserFollowing(user, user.getId(), pageable))
                         .build()
         );
     }

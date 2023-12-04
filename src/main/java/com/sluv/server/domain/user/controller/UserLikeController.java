@@ -4,7 +4,7 @@ import com.sluv.server.domain.comment.dto.CommentSimpleResDto;
 import com.sluv.server.domain.item.dto.ItemSimpleResDto;
 import com.sluv.server.domain.question.dto.QuestionSimpleResDto;
 import com.sluv.server.domain.user.entity.User;
-import com.sluv.server.domain.user.service.UserService;
+import com.sluv.server.domain.user.service.UserLikeService;
 import com.sluv.server.global.common.response.PaginationCountResDto;
 import com.sluv.server.global.common.response.SuccessDataResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class UserLikeController {
 
-    private final UserService userService;
+    private final UserLikeService userLikeService;
 
     @Operation(
             summary = "유저가 좋아요한 아이템 조회",
@@ -40,7 +40,7 @@ public class UserLikeController {
 
         return ResponseEntity.ok().body(
                 SuccessDataResponse.<PaginationCountResDto<ItemSimpleResDto>>builder()
-                        .result(userService.getUserLikeItem(user, pageable))
+                        .result(userLikeService.getUserLikeItem(user, pageable))
                         .build()
         );
     }
@@ -60,7 +60,7 @@ public class UserLikeController {
 
         return ResponseEntity.ok().body(
                 SuccessDataResponse.<PaginationCountResDto<QuestionSimpleResDto>>builder()
-                        .result(userService.getUserLikeQuestion(user, pageable))
+                        .result(userLikeService.getUserLikeQuestion(user, pageable))
                         .build()
         );
     }
@@ -80,7 +80,7 @@ public class UserLikeController {
 
         return ResponseEntity.ok().body(
                 SuccessDataResponse.<PaginationCountResDto<CommentSimpleResDto>>builder()
-                        .result(userService.getUserLikeComment(user, pageable))
+                        .result(userLikeService.getUserLikeComment(user, pageable))
                         .build()
         );
     }

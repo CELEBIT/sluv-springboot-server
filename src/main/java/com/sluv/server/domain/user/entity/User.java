@@ -2,6 +2,8 @@ package com.sluv.server.domain.user.entity;
 
 import com.sluv.server.domain.auth.dto.SocialUserInfoDto;
 import com.sluv.server.domain.auth.enums.SnsType;
+import com.sluv.server.domain.user.enums.UserAge;
+import com.sluv.server.domain.user.enums.UserGender;
 import com.sluv.server.domain.user.enums.UserStatus;
 import com.sluv.server.global.common.entity.BaseEntity;
 import jakarta.persistence.Column;
@@ -49,11 +51,11 @@ public class User extends BaseEntity implements UserDetails {
     @Column(columnDefinition = "TEXT")
     private String profileImgUrl;
 
-    @Size(max = 45)
-    private String ageRange;
+    @Enumerated(EnumType.STRING)
+    private UserAge ageRange;
 
-    @Size(max = 45)
-    private String gender;
+    @Enumerated(EnumType.STRING)
+    private UserGender gender;
     @Enumerated(EnumType.STRING)
     @Column(length = 45, columnDefinition = "varchar(45) default 'PENDING_PROFILE'")
     private UserStatus userStatus;

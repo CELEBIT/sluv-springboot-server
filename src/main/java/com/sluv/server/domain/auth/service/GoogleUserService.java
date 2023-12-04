@@ -12,6 +12,8 @@ import com.sluv.server.domain.auth.dto.SocialUserInfoDto;
 import com.sluv.server.domain.closet.service.ClosetService;
 import com.sluv.server.domain.user.dto.UserIdDto;
 import com.sluv.server.domain.user.entity.User;
+import com.sluv.server.domain.user.enums.UserAge;
+import com.sluv.server.domain.user.enums.UserGender;
 import com.sluv.server.domain.user.exception.UserNotFoundException;
 import com.sluv.server.domain.user.repository.UserRepository;
 import com.sluv.server.global.jwt.JwtProvider;
@@ -84,7 +86,9 @@ public class GoogleUserService {
 
         //Google에서 성별과 연령대 정보를 제공하지 않는 것 같음 23.3.5 -junker-
 
-        return SocialUserInfoDto.builder().email(email).profileImgUrl(profileImgUrl).gender(null).ageRange(null)
+        return SocialUserInfoDto.builder().email(email).profileImgUrl(profileImgUrl)
+                .gender(UserGender.UNKNOWN)
+                .ageRange(UserAge.UNKNOWN)
                 .build();
     }
 

@@ -11,6 +11,8 @@ import com.sluv.server.domain.auth.dto.SocialUserInfoDto;
 import com.sluv.server.domain.closet.service.ClosetService;
 import com.sluv.server.domain.user.dto.UserIdDto;
 import com.sluv.server.domain.user.entity.User;
+import com.sluv.server.domain.user.enums.UserAge;
+import com.sluv.server.domain.user.enums.UserGender;
 import com.sluv.server.domain.user.exception.UserNotFoundException;
 import com.sluv.server.domain.user.repository.UserRepository;
 import com.sluv.server.global.jwt.JwtProvider;
@@ -235,8 +237,8 @@ public class AppleUserService {
         return SocialUserInfoDto.builder()
                 .email(email)
                 .profileImgUrl(profileImgUrl)
-                .gender(gender)
-                .ageRange(ageRange)
+                .gender(convertGender(gender))
+                .ageRange(convertAge(ageRange))
                 .build();
     }
 
@@ -262,5 +264,32 @@ public class AppleUserService {
             closetService.postBasicCloset(user);
         }
         return user;
+    }
+
+    private UserGender convertGender(String gender) {
+        UserGender userGender = UserGender.UNKNOWN;
+        if (gender != null) {
+            if (gender.equals("male")) {
+                userGender = UserGender.MALE;
+            }
+            if (gender.equals("female")) {
+                userGender = UserGender.FEMALE;
+            }
+        }
+        return userGender;
+    }
+
+    private UserAge convertAge(String age) {
+        UserAge userGender = UserAge.UNKNOWN;
+        if (age != null) {
+            int startAge = Integer.parseInt(age.split("-")[0]);
+            for (UserAge value : UserAge.values()) {
+                if (startAge == value.getStartAge()) {
+                    userGender = value;
+                    break;
+                }
+            }
+        }
+        return userGender;
     }
 }

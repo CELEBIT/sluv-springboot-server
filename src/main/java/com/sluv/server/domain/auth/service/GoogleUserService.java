@@ -7,10 +7,8 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.gson.GsonFactory;
 import com.sluv.server.domain.auth.dto.AuthRequestDto;
-import com.sluv.server.domain.auth.dto.AuthResponseDto;
 import com.sluv.server.domain.auth.dto.SocialUserInfoDto;
 import com.sluv.server.domain.closet.service.ClosetService;
-import com.sluv.server.domain.user.dto.UserIdDto;
 import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.domain.user.enums.UserAge;
 import com.sluv.server.domain.user.enums.UserGender;
@@ -37,17 +35,14 @@ public class GoogleUserService {
     @Value("${spring.security.oauth2.client.apple}")
     private String CLIENT_APPLE;
 
-    public AuthResponseDto googleLogin(AuthRequestDto request) {
+    public User googleLogin(AuthRequestDto request) {
         String idToken = request.getAccessToken();
 
         // 1. idToken 검증
         SocialUserInfoDto verifiedIdToken = verifyIdToken(idToken);
 
         // 2. user 정보로 DB 탐색 및 등록
-        User googleUser = registerGoogleUserIfNeed(verifiedIdToken);
-
-        // 3. userToken 생성
-        return AuthResponseDto.builder().token(createUserToken(googleUser)).build();
+        return registerGoogleUserIfNeed(verifiedIdToken);
     }
 
     /**
@@ -112,17 +107,6 @@ public class GoogleUserService {
         }
 
         return user;
-    }
-
-    /**
-     * == user 정보를 기반으로 user Access Token 생성 ==
-     *
-     * @param user
-     * @return user Access Token
-     */
-    private String createUserToken(User user) {
-
-        return jwtProvider.createAccessToken(UserIdDto.of(user.getId()));
     }
 
 }

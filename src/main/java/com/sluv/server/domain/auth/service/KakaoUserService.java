@@ -6,10 +6,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sluv.server.domain.auth.dto.AuthRequestDto;
-import com.sluv.server.domain.auth.dto.AuthResponseDto;
 import com.sluv.server.domain.auth.dto.SocialUserInfoDto;
 import com.sluv.server.domain.closet.service.ClosetService;
-import com.sluv.server.domain.user.dto.UserIdDto;
 import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.domain.user.enums.UserAge;
 import com.sluv.server.domain.user.enums.UserGender;
@@ -34,18 +32,13 @@ public class KakaoUserService {
     private final ClosetService closetService;
     private final JwtProvider jwtProvider;
 
-    public AuthResponseDto kakaoLogin(AuthRequestDto request) throws JsonProcessingException {
+    public User kakaoLogin(AuthRequestDto request) throws JsonProcessingException {
         String accessToken = request.getAccessToken();
         // 1. accessToken으로 user 정보 요청
         SocialUserInfoDto userInfo = getKakaoUserInfo(accessToken);
 
         // 2. user 정보로 DB 탐색 및 등록
-        User kakaoUser = registerKakaoUserIfNeed(userInfo);
-
-        // 3. userToken 생성
-        return AuthResponseDto.builder()
-                .token(createUserToken(kakaoUser))
-                .build();
+        return registerKakaoUserIfNeed(userInfo);
     }
 
     /**
@@ -141,17 +134,6 @@ public class KakaoUserService {
         }
 
         return user;
-    }
-
-    /**
-     * == user 정보를 기반으로 user Access Token 생성 ==
-     *
-     * @param user
-     * @return user Access Token
-     */
-    private String createUserToken(User user) {
-
-        return jwtProvider.createAccessToken(UserIdDto.of(user.getId()));
     }
 
     private static UserGender convertGender(String gender) {

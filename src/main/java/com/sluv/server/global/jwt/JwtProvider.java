@@ -1,7 +1,7 @@
 package com.sluv.server.global.jwt;
 
 
-import com.sluv.server.domain.user.dto.UserIdDto;
+import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.domain.user.exception.UserNotFoundException;
 import com.sluv.server.domain.user.repository.UserRepository;
 import com.sluv.server.global.jwt.exception.ExpiredTokenException;
@@ -67,7 +67,7 @@ public class JwtProvider {
      * @param user
      * @return Access Token
      */
-    public String createAccessToken(UserIdDto user) {
+    public String createAccessToken(User user) {
         Long id = user.getId();
 
         Claims claims = Jwts.claims().setSubject(id.toString());

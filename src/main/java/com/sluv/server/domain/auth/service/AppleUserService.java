@@ -6,10 +6,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sluv.server.domain.auth.dto.AuthRequestDto;
-import com.sluv.server.domain.auth.dto.AuthResponseDto;
 import com.sluv.server.domain.auth.dto.SocialUserInfoDto;
 import com.sluv.server.domain.closet.service.ClosetService;
-import com.sluv.server.domain.user.dto.UserIdDto;
 import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.domain.user.enums.UserAge;
 import com.sluv.server.domain.user.enums.UserGender;
@@ -49,7 +47,7 @@ public class AppleUserService {
     @Value("${apple.iss}")
     private String issUrl;
 
-    public AuthResponseDto appleLogin(AuthRequestDto request) throws Exception {
+    public User appleLogin(AuthRequestDto request) throws Exception {
         String identityToken = request.getAccessToken();
 
         // 1. 검증
@@ -61,12 +59,7 @@ public class AppleUserService {
         SocialUserInfoDto userInfo = getAppleUserInfo(identityToken);
 
         // 3. idToken의 정보로 DB 탐색 및 등록
-        User appleUser = registerAppleUserIfNeed(userInfo);
-
-        // 4. userToken 생성
-        return AuthResponseDto.builder()
-                .token(createUserToken(appleUser))
-                .build();
+        return registerAppleUserIfNeed(userInfo);
     }
 
     /**
@@ -183,17 +176,6 @@ public class AppleUserService {
 
         return correctKey;
 
-    }
-
-    /**
-     * == user 정보를 기반으로 user Access Token 생성 ==
-     *
-     * @param user
-     * @return user Access Token
-     */
-    private String createUserToken(User user) {
-
-        return jwtProvider.createAccessToken(UserIdDto.of(user.getId()));
     }
 
     /**

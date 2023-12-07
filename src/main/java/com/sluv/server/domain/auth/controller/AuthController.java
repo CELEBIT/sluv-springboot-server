@@ -7,9 +7,9 @@ import com.sluv.server.domain.auth.service.AppleUserService;
 import com.sluv.server.domain.auth.service.AuthService;
 import com.sluv.server.domain.auth.service.GoogleUserService;
 import com.sluv.server.domain.auth.service.KakaoUserService;
-import com.sluv.server.domain.user.dto.UserIdDto;
 import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.domain.user.service.UserService;
+import com.sluv.server.domain.visit.service.DailyVisitService;
 import com.sluv.server.global.common.response.ErrorResponse;
 import com.sluv.server.global.common.response.SuccessDataResponse;
 import com.sluv.server.global.common.response.SuccessResponse;
@@ -37,6 +37,7 @@ public class AuthController {
     private final AppleUserService appleUserService;
     private final AuthService authService;
     private final UserService userService;
+    private final DailyVisitService dailyVisitService;
 
 
     @Operation(
@@ -54,18 +55,20 @@ public class AuthController {
     @PostMapping("/social-login")
     public ResponseEntity<SuccessDataResponse<AuthResponseDto>> socialLogin(@RequestBody AuthRequestDto request)
             throws Exception {
-        AuthResponseDto response = null;
+        User loginUser = null;
 
         SnsType userSnsType = SnsType.fromString(request.getSnsType());
 
         switch (userSnsType) {
-            case KAKAO -> response = kakaoUserService.kakaoLogin(request);
-            case GOOGLE -> response = googleUserService.googleLogin(request);
-            case APPLE -> response = appleUserService.appleLogin(request);
+            case KAKAO -> loginUser = kakaoUserService.kakaoLogin(request);
+            case GOOGLE -> loginUser = googleUserService.googleLogin(request);
+            case APPLE -> loginUser = appleUserService.appleLogin(request);
         }
+        dailyVisitService.saveDailyVisit(loginUser);
+        AuthResponseDto authResponseDto = authService.jwtTestService(loginUser);
 
         return ResponseEntity.ok().body(SuccessDataResponse.<AuthResponseDto>builder()
-                .result(response)
+                .result(authResponseDto)
                 .build()
         );
     }
@@ -76,17 +79,8 @@ public class AuthController {
     @GetMapping("/auto-login")
     public ResponseEntity<SuccessResponse> autoLogin(@AuthenticationPrincipal User user) {
         userService.checkUserStatue(user);
-
+        dailyVisitService.saveDailyVisit(user);
         return ResponseEntity.ok().body(new SuccessResponse());
-    }
-
-    @PostMapping("/test")
-    public ResponseEntity<?> testToken(@RequestBody UserIdDto dto) {
-
-        return ResponseEntity.ok().body(SuccessDataResponse.builder()
-                .result(authService.jwtTestService(dto))
-                .build()
-        );
     }
 
 }

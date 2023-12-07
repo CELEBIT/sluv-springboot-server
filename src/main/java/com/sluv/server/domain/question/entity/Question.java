@@ -74,7 +74,7 @@ public class Question {
         this.user = user;
         this.title = title;
         this.content = content;
-        this.searchNum = searchNum;
+        this.searchNum = 0L;
         this.questionStatus = questionStatus;
     }
 

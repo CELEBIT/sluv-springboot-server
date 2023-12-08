@@ -4,7 +4,8 @@ import static com.sluv.server.domain.question.entity.QRecentQuestion.recentQuest
 
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.sluv.server.domain.question.entity.RecentQuestion;
+import com.sluv.server.domain.question.entity.QQuestion;
+import com.sluv.server.domain.question.entity.Question;
 import com.sluv.server.domain.user.entity.User;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -17,8 +18,11 @@ public class RecentQuestionRepositoryImpl implements RecentQuestionRepositoryCus
     private final JPAQueryFactory jpaQueryFactory;
 
     @Override
-    public Page<RecentQuestion> getUserAllRecentQuestion(User user, Pageable pageable) {
-        List<RecentQuestion> content = jpaQueryFactory.selectFrom(recentQuestion)
+    public Page<Question> getUserAllRecentQuestion(User user, Pageable pageable) {
+        QQuestion question = new QQuestion("question");
+        List<Question> content = jpaQueryFactory.select(question)
+                .from(question)
+                .leftJoin(recentQuestion).on(recentQuestion.question.eq(question)).fetchJoin()
                 .where(recentQuestion.user.eq(user))
                 .groupBy(recentQuestion.question)
                 .orderBy(recentQuestion.createdAt.max().desc())
@@ -27,7 +31,9 @@ public class RecentQuestionRepositoryImpl implements RecentQuestionRepositoryCus
                 .fetch();
 
         // Count Query
-        JPAQuery<RecentQuestion> query = jpaQueryFactory.selectFrom(recentQuestion)
+        JPAQuery<Question> query = jpaQueryFactory.select(question)
+                .from(question)
+                .leftJoin(recentQuestion).on(recentQuestion.question.eq(question)).fetchJoin()
                 .where(recentQuestion.user.eq(user))
                 .groupBy(recentQuestion.question)
                 .orderBy(recentQuestion.createdAt.max().desc());

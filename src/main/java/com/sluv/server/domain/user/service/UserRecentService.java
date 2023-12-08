@@ -13,10 +13,11 @@ import com.sluv.server.domain.item.repository.RecentItemRepository;
 import com.sluv.server.domain.question.dto.QuestionImgSimpleResDto;
 import com.sluv.server.domain.question.dto.QuestionSimpleResDto;
 import com.sluv.server.domain.question.entity.Question;
+import com.sluv.server.domain.question.entity.QuestionBuy;
 import com.sluv.server.domain.question.entity.QuestionFind;
+import com.sluv.server.domain.question.entity.QuestionHowabout;
+import com.sluv.server.domain.question.entity.QuestionRecommend;
 import com.sluv.server.domain.question.entity.QuestionRecommendCategory;
-import com.sluv.server.domain.question.entity.RecentQuestion;
-import com.sluv.server.domain.question.exception.QuestionNotFoundException;
 import com.sluv.server.domain.question.exception.QuestionTypeNotFoundException;
 import com.sluv.server.domain.question.repository.QuestionImgRepository;
 import com.sluv.server.domain.question.repository.QuestionItemRepository;
@@ -74,17 +75,14 @@ public class UserRecentService {
     @Transactional(readOnly = true)
     public PaginationCountResDto<QuestionSimpleResDto> getUserRecentQuestion(User user, Pageable pageable) {
 
-        Page<RecentQuestion> recentQuestionPage = recentQuestionRepository.getUserAllRecentQuestion(user, pageable);
+        Page<Question> recentQuestionPage = recentQuestionRepository.getUserAllRecentQuestion(user, pageable);
 
-        List<QuestionSimpleResDto> content = recentQuestionPage.stream().map(recentQuestion -> {
-            Question question = questionRepository.findById(recentQuestion.getQuestion().getId())
-                    .orElseThrow(QuestionNotFoundException::new);
+        List<QuestionSimpleResDto> content = recentQuestionPage.stream().map(question -> {
             List<QuestionImgSimpleResDto> imgList = null;
             List<QuestionImgSimpleResDto> itemImgList = null;
             List<String> categoryList = null;
-            String celebName = null;
 
-            if (recentQuestion.getQType().equals("Buy")) {
+            if (question instanceof QuestionBuy) {
                 // 이미지 Dto 생성
                 imgList = questionImgRepository.findAllByQuestionId(question.getId()).stream()
                         .map(QuestionImgSimpleResDto::of).toList();
@@ -95,18 +93,14 @@ public class UserRecentService {
                             return QuestionImgSimpleResDto.of(mainImg);
                         }).toList();
 
-            } else if (recentQuestion.getQType().equals("How")) {
+            } else if (question instanceof QuestionHowabout) {
 
-            } else if (recentQuestion.getQType().equals("Recommend")) {
+            } else if (question instanceof QuestionRecommend) {
                 // Question 카테고리
                 categoryList = questionRecommendCategoryRepository.findAllByQuestionId(question.getId()).stream()
                         .map(QuestionRecommendCategory::getName).toList();
-            } else if (recentQuestion.getQType().equals("Find")) {
-                QuestionFind questionFind = (QuestionFind) question;
-                celebName = questionFind.getCeleb() != null ? questionFind.getCeleb().getParent() != null ?
-                        questionFind.getCeleb().getParent().getCelebNameKr() + " " + questionFind.getCeleb()
-                                .getCelebNameKr() : questionFind.getCeleb().getCelebNameKr()
-                        : questionFind.getNewCeleb().getCelebName();
+            } else if (question instanceof QuestionFind) {
+
             } else {
                 throw new QuestionTypeNotFoundException();
             }

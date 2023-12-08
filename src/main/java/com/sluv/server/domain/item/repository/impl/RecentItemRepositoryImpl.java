@@ -20,14 +20,16 @@ public class RecentItemRepositoryImpl implements RecentItemRepositoryCustom {
     public Page<RecentItem> getUserAllRecentItem(User user, Pageable pageable) {
         List<RecentItem> content = jpaQueryFactory.selectFrom(recentItem)
                 .where(recentItem.user.eq(user))
-                .orderBy(recentItem.id.desc())
+                .orderBy(recentItem.createdAt.max().desc())
+                .groupBy(recentItem.item)
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
 
         JPAQuery<RecentItem> query = jpaQueryFactory.selectFrom(recentItem)
                 .where(recentItem.user.eq(user))
-                .orderBy(recentItem.id.desc());
+                .groupBy(recentItem.item)
+                .orderBy(recentItem.createdAt.max().desc());
 
         return PageableExecutionUtils.getPage(content, pageable, () -> query.fetch().size());
     }

@@ -34,14 +34,14 @@ public class FollowRepositoryImpl implements FollowRepositoryCustom {
     @Override
     public Long getFollowerCount(User targetUser) {
         return (long) jpaQueryFactory.selectFrom(follow)
-                .where(follow.follower.eq(targetUser))
+                .where(follow.followee.eq(targetUser))
                 .fetch().size();
     }
 
     @Override
     public Long getFollowingCount(User targetUser) {
         return (long) jpaQueryFactory.selectFrom(follow)
-                .where(follow.followee.eq(targetUser))
+                .where(follow.follower.eq(targetUser))
                 .fetch().size();
     }
 }

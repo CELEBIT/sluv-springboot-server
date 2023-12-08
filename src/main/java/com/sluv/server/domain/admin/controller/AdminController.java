@@ -17,7 +17,8 @@ public class AdminController {
         adminRepository.save(Admin.builder()
                 .id(2L)
                 .pwd("4321")
-                .userName("junker")
+                .email("junker@gmail.com")
+                .name("junker")
                 .build());
     }
 

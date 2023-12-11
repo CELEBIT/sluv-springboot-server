@@ -80,4 +80,8 @@ public class Comment extends BaseEntity {
                 .commentStatus(CommentStatus.ACTIVE)
                 .build();
     }
+
+    public void changeStatus(CommentStatus commentStatus) {
+        this.commentStatus = commentStatus;
+    }
 }

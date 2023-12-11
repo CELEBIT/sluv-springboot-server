@@ -154,4 +154,8 @@ public class Item extends BaseEntity {
     public void changeStatus(ItemStatus itemStatus) {
         this.itemStatus = itemStatus;
     }
+
+    public void changeColor(String color) {
+        this.color = color;
+    }
 }

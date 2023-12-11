@@ -3,6 +3,10 @@ package com.sluv.server.global.ai.cleanBot;
 import com.sluv.server.domain.comment.entity.Comment;
 import com.sluv.server.domain.comment.enums.CommentStatus;
 import com.sluv.server.domain.comment.repository.CommentRepository;
+import com.sluv.server.domain.item.entity.Item;
+import com.sluv.server.domain.item.entity.ItemImg;
+import com.sluv.server.domain.item.repository.ItemImgRepository;
+import com.sluv.server.domain.item.repository.ItemRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
@@ -14,6 +18,8 @@ import org.springframework.stereotype.Service;
 public class CleanBotService {
     private final CleanBotRepository cleanBotRepository;
     private final CommentRepository commentRepository;
+    private final ItemRepository itemRepository;
+    private final ItemImgRepository itemImgRepository;
 
     @Async(value = "asyncThreadPoolExecutor")
     public void censorComment(Comment comment) {
@@ -23,5 +29,16 @@ public class CleanBotService {
             comment.changeStatus(CommentStatus.BLOCKED);
             commentRepository.save(comment);
         }
+    }
+
+    @Async(value = "asyncThreadPoolExecutor")
+    public void getItemColor(Item item) {
+        ItemImg mainImg = itemImgRepository.findMainImg(item.getId());
+        System.out.println(mainImg.getItemImgUrl());
+
+        String color = cleanBotRepository.getItemColor(mainImg.getItemImgUrl());
+
+        item.changeColor(color);
+        itemRepository.save(item);
     }
 }

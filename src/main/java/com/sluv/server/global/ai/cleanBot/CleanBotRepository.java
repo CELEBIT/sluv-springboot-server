@@ -39,4 +39,23 @@ public class CleanBotRepository {
 
         return isMalicious;
     }
+
+    public String getItemColor(String imgUrl) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-Type", "application/json");
+
+        HttpEntity<String> request = new HttpEntity<>(imgUrl, headers);
+
+        // RestTemplate
+        log.info("Request: POST {}", URL);
+        RestTemplate rt = new RestTemplate();
+        ResponseEntity<String> response = rt.exchange(
+                URL + "/itemColor",
+                HttpMethod.POST,
+                request,
+                String.class
+        );
+
+        return response.getBody();
+    }
 }

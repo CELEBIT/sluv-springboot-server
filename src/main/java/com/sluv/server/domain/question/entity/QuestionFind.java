@@ -51,6 +51,7 @@ public class QuestionFind extends Question {
                 .content(postReqDto.getContent())
                 .celeb(celeb)
                 .newCeleb(newCeleb)
+                .questionStatus(QuestionStatus.ACTIVE)
                 .build();
     }
 }

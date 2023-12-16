@@ -39,6 +39,7 @@ public class QuestionBuy extends Question {
                 .user(user)
                 .title(postReqDto.getTitle())
                 .voteEndTime(postReqDto.getVoteEndTime())
+                .questionStatus(QuestionStatus.ACTIVE)
                 .build();
     }
 }

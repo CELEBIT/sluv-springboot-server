@@ -32,6 +32,7 @@ public class QuestionHowabout extends Question {
                 .user(user)
                 .title(postReqDto.getTitle())
                 .content(postReqDto.getContent())
+                .questionStatus(QuestionStatus.ACTIVE)
                 .build();
     }
 }

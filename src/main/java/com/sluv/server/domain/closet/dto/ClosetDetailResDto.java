@@ -1,6 +1,7 @@
 package com.sluv.server.domain.closet.dto;
 
 import com.sluv.server.domain.closet.entity.Closet;
+import com.sluv.server.domain.closet.enums.ClosetColor;
 import com.sluv.server.domain.closet.enums.ClosetStatus;
 import com.sluv.server.global.common.response.PaginationResDto;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -22,7 +23,7 @@ public class ClosetDetailResDto<T> extends PaginationResDto<T> {
     @Schema(description = "Closet 공개여부")
     private ClosetStatus closetStatus;
     @Schema(description = "Closet 커버 색상")
-    private String colorScheme;
+    private ClosetColor colorScheme;
     @Schema(description = "Closet에 있는 아이템 개수")
     private Long itemNum;
 

@@ -50,6 +50,7 @@ public class Closet extends BaseEntity {
     @Column(columnDefinition = "TEXT")
     private String coverImgUrl;
 
+    @Enumerated(EnumType.STRING)
     private ClosetColor color;
 
     @NotNull

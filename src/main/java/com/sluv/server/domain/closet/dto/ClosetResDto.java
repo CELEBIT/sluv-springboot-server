@@ -1,7 +1,6 @@
 package com.sluv.server.domain.closet.dto;
 
 import com.sluv.server.domain.closet.entity.Closet;
-import com.sluv.server.domain.closet.enums.ClosetColor;
 import com.sluv.server.domain.closet.enums.ClosetStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
@@ -23,7 +22,7 @@ public class ClosetResDto {
     @Schema(description = "Closet 공개 여부")
     private ClosetStatus closetStatus;
     @Schema(description = "Closet 커버 색상")
-    private ClosetColor colorScheme;
+    private String colorScheme;
     @Schema(description = "해당 Closet의 Item 개수")
     private Long itemNum;
 

@@ -1,7 +1,6 @@
 package com.sluv.server.domain.closet.entity;
 
 import com.sluv.server.domain.closet.dto.ClosetReqDto;
-import com.sluv.server.domain.closet.enums.ClosetColor;
 import com.sluv.server.domain.closet.enums.ClosetStatus;
 import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.global.common.entity.BaseEntity;
@@ -50,8 +49,7 @@ public class Closet extends BaseEntity {
     @Column(columnDefinition = "TEXT")
     private String coverImgUrl;
 
-    @Enumerated(EnumType.STRING)
-    private ClosetColor color;
+    private String color;
 
     @NotNull
     @ColumnDefault("0")

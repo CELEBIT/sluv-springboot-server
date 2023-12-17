@@ -7,7 +7,6 @@ import com.sluv.server.domain.closet.dto.ClosetNameCheckResDto;
 import com.sluv.server.domain.closet.dto.ClosetReqDto;
 import com.sluv.server.domain.closet.dto.ClosetResDto;
 import com.sluv.server.domain.closet.entity.Closet;
-import com.sluv.server.domain.closet.enums.ClosetColor;
 import com.sluv.server.domain.closet.enums.ClosetStatus;
 import com.sluv.server.domain.closet.exception.BasicClosetDeleteException;
 import com.sluv.server.domain.closet.exception.ClosetNotFoundException;
@@ -46,7 +45,7 @@ public class ClosetService {
                 .name("기본 옷장")
                 .coverImgUrl(null)
                 .basicFlag(true)
-                .color(ClosetColor.PURPLE)
+                .color("#EDE9FF")
                 .closetStatus(ClosetStatus.PRIVATE)
                 .build();
 

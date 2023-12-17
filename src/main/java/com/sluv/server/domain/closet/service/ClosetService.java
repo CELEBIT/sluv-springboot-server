@@ -196,8 +196,8 @@ public class ClosetService {
      * 옷장 생성 전 이름 중복 체크 기능
      */
     @Transactional(readOnly = true)
-    public ClosetNameCheckResDto checkClosetNameDuplicated(String name) {
-        Boolean isDuplicated = closetRepository.existsByName(name);
+    public ClosetNameCheckResDto checkClosetNameDuplicated(String name, Long closetId) {
+        Boolean isDuplicated = closetRepository.checkDuplicate(name, closetId);
 
         return ClosetNameCheckResDto.of(isDuplicated);
     }

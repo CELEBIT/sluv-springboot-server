@@ -16,4 +16,6 @@ public interface ClosetRepositoryCustom {
     Page<Closet> getUserAllPublicCloset(Long userId, Pageable pageable);
 
     List<ClosetResDto> getUserClosetList(User user);
+
+    Boolean checkDuplicate(String name, Long closetId);
 }

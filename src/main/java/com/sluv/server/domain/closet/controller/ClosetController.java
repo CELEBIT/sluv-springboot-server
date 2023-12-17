@@ -14,6 +14,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.Nullable;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -195,11 +196,11 @@ public class ClosetController {
     )
     @GetMapping("/check-name")
     public ResponseEntity<SuccessDataResponse<ClosetNameCheckResDto>> checkClosetNameDuplicated(
-            @RequestParam("name") String name) {
+            @RequestParam("name") String name, @Nullable @RequestParam("id") Long closetId) {
 
         return ResponseEntity.ok().body(
                 SuccessDataResponse.<ClosetNameCheckResDto>builder()
-                        .result(closetService.checkClosetNameDuplicated(name))
+                        .result(closetService.checkClosetNameDuplicated(name, closetId))
                         .build()
         );
     }

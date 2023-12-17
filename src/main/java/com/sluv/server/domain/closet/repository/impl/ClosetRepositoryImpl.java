@@ -88,4 +88,16 @@ public class ClosetRepositoryImpl implements ClosetRepositoryCustom {
                 .map(tuple -> ClosetResDto.of(tuple.get(closet), tuple.get(itemScrap.count())))
                 .toList();
     }
+
+    @Override
+    public Boolean checkDuplicate(String name, Long closetId) {
+        JPAQuery<Closet> query = jpaQueryFactory.selectFrom(closet)
+                .where(closet.name.eq(name));
+
+        if (closetId != null) {
+            query.where(closet.id.ne(closetId));
+        }
+
+        return query.fetch().size() > 0;
+    }
 }

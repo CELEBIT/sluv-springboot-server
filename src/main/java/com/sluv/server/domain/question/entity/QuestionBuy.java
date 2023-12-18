@@ -38,6 +38,7 @@ public class QuestionBuy extends Question {
         return builder
                 .user(user)
                 .title(postReqDto.getTitle())
+                .content(postReqDto.getContent())
                 .voteEndTime(postReqDto.getVoteEndTime())
                 .questionStatus(QuestionStatus.ACTIVE)
                 .build();

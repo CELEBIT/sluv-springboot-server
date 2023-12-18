@@ -492,6 +492,7 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
         return jpaQueryFactory.select(question)
                 .from(dailyHotQuestion)
                 .leftJoin(question).on(dailyHotQuestion.question.eq(question)).fetchJoin()
+                .where(question.questionStatus.eq(ACTIVE))
                 .fetch();
     }
 }

@@ -17,8 +17,6 @@ public class QuestionBuyPostReqDto {
     private Long id;
     @Schema(description = "Question 제목")
     private String title;
-    @Schema(description = "Question 내용")
-    private String content;
     @Schema(description = "Question img list")
     private List<QuestionImgReqDto> imgList;
     @Schema(description = "Question item list")

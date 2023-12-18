@@ -1,6 +1,7 @@
 package com.sluv.server.domain.question.repository.impl;
 
 import static com.sluv.server.domain.comment.entity.QComment.comment;
+import static com.sluv.server.domain.question.entity.QDailyHotQuestion.dailyHotQuestion;
 import static com.sluv.server.domain.question.entity.QQuestion.question;
 import static com.sluv.server.domain.question.entity.QQuestionBuy.questionBuy;
 import static com.sluv.server.domain.question.entity.QQuestionFind.questionFind;
@@ -484,5 +485,13 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
                 .groupBy(question);
 
         return PageableExecutionUtils.getPage(content, pageable, () -> countQuery.fetch().size());
+    }
+
+    @Override
+    public List<Question> getDailyHotQuestion() {
+        return jpaQueryFactory.select(question)
+                .from(dailyHotQuestion)
+                .leftJoin(question).on(dailyHotQuestion.question.eq(question)).fetchJoin()
+                .fetch();
     }
 }

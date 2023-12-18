@@ -1,14 +1,15 @@
 package com.sluv.server.domain.question.repository.impl;
 
 import com.sluv.server.domain.celeb.entity.Celeb;
-import com.sluv.server.domain.question.entity.*;
-import com.sluv.server.domain.question.repository.QuestionRepository;
+import com.sluv.server.domain.question.entity.Question;
+import com.sluv.server.domain.question.entity.QuestionBuy;
+import com.sluv.server.domain.question.entity.QuestionFind;
+import com.sluv.server.domain.question.entity.QuestionHowabout;
+import com.sluv.server.domain.question.entity.QuestionRecommend;
 import com.sluv.server.domain.user.entity.User;
+import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-
-import java.util.List;
-import java.util.Optional;
 
 public interface QuestionRepositoryCustom {
     Page<QuestionBuy> getSearchQuestionBuy(List<Long> questionIdList, Pageable pageable);
@@ -46,4 +47,6 @@ public interface QuestionRepositoryCustom {
     List<Question> updateDailyHotQuestion();
 
     Page<Question> getWeeklyHotQuestion(Pageable pageable);
+
+    List<Question> getDailyHotQuestion();
 }

@@ -31,7 +31,6 @@ import com.sluv.server.domain.question.dto.QuestionReportReqDto;
 import com.sluv.server.domain.question.dto.QuestionSimpleResDto;
 import com.sluv.server.domain.question.dto.QuestionVoteDataDto;
 import com.sluv.server.domain.question.dto.QuestionVoteReqDto;
-import com.sluv.server.domain.question.entity.DailyHotQuestion;
 import com.sluv.server.domain.question.entity.Question;
 import com.sluv.server.domain.question.entity.QuestionBuy;
 import com.sluv.server.domain.question.entity.QuestionFind;
@@ -672,9 +671,7 @@ public class QuestionService {
      */
     @Transactional(readOnly = true)
     public List<QuestionHomeResDto> getDailyHotQuestionList() {
-        List<Question> dailyHoyQuestionList = dailyHotQuestionRepository.findAll().stream()
-                .map(DailyHotQuestion::getQuestion)
-                .toList();
+        List<Question> dailyHoyQuestionList = questionRepository.getDailyHotQuestion();
 
         List<QuestionHomeResDto> result = dailyHoyQuestionList.stream().map(question -> {
             List<QuestionImgSimpleResDto> questionImgSimpleList = getQuestionImgSimpleList(question);

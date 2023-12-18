@@ -183,6 +183,7 @@ public class ClosetService {
             throw new UserNotMatchedException();
         }
         Page<ItemSimpleResDto> itemPage = itemRepository.getClosetItems(closet, pageable);
+        log.info("아아아악: {}", itemPage.getContent().size());
         return ClosetDetailResDto.of(itemPage, closet);
     }
 

@@ -121,6 +121,7 @@ public class ItemDetailResDto {
                 .otherSluverItemList(otherSluverItemList)
                 .followStatus(followStatus)
                 .hasMine(hasMine)
+                .color(item.getColor())
                 .build();
     }
 

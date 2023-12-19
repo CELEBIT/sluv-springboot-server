@@ -1,6 +1,7 @@
 package com.sluv.server.global.ai;
 
 import com.sluv.server.global.ai.dto.CommentCleanBotReqDto;
+import com.sluv.server.global.ai.dto.ItemColorCheckReqDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -49,7 +50,7 @@ public class AiModelRepository {
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Type", "application/json");
 
-        HttpEntity<String> request = new HttpEntity<>(imgUrl, headers);
+        HttpEntity<ItemColorCheckReqDto> request = new HttpEntity<>(ItemColorCheckReqDto.of(imgUrl), headers);
 
         // RestTemplate
         log.info("Request: POST {}", URL);

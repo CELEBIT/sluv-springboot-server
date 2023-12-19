@@ -34,11 +34,10 @@ public class AiModelService {
     @Async(value = "asyncThreadPoolExecutor")
     public void getItemColor(Item item) {
         ItemImg mainImg = itemImgRepository.findMainImg(item.getId());
-        System.out.println(mainImg.getItemImgUrl());
 
         String color = aiModelRepository.getItemColor(mainImg.getItemImgUrl());
 
-        item.changeColor(color);
+        item.changeColor(color.replace("\"", ""));
         itemRepository.save(item);
     }
 }

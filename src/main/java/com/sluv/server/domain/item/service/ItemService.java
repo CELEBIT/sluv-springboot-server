@@ -51,7 +51,7 @@ import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.domain.user.exception.UserNotFoundException;
 import com.sluv.server.domain.user.repository.FollowRepository;
 import com.sluv.server.domain.user.repository.UserRepository;
-import com.sluv.server.global.ai.cleanBot.CleanBotService;
+import com.sluv.server.global.ai.AiModelService;
 import com.sluv.server.global.common.enums.ItemImgOrLinkStatus;
 import com.sluv.server.global.common.response.PaginationResDto;
 import java.util.List;
@@ -86,7 +86,7 @@ public class ItemService {
     private final ClosetRepository closetRepository;
     private final ItemScrapRepository itemScrapRepository;
 
-    private final CleanBotService cleanBotService;
+    private final AiModelService aiModelService;
 
     public ItemPostResDto postItem(User user, ItemPostReqDto reqDto) {
 
@@ -178,7 +178,7 @@ public class ItemService {
             ).forEach(itemHashtagRepository::save);
         }
 
-        cleanBotService.getItemColor(newItem);
+        aiModelService.getItemColor(newItem);
         return ItemPostResDto.of(newItem.getId());
     }
 

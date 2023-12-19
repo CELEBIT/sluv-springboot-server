@@ -21,7 +21,7 @@ spring:
   elasticsearch:
     uri: http://awseb-awseb-clwnl48v6djo-1067213661.ap-northeast-2.elb.amazonaws.com
   ai-model:
-    uri: http://localhost:8787 # 추후 모델 주소로 변경
+    uri: http://ec2-43-203-108-7.ap-northeast-2.compute.amazonaws.com
 
 jasypt:
   encryptor:

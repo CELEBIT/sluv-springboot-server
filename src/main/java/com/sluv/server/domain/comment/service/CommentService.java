@@ -31,7 +31,7 @@ import com.sluv.server.domain.question.exception.QuestionNotFoundException;
 import com.sluv.server.domain.question.repository.QuestionRepository;
 import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.domain.user.exception.UserNotMatchedException;
-import com.sluv.server.global.ai.cleanBot.CleanBotService;
+import com.sluv.server.global.ai.AiModelService;
 import com.sluv.server.global.common.response.PaginationResDto;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -55,7 +55,7 @@ public class CommentService {
     private final ItemImgRepository itemImgRepository;
     private final ItemScrapRepository itemScrapRepository;
     private final ClosetRepository closetRepository;
-    private final CleanBotService cleanBotService;
+    private final AiModelService aiModelService;
 
     @Transactional
     public void postComment(User user, Long questionId, CommentPostReqDto dto) {
@@ -67,7 +67,7 @@ public class CommentService {
         );
 
         saveCommentImgAndItem(dto, comment);
-        cleanBotService.censorComment(comment);
+        aiModelService.censorComment(comment);
 
     }
 
@@ -86,7 +86,7 @@ public class CommentService {
         );
 
         saveCommentImgAndItem(dto, comment);
-        cleanBotService.censorComment(comment);
+        aiModelService.censorComment(comment);
     }
 
     /**
@@ -152,7 +152,7 @@ public class CommentService {
         comment.changeContent(dto.getContent());
 
         saveCommentImgAndItem(dto, comment);
-        cleanBotService.censorComment(comment);
+        aiModelService.censorComment(comment);
 
     }
 

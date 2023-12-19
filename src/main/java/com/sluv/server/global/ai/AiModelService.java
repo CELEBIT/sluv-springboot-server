@@ -1,4 +1,4 @@
-package com.sluv.server.global.ai.cleanBot;
+package com.sluv.server.global.ai;
 
 import com.sluv.server.domain.comment.entity.Comment;
 import com.sluv.server.domain.comment.enums.CommentStatus;
@@ -15,15 +15,15 @@ import org.springframework.stereotype.Service;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class CleanBotService {
-    private final CleanBotRepository cleanBotRepository;
+public class AiModelService {
+    private final AiModelRepository aiModelRepository;
     private final CommentRepository commentRepository;
     private final ItemRepository itemRepository;
     private final ItemImgRepository itemImgRepository;
 
     @Async(value = "asyncThreadPoolExecutor")
     public void censorComment(Comment comment) {
-        boolean isMalicious = cleanBotRepository.isMaliciousComment(comment.getContent());
+        boolean isMalicious = aiModelRepository.isMaliciousComment(comment.getContent());
 
         if (isMalicious) {
             comment.changeStatus(CommentStatus.BLOCKED);
@@ -36,7 +36,7 @@ public class CleanBotService {
         ItemImg mainImg = itemImgRepository.findMainImg(item.getId());
         System.out.println(mainImg.getItemImgUrl());
 
-        String color = cleanBotRepository.getItemColor(mainImg.getItemImgUrl());
+        String color = aiModelRepository.getItemColor(mainImg.getItemImgUrl());
 
         item.changeColor(color);
         itemRepository.save(item);

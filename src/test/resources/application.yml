@@ -1,0 +1,58 @@
+spring:
+  h2:
+    console:
+      enabled: true
+      path: /sluvmh2
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:file:~/Desktop/sluv-h2/sluvmh2;Auto_SERVER=TRUE;NON_KEYWORDS=USER
+    username: sa
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: create
+
+  security:
+    user:
+      name: user
+      password: 1234
+    oauth2:
+      client:
+        android: 924373234165-adalqufkonkljl23qk6vv4g3bnc9imfr.apps.googleusercontent.com
+        apple: 924373234165-hfd08tk9pt36g4e9r54hqhpe9ircrv4q.apps.googleusercontent.com
+
+  elasticsearch:
+    uri: http://awseb-awseb-clwnl48v6djo-1067213661.ap-northeast-2.elb.amazonaws.com
+  ai-model:
+    uri: http://ec2-43-203-108-7.ap-northeast-2.compute.amazonaws.com
+
+jasypt:
+  encryptor:
+    bean: jasyptStringEncryptor
+    password: celebit-sluv-mvp2
+
+logging:
+  level:
+    org.hibernate.SQL: debug
+#      com.zaxxer.hikari.HikariConfig: DEBUG
+#      com.zaxxer.hikari.HikariDataSource: DEBUG
+
+jwt:
+  header: Authorization
+  secret: and0LXRlc3QtYWxqamFiYWVnaS1qd3QtdGVzdC1hbGpqYWJhZWdpLWp3dC10ZXN0LWFsamphYmFlZ2ktand0LXRlc3QtYWxqamFiYWVnaS1qd3QtdGVzdC1hbGpqYWJhZWdpLWp3dC10ZXN0LWFsamphYmFlZ2ktand0LXRlc3QtYWxqamFiYWVnaS1qd3QtdGVzdC1hbGpqYWJhZWdp
+  expiration-seconds: 31536000000
+  type: Bearer
+
+apple:
+  #  nonce: 1
+  clientId: Sluv.sluv-ios-renew
+  openKey: https://appleid.apple.com/auth/keys
+  iss: https://appleid.apple.com
+
+aws:
+  s3:
+    accessKey: AKIA5R23H6YS5ZD6OOCH
+    secretKey: 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
+    region: ap-northeast-2
+    bucketName: elasticbeanstalk-ap-northeast-2-931662394917
+    baseUrl: asset

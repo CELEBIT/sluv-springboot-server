@@ -35,8 +35,10 @@ public class BrandService {
 
     @Transactional(readOnly = true)
     public List<BrandSearchResDto> findTopBrand() {
-        return brandRepository.findTop10By().stream()
-                .map(BrandSearchResDto::of).toList();
+        return brandRepository.findTop10By()
+                .stream()
+                .map(BrandSearchResDto::of)
+                .toList();
     }
 
     @Transactional(readOnly = true)

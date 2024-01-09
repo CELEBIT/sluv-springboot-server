@@ -1,13 +1,10 @@
 package com.sluv.server.domain.user.service;
 
-import com.sluv.server.domain.closet.entity.Closet;
-import com.sluv.server.domain.closet.repository.ClosetRepository;
 import com.sluv.server.domain.comment.dto.CommentSimpleResDto;
 import com.sluv.server.domain.comment.entity.Comment;
 import com.sluv.server.domain.comment.repository.CommentRepository;
 import com.sluv.server.domain.item.dto.ItemSimpleResDto;
 import com.sluv.server.domain.item.entity.Item;
-import com.sluv.server.domain.item.mapper.ItemDtoMapper;
 import com.sluv.server.domain.item.repository.ItemRepository;
 import com.sluv.server.domain.question.dto.QuestionSimpleResDto;
 import com.sluv.server.domain.question.entity.Question;
@@ -29,20 +26,15 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserLikeService {
 
     private final ItemRepository itemRepository;
-    private final ClosetRepository closetRepository;
     private final QuestionRepository questionRepository;
     private final CommentRepository commentRepository;
-    private final ItemDtoMapper itemDtoMapper;
     private final QuestionDtoMapper questionDtoMapper;
 
     @Transactional(readOnly = true)
     public PaginationCountResDto<ItemSimpleResDto> getUserLikeItem(User user, Pageable pageable) {
         Page<Item> itemPage = itemRepository.getAllByUserLikeItem(user, pageable);
 
-        List<Closet> closetList = closetRepository.findAllByUserId(user.getId());
-
-        List<ItemSimpleResDto> content = itemPage.stream()
-                .map(item -> itemDtoMapper.getItemSimpleResDto(item, closetList)).toList();
+        List<ItemSimpleResDto> content = itemRepository.getItemSimpleResDto(user, itemPage.getContent());
 
         return new PaginationCountResDto<>(itemPage.hasNext(), itemPage.getNumber(), content,
                 itemPage.getTotalElements());

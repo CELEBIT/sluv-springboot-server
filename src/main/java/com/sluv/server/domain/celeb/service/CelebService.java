@@ -62,7 +62,6 @@ public class CelebService {
         changeCategoryOrder(categoryList);
 
         return categoryList.stream()
-                .parallel()
                 // 카테고리별 CelebSearchByCategoryResDto 생성
                 .map(category -> CelebSearchByCategoryResDto.of(category,
                                 celebRepository.getCelebByCategory(category)

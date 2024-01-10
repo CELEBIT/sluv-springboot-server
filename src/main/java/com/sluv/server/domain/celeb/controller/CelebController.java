@@ -33,6 +33,18 @@ public class CelebController {
         );
     }
 
+    @Operation(summary = "관심셀럽 등록 시 Celeb 검색", description = "멤버 이름을 검색하면 그룹이 검색됨. Pagination X")
+    @GetMapping("/search/interested")
+    public ResponseEntity<SuccessDataResponse<List<CelebSearchByCategoryResDto>>> searchInterestedCelebByName(
+            @RequestParam String celebName) {
+
+        return ResponseEntity.ok().body(
+                SuccessDataResponse.<List<CelebSearchByCategoryResDto>>builder()
+                        .result(celebService.searchInterestedCelebByName(celebName))
+                        .build()
+        );
+    }
+
     @Operation(summary = "인기 셀럽 조회", description = "조회가 많이된 Celeb 상위 10개 조회")
     @GetMapping("/top")
     public ResponseEntity<SuccessDataResponse<List<CelebSearchResDto>>> searchTop10Celeb() {
@@ -51,18 +63,6 @@ public class CelebController {
         return ResponseEntity.ok().body(
                 SuccessDataResponse.<List<CelebSearchByCategoryResDto>>builder()
                         .result(celebService.getCelebByCategory())
-                        .build()
-        );
-    }
-
-    @Operation(summary = "관심셀럽 등록 시 Celeb 검색", description = "멤버 이름을 검색하면 그룹이 검색됨. Pagination X")
-    @GetMapping("/search/interested")
-    public ResponseEntity<SuccessDataResponse<List<CelebSearchByCategoryResDto>>> searchInterestedCelebByName(
-            @RequestParam String celebName) {
-
-        return ResponseEntity.ok().body(
-                SuccessDataResponse.<List<CelebSearchByCategoryResDto>>builder()
-                        .result(celebService.searchInterestedCelebByName(celebName))
                         .build()
         );
     }

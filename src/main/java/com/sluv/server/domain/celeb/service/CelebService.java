@@ -7,6 +7,7 @@ import com.sluv.server.domain.celeb.dto.RecentSelectCelebResDto;
 import com.sluv.server.domain.celeb.entity.Celeb;
 import com.sluv.server.domain.celeb.entity.CelebCategory;
 import com.sluv.server.domain.celeb.entity.RecentSelectCeleb;
+import com.sluv.server.domain.celeb.handler.CelebHandler;
 import com.sluv.server.domain.celeb.repository.CelebCategoryRepository;
 import com.sluv.server.domain.celeb.repository.CelebRepository;
 import com.sluv.server.domain.celeb.repository.RecentSelectCelebRepository;
@@ -28,26 +29,14 @@ public class CelebService {
     private final CelebRepository celebRepository;
     private final RecentSelectCelebRepository recentSearchCelebRepository;
     private final CelebCategoryRepository celebCategoryRepository;
+    private final CelebHandler celebHandler;
 
     @Transactional(readOnly = true)
     public PaginationResDto<CelebSearchResDto> searchCeleb(String celebName, Pageable pageable) {
 
         Page<Celeb> celebPage = celebRepository.searchCeleb(celebName, pageable);
 
-        List<Celeb> childCelebList = celebPage.stream()
-                .filter(celeb -> celeb.getParent() != null)
-                .toList();
-
-        Stream<CelebSearchResDto> childCelebDtoStream = changeCelebSearchResDto(childCelebList).stream();
-
-        List<Celeb> parentCelebList = celebPage.stream()
-                .filter(celeb -> celeb.getParent() == null)
-                .toList();
-        Stream<CelebSearchResDto> parentCelebDtoStream = changeCelebSearchResDto(parentCelebList).stream();
-
-        return PaginationResDto.of(celebPage,
-                Stream.concat(childCelebDtoStream, parentCelebDtoStream)
-                        .sorted(Comparator.comparing(CelebSearchResDto::getCelebTotalNameKr)).toList());
+        return PaginationResDto.of(celebPage, celebHandler.convertCelebSearchResDto(celebPage.toList()));
 
     }
 
@@ -63,16 +52,7 @@ public class CelebService {
 
     @Transactional(readOnly = true)
     public List<CelebSearchResDto> getTop10Celeb() {
-        return changeCelebSearchResDto(celebRepository.findTop10Celeb());
-    }
-
-    /**
-     * Celeb 리스트를 CelebSearchResDto 리스트로 변경
-     */
-    private List<CelebSearchResDto> changeCelebSearchResDto(List<Celeb> celebList) {
-        return celebList.stream()
-                .map(CelebSearchResDto::of)
-                .toList();
+        return celebHandler.convertCelebSearchResDto(celebRepository.findTop10Celeb());
     }
 
     @Transactional(readOnly = true)

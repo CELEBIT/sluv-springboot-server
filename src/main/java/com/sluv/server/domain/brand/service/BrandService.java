@@ -7,7 +7,6 @@ import com.sluv.server.domain.brand.entity.RecentSelectBrand;
 import com.sluv.server.domain.brand.repository.BrandRepository;
 import com.sluv.server.domain.brand.repository.RecentSelectBrandRepository;
 import com.sluv.server.domain.user.entity.User;
-import com.sluv.server.domain.user.repository.UserRepository;
 import com.sluv.server.global.common.response.PaginationResDto;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -21,12 +20,10 @@ import org.springframework.transaction.annotation.Transactional;
 public class BrandService {
     private final BrandRepository brandRepository;
     private final RecentSelectBrandRepository recentSelectBrandRepository;
-    private final UserRepository userRepository;
 
 
     @Transactional(readOnly = true)
     public PaginationResDto<BrandSearchResDto> findAllBrand(String brandName, Pageable pageable) {
-
         Page<Brand> brandPage = brandRepository.findByAllBrandKrOrBrandEnStartingWith(brandName, pageable);
 
         List<BrandSearchResDto> dtoList = brandPage.stream()
@@ -38,8 +35,10 @@ public class BrandService {
 
     @Transactional(readOnly = true)
     public List<BrandSearchResDto> findTopBrand() {
-        return brandRepository.findTop10By().stream()
-                .map(BrandSearchResDto::of).toList();
+        return brandRepository.findTop10By()
+                .stream()
+                .map(BrandSearchResDto::of)
+                .toList();
     }
 
     @Transactional(readOnly = true)

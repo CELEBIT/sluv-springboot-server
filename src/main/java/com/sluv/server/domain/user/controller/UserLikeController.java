@@ -25,15 +25,7 @@ public class UserLikeController {
 
     private final UserLikeService userLikeService;
 
-    @Operation(
-            summary = "유저가 좋아요한 아이템 조회",
-            description = """
-                    유저가 좋아요한 아이템 조회\n
-                    User Id Token 필요
-                        -> Id를 기준으로 조회\n
-                    Pagination 적용\n
-                    """
-    )
+    @Operation(summary = "유저가 좋아요한 아이템 조회", description = "User Id Token 필요, Pagination 적용")
     @GetMapping("/like/item")
     public ResponseEntity<SuccessDataResponse<PaginationCountResDto<ItemSimpleResDto>>> getUserLikeItem(
             @AuthenticationPrincipal User user, Pageable pageable) {

@@ -9,7 +9,7 @@ import com.sluv.server.domain.comment.entity.Comment;
 import com.sluv.server.domain.comment.repository.CommentRepository;
 import com.sluv.server.domain.item.dto.ItemSimpleResDto;
 import com.sluv.server.domain.item.entity.Item;
-import com.sluv.server.domain.item.mapper.ItemDtoMapper;
+import com.sluv.server.domain.item.helper.ItemHelper;
 import com.sluv.server.domain.item.repository.ItemImgRepository;
 import com.sluv.server.domain.item.repository.ItemRepository;
 import com.sluv.server.domain.item.repository.ItemScrapRepository;
@@ -51,7 +51,7 @@ public class UserService {
     private final ItemImgRepository itemImgRepository;
     private final ItemScrapRepository itemScrapRepository;
     private final ClosetRepository closetRepository;
-    private final ItemDtoMapper itemDtoMapper;
+    private final ItemHelper itemHelper;
     private final QuestionDtoMapper questionDtoMapper;
 
     @Transactional
@@ -108,10 +108,9 @@ public class UserService {
     public PaginationResDto<ItemSimpleResDto> getUserItem(User user, Long userId, Pageable pageable) {
         Page<Item> itemPage = itemRepository.getUserAllItem(userId, pageable);
 
-        List<ItemSimpleResDto> content = itemPage.stream().map(item -> {
-            List<Closet> closetList = closetRepository.findAllByUserId(user.getId());
-            return itemDtoMapper.getItemSimpleResDto(item, closetList);
-        }).toList();
+        List<ItemSimpleResDto> content = itemPage.stream()
+                .map(item -> itemHelper.convertItemToSimpleResDto(item, user))
+                .toList();
 
         return PaginationResDto.of(itemPage, content);
     }
@@ -153,11 +152,9 @@ public class UserService {
     public PaginationCountResDto<ItemSimpleResDto> getUserUploadItem(User user, Pageable pageable) {
         // 현재 유저가 업로드한 아이템 조회
         Page<Item> itemPage = itemRepository.getUserAllItem(user.getId(), pageable);
-        // 현재 유저의 옷장 검색
-        List<Closet> closetList = closetRepository.findAllByUserId(user.getId());
         // content 제작
         List<ItemSimpleResDto> content = itemPage.stream()
-                .map(item -> itemDtoMapper.getItemSimpleResDto(item, closetList)).toList();
+                .map(item -> itemHelper.convertItemToSimpleResDto(item, user)).toList();
 
         return new PaginationCountResDto<>(itemPage.hasNext(), itemPage.getNumber(), content,
                 itemPage.getTotalElements());

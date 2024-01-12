@@ -44,7 +44,6 @@ public class ClosetItemService {
         return ClosetDetailResDto.of(itemPage, closet);
     }
 
-
     /**
      * 아이템 스크랩
      */

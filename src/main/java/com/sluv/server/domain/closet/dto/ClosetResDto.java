@@ -28,10 +28,11 @@ public class ClosetResDto {
     private Long itemNum;
 
     public static ClosetResDto of(Closet closet, Long itemNum) {
+        String coverImg = closet.getCoverImgUrl() == null ? null : closet.getCoverImgUrl();
         return ClosetResDto.builder()
                 .id(closet.getId())
                 .name(closet.getName())
-                .coverImgUrl(closet.getCoverImgUrl())
+                .coverImgUrl(coverImg)
                 .closetStatus(closet.getClosetStatus())
                 .colorScheme(closet.getColor())
                 .itemNum(itemNum)

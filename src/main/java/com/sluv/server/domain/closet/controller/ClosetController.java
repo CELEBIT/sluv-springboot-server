@@ -5,6 +5,7 @@ import com.sluv.server.domain.closet.dto.ClosetItemSelectReqDto;
 import com.sluv.server.domain.closet.dto.ClosetListCountResDto;
 import com.sluv.server.domain.closet.dto.ClosetNameCheckResDto;
 import com.sluv.server.domain.closet.dto.ClosetReqDto;
+import com.sluv.server.domain.closet.service.ClosetItemService;
 import com.sluv.server.domain.closet.service.ClosetService;
 import com.sluv.server.domain.item.dto.ItemSimpleResDto;
 import com.sluv.server.domain.user.entity.User;
@@ -32,6 +33,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class ClosetController {
     private final ClosetService closetService;
+    private final ClosetItemService closetItemService;
 
     @Operation(summary = "*현재 유저의 특정 옷장 상세조회", description = "User 토큰 필요. Pagination 적용. 가장 최근 Scrap 한 순서대로 정렬.")
     @GetMapping("/{closetId}")
@@ -40,7 +42,7 @@ public class ClosetController {
                                                                                  Pageable pageable) {
 
         return ResponseEntity.ok().body(
-                closetService.getClosetDetails(user, closetId, pageable)
+                closetItemService.getClosetDetails(user, closetId, pageable)
         );
     }
 
@@ -88,7 +90,7 @@ public class ClosetController {
     public ResponseEntity<SuccessResponse> postItemScrapToCloset(@AuthenticationPrincipal User user,
                                                                  @PathVariable("itemId") Long itemId,
                                                                  @PathVariable("closetId") Long closetId) {
-        closetService.postItemScrapToCloset(user, itemId, closetId);
+        closetItemService.postItemScrapToCloset(user, itemId, closetId);
         return ResponseEntity.ok().body(
                 new SuccessResponse()
         );
@@ -111,7 +113,7 @@ public class ClosetController {
                                                            @PathVariable("fromClosetId") Long fromClosetId,
                                                            @PathVariable("toClosetId") Long toClosetId,
                                                            @RequestBody ClosetItemSelectReqDto dto) {
-        closetService.patchSaveCloset(user, fromClosetId, toClosetId, dto);
+        closetItemService.moveItemInCloset(user, fromClosetId, toClosetId, dto);
         return ResponseEntity.ok().body(
                 new SuccessResponse()
         );
@@ -122,7 +124,7 @@ public class ClosetController {
     public ResponseEntity<SuccessResponse> patchItems(@AuthenticationPrincipal User user,
                                                       @PathVariable("closetId") Long closetId,
                                                       @RequestBody ClosetItemSelectReqDto dto) {
-        closetService.patchItems(user, closetId, dto);
+        closetItemService.removeSelectItemInCloset(user, closetId, dto);
         return ResponseEntity.ok().body(
                 new SuccessResponse()
         );
@@ -145,7 +147,7 @@ public class ClosetController {
     @DeleteMapping("/{itemId}/scrap")
     public ResponseEntity<SuccessResponse> deleteItemScrapFromCloset(@AuthenticationPrincipal User user,
                                                                      @PathVariable("itemId") Long itemId) {
-        closetService.deleteItemScrapFromCloset(user, itemId);
+        closetItemService.deleteItemScrapFromCloset(user, itemId);
         return ResponseEntity.ok().body(
                 new SuccessResponse()
         );

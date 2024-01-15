@@ -1,22 +1,13 @@
 package com.sluv.server.domain.item.controller;
 
 import com.sluv.server.domain.item.dto.ItemDetailResDto;
-import com.sluv.server.domain.item.dto.ItemEditReqDto;
 import com.sluv.server.domain.item.dto.ItemPostReqDto;
 import com.sluv.server.domain.item.dto.ItemPostResDto;
-import com.sluv.server.domain.item.dto.ItemReportReqDto;
 import com.sluv.server.domain.item.dto.ItemSimpleResDto;
-import com.sluv.server.domain.item.dto.TempItemPostReqDto;
-import com.sluv.server.domain.item.dto.TempItemPostResDto;
-import com.sluv.server.domain.item.dto.TempItemResDto;
 import com.sluv.server.domain.item.exception.StandardNotFoundException;
-import com.sluv.server.domain.item.service.ItemEditReqService;
-import com.sluv.server.domain.item.service.ItemReportService;
 import com.sluv.server.domain.item.service.ItemService;
-import com.sluv.server.domain.item.service.TempItemService;
 import com.sluv.server.domain.search.dto.SearchFilterReqDto;
 import com.sluv.server.domain.user.entity.User;
-import com.sluv.server.global.common.response.PaginationCountResDto;
 import com.sluv.server.global.common.response.PaginationResDto;
 import com.sluv.server.global.common.response.SuccessDataResponse;
 import com.sluv.server.global.common.response.SuccessResponse;
@@ -43,63 +34,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class ItemController {
 
     private final ItemService itemService;
-    private final TempItemService tempItemService;
-    private final ItemEditReqService itemEditReqService;
-    private final ItemReportService itemReportService;
-
-    @Operation(summary = "*아이템 등록 및 수정", description = "User 토큰 필요")
-    @PostMapping("")
-    public ResponseEntity<SuccessDataResponse<ItemPostResDto>> postItem(@AuthenticationPrincipal User user,
-                                                                        @RequestBody ItemPostReqDto reqDto) {
-
-        return ResponseEntity.ok().body(
-                SuccessDataResponse.<ItemPostResDto>builder()
-                        .result(itemService.postItem(user, reqDto))
-                        .build()
-        );
-    }
-
-    @Operation(summary = "*Item 임시저장", description = "User 토큰 필요")
-    @PostMapping("/temp")
-    public ResponseEntity<SuccessDataResponse<TempItemPostResDto>> postTempItem(@AuthenticationPrincipal User user,
-                                                                                @RequestBody TempItemPostReqDto reqDto) {
-
-        return ResponseEntity.ok().body(
-                SuccessDataResponse.<TempItemPostResDto>builder()
-                        .result(
-                                TempItemPostResDto.of(
-                                        tempItemService.postTempItem(user, reqDto)
-                                )
-                        )
-                        .build()
-        );
-    }
-
-    @Operation(summary = "*임시저장 아이템 리스트 조회", description = "User 토큰 필요")
-    @GetMapping("/temp")
-    public ResponseEntity<SuccessDataResponse<PaginationCountResDto<TempItemResDto>>> getTempItemList(
-            @AuthenticationPrincipal User user, Pageable pageable) {
-
-        return ResponseEntity.ok().body(
-                SuccessDataResponse.<PaginationCountResDto<TempItemResDto>>builder()
-                        .result(tempItemService.getTempItemList(user, pageable))
-                        .build()
-        );
-    }
-
-    @Operation(summary = "임시저장 아이템 선택삭제", description = "User 토큰 필요")
-    @DeleteMapping("/temp/{tempItemId}")
-    public ResponseEntity<SuccessResponse> deleteTempItem(@PathVariable Long tempItemId) {
-        tempItemService.deleteTempItem(tempItemId);
-        return ResponseEntity.ok().body(new SuccessResponse());
-    }
-
-    @Operation(summary = "*임시저장 아이템 전체삭제", description = "User 토큰 필요")
-    @DeleteMapping("/temp")
-    public ResponseEntity<SuccessResponse> deleteAllTempItem(@AuthenticationPrincipal User user) {
-        tempItemService.deleteAllTempItem(user);
-        return ResponseEntity.ok().body(new SuccessResponse());
-    }
 
     /**
      * 같은 셀럽 아이템 리스트 -> 10개 같은 브랜드 아이템 리스트 -> 10개 다른 스러버들이 함께 보관한 아이템 리스트 -> 10개 1. 같은 셀럽의 아이템 -> 셀럽을 기준으로 최신 아이템 검색 2.
@@ -117,47 +51,6 @@ public class ItemController {
                                 itemService.getItemDetail(user, itemId)
                         )
                         .build()
-        );
-    }
-
-    @Operation(summary = "아이템 게시글 좋아요", description = "User 토큰 필요")
-    @PostMapping("/{itemId}/like")
-    public ResponseEntity<SuccessResponse> postItemLike(@AuthenticationPrincipal User user,
-                                                        @PathVariable("itemId") Long itemId) {
-        itemService.postItemLike(user, itemId);
-        return ResponseEntity.ok().body(
-                new SuccessResponse()
-        );
-    }
-
-    @Operation(summary = "아이템 게시글 삭제")
-    @DeleteMapping("/{itemId}")
-    public ResponseEntity<SuccessResponse> deleteItem(@PathVariable("itemId") Long itemId) {
-        itemService.deleteItem(itemId);
-        return ResponseEntity.ok().body(
-                new SuccessResponse()
-        );
-    }
-
-    @Operation(summary = "*아이템 게시글 수정 요청", description = "User 토큰 필요")
-    @PostMapping("/{itemId}/edit-req")
-    public ResponseEntity<SuccessResponse> postItemEdit(@AuthenticationPrincipal User user,
-                                                        @PathVariable(name = "itemId") Long itemId,
-                                                        @RequestBody ItemEditReqDto dto) {
-        itemEditReqService.postItemEdit(user, itemId, dto);
-        return ResponseEntity.ok().body(
-                new SuccessResponse()
-        );
-    }
-
-    @Operation(summary = "*아이템 게시글 신고", description = "User 토큰 필요")
-    @PostMapping("/{itemId}/report")
-    public ResponseEntity<SuccessResponse> postItemReport(@AuthenticationPrincipal User user,
-                                                          @PathVariable(name = "itemId") Long itemId,
-                                                          @RequestBody ItemReportReqDto dto) {
-        itemReportService.postItemReport(user, itemId, dto);
-        return ResponseEntity.ok().body(
-                new SuccessResponse()
         );
     }
 
@@ -184,6 +77,39 @@ public class ItemController {
                         .build()
         );
     }
+
+    @Operation(summary = "*아이템 등록 및 수정", description = "User 토큰 필요")
+    @PostMapping("")
+    public ResponseEntity<SuccessDataResponse<ItemPostResDto>> postItem(@AuthenticationPrincipal User user,
+                                                                        @RequestBody ItemPostReqDto reqDto) {
+
+        return ResponseEntity.ok().body(
+                SuccessDataResponse.<ItemPostResDto>builder()
+                        .result(itemService.postItem(user, reqDto))
+                        .build()
+        );
+    }
+
+    @Operation(summary = "아이템 게시글 좋아요", description = "User 토큰 필요")
+    @PostMapping("/{itemId}/like")
+    public ResponseEntity<SuccessResponse> postItemLike(@AuthenticationPrincipal User user,
+                                                        @PathVariable("itemId") Long itemId) {
+        itemService.postItemLike(user, itemId);
+        return ResponseEntity.ok().body(
+                new SuccessResponse()
+        );
+    }
+
+    @Operation(summary = "아이템 게시글 삭제")
+    @DeleteMapping("/{itemId}")
+    public ResponseEntity<SuccessResponse> deleteItem(@PathVariable("itemId") Long itemId) {
+        itemService.deleteItem(itemId);
+        return ResponseEntity.ok().body(
+                new SuccessResponse()
+        );
+    }
+
+    /* 홈페이지 기능 */
 
     /**
      * 초반: 좋아요 수, 스크랩 수, 조회수를 모두 합산하여 높은 순서 + 착용 최신순으로 정렬 후반: 유저별 검색기록, 관심셀럽을 기준으로 조회

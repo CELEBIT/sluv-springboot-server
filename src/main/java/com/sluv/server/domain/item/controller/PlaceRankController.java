@@ -39,6 +39,18 @@ public class PlaceRankController {
         );
     }
 
+    @Operation(summary = "*유저가 최근 입력한 장소 검색", description = "User 토큰 필요")
+    @GetMapping("/recent")
+    public ResponseEntity<SuccessDataResponse<List<PlaceRankResDto>>> getRecentPlaceTop20(
+            @AuthenticationPrincipal User user) {
+
+        return ResponseEntity.ok().body(
+                SuccessDataResponse.<List<PlaceRankResDto>>builder()
+                        .result(placeRankService.getRecentPlaceTop20(user))
+                        .build()
+        );
+    }
+
     @Operation(summary = "*최근 입력한 장소 등록", description = "User 토큰 필요.")
     @PostMapping("")
     public ResponseEntity<SuccessResponse> postPlace(@AuthenticationPrincipal User user,
@@ -68,18 +80,6 @@ public class PlaceRankController {
 
         return ResponseEntity.ok().body(
                 new SuccessResponse()
-        );
-    }
-
-    @Operation(summary = "*유저가 최근 입력한 장소 검색", description = "User 토큰 필요")
-    @GetMapping("/recent")
-    public ResponseEntity<SuccessDataResponse<List<PlaceRankResDto>>> getRecentPlaceTop20(
-            @AuthenticationPrincipal User user) {
-
-        return ResponseEntity.ok().body(
-                SuccessDataResponse.<List<PlaceRankResDto>>builder()
-                        .result(placeRankService.getRecentPlaceTop20(user))
-                        .build()
         );
     }
 }

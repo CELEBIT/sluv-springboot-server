@@ -23,15 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserRecentController {
     private final UserRecentService userRecentService;
 
-    @Operation(
-            summary = "유저의 최근 본 아이템 조회",
-            description = """
-                    유저의 최근 본 아이템 조회\n
-                    User Id Token 필요
-                        -> Id를 기준으로 조회\n
-                    Pagination 적용\n
-                    """
-    )
+    @Operation(summary = "유저의 최근 본 아이템 조회", description = "User 토큰 필요. Pagination 적용.")
     @GetMapping("/recent/item")
     public ResponseEntity<SuccessDataResponse<PaginationCountResDto<ItemSimpleResDto>>> getUserRecentItem(
             @AuthenticationPrincipal User user, Pageable pageable) {
@@ -43,15 +35,7 @@ public class UserRecentController {
         );
     }
 
-    @Operation(
-            summary = "유저의 최근 본 Question 조회",
-            description = """
-                    유저의 최근 본 Question 조회\n
-                    User Id Token 필요
-                        -> Id를 기준으로 조회\n
-                    Pagination 적용\n
-                    """
-    )
+    @Operation(summary = "유저의 최근 본 Question 조회", description = "User 토큰 필요. Pagination 적용.")
     @GetMapping("/recent/question")
     public ResponseEntity<SuccessDataResponse<PaginationCountResDto<QuestionSimpleResDto>>> getUserRecentQuestion(
             @AuthenticationPrincipal User user, Pageable pageable) {

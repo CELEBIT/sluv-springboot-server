@@ -46,9 +46,8 @@ public class FollowService {
         Page<User> followerPage = userRepository.getAllFollower(userId, pageable);
 
         // UserSearchInfoDto로 가공
-        List<UserSearchInfoDto> content = followerPage.stream()
-                .map(follower -> UserSearchInfoDto.of(follower, followRepository.getFollowStatus(user, follower)))
-                .toList();
+        List<UserSearchInfoDto> content =
+                followRepository.getUserSearchInfoDto(user, followerPage.getContent(), "follower");
 
         return PaginationResDto.of(followerPage, content);
     }
@@ -59,9 +58,8 @@ public class FollowService {
         Page<User> followerPage = userRepository.getAllFollowing(userId, pageable);
 
         // UserSearchInfoDto로 가공
-        List<UserSearchInfoDto> content = followerPage.stream()
-                .map(follower -> UserSearchInfoDto.of(follower, followRepository.getFollowStatus(user, follower)))
-                .toList();
+        List<UserSearchInfoDto> content =
+                followRepository.getUserSearchInfoDto(user, followerPage.getContent(), "followee");
 
         return PaginationResDto.of(followerPage, content);
     }

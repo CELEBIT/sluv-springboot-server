@@ -41,10 +41,8 @@ public class HashtagService {
         //있다면 해당 Hashtag를 반환
         if (hashtag.isPresent()) {
             return HashtagPostResponseDto.of(hashtag.get());
-        } else { // 없다면 등록후 반환
-            Hashtag save = hashtagRepository.save(
-                    Hashtag.toEntity(requestDto.getHashtagContent())
-            );
+        } else { // 없다면 등록 후 반환
+            Hashtag save = hashtagRepository.save(Hashtag.toEntity(requestDto.getHashtagContent()));
             return HashtagPostResponseDto.of(save);
         }
 

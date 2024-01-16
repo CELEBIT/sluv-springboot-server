@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @RequestMapping("/app/item/temp")
 @Slf4j
-public class ItemTempController {
+public class TempItemController {
     private final TempItemService tempItemService;
 
     @Operation(summary = "*임시저장 아이템 리스트 조회", description = "User 토큰 필요")

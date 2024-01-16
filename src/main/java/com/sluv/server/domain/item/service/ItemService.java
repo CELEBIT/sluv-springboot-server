@@ -65,7 +65,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-@Transactional
 public class ItemService {
     private final ItemRepository itemRepository;
     private final ItemImgRepository itemImgRepository;
@@ -88,6 +87,7 @@ public class ItemService {
 
     private final AiModelService aiModelService;
 
+    @Transactional
     public ItemPostResDto postItem(User user, ItemPostReqDto reqDto) {
 
         // 추가될 Celeb 확인
@@ -189,6 +189,7 @@ public class ItemService {
                 .map(HotPlaceResDto::of).toList();
     }
 
+    @Transactional
     public ItemDetailResDto getItemDetail(User user, Long itemId) {
 
         // 1. Item 조회
@@ -196,7 +197,7 @@ public class ItemService {
                 .orElseThrow(ItemNotFoundException::new);
 
         item.increaseViewNum();
-        recentItemRepository.save(RecentItem.of(item, user));
+        recentItemRepository.save(RecentItem.of(item, user)); /** 1. 최근 본 아이템 등록*/
 
         // 2. Item 이미지들 조회
         List<ItemImgResDto> imgList = itemImgRepository.findAllByItemId(itemId)
@@ -252,6 +253,7 @@ public class ItemService {
                         HashtagResponseDto.of(itemHashtag.getHashtag(), null)
                 ).toList();
 
+        /* ===== */
         // 11. 같은 셀럽 아이템 리스트
         boolean celebJudge = item.getCeleb() != null;
         List<ItemSimpleResDto> sameCelebItemList = itemRepository.getItemSimpleResDto(
@@ -268,6 +270,7 @@ public class ItemService {
         List<ItemSimpleResDto> sameClosetItemList = itemRepository.getItemSimpleResDto(
                 user, getClosetItemList(item)
         );
+        /* ===== */
 
         // 14. 좋아요 여부
         boolean likeStatus = itemLikeRepository.existsByUserIdAndItemId(user.getId(), itemId);
@@ -304,6 +307,7 @@ public class ItemService {
         );
     }
 
+    @Transactional
     public void postItemLike(User user, Long itemId) {
         Item item = itemRepository.findById(itemId).orElseThrow(ItemNotFoundException::new);
 
@@ -319,6 +323,7 @@ public class ItemService {
         item.decreaseViewNum();
     }
 
+    @Transactional
     public void deleteItem(Long itemId) {
         Item item = itemRepository.findById(itemId).orElseThrow(ItemNotFoundException::new);
 
@@ -329,9 +334,9 @@ public class ItemService {
     @Transactional(readOnly = true)
     public PaginationResDto<ItemSimpleResDto> getRecentItem(User user, Pageable pageable) {
         Page<Item> recentItemPage = itemRepository.getRecentItem(user, pageable);
-
-        return convertItemSimplePageDto(user, pageable, recentItemPage);
-
+        List<ItemSimpleResDto> itemSimpleResDtos = itemRepository.getItemSimpleResDto(user,
+                recentItemPage.getContent());
+        return PaginationResDto.of(recentItemPage, itemSimpleResDtos);
 
     }
 
@@ -339,15 +344,8 @@ public class ItemService {
     public PaginationResDto<ItemSimpleResDto> getScrapItem(User user, Pageable pageable) {
         // User, Closet, Item 조인하여 ItemPage 조회
         Page<Item> itemPage = itemRepository.getAllScrapItem(user, pageable);
-
-        return convertItemSimplePageDto(user, pageable, itemPage);
-    }
-
-    private PaginationResDto<ItemSimpleResDto> convertItemSimplePageDto(User user, Pageable pageable, Page<Item> page) {
-        // ItemPage에서 ItemSameResDto 생성
-        List<ItemSimpleResDto> content = itemRepository.getItemSimpleResDto(user, page.getContent());
-
-        return PaginationResDto.of(page, content);
+        List<ItemSimpleResDto> itemSimpleResDtos = itemRepository.getItemSimpleResDto(user, itemPage.getContent());
+        return PaginationResDto.of(itemPage, itemSimpleResDtos);
     }
 
     private List<Item> getClosetItemList(Item item) {

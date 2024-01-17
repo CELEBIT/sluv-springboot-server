@@ -26,12 +26,16 @@ import com.sluv.server.domain.celeb.entity.Celeb;
 import com.sluv.server.domain.closet.entity.Closet;
 import com.sluv.server.domain.item.dto.ItemSimpleResDto;
 import com.sluv.server.domain.item.entity.Item;
+import com.sluv.server.domain.item.entity.RecentItem;
 import com.sluv.server.domain.search.dto.SearchFilterReqDto;
 import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.domain.user.enums.UserStatus;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -768,7 +772,7 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
                 .where(closet.user.eq(user))
                 .fetch();
 
-        List<Tuple> content = jpaQueryFactory.select(item, itemImg, itemScrap)
+        List<Tuple> fetch = jpaQueryFactory.select(item, itemImg, itemScrap)
                 .from(item)
                 .leftJoin(item.brand, brand).fetchJoin()
                 .leftJoin(item.celeb, celeb).fetchJoin()
@@ -778,9 +782,40 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
                 .groupBy(item)
                 .fetch();
 
-        return content.stream()
+        List<Long> itemIds = items.stream().map(Item::getId).toList();
+        List<ItemSimpleResDto> content = fetch.stream()
                 .map(tuple -> ItemSimpleResDto.of(tuple.get(item), tuple.get(itemImg),
                         tuple.get(itemScrap) != null))
                 .toList();
+
+        Map<Long, ItemSimpleResDto> contentMap = content.stream()
+                .collect(Collectors.toMap(ItemSimpleResDto::getItemId, Function.identity()));
+
+        return itemIds.stream()
+                .map(contentMap::get)
+                .toList();
+    }
+
+    @Override
+    public Page<Item> getUserAllRecentItem(User user, Pageable pageable) {
+        List<RecentItem> fetch = jpaQueryFactory.selectFrom(recentItem)
+                .leftJoin(recentItem.item, item).fetchJoin()
+                .where(recentItem.user.eq(user))
+                .orderBy(recentItem.createdAt.max().desc())
+                .groupBy(recentItem.item)
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        JPAQuery<RecentItem> query = jpaQueryFactory.selectFrom(recentItem)
+                .where(recentItem.user.eq(user))
+                .groupBy(recentItem.item)
+                .orderBy(recentItem.createdAt.max().desc());
+
+        List<Item> content = fetch.stream()
+                .map(RecentItem::getItem)
+                .toList();
+
+        return PageableExecutionUtils.getPage(content, pageable, () -> query.fetch().size());
     }
 }

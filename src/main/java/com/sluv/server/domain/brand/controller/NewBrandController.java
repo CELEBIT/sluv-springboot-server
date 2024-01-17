@@ -4,6 +4,7 @@ import com.sluv.server.domain.brand.dto.NewBrandPostReqDto;
 import com.sluv.server.domain.brand.dto.NewBrandPostResDto;
 import com.sluv.server.domain.brand.service.NewBrandService;
 import com.sluv.server.global.common.response.SuccessDataResponse;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +21,7 @@ public class NewBrandController {
     private final NewBrandService newBrandService;
 
 
+    @Operation(summary = "NewBrand 등록", description = "새로운 NewBrand를 등록한다.")
     @PostMapping("")
     public ResponseEntity<SuccessDataResponse<NewBrandPostResDto>> postNewBrand(@RequestBody NewBrandPostReqDto dto) {
         log.info("NewBrand 등록. NewBrand Name:{}", dto.getNewBrandName());

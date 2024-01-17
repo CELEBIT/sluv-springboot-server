@@ -34,7 +34,10 @@ public class CelebDto {
                 .celebNameKr(celeb.getCelebNameKr())
                 .celebNameEn(celeb.getCelebNameEn())
                 .categoryChild(celeb.getCelebCategory().getName())
-                .categoryParent(celeb.getCelebCategory().getParent().getName())
+                .categoryParent(
+                        celeb.getCelebCategory().getParent() != null
+                                ? celeb.getCelebCategory().getParent().getName()
+                                : null)
                 .parentCelebNameKr(celeb.getParent() != null ? celeb.getParent().getCelebNameKr() : null)
                 .parentCelebNameEn(celeb.getParent() != null ? celeb.getParent().getCelebNameEn() : null)
                 .build();

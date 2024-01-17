@@ -1,8 +1,8 @@
-package com.sluv.server.domain.user.controller;
+package com.sluv.server.domain.item.controller;
 
-import com.sluv.server.domain.user.dto.UserReportReqDto;
+import com.sluv.server.domain.item.dto.ItemEditReqDto;
+import com.sluv.server.domain.item.service.ItemEditReqService;
 import com.sluv.server.domain.user.entity.User;
-import com.sluv.server.domain.user.service.UserReportService;
 import com.sluv.server.global.common.response.SuccessResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
@@ -16,19 +16,18 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@Slf4j
-@RequestMapping("/app/user")
 @RequiredArgsConstructor
-public class UserReportController {
+@RequestMapping("/app/item")
+@Slf4j
+public class ItemEditController {
+    private final ItemEditReqService itemEditReqService;
 
-    private final UserReportService userReportService;
-
-    @Operation(summary = "*유저 신고하기", description = "User 토큰 필요")
-    @PostMapping("/{userId}/report")
-    public ResponseEntity<SuccessResponse> postUserReport(@AuthenticationPrincipal User user,
-                                                          @PathVariable(name = "userId") Long userId,
-                                                          @RequestBody UserReportReqDto dto) {
-        userReportService.postUserReport(user, userId, dto);
+    @Operation(summary = "*아이템 게시글 수정 요청", description = "User 토큰 필요")
+    @PostMapping("/{itemId}/edit-req")
+    public ResponseEntity<SuccessResponse> postItemEdit(@AuthenticationPrincipal User user,
+                                                        @PathVariable(name = "itemId") Long itemId,
+                                                        @RequestBody ItemEditReqDto dto) {
+        itemEditReqService.postItemEdit(user, itemId, dto);
         return ResponseEntity.ok().body(
                 new SuccessResponse()
         );

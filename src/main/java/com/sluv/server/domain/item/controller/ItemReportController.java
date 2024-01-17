@@ -1,8 +1,8 @@
-package com.sluv.server.domain.user.controller;
+package com.sluv.server.domain.item.controller;
 
-import com.sluv.server.domain.user.dto.UserReportReqDto;
+import com.sluv.server.domain.item.dto.ItemReportReqDto;
+import com.sluv.server.domain.item.service.ItemReportService;
 import com.sluv.server.domain.user.entity.User;
-import com.sluv.server.domain.user.service.UserReportService;
 import com.sluv.server.global.common.response.SuccessResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
@@ -16,19 +16,18 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@Slf4j
-@RequestMapping("/app/user")
 @RequiredArgsConstructor
-public class UserReportController {
+@RequestMapping("/app/item")
+@Slf4j
+public class ItemReportController {
+    private final ItemReportService itemReportService;
 
-    private final UserReportService userReportService;
-
-    @Operation(summary = "*유저 신고하기", description = "User 토큰 필요")
-    @PostMapping("/{userId}/report")
-    public ResponseEntity<SuccessResponse> postUserReport(@AuthenticationPrincipal User user,
-                                                          @PathVariable(name = "userId") Long userId,
-                                                          @RequestBody UserReportReqDto dto) {
-        userReportService.postUserReport(user, userId, dto);
+    @Operation(summary = "*아이템 게시글 신고", description = "User 토큰 필요")
+    @PostMapping("/{itemId}/report")
+    public ResponseEntity<SuccessResponse> postItemReport(@AuthenticationPrincipal User user,
+                                                          @PathVariable(name = "itemId") Long itemId,
+                                                          @RequestBody ItemReportReqDto dto) {
+        itemReportService.postItemReport(user, itemId, dto);
         return ResponseEntity.ok().body(
                 new SuccessResponse()
         );

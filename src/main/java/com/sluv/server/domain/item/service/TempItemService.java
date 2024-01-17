@@ -1,30 +1,23 @@
 package com.sluv.server.domain.item.service;
 
-import com.sluv.server.domain.brand.dto.NewBrandPostResDto;
 import com.sluv.server.domain.brand.entity.Brand;
 import com.sluv.server.domain.brand.entity.NewBrand;
 import com.sluv.server.domain.brand.exception.BrandNotFoundException;
 import com.sluv.server.domain.brand.exception.NewBrandNotFoundException;
 import com.sluv.server.domain.brand.repository.BrandRepository;
 import com.sluv.server.domain.brand.repository.NewBrandRepository;
-import com.sluv.server.domain.celeb.dto.CelebDto;
-import com.sluv.server.domain.celeb.dto.NewCelebPostResDto;
 import com.sluv.server.domain.celeb.entity.Celeb;
 import com.sluv.server.domain.celeb.entity.NewCeleb;
 import com.sluv.server.domain.celeb.exception.CelebNotFoundException;
 import com.sluv.server.domain.celeb.exception.NewCelebNotFoundException;
 import com.sluv.server.domain.celeb.repository.CelebRepository;
 import com.sluv.server.domain.celeb.repository.NewCelebRepository;
-import com.sluv.server.domain.item.dto.ItemCategoryDto;
-import com.sluv.server.domain.item.dto.ItemImgResDto;
-import com.sluv.server.domain.item.dto.ItemLinkResDto;
 import com.sluv.server.domain.item.dto.TempItemPostReqDto;
 import com.sluv.server.domain.item.dto.TempItemResDto;
 import com.sluv.server.domain.item.entity.ItemCategory;
 import com.sluv.server.domain.item.entity.TempItem;
 import com.sluv.server.domain.item.entity.TempItemImg;
 import com.sluv.server.domain.item.entity.TempItemLink;
-import com.sluv.server.domain.item.entity.hashtag.Hashtag;
 import com.sluv.server.domain.item.entity.hashtag.TempItemHashtag;
 import com.sluv.server.domain.item.exception.ItemCategoryNotFoundException;
 import com.sluv.server.domain.item.exception.TempItemNotFoundException;
@@ -38,7 +31,6 @@ import com.sluv.server.domain.item.repository.hashtag.TempItemHashtagRepository;
 import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.global.common.response.PaginationCountResDto;
 import java.util.List;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -132,53 +124,15 @@ public class TempItemService {
 
     @Transactional(readOnly = true)
     public PaginationCountResDto<TempItemResDto> getTempItemList(User user, Pageable pageable) {
+        Page<TempItem> tempItemPage = tempItemRepository.getTempItemList(user, pageable);
 
-        Page<TempItem> contentPage = tempItemRepository.getTempItemList(user, pageable);
-
-        List<TempItemResDto> dtoList = contentPage.stream().map(tempItem -> {
-
-                    List<ItemImgResDto> tempImgList = tempItemImgRepository.findAllByTempItem(tempItem)
-                            .stream().map(ItemImgResDto::of).collect(Collectors.toList());
-
-                    List<Hashtag> tempHashtagList = tempItemHashtagRepository.findAllByTempItem(tempItem)
-                            .stream().map(TempItemHashtag::getHashtag).toList();
-
-                    List<ItemLinkResDto> tempLinkList = tempItemLinkRepository.findAllByTempItem(tempItem)
-                            .stream().map(ItemLinkResDto::of).collect(Collectors.toList());
-
-                    CelebDto celebDto = tempItem.getCeleb() != null ?
-                            CelebDto.of(tempItem.getCeleb())
-                            : null;
-
-                    ItemCategoryDto itemCategoryDto = tempItem.getCategory() != null ?
-                            ItemCategoryDto.of(tempItem.getCategory())
-                            : null;
-
-                    Brand brand = tempItem.getBrand() != null
-                            ? tempItem.getBrand()
-                            : null;
-
-                    NewCelebPostResDto newCelebPostResDto = tempItem.getNewCeleb() != null
-                            ? NewCelebPostResDto.of(tempItem.getNewCeleb())
-                            : null;
-                    NewBrandPostResDto newBrandPostResDto = tempItem.getNewBrand() != null
-                            ? NewBrandPostResDto.of(tempItem.getNewBrand())
-                            : null;
-
-                    return TempItemResDto.of(
-                            tempItem, celebDto, newCelebPostResDto,
-                            brand, newBrandPostResDto, itemCategoryDto,
-                            tempImgList, tempLinkList, tempHashtagList
-
-                    );
-                }
-        ).toList();
+        List<TempItemResDto> dtoList = tempItemRepository.getTempItemResDto(tempItemPage.getContent());
 
         return new PaginationCountResDto<>(
-                contentPage.hasNext(),
-                contentPage.getNumber(),
+                tempItemPage.hasNext(),
+                tempItemPage.getNumber(),
                 dtoList,
-                contentPage.getTotalElements());
+                tempItemPage.getTotalElements());
 
 
     }

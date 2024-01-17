@@ -13,15 +13,10 @@ import com.sluv.server.domain.question.dto.QuestionVoteReqDto;
 import com.sluv.server.domain.question.exception.QuestionTypeNotFoundException;
 import com.sluv.server.domain.question.service.QuestionService;
 import com.sluv.server.domain.user.entity.User;
-import com.sluv.server.global.common.response.ErrorResponse;
 import com.sluv.server.global.common.response.PaginationResDto;
 import com.sluv.server.global.common.response.SuccessDataResponse;
 import com.sluv.server.global.common.response.SuccessResponse;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -43,18 +38,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class QuestionController {
     private final QuestionService questionService;
 
-    @Operation(
-            summary = "*찾아주세요 게시글 등록",
-            description = "찾아주세요 게시글을 등록하는 기능" +
-                    "\n - User Id Token 필요" +
-                    "\n 생성: id -> null" +
-                    "\n 수정: id -> 해당 Question Id"
-    )
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "1000", description = "요청성공"),
-            @ApiResponse(responseCode = "5000", description = "서버내부 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-            @ApiResponse(responseCode = "5001", description = "DB 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
-    })
+    @Operation(summary = "*찾아주세요 게시글 등록",
+            description = "User 토큰 필요. 생성: id -> null. 수정: id -> 해당 Question Id")
     @PostMapping("/find")
     public ResponseEntity<SuccessDataResponse<QuestionPostResDto>> postFind(@AuthenticationPrincipal User user,
                                                                             @RequestBody QuestionFindPostReqDto dto) {
@@ -65,18 +50,8 @@ public class QuestionController {
         );
     }
 
-    @Operation(
-            summary = "*이중에뭐살까 게시글 등록",
-            description = "이중에뭐살까 게시글을 등록하는 기능" +
-                    "\n - User Id Token 필요" +
-                    "\n 생성: id -> null" +
-                    "\n 수정: id -> 해당 Question Id"
-    )
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "1000", description = "요청성공"),
-            @ApiResponse(responseCode = "5000", description = "서버내부 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-            @ApiResponse(responseCode = "5001", description = "DB 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
-    })
+    @Operation(summary = "*이중에뭐살까 게시글 등록",
+            description = "User 토큰 필요. 생성: id -> null. 수정: id -> 해당 Question Id")
     @PostMapping("/buy")
     public ResponseEntity<SuccessDataResponse<QuestionPostResDto>> postBuy(@AuthenticationPrincipal User user,
                                                                            @RequestBody QuestionBuyPostReqDto dto) {
@@ -88,18 +63,8 @@ public class QuestionController {
         );
     }
 
-    @Operation(
-            summary = "*이거어때 게시글 등록",
-            description = "이거어때 게시글을 등록하는 기능" +
-                    "\n - User Id Token 필요" +
-                    "\n 생성: id -> null" +
-                    "\n 수정: id -> 해당 Question Id"
-    )
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "1000", description = "요청성공"),
-            @ApiResponse(responseCode = "5000", description = "서버내부 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-            @ApiResponse(responseCode = "5001", description = "DB 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
-    })
+    @Operation(summary = "*이거어때 게시글 등록",
+            description = "User 토큰 필요. 생성: id -> null. 수정: id -> 해당 Question Id")
     @PostMapping("/how-about")
     public ResponseEntity<SuccessDataResponse<QuestionPostResDto>> postHowabout(@AuthenticationPrincipal User user,
                                                                                 @RequestBody QuestionHowaboutPostReqDto dto) {
@@ -111,18 +76,8 @@ public class QuestionController {
         );
     }
 
-    @Operation(
-            summary = "*추천해 줘 게시글 등록",
-            description = "추천해 줘 게시글을 등록하는 기능" +
-                    "\n - User Id Token 필요" +
-                    "\n 생성: id -> null" +
-                    "\n 수정: id -> 해당 Question Id"
-    )
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "1000", description = "요청성공"),
-            @ApiResponse(responseCode = "5000", description = "서버내부 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-            @ApiResponse(responseCode = "5001", description = "DB 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
-    })
+    @Operation(summary = "*추천해 줘 게시글 등록",
+            description = "User 토큰 필요. 생성: id -> null. 수정: id -> 해당 Question Id")
     @PostMapping("/recommend")
     public ResponseEntity<SuccessDataResponse<QuestionPostResDto>> postRecommend(@AuthenticationPrincipal User user,
                                                                                  @RequestBody QuestionRecommendPostReqDto dto) {
@@ -134,17 +89,8 @@ public class QuestionController {
         );
     }
 
-    @Operation(
-            summary = "Question 게시글 삭제",
-            description = "Question 게시글 삭제" +
-                    "\n 관련된 데이터를 삭제하는 것이 아닌 Question의 상태만 변경" +
-                    "\n ACTIVE -> DELETE"
-    )
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "1000", description = "요청성공"),
-            @ApiResponse(responseCode = "5000", description = "서버내부 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-            @ApiResponse(responseCode = "5001", description = "DB 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
-    })
+    @Operation(summary = "Question 게시글 삭제",
+            description = "데이터를 삭제 X -> QuestionStatus 변경 (ACTIVE -> DELETE)")
     @DeleteMapping("/{questionId}")
     public ResponseEntity<SuccessResponse> deleteQuestion(@PathVariable("questionId") Long questionId) {
         questionService.deleteQuestion(questionId);
@@ -153,16 +99,7 @@ public class QuestionController {
         );
     }
 
-    @Operation(
-            summary = "*Question 게시글 좋아요",
-            description = "Question 게시글 좋아요 기능" +
-                    "\n User Id Token 필요"
-    )
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "1000", description = "요청성공"),
-            @ApiResponse(responseCode = "5000", description = "서버내부 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-            @ApiResponse(responseCode = "5001", description = "DB 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
-    })
+    @Operation(summary = "*Question 게시글 좋아요", description = "User 토큰 필요")
     @PostMapping("/{questionId}/like")
     public ResponseEntity<SuccessResponse> postQuestionLike(@AuthenticationPrincipal User user,
                                                             @PathVariable("questionId") Long questionId) {
@@ -172,17 +109,8 @@ public class QuestionController {
         );
     }
 
-    @Operation(
-            summary = "*Question 게시글 신고",
-            description = "Question 게시글 신고 기능" +
-                    "\n User Id Token 필요" +
-                    "\n 중복 신고 시 [QuestionReportDuplicate] 예외 발생"
-    )
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "1000", description = "요청성공"),
-            @ApiResponse(responseCode = "5000", description = "서버내부 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-            @ApiResponse(responseCode = "5001", description = "DB 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
-    })
+    @Operation(summary = "*Question 게시글 신고",
+            description = "User 토큰 필요. 중복 신고 시 [QuestionReportDuplicate] 예외 발생")
     @PostMapping("/{questionId}/report")
     public ResponseEntity<SuccessResponse> postQuestionReport(@AuthenticationPrincipal User user,
                                                               @PathVariable("questionId") Long questionId,
@@ -193,16 +121,7 @@ public class QuestionController {
         );
     }
 
-    @Operation(
-            summary = "*Question 게시글 상세조회",
-            description = "Question 게시글을 상세조회하는 기능" +
-                    "\n User Id Token 필요 -> 현재 유저가 작성한 게시글인지 판단하기 위함"
-    )
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "1000", description = "요청성공"),
-            @ApiResponse(responseCode = "5000", description = "서버내부 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-            @ApiResponse(responseCode = "5001", description = "DB 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
-    })
+    @Operation(summary = "*Question 게시글 상세조회", description = "User 토큰 필요")
     @GetMapping("/{questionId}")
     public ResponseEntity<SuccessDataResponse<QuestionGetDetailResDto>> postQuestionReport(
             @AuthenticationPrincipal User user, @PathVariable("questionId") Long questionId) {
@@ -216,15 +135,7 @@ public class QuestionController {
         );
     }
 
-    @Operation(
-            summary = "*QuestionBuy 게시글 투표",
-            description = """
-                    QuestionBuy 게시글 투표 \n
-                    최초 호출 -> QuestionVote 등록 \n
-                    재호출 -> QuestionVote 삭제 \n
-                    좋아요 시스템과 동일.
-                    """
-    )
+    @Operation(summary = "*QuestionBuy 게시글 투표", description = "User 토큰 필요. 좋아요 시스템과 동일.")
     @PostMapping("/{questionId}/vote")
     public ResponseEntity<SuccessResponse> postQuestionVote(@AuthenticationPrincipal User user,
                                                             @PathVariable("questionId") Long questionId,
@@ -237,14 +148,8 @@ public class QuestionController {
         );
     }
 
-    @Operation(
-            summary = "*Question 기다리고 있어요",
-            description = """
-                    유저를 기다리고 있는 Question 조회\n
-                    qType에 따라 Question 타입 변경\n
-                    questionId는 현재 Question은 제외하고 조회하기 위함.
-                    """
-    )
+    @Operation(summary = "*Question 기다리고 있어요",
+            description = "qType에 따라 Question 타입 변경. questionId는 현재 Question은 제외하고 조회하기 위함.")
     @GetMapping("/wait")
     public ResponseEntity<SuccessDataResponse<List<QuestionSimpleResDto>>> getWaitQuestionBuy(
             @AuthenticationPrincipal User user,
@@ -266,13 +171,7 @@ public class QuestionController {
     }
 
     @Deprecated
-    @Operation(
-            summary = "Question 커뮤니티 리스트 조회",
-            description = """
-                    Question 커뮤니티 리스트 조회\n
-                    Pagination 적용
-                    """
-    )
+    @Operation(summary = "Question 커뮤니티 리스트 조회", description = "Pagination 적용")
     @GetMapping("/list")
     public ResponseEntity<SuccessDataResponse<PaginationResDto<QuestionSimpleResDto>>> getQuestionList(
             @Nullable @RequestParam("qType") String qType, Pageable pageable) {
@@ -292,14 +191,7 @@ public class QuestionController {
         );
     }
 
-    @Operation(
-            summary = "Question 커뮤니티 게시글 종합 검색",
-            description = """
-                    Question 커뮤니티 게시글 종합 검색\n
-                    - Pagination 적용
-                    - 최신순으로 조회
-                    """
-    )
+    @Operation(summary = "Question 커뮤니티 게시글 종합 검색", description = "Pagination 적용. 최신순으로 조회")
     @GetMapping("/total")
     public ResponseEntity<SuccessDataResponse<PaginationResDto<QuestionSimpleResDto>>> getQuestionTotalList(
             Pageable pageable) {
@@ -311,15 +203,8 @@ public class QuestionController {
         );
     }
 
-    @Operation(
-            summary = "QuestionFind 커뮤니티 게시글 검색",
-            description = """
-                    QuestionFind 커뮤니티 게시글 검색\n
-                    - Pagination 적용
-                    - Ordering: 최신순으로 조회
-                    - Filtering: celebId
-                    """
-    )
+    @Operation(summary = "QuestionFind 커뮤니티 게시글 검색",
+            description = "Pagination 적용. Ordering: 최신순으로 조회. Filtering: celebId.")
     @GetMapping("/find")
     public ResponseEntity<SuccessDataResponse<PaginationResDto<QuestionSimpleResDto>>> getQuestionFindList(
             @Nullable @RequestParam("celebId") Long celebId, Pageable pageable) {
@@ -334,7 +219,6 @@ public class QuestionController {
     @Operation(
             summary = "QuestionBuy 커뮤니티 게시글 검색",
             description = """
-                    QuestionBuy 커뮤니티 게시글 검색\n
                     - Pagination 적용
                     - Filtering: 전체, 진행중, 마감임박, 종료
                     =Ordering=\n
@@ -355,14 +239,7 @@ public class QuestionController {
         );
     }
 
-    @Operation(
-            summary = "QuestionHowabout 커뮤니티 게시글 검색",
-            description = """
-                    QuestionHowabout 커뮤니티 게시글 검색\n
-                    - Pagination 적용 \n
-                    - Ordering 최신순
-                    """
-    )
+    @Operation(summary = "QuestionHowabout 커뮤니티 게시글 검색", description = "Pagination 적용. Ordering 최신순")
     @GetMapping("/howabout")
     public ResponseEntity<SuccessDataResponse<PaginationResDto<QuestionSimpleResDto>>> getQuestionHowaboutList(
             Pageable pageable) {
@@ -374,15 +251,8 @@ public class QuestionController {
         );
     }
 
-    @Operation(
-            summary = "QuestionRecommend 커뮤니티 게시글 검색",
-            description = """
-                    QuestionRecommend 커뮤니티 게시글 검색\n
-                    - Pagination 적용 \n
-                    - Ordering 최신순 \n
-                    - Filtering 전체, 특정해시태그
-                    """
-    )
+    @Operation(summary = "QuestionRecommend 커뮤니티 게시글 검색",
+            description = "Pagination 적용. Ordering 최신순. Filtering 전체, 특정해시태그")
     @GetMapping("/recommend")
     public ResponseEntity<SuccessDataResponse<PaginationResDto<QuestionSimpleResDto>>> getQuestionRecommendList(
             @Nullable @RequestParam String hashtag, Pageable pageable) {
@@ -394,16 +264,8 @@ public class QuestionController {
         );
     }
 
-    @Operation(
-            summary = "일간 핫 커뮤니티 게시글 검색",
-            description = """
-                    일간 핫 커뮤니티 게시글 검색\n
-                    - 10개 \n
-                    - Ordering 인기순\n
-                        - 조회수 + 좋아요 수 + 댓글 수\n
-                    - 매일 00시 00분 00초를 기준으로 업데이트
-                    """
-    )
+    @Operation(summary = "일간 핫 커뮤니티 게시글 검색",
+            description = " 10개 조회. Ordering 인기순(조회수 + 좋아요 수 + 댓글 수). 매일 00시 00분 00초를 기준으로 업데이트")
     @GetMapping("/dailyhot")
     public ResponseEntity<SuccessDataResponse<List<QuestionHomeResDto>>> getDailyHotQuestionList() {
 
@@ -414,15 +276,8 @@ public class QuestionController {
         );
     }
 
-    @Operation(
-            summary = "주간 핫 커뮤니티 게시글 검색",
-            description = """
-                    일간 핫 커뮤니티 게시글 검색\n
-                    - Pagination 적용 \n
-                    - Ordering 조회수 + 좋아요 수 + 댓글 수 \n
-                    - Filtering 현재를 기점으로 일주일간 작성된 글
-                    """
-    )
+    @Operation(summary = "주간 핫 커뮤니티 게시글 검색",
+            description = "Pagination 적용. Ordering 조회수 + 좋아요 수 + 댓글 수. Filtering 현재를 기점으로 일주일간 작성된 글")
     @GetMapping("/weeklyhot")
     public ResponseEntity<SuccessDataResponse<PaginationResDto<QuestionSimpleResDto>>> getWeeklyHotQuestionList(
             Pageable pageable) {

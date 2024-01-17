@@ -58,11 +58,29 @@ public class TempItemResDto {
     @Schema(description = "최신 update 시점")
     private LocalDateTime updatedAt;
 
-    public static TempItemResDto of(TempItem tempItem, CelebDto celeb, NewCelebPostResDto newCeleb,
-                                    Brand brand, NewBrandPostResDto newBrand, ItemCategoryDto itemCategory,
-                                    List<ItemImgResDto> imgList, List<ItemLinkResDto> linkList,
+    public static TempItemResDto of(TempItem tempItem, List<ItemImgResDto> imgList, List<ItemLinkResDto> linkList,
                                     List<Hashtag> hashtagList
     ) {
+
+        CelebDto celeb = tempItem.getCeleb() != null ?
+                CelebDto.of(tempItem.getCeleb())
+                : null;
+
+        ItemCategoryDto itemCategory = tempItem.getCategory() != null ?
+                ItemCategoryDto.of(tempItem.getCategory())
+                : null;
+
+        Brand brand = tempItem.getBrand() != null
+                ? tempItem.getBrand()
+                : null;
+
+        NewCelebPostResDto newCeleb = tempItem.getNewCeleb() != null
+                ? NewCelebPostResDto.of(tempItem.getNewCeleb())
+                : null;
+        
+        NewBrandPostResDto newBrand = tempItem.getNewBrand() != null
+                ? NewBrandPostResDto.of(tempItem.getNewBrand())
+                : null;
 
         return TempItemResDto.builder()
                 .id(tempItem.getId())

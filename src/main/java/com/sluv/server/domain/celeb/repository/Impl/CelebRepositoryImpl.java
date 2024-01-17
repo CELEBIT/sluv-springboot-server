@@ -9,6 +9,10 @@ import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sluv.server.domain.celeb.entity.Celeb;
 import com.sluv.server.domain.celeb.entity.CelebCategory;
+import com.sluv.server.domain.celeb.entity.InterestedCeleb;
+import com.sluv.server.domain.celeb.entity.QCeleb;
+import com.sluv.server.domain.celeb.entity.QCelebCategory;
+import com.sluv.server.domain.celeb.entity.RecentSelectCeleb;
 import com.sluv.server.domain.user.entity.User;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,12 +31,21 @@ public class CelebRepositoryImpl implements CelebRepositoryCustom {
     @Override
     public List<Celeb> findInterestedCeleb(User _user) {
         log.info("유저 {}의 관심셀럽 조회", _user.getId());
-        return jpaQueryFactory.selectFrom(celeb)
-                .leftJoin(celebCategory).on(celeb.celebCategory.eq(celebCategory)).fetchJoin()
-                .leftJoin(interestedCeleb).on(interestedCeleb.celeb.eq(celeb)).fetchJoin()
+        QCeleb child = new QCeleb("childCeleb");
+        QCelebCategory parentCelebCategory = new QCelebCategory("parentCelebCategory");
+        
+        List<InterestedCeleb> fetch = jpaQueryFactory.selectFrom(interestedCeleb)
+                .leftJoin(interestedCeleb.celeb, celeb).fetchJoin()
+                .leftJoin(celeb.subCelebList, child).fetchJoin()
+                .leftJoin(celeb.celebCategory, celebCategory).fetchJoin()
+                .leftJoin(celebCategory.parent, parentCelebCategory).fetchJoin()
                 .where(interestedCeleb.user.eq(_user))
                 .orderBy(interestedCeleb.createdAt.desc())
                 .fetch();
+
+        return fetch.stream()
+                .map(InterestedCeleb::getCeleb)
+                .toList();
     }
 
     @Override
@@ -145,13 +158,20 @@ public class CelebRepositoryImpl implements CelebRepositoryCustom {
 
     @Override
     public List<Celeb> findTop10Celeb() {
+        QCeleb parent = new QCeleb("parent");
+        QCelebCategory parentCelebCategory = new QCelebCategory("parentCelebCategory");
 
-        return jpaQueryFactory.select(celeb)
-                .from(recentSelectCeleb)
+        List<RecentSelectCeleb> fetch = jpaQueryFactory.selectFrom(recentSelectCeleb)
+                .leftJoin(recentSelectCeleb.celeb, celeb).fetchJoin()
+                .leftJoin(celeb.parent, parent).fetchJoin()
+                .leftJoin(celeb.celebCategory, celebCategory).fetchJoin()
+                .leftJoin(parent.celebCategory, parentCelebCategory).fetchJoin()
                 .groupBy(recentSelectCeleb.celeb)
                 .orderBy(recentSelectCeleb.celeb.count().desc())
                 .limit(10)
                 .fetch();
+
+        return fetch.stream().map(RecentSelectCeleb::getCeleb).toList();
     }
 
     @Override

@@ -4,6 +4,7 @@ import com.sluv.server.domain.celeb.dto.NewCelebPostReqDto;
 import com.sluv.server.domain.celeb.dto.NewCelebPostResDto;
 import com.sluv.server.domain.celeb.service.NewCelebService;
 import com.sluv.server.global.common.response.SuccessDataResponse;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,6 +19,7 @@ public class NewCelebController {
     private final NewCelebService newCelebService;
 
 
+    @Operation(summary = "NewCeleb 등록", description = "사용자가 새로운 NewCeleb 등록")
     @PostMapping("")
     public ResponseEntity<SuccessDataResponse<NewCelebPostResDto>> postNewCeleb(@RequestBody NewCelebPostReqDto dto) {
         return ResponseEntity.ok().body(

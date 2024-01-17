@@ -1,15 +1,13 @@
 package com.sluv.server.domain.user.service;
 
-import com.sluv.server.domain.closet.entity.Closet;
 import com.sluv.server.domain.closet.repository.ClosetRepository;
 import com.sluv.server.domain.comment.repository.CommentRepository;
 import com.sluv.server.domain.item.dto.ItemSimpleResDto;
 import com.sluv.server.domain.item.entity.Item;
 import com.sluv.server.domain.item.entity.ItemImg;
-import com.sluv.server.domain.item.entity.RecentItem;
 import com.sluv.server.domain.item.repository.ItemImgRepository;
+import com.sluv.server.domain.item.repository.ItemRepository;
 import com.sluv.server.domain.item.repository.ItemScrapRepository;
-import com.sluv.server.domain.item.repository.RecentItemRepository;
 import com.sluv.server.domain.question.dto.QuestionImgSimpleResDto;
 import com.sluv.server.domain.question.dto.QuestionSimpleResDto;
 import com.sluv.server.domain.question.entity.Question;
@@ -23,7 +21,6 @@ import com.sluv.server.domain.question.repository.QuestionImgRepository;
 import com.sluv.server.domain.question.repository.QuestionItemRepository;
 import com.sluv.server.domain.question.repository.QuestionLikeRepository;
 import com.sluv.server.domain.question.repository.QuestionRecommendCategoryRepository;
-import com.sluv.server.domain.question.repository.QuestionRepository;
 import com.sluv.server.domain.question.repository.RecentQuestionRepository;
 import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.global.common.response.PaginationCountResDto;
@@ -40,11 +37,11 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class UserRecentService {
 
-    private final RecentItemRepository recentItemRepository;
+    //    private final RecentItemRepository recentItemRepository;
+    private final ItemRepository itemRepository;
     private final ClosetRepository closetRepository;
     private final ItemImgRepository itemImgRepository;
     private final ItemScrapRepository itemScrapRepository;
-    private final QuestionRepository questionRepository;
     private final QuestionImgRepository questionImgRepository;
     private final QuestionItemRepository questionItemRepository;
     private final QuestionLikeRepository questionLikeRepository;
@@ -56,20 +53,12 @@ public class UserRecentService {
     @Transactional(readOnly = true)
     public PaginationCountResDto<ItemSimpleResDto> getUserRecentItem(User user, Pageable pageable) {
 
-        Page<RecentItem> recentItemPage = recentItemRepository.getUserAllRecentItem(user, pageable);
+        Page<Item> recentItemPage = itemRepository.getUserAllRecentItem(user, pageable);
 
-        List<Closet> closetList = closetRepository.findAllByUserId(user.getId());
-
-        List<ItemSimpleResDto> content = recentItemPage.stream()
-                .map(recentItem -> getItemSimpleResDto(recentItem.getItem(), closetList)).toList();
+        List<ItemSimpleResDto> content = itemRepository.getItemSimpleResDto(user, recentItemPage.getContent());
 
         return new PaginationCountResDto<>(recentItemPage.hasNext(), recentItemPage.getNumber(), content,
                 recentItemPage.getTotalElements());
-    }
-
-    private ItemSimpleResDto getItemSimpleResDto(Item item, List<Closet> closetList) {
-        return ItemSimpleResDto.of(item, itemImgRepository.findMainImg(item.getId()),
-                itemScrapRepository.getItemScrapStatus(item, closetList));
     }
 
     @Transactional(readOnly = true)

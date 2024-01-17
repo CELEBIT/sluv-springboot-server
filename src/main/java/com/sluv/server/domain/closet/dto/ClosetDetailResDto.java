@@ -28,12 +28,13 @@ public class ClosetDetailResDto<T> extends PaginationResDto<T> {
     private Long itemNum;
 
     public static <T> ClosetDetailResDto<T> of(Page<T> page, Closet closet) {
+        String coverImg = closet.getCoverImgUrl() == null ? null : closet.getCoverImgUrl();
         return ClosetDetailResDto.<T>builder()
                 .hasNext(page.hasNext())
                 .page(page.getNumber())
                 .content(page.getContent())
                 .id(closet.getId())
-                .coverImgUrl(closet.getCoverImgUrl())
+                .coverImgUrl(coverImg)
                 .name(closet.getName())
                 .closetStatus(closet.getClosetStatus())
                 .colorScheme(closet.getColor())

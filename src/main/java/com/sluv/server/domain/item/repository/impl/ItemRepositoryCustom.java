@@ -66,4 +66,6 @@ public interface ItemRepositoryCustom {
     List<Item> getHowAboutItem(User user, List<Celeb> interestedCeleb);
 
     List<ItemSimpleResDto> getItemSimpleResDto(User user, List<Item> items);
+
+    Page<Item> getUserAllRecentItem(User user, Pageable pageable);
 }

@@ -42,8 +42,7 @@ public class UserCelebService {
         changeCategoryOrder(categoryList);
 
         return categoryList.stream()
-                // 카테고리별 InterestedCelebCategoryResDto 생성
-                .map(category -> {
+                .map(category -> { // 카테고리별 InterestedCelebCategoryResDto 생성
                     List<Celeb> categoryFilterCeleb = getCategoryFilterCeleb(interestedCelebList, category);
                     return InterestedCelebCategoryResDto.of(category,
                             convertInterestedCelebParentResDto(categoryFilterCeleb));
@@ -51,22 +50,27 @@ public class UserCelebService {
     }
 
     /**
-     * 관심셀럽 목록에서 category와 일치하는 Celeb을 분류
+     * 특정 유저가 선택한 관심 Celeb을 조회 CelebCategory를 기준으로 그룹핑 유저가 등록한 순서대로 조회
      */
     @Transactional(readOnly = true)
-    public List<Celeb> getCategoryFilterCeleb(List<Celeb> celebList, CelebCategory category) {
-        return celebList.stream().filter(celeb ->
-                // interestedCeleb의 상위 카테고리 id와 카테고리별 묶을 카테고리의 아이디가 일치하는 것만 filtering
-                Objects.equals(
-                        celeb.getCelebCategory().getParent() != null ? celeb.getCelebCategory().getParent().getId()
-                                : celeb.getCelebCategory().getId(), category.getId())).toList();
+    public List<InterestedCelebParentResDto> getTargetUserInterestedCelebByPostTime(Long userId) {
+        User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+
+        return celebRepository.findInterestedCeleb(user)
+                .stream()
+                .map(InterestedCelebParentResDto::of)
+                .toList();
     }
 
     /**
-     * 관심셀럽 목록에서 category와 일치하는 Celeb을 분류
+     * User가 선택한 관심 셀럽을 검색 관심 셀럽 선택순서를 기준으로 조회
      */
-    private List<InterestedCelebParentResDto> convertInterestedCelebParentResDto(List<Celeb> celebList) {
-        return celebList.stream().map(InterestedCelebParentResDto::of).toList();
+    @Transactional(readOnly = true)
+    public List<InterestedCelebParentResDto> getInterestedCelebByPostTime(User user) {
+        return celebRepository.findInterestedCeleb(user)
+                .stream()
+                .map(InterestedCelebParentResDto::of)
+                .toList();
     }
 
     @Transactional
@@ -116,19 +120,20 @@ public class UserCelebService {
     }
 
     /**
-     * 특정 유저가 선택한 관심 Celeb을 조회 CelebCategory를 기준으로 그룹핑 유저가 등록한 순서대로 조회
+     * 관심셀럽 목록에서 category와 일치하는 Celeb을 분류
      */
-    @Transactional(readOnly = true)
-    public List<InterestedCelebParentResDto> getTargetUserInterestedCelebByPostTime(Long userId) {
-        User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
-        return celebRepository.findInterestedCeleb(user).stream().map(InterestedCelebParentResDto::of).toList();
+    private List<Celeb> getCategoryFilterCeleb(List<Celeb> celebList, CelebCategory category) {
+        return celebList.stream().filter(celeb ->
+                // interestedCeleb의 상위 카테고리 id와 카테고리별 묶을 카테고리의 아이디가 일치하는 것만 filtering
+                Objects.equals(
+                        celeb.getCelebCategory().getParent() != null ? celeb.getCelebCategory().getParent().getId()
+                                : celeb.getCelebCategory().getId(), category.getId())).toList();
     }
 
     /**
-     * User가 선택한 관심 셀럽을 검색 관심 셀럽 선택순서를 기준으로 조회
+     * 관심셀럽 목록에서 category와 일치하는 Celeb을 분류
      */
-    @Transactional(readOnly = true)
-    public List<InterestedCelebParentResDto> getInterestedCelebByPostTime(User user) {
-        return celebRepository.findInterestedCeleb(user).stream().map(InterestedCelebParentResDto::of).toList();
+    private List<InterestedCelebParentResDto> convertInterestedCelebParentResDto(List<Celeb> celebList) {
+        return celebList.stream().map(InterestedCelebParentResDto::of).toList();
     }
 }

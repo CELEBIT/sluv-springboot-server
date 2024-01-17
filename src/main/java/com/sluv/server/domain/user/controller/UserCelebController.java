@@ -38,16 +38,6 @@ public class UserCelebController {
                 .build());
     }
 
-    @Operation(summary = "*유저의 관심 셀럽 업데이트", description = "User 토큰 필요")
-    @PostMapping("/celeb")
-    public ResponseEntity<SuccessResponse> postInterestedCeleb(@AuthenticationPrincipal User user,
-                                                               @RequestBody InterestedCelebPostReqDto dto) {
-        userCelebService.postInterestedCeleb(user, dto);
-        return ResponseEntity.ok().body(
-                new SuccessResponse()
-        );
-    }
-
     @Operation(summary = "*현재 유저의 관심 샐럽을 등록순을 기준으로 조회",
             description = "현재 유저를 기준으로 InterstedCeleb 테이블에서 일치하는 Celeb을 등록순을 기준으로 검색")
     @GetMapping("/celeb")
@@ -81,4 +71,13 @@ public class UserCelebController {
                 .build());
     }
 
+    @Operation(summary = "*유저의 관심 셀럽 업데이트", description = "User 토큰 필요")
+    @PostMapping("/celeb")
+    public ResponseEntity<SuccessResponse> postInterestedCeleb(@AuthenticationPrincipal User user,
+                                                               @RequestBody InterestedCelebPostReqDto dto) {
+        userCelebService.postInterestedCeleb(user, dto);
+        return ResponseEntity.ok().body(
+                new SuccessResponse()
+        );
+    }
 }

@@ -93,6 +93,10 @@ public class ItemService {
     @Transactional
     public ItemPostResDto postItem(User user, ItemPostReqDto reqDto) {
 
+        if (reqDto.getId() != null) {
+            cacheService.deleteItemDetailFixDataByItemId(reqDto.getId());
+        }
+
         // 추가될 Celeb 확인
         Celeb celeb = null;
         if (reqDto.getCelebId() != null) {
@@ -198,7 +202,7 @@ public class ItemService {
         Item item = itemRepository.findById(itemId)
                 .orElseThrow(ItemNotFoundException::new);
 
-        // 2. Item Detail 고정 데이터 조회
+        // 2. Item Detail 고정 데이터 조회 -> Cache Aside
         ItemDetailFixData fixData = cacheService.findItemDetailFixDataByItemId(itemId);
         if (fixData == null) {
             fixData = getItemDetailFixData(item);
@@ -323,6 +327,7 @@ public class ItemService {
 
         item.changeStatus(ItemStatus.DELETED);
         itemRepository.save(item);
+        cacheService.deleteItemDetailFixDataByItemId(itemId);
     }
 
     @Transactional(readOnly = true)

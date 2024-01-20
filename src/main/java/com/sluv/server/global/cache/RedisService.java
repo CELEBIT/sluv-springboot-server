@@ -35,6 +35,7 @@ public class RedisService implements CacheService {
         redisStringLongTemplate.delete(VISITANT_KEY);
     }
 
+    @Async(value = "redisThreadPoolExecutor")
     @Override
     public void saveItemDetailFixData(Long itemId, ItemDetailFixData itemDetailFixData) {
         ValueOperations<String, ItemDetailFixData> itemDetailFixDataCache = redisStringItemDetailFixDataTemplate.opsForValue();
@@ -45,5 +46,12 @@ public class RedisService implements CacheService {
     public ItemDetailFixData findItemDetailFixDataByItemId(Long itemId) {
         ValueOperations<String, ItemDetailFixData> itemDetailFixDataCache = redisStringItemDetailFixDataTemplate.opsForValue();
         return itemDetailFixDataCache.get("item:" + itemId);
+    }
+
+    @Async(value = "redisThreadPoolExecutor")
+    @Override
+    public void deleteItemDetailFixDataByItemId(Long itemId) {
+        ValueOperations<String, ItemDetailFixData> itemDetailFixDataCache = redisStringItemDetailFixDataTemplate.opsForValue();
+        itemDetailFixDataCache.getAndDelete("item:" + itemId);
     }
 }

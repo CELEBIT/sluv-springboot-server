@@ -19,10 +19,9 @@ import com.sluv.server.domain.search.entity.SearchData;
 import com.sluv.server.domain.search.entity.SearchRank;
 import com.sluv.server.domain.search.repository.SearchDataRepository;
 import com.sluv.server.domain.search.repository.SearchRankRepository;
-import com.sluv.server.domain.visit.entity.DailyVisit;
 import com.sluv.server.domain.visit.entity.VisitHistory;
-import com.sluv.server.domain.visit.repository.DailyVisitRepository;
 import com.sluv.server.domain.visit.repository.VisitHistoryRepository;
+import com.sluv.server.global.cache.CacheService;
 import java.time.LocalDateTime;
 import java.util.Calendar;
 import java.util.List;
@@ -46,8 +45,8 @@ public class Scheduler {
     private final DailyHotQuestionRepository dailyHotQuestionRepository;
     private final ItemRepository itemRepository;
     private final QuestionRepository questionRepository;
-    private final DailyVisitRepository dailyVisitRepository;
     private final VisitHistoryRepository visitHistoryRepository;
+    private final CacheService cacheService;
 
     /**
      * SearchRank 업데이트
@@ -187,29 +186,16 @@ public class Scheduler {
      * 일일 접속 횟수 저장.
      */
     @Scheduled(cron = "0 0 0 * * *") // 초 분 시 일 월 요일
-    public void updateVisitHistory() {
+    public void updateDailyVisitantCount() {
         LocalDateTime now = LocalDateTime.now();
-        log.info("VisitHistory Update Time: {}", LocalDateTime.now());
-
-        log.info("Get RecentDailyVisit. Time: {}", LocalDateTime.now());
-        List<DailyVisit> recentDailyVisit = dailyVisitRepository.getRecentDailyVisit(now);
+        log.info("VisitantCount Update Time: {}", LocalDateTime.now());
+        Long visitantCount = cacheService.getCount();
 
         log.info("Save RecentDailyVisit. Time: {}", LocalDateTime.now());
 
-        visitHistoryRepository.save(
-                VisitHistory.of(now.minusDays(1), recentDailyVisit.stream().count())
-        );
-    }
+        visitHistoryRepository.save(VisitHistory.of(now.minusDays(1), visitantCount));
 
-    /**
-     * DailyVisit에서 2일이 지난 기록을 삭제.
-     */
-    @Scheduled(cron = "0 0 0 * * *") // 초 분 시 일 월 요일
-    public void deleteDailyVisitTwoDaysAgo() {
-        LocalDateTime now = LocalDateTime.now();
-        log.info("Two Days Ago DailyVisit Delete. Time: {}", LocalDateTime.now());
-
-        dailyVisitRepository.deleteTwoDaysAgo(now);
+        cacheService.clear();
     }
 
 }

@@ -11,6 +11,11 @@ spring:
   jpa:
     hibernate:
       ddl-auto: create
+  data:
+    redis:
+      port: 6379
+      host: ENC(ajTgI0+nMC6cfK2bGTtX90cGtuWO4/JY)
+      password: ENC(MfBuf4wr2l1e1d0eOZTNXHFmPk9RI52b)
 
   security:
     user:

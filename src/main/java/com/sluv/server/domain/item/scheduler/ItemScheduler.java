@@ -1,4 +1,4 @@
-package com.sluv.server.domain.visit.scheduler;
+package com.sluv.server.domain.item.scheduler;
 
 import com.sluv.server.domain.item.entity.DayHotItem;
 import com.sluv.server.domain.item.entity.EfficientItem;

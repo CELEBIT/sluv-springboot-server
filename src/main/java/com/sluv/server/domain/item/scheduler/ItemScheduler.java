@@ -1,6 +1,5 @@
-package com.sluv.server.global.scheduler;
+package com.sluv.server.domain.item.scheduler;
 
-import com.querydsl.core.Tuple;
 import com.sluv.server.domain.item.entity.DayHotItem;
 import com.sluv.server.domain.item.entity.EfficientItem;
 import com.sluv.server.domain.item.entity.Item;
@@ -11,18 +10,6 @@ import com.sluv.server.domain.item.repository.EfficientItemRepository;
 import com.sluv.server.domain.item.repository.ItemRepository;
 import com.sluv.server.domain.item.repository.LuxuryItemRepository;
 import com.sluv.server.domain.item.repository.WeekHotItemRepository;
-import com.sluv.server.domain.question.entity.DailyHotQuestion;
-import com.sluv.server.domain.question.entity.Question;
-import com.sluv.server.domain.question.repository.DailyHotQuestionRepository;
-import com.sluv.server.domain.question.repository.QuestionRepository;
-import com.sluv.server.domain.search.entity.SearchData;
-import com.sluv.server.domain.search.entity.SearchRank;
-import com.sluv.server.domain.search.repository.SearchDataRepository;
-import com.sluv.server.domain.search.repository.SearchRankRepository;
-import com.sluv.server.domain.visit.entity.VisitHistory;
-import com.sluv.server.domain.visit.repository.VisitHistoryRepository;
-import com.sluv.server.global.cache.CacheService;
-import java.time.LocalDateTime;
 import java.util.Calendar;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -35,42 +22,13 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 @Transactional
 @RequiredArgsConstructor
-public class Scheduler {
-    private final SearchDataRepository searchDataRepository;
-    private final SearchRankRepository searchRankRepository;
+public class ItemScheduler {
+
     private final LuxuryItemRepository luxuryItemRepository;
     private final EfficientItemRepository efficientItemRepository;
     private final WeekHotItemRepository weekHotItemRepository;
     private final DayHotItemRepository dayHotItemRepository;
-    private final DailyHotQuestionRepository dailyHotQuestionRepository;
     private final ItemRepository itemRepository;
-    private final QuestionRepository questionRepository;
-    private final VisitHistoryRepository visitHistoryRepository;
-    private final CacheService cacheService;
-
-    /**
-     * SearchRank 업데이트
-     */
-    @Scheduled(cron = "0 0 0 * * *") // 초 분 시 일 월 요일
-    public void updateSearchRank() {
-        log.info("SearchRank Update Time: {}", Calendar.getInstance().getTime());
-
-        log.info("Delete Old SearchRank Data");
-        searchRankRepository.deleteAll();
-
-        log.info("Get SearchData. Time: {}", Calendar.getInstance().getTime());
-        List<Tuple> topData = searchDataRepository.getTopData();
-
-        List<SearchRank> result = topData.stream().map(data ->
-                SearchRank.of(
-                        data.get(1, Long.class),
-                        data.get(0, SearchData.class).getSearchWord()
-                )
-        ).toList();
-
-        log.info("Save SearchRank. Time: {}", Calendar.getInstance().getTime());
-        searchRankRepository.saveAll(result);
-    }
 
     /**
      * 럭셔리 아이템 업데이트
@@ -159,43 +117,4 @@ public class Scheduler {
                 )
         );
     }
-
-    /**
-     * 일간 HOT Question
-     */
-    @Scheduled(cron = "0 0 0 * * *") // 초 분 시 일 월 요일
-    public void updateDailyHotQuestion() {
-        log.info("DailyHotQuestion Update Time: {}", Calendar.getInstance().getTime());
-
-        log.info("Delete Old DailyHotQuestion Data");
-        dailyHotQuestionRepository.deleteAll();
-
-        log.info("Get DailyHotQuestion. Time: {}", Calendar.getInstance().getTime());
-        List<Question> newDailyHotQuestion = questionRepository.updateDailyHotQuestion();
-
-        log.info("Save DailyHotQuestion. Time: {}", Calendar.getInstance().getTime());
-
-        newDailyHotQuestion.forEach(question ->
-                dailyHotQuestionRepository.save(
-                        DailyHotQuestion.toEntity(question)
-                )
-        );
-    }
-
-    /**
-     * 일일 접속 횟수 저장.
-     */
-    @Scheduled(cron = "0 0 0 * * *") // 초 분 시 일 월 요일
-    public void updateDailyVisitantCount() {
-        LocalDateTime now = LocalDateTime.now();
-        log.info("VisitantCount Update Time: {}", LocalDateTime.now());
-        Long visitantCount = cacheService.getCount();
-
-        log.info("Save RecentDailyVisit. Time: {}", LocalDateTime.now());
-
-        visitHistoryRepository.save(VisitHistory.of(now.minusDays(1), visitantCount));
-
-        cacheService.clear();
-    }
-
 }

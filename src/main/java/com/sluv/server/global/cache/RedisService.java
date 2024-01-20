@@ -4,6 +4,7 @@ package com.sluv.server.global.cache;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.SetOperations;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -13,6 +14,7 @@ public class RedisService implements CacheService {
     private final RedisTemplate<String, Long> redisTemplate;
     private final String VISITANT_KEY = "visitant";
 
+    @Async(value = "redisThreadPoolExecutor")
     @Override
     public void insert(Long memberId) {
         SetOperations<String, Long> visitantLog = redisTemplate.opsForSet();

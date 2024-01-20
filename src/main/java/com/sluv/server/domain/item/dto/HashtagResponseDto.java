@@ -2,6 +2,7 @@ package com.sluv.server.domain.item.dto;
 
 import com.sluv.server.domain.item.entity.hashtag.Hashtag;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.io.Serializable;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,7 +14,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class HashtagResponseDto {
+public class HashtagResponseDto implements Serializable {
     @Schema(description = "해쉬태그 id")
     private Long hashtagId;
     @Schema(description = "해쉬태그 내용")

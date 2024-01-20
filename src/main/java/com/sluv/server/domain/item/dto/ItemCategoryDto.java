@@ -2,6 +2,7 @@ package com.sluv.server.domain.item.dto;
 
 import com.sluv.server.domain.item.entity.ItemCategory;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.io.Serializable;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -9,7 +10,7 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 @Builder
-public class ItemCategoryDto {
+public class ItemCategoryDto implements Serializable {
     @Schema(description = "아이템 카테고리 Id")
     private Long id;
     @Schema(description = "아이템 상위 카테고리 Id")

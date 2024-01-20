@@ -96,7 +96,7 @@ public class UserService {
             targetUser = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
         }
 
-        Boolean followStatus = followRepository.getFollowStatus(user, targetUser);
+        Boolean followStatus = followRepository.getFollowStatus(user, targetUser.getId());
         Long followerCount = followRepository.getFollowerCount(targetUser);
         Long followingCount = followRepository.getFollowingCount(targetUser);
 
@@ -193,7 +193,8 @@ public class UserService {
         List<User> userList = userRepository.getHotSluver(user, celebId);
 
         return userList.stream()
-                .map(_user -> UserSearchInfoDto.of(_user, followRepository.getFollowStatus(user, _user))).toList();
+                .map(_user -> UserSearchInfoDto.of(_user, followRepository.getFollowStatus(user, _user.getId())))
+                .toList();
 
 
     }

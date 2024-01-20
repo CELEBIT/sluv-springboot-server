@@ -3,6 +3,7 @@ package com.sluv.server.domain.celeb.dto;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.sluv.server.domain.celeb.entity.Celeb;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.io.Serializable;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,7 +14,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 @JsonPropertyOrder({"id", "CelebNameKr", "CelebNameEn"})
-public class CelebSearchResDto {
+public class CelebSearchResDto implements Serializable {
     @Schema(description = "Celeb id")
     private Long id;
     @Schema(description = "Parent Celeb id")

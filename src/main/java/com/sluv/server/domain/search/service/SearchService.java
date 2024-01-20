@@ -243,7 +243,7 @@ public class SearchService {
         List<UserSearchInfoDto> content = searchUserPage.stream().map(searchUser ->
                 UserSearchInfoDto.of(
                         searchUser,
-                        followRepository.getFollowStatus(user, searchUser)
+                        followRepository.getFollowStatus(user, searchUser.getId())
                 )
         ).toList();
 

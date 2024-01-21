@@ -48,7 +48,7 @@ public class AuthController {
             case GOOGLE -> loginUser = googleUserService.googleLogin(request);
             case APPLE -> loginUser = appleUserService.appleLogin(request);
         }
-        cacheService.insert(loginUser.getId());
+        cacheService.visitMember(loginUser.getId());
         AuthResponseDto authResponseDto = authService.jwtTestService(loginUser);
 
         return ResponseEntity.ok().body(SuccessDataResponse.<AuthResponseDto>builder()
@@ -63,7 +63,7 @@ public class AuthController {
     @GetMapping("/auto-login")
     public ResponseEntity<SuccessResponse> autoLogin(@AuthenticationPrincipal User user) {
         userService.checkUserStatue(user);
-        cacheService.insert(user.getId());
+        cacheService.visitMember(user.getId());
         return ResponseEntity.ok().body(new SuccessResponse());
     }
 

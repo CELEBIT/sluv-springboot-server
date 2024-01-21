@@ -1,12 +1,19 @@
 package com.sluv.server.global.cache;
 
+import com.sluv.server.domain.item.dto.ItemDetailFixData;
 import org.springframework.stereotype.Service;
 
 @Service
 public interface CacheService {
-    void insert(Long memberId);
+    void visitMember(Long memberId);
 
-    Long getCount();
+    Long getVisitantCount();
 
-    void clear();
+    void clearVisitantCount();
+
+    void saveItemDetailFixData(Long itemId, ItemDetailFixData itemDetailFixData);
+
+    ItemDetailFixData findItemDetailFixDataByItemId(Long itemId);
+
+    void deleteItemDetailFixDataByItemId(Long itemId);
 }

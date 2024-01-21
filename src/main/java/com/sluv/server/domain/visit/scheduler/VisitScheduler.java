@@ -25,13 +25,13 @@ public class VisitScheduler {
     public void updateDailyVisitantCount() {
         LocalDateTime now = LocalDateTime.now();
         log.info("Daily Visitant Count Update Time: {}", LocalDateTime.now());
-        Long visitantCount = cacheService.getCount();
+        Long visitantCount = cacheService.getVisitantCount();
 
         log.info("Save RecentDailyVisit. Time: {}", LocalDateTime.now());
 
         visitHistoryRepository.save(VisitHistory.of(now.minusDays(1), visitantCount));
 
-        cacheService.clear();
+        cacheService.clearVisitantCount();
     }
 
 }

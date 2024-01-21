@@ -13,6 +13,7 @@ import com.sluv.server.domain.item.helper.ItemHelper;
 import com.sluv.server.domain.item.repository.ItemImgRepository;
 import com.sluv.server.domain.item.repository.ItemRepository;
 import com.sluv.server.domain.item.repository.ItemScrapRepository;
+import com.sluv.server.domain.item.service.ItemCacheService;
 import com.sluv.server.domain.question.dto.QuestionSimpleResDto;
 import com.sluv.server.domain.question.entity.Question;
 import com.sluv.server.domain.question.mapper.QuestionDtoMapper;
@@ -53,11 +54,12 @@ public class UserService {
     private final ClosetRepository closetRepository;
     private final ItemHelper itemHelper;
     private final QuestionDtoMapper questionDtoMapper;
+    private final ItemCacheService itemCacheService;
 
     @Transactional
     public void postUserProfile(User user, UserProfileReqDto dto) {
         User currentUser = userRepository.findById(user.getId()).orElseThrow(UserNotFoundException::new);
-
+        itemCacheService.deleteAllItemCacheByUserId(user.getId());
         // 닉네임 중복 검사
         Boolean nicknameExistsStatus = userRepository.existsByNickname(dto.getNickName());
         if (nicknameExistsStatus) {
@@ -96,7 +98,7 @@ public class UserService {
             targetUser = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
         }
 
-        Boolean followStatus = followRepository.getFollowStatus(user, targetUser);
+        Boolean followStatus = followRepository.getFollowStatus(user, targetUser.getId());
         Long followerCount = followRepository.getFollowerCount(targetUser);
         Long followingCount = followRepository.getFollowingCount(targetUser);
 
@@ -193,7 +195,8 @@ public class UserService {
         List<User> userList = userRepository.getHotSluver(user, celebId);
 
         return userList.stream()
-                .map(_user -> UserSearchInfoDto.of(_user, followRepository.getFollowStatus(user, _user))).toList();
+                .map(_user -> UserSearchInfoDto.of(_user, followRepository.getFollowStatus(user, _user.getId())))
+                .toList();
 
 
     }

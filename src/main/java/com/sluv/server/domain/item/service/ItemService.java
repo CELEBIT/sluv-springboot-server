@@ -19,6 +19,7 @@ import com.sluv.server.domain.closet.repository.ClosetRepository;
 import com.sluv.server.domain.item.dto.HashtagResponseDto;
 import com.sluv.server.domain.item.dto.HotPlaceResDto;
 import com.sluv.server.domain.item.dto.ItemCategoryDto;
+import com.sluv.server.domain.item.dto.ItemDetailFixData;
 import com.sluv.server.domain.item.dto.ItemDetailResDto;
 import com.sluv.server.domain.item.dto.ItemImgResDto;
 import com.sluv.server.domain.item.dto.ItemLinkResDto;
@@ -52,6 +53,7 @@ import com.sluv.server.domain.user.exception.UserNotFoundException;
 import com.sluv.server.domain.user.repository.FollowRepository;
 import com.sluv.server.domain.user.repository.UserRepository;
 import com.sluv.server.global.ai.AiModelService;
+import com.sluv.server.global.cache.CacheService;
 import com.sluv.server.global.common.enums.ItemImgOrLinkStatus;
 import com.sluv.server.global.common.response.PaginationResDto;
 import java.util.List;
@@ -86,9 +88,14 @@ public class ItemService {
     private final ItemScrapRepository itemScrapRepository;
 
     private final AiModelService aiModelService;
+    private final CacheService cacheService;
 
     @Transactional
     public ItemPostResDto postItem(User user, ItemPostReqDto reqDto) {
+
+        if (reqDto.getId() != null) {
+            cacheService.deleteItemDetailFixDataByItemId(reqDto.getId());
+        }
 
         // 추가될 Celeb 확인
         Celeb celeb = null;
@@ -191,20 +198,70 @@ public class ItemService {
 
     @Transactional
     public ItemDetailResDto getItemDetail(User user, Long itemId) {
-
         // 1. Item 조회
         Item item = itemRepository.findById(itemId)
                 .orElseThrow(ItemNotFoundException::new);
 
+        // 2. Item Detail 고정 데이터 조회 -> Cache Aside
+        ItemDetailFixData fixData = cacheService.findItemDetailFixDataByItemId(itemId);
+        if (fixData == null) {
+            fixData = getItemDetailFixData(item);
+            cacheService.saveItemDetailFixData(itemId, fixData);
+        }
+
+        // 3. 최근 본 아이템 등록
+        recentItemRepository.save(RecentItem.of(item, user));
+
+        // 4. 좋아요 수
+        Integer likeNum = itemLikeRepository.countByItemId(item.getId());
+
+        // 5. 스크랩 수
+        Integer scrapNum = itemScrapRepository.countByItemId(item.getId());
+
+        // 6. 조회수 TODO : Redis를 사용한 IP:PostId 저장으로 조회수 중복방지 기능
         item.increaseViewNum();
-        recentItemRepository.save(RecentItem.of(item, user)); /** 1. 최근 본 아이템 등록*/
+        Long viewNum = item.getViewNum();
 
-        // 2. Item 이미지들 조회
-        List<ItemImgResDto> imgList = itemImgRepository.findAllByItemId(itemId)
-                .stream()
-                .map(ItemImgResDto::of).toList();
+        // 7. 좋아요 여부
+        boolean likeStatus = itemLikeRepository.existsByUserIdAndItemId(user.getId(), itemId);
 
-        // 3. Item Celeb
+        // 8. 팔로우 여부
+        boolean followStatus = followRepository.getFollowStatus(user, fixData.getWriter().getId());
+
+        // 9. 스크랩 여부
+        List<Closet> closetList = closetRepository.findAllByUserId(user.getId());
+        boolean scrapStatus = itemScrapRepository.getItemScrapStatus(item, closetList);
+
+        // Dto 조립
+        return ItemDetailResDto.of(
+                item,
+                fixData.getCeleb(),
+                fixData.getNewCelebName(),
+                fixData.getBrand(),
+                fixData.getNewBrandName(),
+                fixData.getCategory(),
+                likeNum,
+                likeStatus,
+                scrapNum,
+                scrapStatus,
+                viewNum,
+                fixData.getWriter(),
+                followStatus,
+                item.getUser().getId().equals(user.getId()),
+                fixData.getImgList(),
+                fixData.getLinkList(),
+                fixData.getHashTagList()
+        );
+    }
+
+    //    @Cacheable(cacheNames = "item", key = "#itemId")
+    public ItemDetailFixData getItemDetailFixData(Item item) {
+        Long itemId = item.getId();
+
+        // 1. Item Category
+        ItemCategoryDto category = ItemCategoryDto.of(item.getCategory());
+
+        // 2. Item Celeb
         CelebSearchResDto celeb = item.getCeleb() != null
                 ? CelebSearchResDto.of(item.getCeleb())
                 : null;
@@ -213,10 +270,7 @@ public class ItemService {
                 item.getNewCeleb().getCelebName()
                 : null;
 
-        // 4. Item Category
-        ItemCategoryDto category = ItemCategoryDto.of(item.getCategory());
-
-        // 4. Brand
+        // 3. Brand
         BrandSearchResDto brand = item.getBrand() != null ?
                 BrandSearchResDto.of(item.getBrand())
                 : null;
@@ -225,63 +279,30 @@ public class ItemService {
                 item.getNewBrand().getBrandName()
                 : null;
 
-        // 5. 좋아요 수
-        Integer likeNum = itemLikeRepository.countByItemId(item.getId());
-
-        // 6. 스크랩 수
-        Integer scrapNum = itemScrapRepository.countByItemId(item.getId());
-
-        // 7. 조회수 TODO : Redis를 사용한 IP:PostId 저장으로 조회수 중복방지 기능
-        Long viewNum = item.getViewNum();
-
-        // 8. Item 링크들 조회
-        List<ItemLinkResDto> linkList = itemLinkRepository.findByItemId(itemId)
-                .stream()
-                .map(ItemLinkResDto::of).toList();
-
-        // 9. 작성자 info
+        // 4. 작성자 info
         User writer = userRepository.findById(item.getUser().getId())
                 .orElseThrow(UserNotFoundException::new);
         UserInfoDto writerInfo = UserInfoDto.of(writer);
 
-        // 10. Hashtag
-        List<ItemHashtag> itemHashtagId = itemHashtagRepository.findAllByItemId(itemId);
-        List<HashtagResponseDto> hashtagList = itemHashtagId.stream()
-                .parallel()
+        // 5. Item 이미지들 조회
+        List<ItemImgResDto> imgList = itemImgRepository.findAllByItemId(itemId)
+                .stream()
+                .map(ItemImgResDto::of).toList();
+
+        // 6. Item 링크들 조회
+        List<ItemLinkResDto> linkList = itemLinkRepository.findByItemId(itemId)
+                .stream()
+                .map(ItemLinkResDto::of).toList();
+
+        // 7. Hashtag
+        List<HashtagResponseDto> itemHashtags = itemHashtagRepository.findAllByItemId(itemId)
+                .stream()
                 .map(itemHashtag ->
                         HashtagResponseDto.of(itemHashtag.getHashtag(), null)
                 ).toList();
 
-        // 14. 좋아요 여부
-        boolean likeStatus = itemLikeRepository.existsByUserIdAndItemId(user.getId(), itemId);
-
-        // 15. 팔로우 여부
-        boolean followStatus = followRepository.getFollowStatus(user, writer);
-
-        // 16. 스크랩 여부
-        List<Closet> closetList = closetRepository.findAllByUserId(user.getId());
-        boolean scrapStatus = itemScrapRepository.getItemScrapStatus(item, closetList);
-
-        // Dto 조립
-        return ItemDetailResDto.of(
-                item,
-                celeb,
-                newCeleb,
-                brand,
-                newBrand,
-                category,
-                likeNum,
-                likeStatus,
-                scrapNum,
-                scrapStatus,
-                viewNum,
-                writerInfo,
-                followStatus,
-                item.getUser().getId().equals(user.getId()),
-                imgList,
-                linkList,
-                hashtagList
-        );
+        return ItemDetailFixData.of(item, celeb, newCeleb, brand, newBrand, category, writerInfo,
+                imgList, linkList, itemHashtags);
     }
 
     @Transactional
@@ -306,6 +327,7 @@ public class ItemService {
 
         item.changeStatus(ItemStatus.DELETED);
         itemRepository.save(item);
+        cacheService.deleteItemDetailFixDataByItemId(itemId);
     }
 
     @Transactional(readOnly = true)

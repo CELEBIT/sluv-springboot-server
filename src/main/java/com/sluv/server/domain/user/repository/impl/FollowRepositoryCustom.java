@@ -5,7 +5,7 @@ import com.sluv.server.domain.user.entity.User;
 import java.util.List;
 
 public interface FollowRepositoryCustom {
-    Boolean getFollowStatus(User user, User targetUser);
+    Boolean getFollowStatus(User user, Long targetUserId);
 
     void deleteFollow(User user, User targetUser);
 

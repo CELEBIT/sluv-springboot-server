@@ -29,7 +29,7 @@ public class FollowService {
         User targetUser = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
 
         // Follow 여부 확인.
-        Boolean followStatus = followRepository.getFollowStatus(user, targetUser);
+        Boolean followStatus = followRepository.getFollowStatus(user, targetUser.getId());
 
         if (followStatus) {
             followRepository.deleteFollow(user, targetUser);

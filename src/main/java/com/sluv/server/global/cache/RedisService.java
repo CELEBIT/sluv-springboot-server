@@ -2,6 +2,7 @@ package com.sluv.server.global.cache;
 
 
 import com.sluv.server.domain.item.dto.ItemDetailFixData;
+import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.SetOperations;
@@ -39,7 +40,7 @@ public class RedisService implements CacheService {
     @Override
     public void saveItemDetailFixData(Long itemId, ItemDetailFixData itemDetailFixData) {
         ValueOperations<String, ItemDetailFixData> itemDetailFixDataCache = redisStringItemDetailFixDataTemplate.opsForValue();
-        itemDetailFixDataCache.set("item:" + itemId, itemDetailFixData);
+        itemDetailFixDataCache.set("item:" + itemId, itemDetailFixData, 1, TimeUnit.HOURS);
     }
 
     @Override

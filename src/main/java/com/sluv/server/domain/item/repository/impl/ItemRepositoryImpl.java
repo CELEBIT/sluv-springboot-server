@@ -1,8 +1,10 @@
 package com.sluv.server.domain.item.repository.impl;
 
 import static com.sluv.server.domain.brand.entity.QBrand.brand;
+import static com.sluv.server.domain.brand.entity.QNewBrand.newBrand;
 import static com.sluv.server.domain.celeb.entity.QCeleb.celeb;
 import static com.sluv.server.domain.celeb.entity.QInterestedCeleb.interestedCeleb;
+import static com.sluv.server.domain.celeb.entity.QNewCeleb.newCeleb;
 import static com.sluv.server.domain.closet.entity.QCloset.closet;
 import static com.sluv.server.domain.item.entity.QDayHotItem.dayHotItem;
 import static com.sluv.server.domain.item.entity.QEfficientItem.efficientItem;
@@ -20,6 +22,7 @@ import static com.sluv.server.domain.user.entity.QUser.user;
 
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.OrderSpecifier;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sluv.server.domain.celeb.entity.Celeb;
@@ -61,46 +64,37 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
     }
 
     @Override
-    public List<Item> findSameCelebItem(Item _item, boolean celebJudge) {
-        JPAQuery<Item> query = jpaQueryFactory.selectFrom(item);
-        if (celebJudge) {
-            query = query
-                    .where(item.celeb.eq(_item.getCeleb())
-                            .and(item.ne(_item))
-                    );
-        } else {
-            query = query
-                    .where(item.newCeleb.eq(_item.getNewCeleb())
-                            .and(item.ne(_item))
-                    );
-        }
-
-        return query
+    public List<Item> findSameCelebItem(Long itemId, Long celebId, boolean celebJudge) {
+        return jpaQueryFactory.selectFrom(item)
+                .where(getSameCelebId(celebId, celebJudge).and(item.id.ne(itemId)))
                 .limit(10)
                 .orderBy(item.createdAt.desc())
                 .fetch();
     }
 
-    @Override
-    public List<Item> findSameBrandItem(Item _item, boolean brandJudge) {
-        JPAQuery<Item> query = jpaQueryFactory.selectFrom(item);
-
-        if (brandJudge) {
-            query = query
-                    .where(item.brand.eq(_item.getBrand())
-                            .and(item.ne(_item))
-                    );
+    private BooleanExpression getSameCelebId(Long celebId, boolean celebJudge) {
+        if (celebJudge) {
+            return item.celeb.id.eq(celebId);
         } else {
-            query = query
-                    .where(item.newBrand.eq(_item.getNewBrand())
-                            .and(item.ne(_item))
-                    );
+            return item.newCeleb.id.eq(celebId);
         }
+    }
 
-        return query
+    @Override
+    public List<Item> findSameBrandItem(Long itemId, Long brandId, boolean brandJudge) {
+        return jpaQueryFactory.selectFrom(item)
+                .where(getSameBrandId(brandId, brandJudge).and(item.id.ne(itemId)))
                 .limit(10)
                 .orderBy(item.createdAt.desc())
                 .fetch();
+    }
+
+    private BooleanExpression getSameBrandId(Long brandId, boolean brandJudge) {
+        if (brandJudge) {
+            return item.brand.id.eq(brandId);
+        } else {
+            return item.newBrand.id.eq(brandId);
+        }
     }
 
     @Override
@@ -192,11 +186,11 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
     }
 
     @Override
-    public List<Item> getSameClosetItems(Item _item, List<Closet> closetList) {
+    public List<Item> getSameClosetItems(Long itemId, List<Closet> closetList) {
         return jpaQueryFactory.select(item)
                 .from(itemScrap)
                 .leftJoin(itemScrap.item, item)
-                .where(itemScrap.closet.in(closetList).and(item.ne(_item)))
+                .where(itemScrap.closet.in(closetList).and(item.id.ne(itemId)))
                 .groupBy(item)
                 .orderBy(itemScrap.createdAt.max().desc())
                 .limit(10)
@@ -817,5 +811,16 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
                 .toList();
 
         return PageableExecutionUtils.getPage(content, pageable, () -> query.fetch().size());
+    }
+
+    @Override
+    public Item getItemByIdWithCelebAndBrand(Long itemId) {
+        return jpaQueryFactory.selectFrom(item)
+                .leftJoin(item.celeb, celeb)
+                .leftJoin(item.newCeleb, newCeleb)
+                .leftJoin(item.brand, brand)
+                .leftJoin(item.newBrand, newBrand)
+                .where(item.id.eq(itemId))
+                .fetchOne();
     }
 }

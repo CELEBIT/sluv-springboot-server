@@ -9,7 +9,6 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sluv.server.domain.closet.dto.ClosetResDto;
 import com.sluv.server.domain.closet.entity.Closet;
 import com.sluv.server.domain.closet.enums.ClosetStatus;
-import com.sluv.server.domain.item.entity.Item;
 import com.sluv.server.domain.user.entity.User;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -22,12 +21,12 @@ public class ClosetRepositoryImpl implements ClosetRepositoryCustom {
     private final JPAQueryFactory jpaQueryFactory;
 
     @Override
-    public List<Closet> getRecentAddCloset(Item item) {
+    public List<Closet> getRecentAddCloset(Long itemId) {
         // 상위 20개 추출
         return jpaQueryFactory.select(closet)
                 .from(itemScrap)
                 .leftJoin(itemScrap.closet, closet)
-                .where(itemScrap.item.eq(item))
+                .where(itemScrap.item.id.eq(itemId))
                 .limit(20)
                 .orderBy(itemScrap.createdAt.desc())
                 .fetch();

@@ -13,9 +13,9 @@ import org.springframework.data.domain.Pageable;
 public interface ItemRepositoryCustom {
     List<String> findTopPlace();
 
-    List<Item> findSameCelebItem(Item item, boolean celebJudge);
+    List<Item> findSameCelebItem(Long itemId, Long celebId, boolean celebJudge);
 
-    List<Item> findSameBrandItem(Item item, boolean brandJudge);
+    List<Item> findSameBrandItem(Long itemId, Long brandId, boolean brandJudge);
 
     Page<Item> getRecentItem(User user, Pageable pageable);
 
@@ -23,7 +23,7 @@ public interface ItemRepositoryCustom {
 
     Page<ItemSimpleResDto> getClosetItems(Closet closet, Pageable pageable);
 
-    List<Item> getSameClosetItems(Item item, List<Closet> closetList);
+    List<Item> getSameClosetItems(Long itemId, List<Closet> closetList);
 
     Page<Item> getSearchItem(List<Long> itemIdList, SearchFilterReqDto dto, Pageable pageable);
 
@@ -68,4 +68,6 @@ public interface ItemRepositoryCustom {
     List<ItemSimpleResDto> getItemSimpleResDto(User user, List<Item> items);
 
     Page<Item> getUserAllRecentItem(User user, Pageable pageable);
+
+    Item getItemByIdWithCelebAndBrand(Long itemId);
 }

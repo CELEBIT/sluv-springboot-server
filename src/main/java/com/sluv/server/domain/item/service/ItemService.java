@@ -235,7 +235,6 @@ public class ItemService {
         Long viewNum = item.getViewNum();
 
         // 8. Item 링크들 조회
-
         List<ItemLinkResDto> linkList = itemLinkRepository.findByItemId(itemId)
                 .stream()
                 .map(ItemLinkResDto::of).toList();
@@ -252,25 +251,6 @@ public class ItemService {
                 .map(itemHashtag ->
                         HashtagResponseDto.of(itemHashtag.getHashtag(), null)
                 ).toList();
-
-        /* ===== */
-        // 11. 같은 셀럽 아이템 리스트
-        boolean celebJudge = item.getCeleb() != null;
-        List<ItemSimpleResDto> sameCelebItemList = itemRepository.getItemSimpleResDto(
-                user, itemRepository.findSameCelebItem(item, celebJudge)
-        );
-
-        // 12. 같은 브랜드 아이템 리스트
-        boolean brandJudge = item.getBrand() != null;
-        List<ItemSimpleResDto> sameBrandItemList = itemRepository.getItemSimpleResDto(
-                user, itemRepository.findSameBrandItem(item, brandJudge)
-        );
-
-        // 13. 다른 스러버들이 함께 보관한 아이템 리스트
-        List<ItemSimpleResDto> sameClosetItemList = itemRepository.getItemSimpleResDto(
-                user, getClosetItemList(item)
-        );
-        /* ===== */
 
         // 14. 좋아요 여부
         boolean likeStatus = itemLikeRepository.existsByUserIdAndItemId(user.getId(), itemId);
@@ -300,10 +280,7 @@ public class ItemService {
                 item.getUser().getId().equals(user.getId()),
                 imgList,
                 linkList,
-                hashtagList,
-                sameCelebItemList,
-                sameBrandItemList,
-                sameClosetItemList
+                hashtagList
         );
     }
 
@@ -346,14 +323,6 @@ public class ItemService {
         Page<Item> itemPage = itemRepository.getAllScrapItem(user, pageable);
         List<ItemSimpleResDto> itemSimpleResDtos = itemRepository.getItemSimpleResDto(user, itemPage.getContent());
         return PaginationResDto.of(itemPage, itemSimpleResDtos);
-    }
-
-    private List<Item> getClosetItemList(Item item) {
-        // 가장 최근에 해당 item을 추가한 상위 20개의 Closet을 검색
-        List<Closet> recentAddClosetList = closetRepository.getRecentAddCloset(item);
-
-        // 해당 Closet에 해당하는 아이템들을 최신순으로 정렬후 10개 추출.
-        return itemRepository.getSameClosetItems(item, recentAddClosetList);
     }
 
     @Transactional(readOnly = true)
@@ -458,5 +427,39 @@ public class ItemService {
         List<Item> itemList = itemRepository.getHowAboutItem(user, interestedCeleb);
 
         return itemRepository.getItemSimpleResDto(user, itemList);
+    }
+
+    @Transactional(readOnly = true)
+    public List<ItemSimpleResDto> getSameCelebItems(User user, Long itemId) {
+        Item item = itemRepository.getItemByIdWithCelebAndBrand(itemId);
+        List<Item> sameCelebItems;
+        if (item.getCeleb() != null) {
+            sameCelebItems = itemRepository.findSameCelebItem(itemId, item.getCeleb().getId(), true);
+        } else {
+            sameCelebItems = itemRepository.findSameCelebItem(itemId, item.getNewCeleb().getId(), false);
+        }
+
+        return itemRepository.getItemSimpleResDto(user, sameCelebItems);
+    }
+
+    @Transactional(readOnly = true)
+    public List<ItemSimpleResDto> getSameBrandItem(User user, Long itemId) {
+        Item item = itemRepository.getItemByIdWithCelebAndBrand(itemId);
+        List<Item> sameBrandItems;
+
+        if (item.getBrand() != null) {
+            sameBrandItems = itemRepository.findSameBrandItem(itemId, item.getBrand().getId(), true);
+        } else {
+            sameBrandItems = itemRepository.findSameBrandItem(itemId, item.getNewBrand().getId(), false);
+        }
+
+        return itemRepository.getItemSimpleResDto(user, sameBrandItems);
+    }
+
+    @Transactional(readOnly = true)
+    public List<ItemSimpleResDto> getTogetherScrapItem(User user, Long itemId) {
+        List<Closet> recentAddClosetList = closetRepository.getRecentAddCloset(itemId);
+        List<Item> sameClosetItems = itemRepository.getSameClosetItems(itemId, recentAddClosetList);
+        return itemRepository.getItemSimpleResDto(user, sameClosetItems);
     }
 }

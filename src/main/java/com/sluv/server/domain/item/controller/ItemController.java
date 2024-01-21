@@ -36,9 +36,7 @@ public class ItemController {
     private final ItemService itemService;
 
     /**
-     * 같은 셀럽 아이템 리스트 -> 10개 같은 브랜드 아이템 리스트 -> 10개 다른 스러버들이 함께 보관한 아이템 리스트 -> 10개 1. 같은 셀럽의 아이템 -> 셀럽을 기준으로 최신 아이템 검색 2.
-     * 같은 브랜드의 아이템 -> 브랜드를 기준으로 최신 아이템 검색 3. 함께 스크랩한 아이템 -> a. 해당 아이템을 저장한 Closet을 최신순으로 20개 추출 b. 20개의 Closet의 모든 Item을
-     * 최신순으로 정렬 c. 정렬된 것중 상위 10개 추출.
+     * 아이템 상세조회
      */
     @Operation(summary = "*특정 아이템 게시글 상세조회", description = "User 토큰 필요")
     @GetMapping("/{itemId}")
@@ -48,6 +46,52 @@ public class ItemController {
         return ResponseEntity.ok().body(
                 SuccessDataResponse.<ItemDetailResDto>builder()
                         .result(itemService.getItemDetail(user, itemId))
+                        .build()
+        );
+    }
+
+    /**
+     * 같은 셀럽 아이템 리스트 -> 10개 같은 브랜드 아이템 리스트 -> 10개
+     */
+    @Operation(summary = "*같은 셀럽 아이템 리스트 조회", description = "User 토큰 필요")
+    @GetMapping("/sameCelebItem")
+    public ResponseEntity<SuccessDataResponse<List<ItemSimpleResDto>>> getSameCelebItem(
+            @AuthenticationPrincipal User user, @RequestParam("itemId") Long itemId) {
+
+        return ResponseEntity.ok().body(
+                SuccessDataResponse.<List<ItemSimpleResDto>>builder()
+                        .result(itemService.getSameCelebItems(user, itemId))
+                        .build()
+        );
+    }
+
+    /**
+     * 같은 브랜드의 아이템 -> 브랜드를 기준으로 최신 아이템 검색 -> 10개
+     */
+    @Operation(summary = "*같은 브랜드의 아이템 리스트 조회", description = "User 토큰 필요")
+    @GetMapping("/sameBrandItem")
+    public ResponseEntity<SuccessDataResponse<List<ItemSimpleResDto>>> getSameBrandItem(
+            @AuthenticationPrincipal User user, @RequestParam("itemId") Long itemId) {
+
+        return ResponseEntity.ok().body(
+                SuccessDataResponse.<List<ItemSimpleResDto>>builder()
+                        .result(itemService.getSameBrandItem(user, itemId))
+                        .build()
+        );
+    }
+
+    /**
+     * 함께 스크랩한 아이템 -> 10개
+     */
+    @Operation(summary = "*함께 스크랩한 아이템 리스트 조회", description = "User 토큰 필요")
+    @GetMapping("/togetherScrap")
+    public ResponseEntity<SuccessDataResponse<List<ItemSimpleResDto>>> getTogetherScrapItem(
+            @AuthenticationPrincipal User user,
+            @RequestParam("itemId") Long itemId) {
+
+        return ResponseEntity.ok().body(
+                SuccessDataResponse.<List<ItemSimpleResDto>>builder()
+                        .result(itemService.getTogetherScrapItem(user, itemId))
                         .build()
         );
     }

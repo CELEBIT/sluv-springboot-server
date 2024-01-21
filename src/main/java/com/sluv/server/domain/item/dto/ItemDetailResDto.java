@@ -66,15 +66,6 @@ public class ItemDetailResDto {
     @Schema(description = "추가정보를 발견한 출처")
     private String infoSource;
 
-    @Schema(description = "같은 셀럽 아이템 리스트")
-    private List<ItemSimpleResDto> sameCelebItemList;
-
-    @Schema(description = "같은 브랜드 아이템 리스트")
-    private List<ItemSimpleResDto> sameBrandItemList;
-
-    @Schema(description = "다른 스러버들이 함께 보관한 아이템 리스트")
-    private List<ItemSimpleResDto> otherSluverItemList;
-
     @Schema(description = "색")
     private String color;
 
@@ -89,10 +80,7 @@ public class ItemDetailResDto {
                                       Integer likeNum, Boolean likeStatus, Integer scrapNum, Boolean scrapStatus,
                                       Long viewNum, UserInfoDto writerInfo, Boolean followStatus, Boolean hasMine,
                                       List<ItemImgResDto> imgList, List<ItemLinkResDto> linkList,
-                                      List<HashtagResponseDto> hashtagList,
-                                      List<ItemSimpleResDto> sameCelebItemList,
-                                      List<ItemSimpleResDto> sameBrandItemList,
-                                      List<ItemSimpleResDto> otherSluverItemList
+                                      List<HashtagResponseDto> hashtagList
     ) {
 
         return ItemDetailResDto.builder()
@@ -116,9 +104,6 @@ public class ItemDetailResDto {
                 .additionalInfo(item.getAdditionalInfo())
                 .hashTagList(hashtagList)
                 .infoSource(item.getInfoSource())
-                .sameCelebItemList(sameCelebItemList)
-                .sameBrandItemList(sameBrandItemList)
-                .otherSluverItemList(otherSluverItemList)
                 .followStatus(followStatus)
                 .hasMine(hasMine)
                 .color(item.getColor())

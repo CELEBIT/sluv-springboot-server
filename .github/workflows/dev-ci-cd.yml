@@ -86,8 +86,7 @@ jobs:
         if: always() # Pick up events even if the job fails or is canceled.
 
   ## discord
-  action-discord:
-    needs: dev-ci-cd
+  message:
     runs-on: ubuntu-latest
     steps:
       - name: Discord Alarm

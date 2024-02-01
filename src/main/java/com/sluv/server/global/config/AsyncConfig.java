@@ -14,8 +14,8 @@ public class AsyncConfig {
     public Executor getAsyncExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
         executor.setCorePoolSize(5);
-        executor.setMaxPoolSize(30);
-        executor.setQueueCapacity(100);
+        executor.setMaxPoolSize(10);
+        executor.setQueueCapacity(10);
         executor.setThreadNamePrefix("Sluv-Async-Thread-");
         executor.initialize();
         return executor;
@@ -25,8 +25,8 @@ public class AsyncConfig {
     public Executor getRedisExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
         executor.setCorePoolSize(5);
-        executor.setMaxPoolSize(30);
-        executor.setQueueCapacity(100);
+        executor.setMaxPoolSize(10);
+        executor.setQueueCapacity(10);
         executor.setThreadNamePrefix("Sluv-Redis-Thread-");
         executor.initialize();
         return executor;

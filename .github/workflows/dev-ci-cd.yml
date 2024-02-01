@@ -93,8 +93,6 @@ jobs:
       - name: Discord Alarm
         uses: tsickert/discord-webhook@v5.3.0
         with:
-          status: ${{ job.status }}
-          author_name: GitHub-Actions CI/CD
-          fields: repo,message,commit,author,ref,job,took
           webhook-url: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          content: ${{ job.status }}
         if: always() # Pick up events even if the job fails or is canceled.

@@ -12,10 +12,11 @@ public class AuthService {
 
     private final JwtProvider jwtProvider;
 
-    public AuthResponseDto jwtTestService(User user) {
+    public AuthResponseDto getAuthResDto(User user) {
 
         return AuthResponseDto.builder()
                 .token(jwtProvider.createAccessToken(user))
+                .userStatus(user.getUserStatus())
                 .build();
     }
 }

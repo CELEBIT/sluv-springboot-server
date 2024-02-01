@@ -1,6 +1,5 @@
 package com.sluv.server.domain.user.service;
 
-import com.sluv.server.domain.auth.exception.UserBlockedException;
 import com.sluv.server.domain.closet.dto.ClosetResDto;
 import com.sluv.server.domain.closet.entity.Closet;
 import com.sluv.server.domain.closet.repository.ClosetRepository;
@@ -199,12 +198,5 @@ public class UserService {
                 .toList();
 
 
-    }
-
-    public void checkUserStatue(User user) {
-
-        if (user.getUserStatus().equals(UserStatus.BLOCKED)) {
-            throw new UserBlockedException();
-        }
     }
 }

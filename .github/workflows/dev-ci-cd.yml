@@ -87,6 +87,7 @@ jobs:
 
   ## discord
   action-discord:
+    needs: dev-ci-cd
     runs-on: ubuntu-latest
     steps:
       - name: Discord Alarm

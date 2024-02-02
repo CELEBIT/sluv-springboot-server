@@ -9,6 +9,7 @@ import com.sluv.server.domain.user.dto.UserMypageResDto;
 import com.sluv.server.domain.user.dto.UserProfileImgReqDto;
 import com.sluv.server.domain.user.dto.UserProfileReqDto;
 import com.sluv.server.domain.user.dto.UserSearchInfoDto;
+import com.sluv.server.domain.user.dto.UserTermsResDto;
 import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.domain.user.service.UserService;
 import com.sluv.server.global.common.response.PaginationCountResDto;
@@ -174,6 +175,16 @@ public class UserController {
         return ResponseEntity.ok().body(
                 SuccessDataResponse.<List<UserSearchInfoDto>>builder()
                         .result(userService.getHotSluver(user, celebId))
+                        .build()
+        );
+    }
+
+    @Operation(summary = "*약관 동의", description = "광고성 정보 수신 및 마케팅 활용 동의")
+    @PostMapping("/terms")
+    public ResponseEntity<SuccessDataResponse<UserTermsResDto>> postTerms(@AuthenticationPrincipal User user) {
+        return ResponseEntity.ok().body(
+                SuccessDataResponse.<UserTermsResDto>builder()
+                        .result(userService.postTerms(user))
                         .build()
         );
     }

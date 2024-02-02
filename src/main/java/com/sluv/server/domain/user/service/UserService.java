@@ -21,6 +21,7 @@ import com.sluv.server.domain.user.dto.UserMypageResDto;
 import com.sluv.server.domain.user.dto.UserProfileImgReqDto;
 import com.sluv.server.domain.user.dto.UserProfileReqDto;
 import com.sluv.server.domain.user.dto.UserSearchInfoDto;
+import com.sluv.server.domain.user.dto.UserTermsResDto;
 import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.domain.user.enums.UserStatus;
 import com.sluv.server.domain.user.exception.UserNicknameDuplicatedException;
@@ -198,5 +199,13 @@ public class UserService {
                 .toList();
 
 
+    }
+
+    public UserTermsResDto postTerms(User user) {
+        user.changeTermStatus(!user.getTermsStatus());
+        userRepository.save(user);
+        return UserTermsResDto.builder()
+                .termsStatus(user.getTermsStatus())
+                .build();
     }
 }

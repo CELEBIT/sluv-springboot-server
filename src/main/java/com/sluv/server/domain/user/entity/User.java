@@ -60,6 +60,8 @@ public class User extends BaseEntity implements UserDetails {
     @Column(length = 45, columnDefinition = "varchar(45) default 'PENDING_PROFILE'")
     private UserStatus userStatus;
 
+    private Boolean termsStatus;
+
     public static User toEntity(SocialUserInfoDto userInfoDto, SnsType snsType) {
         return User.builder()
                 .email(userInfoDto.getEmail())
@@ -80,6 +82,10 @@ public class User extends BaseEntity implements UserDetails {
 
     public void changeUserStatus(UserStatus userStatus) {
         this.userStatus = userStatus;
+    }
+
+    public void changeTermStatus(Boolean termsStatus) {
+        this.termsStatus = termsStatus;
     }
 
     @Override

@@ -86,7 +86,7 @@ jobs:
         if: always() # Pick up events even if the job fails or is canceled.
 
   ## discord
-  message:
+  action-discord:
     runs-on: ubuntu-latest
     steps:
       - name: Discord Alarm
@@ -94,4 +94,3 @@ jobs:
         with:
           webhook-url: ${{ secrets.DISCORD_WEBHOOK_URL }}
           content: ${{ job.status }}
-        if: always() # Pick up events even if the job fails or is canceled.

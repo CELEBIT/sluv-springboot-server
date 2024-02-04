@@ -55,4 +55,11 @@ public class RedisService implements CacheService {
         ValueOperations<String, ItemDetailFixData> itemDetailFixDataCache = redisStringItemDetailFixDataTemplate.opsForValue();
         itemDetailFixDataCache.getAndDelete("item:" + itemId);
     }
+
+    @Async(value = "redisThreadPoolExecutor")
+    @Override
+    public void saveUserViewItemId(Long userId, Long itemId) {
+        ValueOperations<String, Long> userViewItemCache = redisStringLongTemplate.opsForValue();
+        userViewItemCache.set("userItem:" + userId, itemId, 20, TimeUnit.MINUTES);
+    }
 }

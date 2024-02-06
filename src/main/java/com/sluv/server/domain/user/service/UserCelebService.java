@@ -11,6 +11,7 @@ import com.sluv.server.domain.celeb.repository.CelebCategoryRepository;
 import com.sluv.server.domain.celeb.repository.CelebRepository;
 import com.sluv.server.domain.celeb.repository.InterestedCelebRepository;
 import com.sluv.server.domain.user.entity.User;
+import com.sluv.server.domain.user.enums.UserStatus;
 import com.sluv.server.domain.user.exception.UserNotFoundException;
 import com.sluv.server.domain.user.repository.UserRepository;
 import java.util.Comparator;
@@ -76,7 +77,9 @@ public class UserCelebService {
     @Transactional
     public void postInterestedCeleb(User user, InterestedCelebPostReqDto dto) {
         // 기존에 있는 해당 유저의 관심셀럽 초기화
-        interestedCelebRepository.deleteAllByUserId(user.getId());
+        if (user.getUserStatus().equals(UserStatus.ACTIVE)) {
+            interestedCelebRepository.deleteAllByUserId(user.getId());
+        }
 
         // 초기화 상태에서 다시 추가.
         List<InterestedCeleb> interestedCelebList = dto.getCelebIdList().stream()
@@ -84,6 +87,11 @@ public class UserCelebService {
                         celebRepository.findById(celeb).orElseThrow(CelebNotFoundException::new))).toList();
 
         interestedCelebRepository.saveAll(interestedCelebList);
+
+        if (user.getUserStatus().equals(UserStatus.PENDING_CELEB)) {
+            user.changeUserStatus(UserStatus.ACTIVE);
+            userRepository.save(user);
+        }
     }
 
     /**

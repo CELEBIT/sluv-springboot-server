@@ -246,6 +246,8 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
         List<Question> content = jpaQueryFactory.selectFrom(question)
                 .where(question.questionStatus.eq(ACTIVE))
                 .orderBy(question.createdAt.desc())
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
                 .fetch();
 
         // Count Query

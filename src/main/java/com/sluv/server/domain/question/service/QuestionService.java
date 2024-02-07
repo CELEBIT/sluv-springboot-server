@@ -418,8 +418,9 @@ public class QuestionService {
     }
 
     private void increaseQuestionViewNum(Long userId, Question question) {
-        long addStatus = cacheService.saveUserViewQuestionId(userId, question.getId());
-        if (addStatus == 1) {
+        boolean isExist = cacheService.existUserViewQuestionId(userId, question.getId());
+        if (!isExist) {
+            cacheService.saveUserViewQuestionId(userId, question.getId());
             question.increaseSearchNum();
         }
     }

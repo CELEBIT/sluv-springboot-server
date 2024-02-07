@@ -17,8 +17,12 @@ public interface CacheService {
 
     void deleteItemDetailFixDataByItemId(Long itemId);
 
-    long saveUserViewItemId(Long userId, Long itemId);
+    void saveUserViewItemId(Long userId, Long itemId);
 
-    long saveUserViewQuestionId(Long userId, Long questionId);
+    boolean existUserViewItemId(Long userId, Long itemId);
+
+    void saveUserViewQuestionId(Long userId, Long questionId);
+
+    boolean existUserViewQuestionId(Long userId, Long questionId);
 
 }

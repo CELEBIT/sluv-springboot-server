@@ -255,8 +255,9 @@ public class ItemService {
     }
 
     private void increaseViewNum(Long userId, Item item) {
-        long addStatus = cacheService.saveUserViewItemId(userId, item.getId());
-        if (addStatus == 1) {
+        boolean isExist = cacheService.existUserViewItemId(userId, item.getId());
+        if (!isExist) {
+            cacheService.saveUserViewItemId(userId, item.getId());
             item.increaseViewNum();
         }
     }

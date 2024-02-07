@@ -4,7 +4,6 @@ package com.sluv.server.global.cache;
 import com.sluv.server.domain.item.dto.ItemDetailFixData;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -59,14 +58,32 @@ public class RedisService implements CacheService {
         itemDetailFixDataCache.getAndDelete("item:" + itemId);
     }
 
+    @Async(value = "redisThreadPoolExecutor")
     @Override
-    public long saveUserViewItemId(Long userId, Long itemId) {
-        SetOperations<String, Long> userViewItemCache = redisStringLongTemplate.opsForSet();
-        Long addStatus = Optional.ofNullable(userViewItemCache.add("userItem:" + userId, itemId)).orElse(0L);
-        Date nextDate = getNextDate();
-        redisStringLongTemplate.expireAt("userItem:" + userId, nextDate);
+    public void saveUserViewItemId(Long userId, Long itemId) {
+        ValueOperations<String, Long> userViewItemCache = redisStringLongTemplate.opsForValue();
+        userViewItemCache.set("userItem:" + userId + "::" + itemId, 0L, 20, TimeUnit.MINUTES);
+    }
 
-        return addStatus;
+    @Override
+    public boolean existUserViewItemId(Long userId, Long itemId) {
+        ValueOperations<String, Long> userViewItemCache = redisStringLongTemplate.opsForValue();
+        Long isExist = userViewItemCache.get("userItem:" + userId + "::" + itemId);
+        return isExist != null;
+    }
+
+    @Async(value = "redisThreadPoolExecutor")
+    @Override
+    public void saveUserViewQuestionId(Long userId, Long questionId) {
+        ValueOperations<String, Long> userViewQuestionCache = redisStringLongTemplate.opsForValue();
+        userViewQuestionCache.set("userQuestion:" + userId + "::" + questionId, 0L, 20, TimeUnit.MINUTES);
+    }
+
+    @Override
+    public boolean existUserViewQuestionId(Long userId, Long questionId) {
+        ValueOperations<String, Long> userViewQuestionCache = redisStringLongTemplate.opsForValue();
+        Long isExist = userViewQuestionCache.get("userQuestion:" + userId + "::" + questionId);
+        return isExist != null;
     }
 
     private Date getNextDate() {
@@ -80,17 +97,6 @@ public class RedisService implements CacheService {
         calendar.set(Calendar.MILLISECOND, 0);
 
         return calendar.getTime();
-    }
-
-    @Override
-    public long saveUserViewQuestionId(Long userId, Long questionId) {
-        SetOperations<String, Long> userViewQuestionCache = redisStringLongTemplate.opsForSet();
-        Long addStatus = Optional.ofNullable(userViewQuestionCache.add("userQuestion:" + userId, questionId))
-                .orElse(0L);
-        Date nextDate = getNextDate();
-        redisStringLongTemplate.expireAt("userQuestion:" + userId, nextDate);
-
-        return addStatus;
     }
 
 }

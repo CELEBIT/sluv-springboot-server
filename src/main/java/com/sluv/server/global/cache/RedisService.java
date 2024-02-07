@@ -2,6 +2,9 @@ package com.sluv.server.global.cache;
 
 
 import com.sluv.server.domain.item.dto.ItemDetailFixData;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -56,10 +59,27 @@ public class RedisService implements CacheService {
         itemDetailFixDataCache.getAndDelete("item:" + itemId);
     }
 
-    @Async(value = "redisThreadPoolExecutor")
     @Override
-    public void saveUserViewItemId(Long userId, Long itemId) {
-        ValueOperations<String, Long> userViewItemCache = redisStringLongTemplate.opsForValue();
-        userViewItemCache.set("userItem:" + userId, itemId, 20, TimeUnit.MINUTES);
+    public long saveUserViewItemId(Long userId, Long itemId) {
+        SetOperations<String, Long> userViewItemCache = redisStringLongTemplate.opsForSet();
+        Long addStatus = Optional.ofNullable(userViewItemCache.add("userItem:" + userId, itemId)).orElse(0L);
+        Date nextDate = getNextDate();
+        redisStringLongTemplate.expireAt("userItem:" + userId, nextDate);
+
+        return addStatus;
     }
+
+    private Date getNextDate() {
+        Calendar calendar = Calendar.getInstance();
+
+        // 다음날 00시 00분 00초로 설정.
+        calendar.add(Calendar.DAY_OF_YEAR, 1);
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+
+        return calendar.getTime();
+    }
+
 }

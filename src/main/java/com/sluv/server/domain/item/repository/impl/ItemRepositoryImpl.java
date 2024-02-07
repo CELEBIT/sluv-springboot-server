@@ -481,7 +481,7 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
 
         List<Item> content = jpaQueryFactory.selectFrom(item)
                 .where(item.itemStatus.eq(ACTIVE)
-                        .and(item.createdAt.between(nowTime.minusHours(1L), nowTime))
+//                        .and(item.createdAt.between(nowTime.minusHours(1L), nowTime))
                 )
                 .orderBy(item.createdAt.desc())
                 .offset(pageable.getOffset())
@@ -491,7 +491,7 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
         // Count Query
         JPAQuery<Item> countQuery = jpaQueryFactory.selectFrom(item)
                 .where(item.itemStatus.eq(ACTIVE)
-                        .and(item.createdAt.between(nowTime.minusHours(1L), nowTime))
+//                        .and(item.createdAt.between(nowTime.minusHours(1L), nowTime))
                 )
                 .orderBy(item.createdAt.desc());
 

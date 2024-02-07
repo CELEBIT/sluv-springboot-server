@@ -19,4 +19,6 @@ public interface CacheService {
 
     long saveUserViewItemId(Long userId, Long itemId);
 
+    long saveUserViewQuestionId(Long userId, Long questionId);
+
 }

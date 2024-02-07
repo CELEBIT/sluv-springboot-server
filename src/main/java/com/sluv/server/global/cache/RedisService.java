@@ -82,4 +82,15 @@ public class RedisService implements CacheService {
         return calendar.getTime();
     }
 
+    @Override
+    public long saveUserViewQuestionId(Long userId, Long questionId) {
+        SetOperations<String, Long> userViewQuestionCache = redisStringLongTemplate.opsForSet();
+        Long addStatus = Optional.ofNullable(userViewQuestionCache.add("userQuestion:" + userId, questionId))
+                .orElse(0L);
+        Date nextDate = getNextDate();
+        redisStringLongTemplate.expireAt("userQuestion:" + userId, nextDate);
+
+        return addStatus;
+    }
+
 }

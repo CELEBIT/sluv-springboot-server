@@ -218,8 +218,8 @@ public class ItemService {
         // 5. 스크랩 수
         Integer scrapNum = itemScrapRepository.countByItemId(item.getId());
 
-        // 6. 조회수 TODO : Redis를 사용한 IP:PostId 저장으로 조회수 중복방지 기능
-        item.increaseViewNum();
+        // 6. 조회수
+        increaseViewNum(user.getId(), item);
         Long viewNum = item.getViewNum();
 
         // 7. 좋아요 여부
@@ -252,6 +252,13 @@ public class ItemService {
                 fixData.getLinkList(),
                 fixData.getHashTagList()
         );
+    }
+
+    private void increaseViewNum(Long userId, Item item) {
+        long addStatus = cacheService.saveUserViewItemId(userId, item.getId());
+        if (addStatus == 1) {
+            item.increaseViewNum();
+        }
     }
 
     //    @Cacheable(cacheNames = "item", key = "#itemId")

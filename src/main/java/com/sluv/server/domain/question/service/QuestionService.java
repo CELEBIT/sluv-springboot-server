@@ -47,7 +47,6 @@ import com.sluv.server.domain.question.enums.QuestionStatus;
 import com.sluv.server.domain.question.exception.QuestionNotFoundException;
 import com.sluv.server.domain.question.exception.QuestionReportDuplicateException;
 import com.sluv.server.domain.question.exception.QuestionTypeNotFoundException;
-import com.sluv.server.domain.question.repository.DailyHotQuestionRepository;
 import com.sluv.server.domain.question.repository.QuestionImgRepository;
 import com.sluv.server.domain.question.repository.QuestionItemRepository;
 import com.sluv.server.domain.question.repository.QuestionLikeRepository;
@@ -57,6 +56,7 @@ import com.sluv.server.domain.question.repository.QuestionRepository;
 import com.sluv.server.domain.question.repository.QuestionVoteRepository;
 import com.sluv.server.domain.question.repository.RecentQuestionRepository;
 import com.sluv.server.domain.user.entity.User;
+import com.sluv.server.global.cache.CacheService;
 import com.sluv.server.global.common.response.PaginationResDto;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -89,7 +89,7 @@ public class QuestionService {
     private final ItemScrapRepository itemScrapRepository;
     private final ClosetRepository closetRepository;
     private final QuestionVoteRepository questionVoteRepository;
-    private final DailyHotQuestionRepository dailyHotQuestionRepository;
+    private final CacheService cacheService;
 
 
     @Transactional
@@ -404,7 +404,7 @@ public class QuestionService {
         );
 
         // SearchNum 증가
-        question.increaseSearchNum();
+        increaseQuestionViewNum(user.getId(), question);
 
         return QuestionGetDetailResDto.of(
                 question, qType, writer,
@@ -415,6 +415,13 @@ public class QuestionService {
                 voteEndTime, totalVoteNum, voteStatus,
                 recommendCategoryList
         );
+    }
+
+    private void increaseQuestionViewNum(Long userId, Question question) {
+        long addStatus = cacheService.saveUserViewQuestionId(userId, question.getId());
+        if (addStatus == 1) {
+            question.increaseSearchNum();
+        }
     }
 
     /**

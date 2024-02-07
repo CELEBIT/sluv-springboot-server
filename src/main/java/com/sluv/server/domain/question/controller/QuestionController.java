@@ -128,9 +128,7 @@ public class QuestionController {
 
         return ResponseEntity.ok().body(
                 SuccessDataResponse.<QuestionGetDetailResDto>builder()
-                        .result(
-                                questionService.getQuestionDetail(user, questionId)
-                        )
+                        .result(questionService.getQuestionDetail(user, questionId))
                         .build()
         );
     }

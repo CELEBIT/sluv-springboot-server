@@ -16,4 +16,9 @@ public interface CacheService {
     ItemDetailFixData findItemDetailFixDataByItemId(Long itemId);
 
     void deleteItemDetailFixDataByItemId(Long itemId);
+
+    long saveUserViewItemId(Long userId, Long itemId);
+
+    long saveUserViewQuestionId(Long userId, Long questionId);
+
 }

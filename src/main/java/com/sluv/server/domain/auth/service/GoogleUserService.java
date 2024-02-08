@@ -14,7 +14,6 @@ import com.sluv.server.domain.user.enums.UserAge;
 import com.sluv.server.domain.user.enums.UserGender;
 import com.sluv.server.domain.user.exception.UserNotFoundException;
 import com.sluv.server.domain.user.repository.UserRepository;
-import com.sluv.server.global.jwt.JwtProvider;
 import com.sluv.server.global.jwt.exception.InvalidateTokenException;
 import java.util.Arrays;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +26,7 @@ import org.springframework.stereotype.Service;
 public class GoogleUserService {
     private final UserRepository userRepository;
     private final ClosetService closetService;
-    private final JwtProvider jwtProvider;
+
 
     @Value("${spring.security.oauth2.client.android}")
     private String CLIENT_ANDROID;

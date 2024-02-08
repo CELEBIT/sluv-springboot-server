@@ -20,8 +20,8 @@ spring:
       password: 1234
     oauth2:
       client:
-        android: 924373234165-adalqufkonkljl23qk6vv4g3bnc9imfr.apps.googleusercontent.com
-        apple: 924373234165-hfd08tk9pt36g4e9r54hqhpe9ircrv4q.apps.googleusercontent.com
+        android: ENX(NCPz/n4jm3VczyJgObnbqqFhbFfaIUbbRJ1rP670nORPz0mRWt/Iq8rRfJYQYxUntqGLgwl1By5VY39kXmbrtFU4WTCaXsbepoFEXaSPsXHOFkjUCXS/Xw==)
+        apple: ENC(CkoD2RiKTi3g3RHBIL9NqampRjLP9hwIvHkbA/WeshF6ocbj+cLHUoq/lUhLlW3qfscl7PV+6ssJfN+Yl6mz4Frr8S5Q5HqFV8rQ4TGi9mVpYvV5+eyxdw==)
 
   elasticsearch:
     uri: http://awseb-awseb-clwnl48v6djo-1067213661.ap-northeast-2.elb.amazonaws.com

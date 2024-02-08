@@ -1,6 +1,6 @@
 package com.sluv.server.domain.auth.service;
 
-import static com.sluv.server.domain.auth.enums.SnsType.GOOGLE;
+import static com.sluv.server.domain.auth.enums.SnsType.KAKAO;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -13,7 +13,6 @@ import com.sluv.server.domain.user.enums.UserAge;
 import com.sluv.server.domain.user.enums.UserGender;
 import com.sluv.server.domain.user.exception.UserNotFoundException;
 import com.sluv.server.domain.user.repository.UserRepository;
-import com.sluv.server.global.jwt.JwtProvider;
 import com.sluv.server.global.jwt.exception.InvalidateTokenException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpEntity;
@@ -30,7 +29,6 @@ import org.springframework.web.client.RestTemplate;
 public class KakaoUserService {
     private final UserRepository userRepository;
     private final ClosetService closetService;
-    private final JwtProvider jwtProvider;
 
     public User kakaoLogin(AuthRequestDto request) throws JsonProcessingException {
         String accessToken = request.getAccessToken();
@@ -124,7 +122,7 @@ public class KakaoUserService {
 
         if (user == null) {
             userRepository.save(
-                    User.toEntity(userInfoDto, GOOGLE)
+                    User.toEntity(userInfoDto, KAKAO)
             );
             user = userRepository.findByEmail(userInfoDto.getEmail())
                     .orElseThrow(UserNotFoundException::new);
@@ -149,7 +147,7 @@ public class KakaoUserService {
 
     private static UserAge convertAge(String age) {
         UserAge userGender = UserAge.UNKNOWN;
-        int startAge = Integer.parseInt(age.split("-")[0]);
+        int startAge = Integer.parseInt(age.split("~")[0]);
         for (UserAge value : UserAge.values()) {
             if (startAge == value.getStartAge()) {
                 userGender = value;

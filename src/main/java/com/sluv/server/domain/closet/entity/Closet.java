@@ -46,7 +46,6 @@ public class Closet extends BaseEntity {
     @Size(max = 45)
     private String name;
 
-    @NotNull
     @Column(columnDefinition = "TEXT")
     private String coverImgUrl;
 

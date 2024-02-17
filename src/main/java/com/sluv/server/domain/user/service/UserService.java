@@ -8,6 +8,7 @@ import com.sluv.server.domain.comment.entity.Comment;
 import com.sluv.server.domain.comment.repository.CommentRepository;
 import com.sluv.server.domain.item.dto.ItemSimpleResDto;
 import com.sluv.server.domain.item.entity.Item;
+import com.sluv.server.domain.item.enums.ItemStatus;
 import com.sluv.server.domain.item.helper.ItemHelper;
 import com.sluv.server.domain.item.repository.ItemImgRepository;
 import com.sluv.server.domain.item.repository.ItemRepository;
@@ -15,6 +16,7 @@ import com.sluv.server.domain.item.repository.ItemScrapRepository;
 import com.sluv.server.domain.item.service.ItemCacheService;
 import com.sluv.server.domain.question.dto.QuestionSimpleResDto;
 import com.sluv.server.domain.question.entity.Question;
+import com.sluv.server.domain.question.enums.QuestionStatus;
 import com.sluv.server.domain.question.mapper.QuestionDtoMapper;
 import com.sluv.server.domain.question.repository.QuestionRepository;
 import com.sluv.server.domain.user.dto.UserMypageResDto;
@@ -84,7 +86,8 @@ public class UserService {
         if (userId == null) { // 현재 유저일때
             targetUser = user;
 
-            Long questionNum = questionRepository.countByUserId(targetUser.getId());
+            Long questionNum = questionRepository.countByUserIdAndQuestionStatus(targetUser.getId(),
+                    QuestionStatus.ACTIVE);
             Long commentNum = commentRepository.countByUserId(targetUser.getId());
 
             communityCount = questionNum + commentNum;
@@ -92,7 +95,7 @@ public class UserService {
             imgList = itemRepository.getRecentTop2Item(targetUser).stream()
                     .map(item -> itemImgRepository.findMainImg(item.getId()).getItemImgUrl()).toList();
 
-            itemCount = itemRepository.countByUserId(targetUser.getId());
+            itemCount = itemRepository.countByUserIdAndItemStatus(targetUser.getId(), ItemStatus.ACTIVE);
 
         } else { // 특정 유저일때
             targetUser = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);

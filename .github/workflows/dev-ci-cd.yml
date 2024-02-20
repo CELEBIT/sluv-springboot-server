@@ -42,6 +42,18 @@ jobs:
           replace-with: '-'
           flags: 'g'
 
+
+      - name: Deploy to Local Server
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.LOCAL_SERVER_HOST }}
+          username: ${{ secrets.LOCAL_SERVER_USER }}
+          key: ${{ secrets.LOCAL_SERVER_SSH_PRIVATE_KEY }}
+          port: ${{ secrets.LOCAL_SERVER_SSH_PORT }}
+          script: |
+            chmod +x /home/sluv/deploy_script.sh
+            /home/sluv/deploy_script.sh
+
   current-time:
     needs: dev-ci-cd
     runs-on: ubuntu-latest

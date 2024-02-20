@@ -8,6 +8,7 @@ import static com.sluv.server.domain.user.enums.UserStatus.ACTIVE;
 
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.sluv.server.domain.user.entity.Follow;
 import com.sluv.server.domain.user.entity.User;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -47,7 +48,7 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
     public Page<User> getAllFollower(Long userId, Pageable pageable) {
         List<User> content = jpaQueryFactory.select(user)
                 .from(follow)
-                .leftJoin(follow.follower, user)
+                .leftJoin(user).on(follow.follower.eq(user))
                 .where(follow.followee.id.eq(userId).and(follow.follower.userStatus.eq(ACTIVE)))
                 .orderBy(follow.id.desc())
                 .offset(pageable.getOffset())
@@ -55,10 +56,8 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
                 .fetch();
 
         // Count Query
-        JPAQuery<User> query = jpaQueryFactory.select(user)
-                .from(follow)
-                .leftJoin(follow.follower, user)
-                .where(follow.follower.id.eq(userId).and(follow.followee.userStatus.eq(ACTIVE)))
+        JPAQuery<Follow> query = jpaQueryFactory.selectFrom(follow)
+                .where(follow.followee.id.eq(userId).and(follow.follower.userStatus.eq(ACTIVE)))
                 .orderBy(follow.id.desc());
 
         return PageableExecutionUtils.getPage(content, pageable, () -> query.fetch().size());
@@ -71,7 +70,7 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
     public Page<User> getAllFollowing(Long userId, Pageable pageable) {
         List<User> content = jpaQueryFactory.select(user)
                 .from(follow)
-                .leftJoin(follow.followee, user)
+                .leftJoin(user).on(follow.followee.eq(user))
                 .where(follow.follower.id.eq(userId).and(follow.followee.userStatus.eq(ACTIVE)))
                 .orderBy(follow.id.desc())
                 .offset(pageable.getOffset())
@@ -79,10 +78,8 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
                 .fetch();
 
         // Count Query
-        JPAQuery<User> query = jpaQueryFactory.select(user)
-                .from(follow)
-                .leftJoin(follow.followee, user)
-                .where(follow.followee.id.eq(userId).and(follow.follower.userStatus.eq(ACTIVE)))
+        JPAQuery<Follow> query = jpaQueryFactory.selectFrom(follow)
+                .where(follow.follower.id.eq(userId).and(follow.followee.userStatus.eq(ACTIVE)))
                 .orderBy(follow.id.desc());
 
         return PageableExecutionUtils.getPage(content, pageable, () -> query.fetch().size());

@@ -3,7 +3,6 @@ package com.sluv.server.domain.user.repository.impl;
 import static com.sluv.server.domain.user.entity.QFollow.follow;
 import static com.sluv.server.domain.user.entity.QUser.user;
 
-import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sluv.server.domain.user.dto.UserSearchInfoDto;
 import com.sluv.server.domain.user.entity.Follow;
@@ -54,32 +53,14 @@ public class FollowRepositoryImpl implements FollowRepositoryCustom {
     @Override
     public List<UserSearchInfoDto> getUserSearchInfoDto(User nowUser, List<User> content, String target) {
         List<Follow> fetch = jpaQueryFactory.selectFrom(follow)
-                .where(getTarget(nowUser, target))
+                .where(follow.follower.eq(nowUser))
                 .fetch();
+
         Map<Long, List<Follow>> followMap = fetch.stream()
-                .collect(Collectors.groupingBy(fol -> getTargetId(fol, target)));
+                .collect(Collectors.groupingBy(fol -> fol.getFollowee().getId()));
 
         return content.stream()
-                .map(u -> UserSearchInfoDto.of(u, followMap.keySet().contains(u.getId())))
+                .map(u -> UserSearchInfoDto.of(u, followMap.containsKey(u.getId())))
                 .toList();
-    }
-
-    private static Long getTargetId(Follow fol, String target) {
-        Long targetId = fol.getFollowee().getId();
-        if (target.equals("followee")) {
-            targetId = fol.getFollower().getId();
-        }
-        return targetId;
-    }
-
-    private static BooleanExpression getTarget(User nowUser, String target) {
-        BooleanExpression targetUsers = null;
-        if (target.equals("follower")) {
-            targetUsers = follow.follower.eq(nowUser);
-        }
-        if (target.equals("followee")) {
-            targetUsers = follow.followee.eq(nowUser);
-        }
-        return targetUsers;
     }
 }

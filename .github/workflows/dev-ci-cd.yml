@@ -42,19 +42,6 @@ jobs:
           replace-with: '-'
           flags: 'g'
 
-      - name: Beanstalk Deploy
-        uses: einaregilsson/beanstalk-deploy@v21
-        with:
-          aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          application_name: sluv-dev
-          environment_name: Sluvdev-env
-          version_label: "github-action--${{ steps.format-time.outputs.replaced }}"
-          region: ap-northeast-2
-          deployment_package: Dockerrun.aws.json
-          wait_for_environment_recovery: 180
-  
-
   current-time:
     needs: dev-ci-cd
     runs-on: ubuntu-latest
@@ -69,21 +56,6 @@ jobs:
       - name: Print Current Time
         run: echo "Current Time=${{steps.current-time.outputs.formattedTime}}" # current-time 에서 지정한 포맷대로 현재 시간 출력
         shell: bash
-  
-  ## slack
-  action-slack:
-    needs: dev-ci-cd
-    runs-on: ubuntu-latest
-    steps:
-      - name: Slack Alarm
-        uses: 8398a7/action-slack@v3
-        with:
-          status: ${{ job.status }}
-          author_name: GitHub-Actions CI/CD
-          fields: repo,message,commit,author,ref,job,took
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }} # required
-        if: always() # Pick up events even if the job fails or is canceled.
 
   ## discord
   action-discord:

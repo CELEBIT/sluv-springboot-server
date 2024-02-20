@@ -7,6 +7,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sluv.server.domain.user.dto.UserSearchInfoDto;
 import com.sluv.server.domain.user.entity.Follow;
 import com.sluv.server.domain.user.entity.User;
+import com.sluv.server.domain.user.enums.UserStatus;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -39,14 +40,16 @@ public class FollowRepositoryImpl implements FollowRepositoryCustom {
     @Override
     public Long getFollowerCount(User targetUser) {
         return (long) jpaQueryFactory.selectFrom(follow)
-                .where(follow.followee.eq(targetUser))
+                .where(follow.followee.eq(targetUser)
+                        .and(follow.follower.userStatus.eq(UserStatus.ACTIVE)))
                 .fetch().size();
     }
 
     @Override
     public Long getFollowingCount(User targetUser) {
         return (long) jpaQueryFactory.selectFrom(follow)
-                .where(follow.follower.eq(targetUser))
+                .where(follow.follower.eq(targetUser)
+                        .and(follow.followee.userStatus.eq(UserStatus.ACTIVE)))
                 .fetch().size();
     }
 

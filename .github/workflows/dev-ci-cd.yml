@@ -51,7 +51,7 @@ jobs:
           password: ${{ secrets.LOCAL_SERVER_SSH_PASSWORD }}
           script: |
             chmod +x /home/sluv/deploy_script.sh
-            sudo /home/sluv/deploy_script.sh -p ${{ secrets.LOCAL_SERVER_SSH_PASSWORD }}
+            echo ${{ secrets.SUDO_PASSWORD }} | sudo -S /home/sluv/deploy.sh
 
   current-time:
     needs: dev-ci-cd

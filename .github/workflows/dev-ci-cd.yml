@@ -48,8 +48,7 @@ jobs:
         with:
           host: ${{ secrets.LOCAL_SERVER_HOST }}
           username: ${{ secrets.LOCAL_SERVER_USER }}
-          key: ${{ secrets.LOCAL_SERVER_SSH_PRIVATE_KEY }}
-          port: ${{ secrets.LOCAL_SERVER_SSH_PORT }}
+          password: ${{ secrets.LOCAL_SERVER_SSH_PASSWORD }}
           script: |
             chmod +x /home/sluv/deploy_script.sh
             /home/sluv/deploy_script.sh

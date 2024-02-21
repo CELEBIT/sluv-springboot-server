@@ -97,7 +97,7 @@ public class KakaoUserService {
 
         String ageRange;
         try {
-            ageRange = jsonNode.get("kakao_account").get("age_range").asText();
+            ageRange = jsonNode.get("kakao_account").get("gender").asText();
         } catch (Exception e) {
             ageRange = null;
         }
@@ -136,6 +136,13 @@ public class KakaoUserService {
 
     private static UserGender convertGender(String gender) {
         UserGender userGender = UserGender.UNKNOWN;
+        if (gender != null) {
+            userGender = getUserGender(userGender, gender);
+        }
+        return userGender;
+    }
+
+    private static UserGender getUserGender(UserGender userGender, String gender) {
         if (gender.equals("male")) {
             userGender = UserGender.MALE;
         }
@@ -146,7 +153,15 @@ public class KakaoUserService {
     }
 
     private static UserAge convertAge(String age) {
+
         UserAge userGender = UserAge.UNKNOWN;
+        if (age != null) {
+            userGender = getUserAge(userGender, age);
+        }
+        return userGender;
+    }
+
+    private static UserAge getUserAge(UserAge userGender, String age) {
         int startAge = Integer.parseInt(age.split("~")[0]);
         for (UserAge value : UserAge.values()) {
             if (startAge == value.getStartAge()) {

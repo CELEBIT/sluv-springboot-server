@@ -1,6 +1,7 @@
 package com.sluv.server.domain.question.entity;
 
 import com.sluv.server.global.common.entity.BaseEntity;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -24,6 +25,7 @@ public class QuestionRecommendCategory extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "question_recommend_category_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)

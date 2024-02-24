@@ -97,7 +97,7 @@ public class KakaoUserService {
 
         String ageRange;
         try {
-            ageRange = jsonNode.get("kakao_account").get("gender").asText();
+            ageRange = jsonNode.get("kakao_account").get("ageRange").asText();
         } catch (Exception e) {
             ageRange = null;
         }

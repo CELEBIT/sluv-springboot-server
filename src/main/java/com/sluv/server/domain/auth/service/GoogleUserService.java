@@ -19,6 +19,7 @@ import java.util.Arrays;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 
 @Service
@@ -34,6 +35,7 @@ public class GoogleUserService {
     @Value("${spring.security.oauth2.client.apple}")
     private String CLIENT_APPLE;
 
+    @Transactional
     public User googleLogin(AuthRequestDto request) {
         String idToken = request.getAccessToken();
 

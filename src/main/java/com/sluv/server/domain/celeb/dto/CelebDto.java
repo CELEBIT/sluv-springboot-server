@@ -23,6 +23,8 @@ public class CelebDto {
     @Schema(description = "셀럽의 상위 카테고리 이름")
     private String categoryParent;
 
+    @Schema(description = "셀럽의 그룸 Id")
+    private Long parentId;
     @Schema(description = "셀럽의 그룹 한글이름")
     private String parentCelebNameKr;
     @Schema(description = "셀럽의 그룹 영어이름")
@@ -38,6 +40,7 @@ public class CelebDto {
                         celeb.getCelebCategory().getParent() != null
                                 ? celeb.getCelebCategory().getParent().getName()
                                 : null)
+                .parentId(celeb.getParent() != null ? celeb.getParent().getId() : null)
                 .parentCelebNameKr(celeb.getParent() != null ? celeb.getParent().getCelebNameKr() : null)
                 .parentCelebNameEn(celeb.getParent() != null ? celeb.getParent().getCelebNameEn() : null)
                 .build();

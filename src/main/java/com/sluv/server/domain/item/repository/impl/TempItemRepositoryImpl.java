@@ -9,6 +9,7 @@ import static com.sluv.server.domain.item.entity.QItemCategory.itemCategory;
 import static com.sluv.server.domain.item.entity.QTempItem.tempItem;
 import static com.sluv.server.domain.item.entity.QTempItemImg.tempItemImg;
 import static com.sluv.server.domain.item.entity.QTempItemLink.tempItemLink;
+import static com.sluv.server.domain.item.entity.hashtag.QHashtag.hashtag;
 import static com.sluv.server.domain.item.entity.hashtag.QTempItemHashtag.tempItemHashtag;
 
 import com.querydsl.jpa.impl.JPAQuery;
@@ -88,6 +89,7 @@ public class TempItemRepositoryImpl implements TempItemRepositoryCustom {
                 .fetch();
 
         List<TempItemHashtag> tempItemHashtags = jpaQueryFactory.selectFrom(tempItemHashtag)
+                .leftJoin(tempItemHashtag.hashtag, hashtag).fetchJoin()
                 .where(tempItemHashtag.tempItem.id.in(tempItemIds))
                 .fetch();
 

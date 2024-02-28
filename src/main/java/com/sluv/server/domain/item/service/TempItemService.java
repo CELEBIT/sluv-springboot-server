@@ -18,9 +18,9 @@ import com.sluv.server.domain.item.entity.ItemCategory;
 import com.sluv.server.domain.item.entity.TempItem;
 import com.sluv.server.domain.item.entity.TempItemImg;
 import com.sluv.server.domain.item.entity.TempItemLink;
+import com.sluv.server.domain.item.entity.hashtag.Hashtag;
 import com.sluv.server.domain.item.entity.hashtag.TempItemHashtag;
 import com.sluv.server.domain.item.exception.ItemCategoryNotFoundException;
-import com.sluv.server.domain.item.exception.TempItemNotFoundException;
 import com.sluv.server.domain.item.exception.hashtag.HashtagNotFoundException;
 import com.sluv.server.domain.item.repository.ItemCategoryRepository;
 import com.sluv.server.domain.item.repository.TempItemImgRepository;
@@ -74,22 +74,21 @@ public class TempItemService {
                         .orElseThrow(ItemCategoryNotFoundException::new)
                         : null;
 
-        TempItem tempItem = reqDto.getId() != null ? tempItemRepository.findById(reqDto.getId())
-                .orElseThrow(TempItemNotFoundException::new)
-                : TempItem.toEntity(
-                        user,
-                        celeb,
-                        newCeleb,
-                        itemCategory,
-                        brand,
-                        newBrand,
-                        reqDto
-                );
+        TempItem tempItem = tempItemRepository.findById(reqDto.getId())
+                .orElse(null);
 
-        TempItem saveTempItem = tempItemRepository.save(tempItem);
+        TempItem postTempItem;
+        if (tempItem != null) {
+            postTempItem = TempItem.toEntity(tempItem.getId(), user, celeb, newCeleb, itemCategory, brand, newBrand,
+                    reqDto);
+        } else {
+            postTempItem = TempItem.toEntity(user, celeb, newCeleb, itemCategory, brand, newBrand, reqDto);
+        }
+
+        TempItem saveTempItem = tempItemRepository.save(postTempItem);
 
         // ItemImg 테이블에 추가
-        tempItemImgRepository.deleteAllByTempItemId(tempItem.getId());
+        tempItemImgRepository.deleteAllByTempItemId(postTempItem.getId());
         if (reqDto.getImgList() != null) {
             reqDto.getImgList().stream()
                     .map(tempItemImg ->
@@ -99,7 +98,7 @@ public class TempItemService {
         }
 
         // ItemLink 테이블에 추가
-        tempItemLinkRepository.deleteAllByTempItemId(tempItem.getId());
+        tempItemLinkRepository.deleteAllByTempItemId(postTempItem.getId());
         if (reqDto.getLinkList() != null) {
             reqDto.getLinkList().stream()
                     .map(tempItemLink ->
@@ -108,15 +107,12 @@ public class TempItemService {
         }
 
         // ItemHashtag 테이블에 추가
-        tempItemHashtagRepository.deleteAllByTempItemId(tempItem.getId());
+        tempItemHashtagRepository.deleteAllByTempItemId(postTempItem.getId());
         if (reqDto.getHashTagIdList() != null) {
-            reqDto.getHashTagIdList().stream().map(hashTag ->
-                    TempItemHashtag.toEntity(
-                            saveTempItem,
-                            hashtagRepository.findById(hashTag)
-                                    .orElseThrow(HashtagNotFoundException::new)
-                    )
-            ).forEach(tempItemHashtagRepository::save);
+            reqDto.getHashTagIdList().stream().map(hashTag -> {
+                Hashtag tag = hashtagRepository.findById(hashTag).orElseThrow(HashtagNotFoundException::new);
+                return TempItemHashtag.toEntity(saveTempItem, tag);
+            }).forEach(tempItemHashtagRepository::save);
         }
 
         return saveTempItem.getId();

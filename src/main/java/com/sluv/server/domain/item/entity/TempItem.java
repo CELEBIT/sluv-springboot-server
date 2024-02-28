@@ -105,4 +105,24 @@ public class TempItem extends BaseEntity {
                 .infoSource(dto.getInfoSource())
                 .build();
     }
+
+    public static TempItem toEntity(Long id, User user, Celeb celeb, NewCeleb newCeleb,
+                                    ItemCategory category, Brand brand, NewBrand newBrand,
+                                    TempItemPostReqDto dto) {
+        return TempItem.builder()
+                .id(id)
+                .user(user)
+                .celeb(celeb)
+                .newCeleb(newCeleb)
+                .category(category)
+                .brand(brand)
+                .newBrand(newBrand)
+                .name(dto.getItemName())
+                .whenDiscovery(dto.getWhenDiscovery())
+                .whereDiscovery(dto.getWhereDiscovery())
+                .price(dto.getPrice())
+                .additionalInfo(dto.getAdditionalInfo())
+                .infoSource(dto.getInfoSource())
+                .build();
+    }
 }

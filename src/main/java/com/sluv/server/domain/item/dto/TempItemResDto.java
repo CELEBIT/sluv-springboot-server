@@ -5,7 +5,6 @@ import com.sluv.server.domain.brand.entity.Brand;
 import com.sluv.server.domain.celeb.dto.CelebDto;
 import com.sluv.server.domain.celeb.dto.NewCelebPostResDto;
 import com.sluv.server.domain.item.entity.TempItem;
-import com.sluv.server.domain.item.entity.hashtag.Hashtag;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -44,7 +43,7 @@ public class TempItemResDto {
     @Schema(description = "추가정보")
     private String additionalInfo;
     @Schema(description = "해쉬태그 리스트")
-    private List<Hashtag> hashTagList;
+    private List<ItemHashtagResponseDto> hashTagList;
     @Schema(description = "item 링크 리스트 ")
     private List<ItemLinkResDto> linkList;
     @Schema(description = "추가정보를 발견한 출처")
@@ -59,7 +58,7 @@ public class TempItemResDto {
     private LocalDateTime updatedAt;
 
     public static TempItemResDto of(TempItem tempItem, List<ItemImgResDto> imgList, List<ItemLinkResDto> linkList,
-                                    List<Hashtag> hashtagList
+                                    List<ItemHashtagResponseDto> hashtagList
     ) {
 
         CelebDto celeb = tempItem.getCeleb() != null ?
@@ -77,7 +76,7 @@ public class TempItemResDto {
         NewCelebPostResDto newCeleb = tempItem.getNewCeleb() != null
                 ? NewCelebPostResDto.of(tempItem.getNewCeleb())
                 : null;
-        
+
         NewBrandPostResDto newBrand = tempItem.getNewBrand() != null
                 ? NewBrandPostResDto.of(tempItem.getNewBrand())
                 : null;

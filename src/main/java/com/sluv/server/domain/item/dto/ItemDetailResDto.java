@@ -62,7 +62,7 @@ public class ItemDetailResDto {
     @Schema(description = "추가정보")
     private String additionalInfo;
     @Schema(description = "해쉬태그 리스트")
-    private List<HashtagResponseDto> hashTagList;
+    private List<ItemHashtagResponseDto> hashTagList;
     @Schema(description = "추가정보를 발견한 출처")
     private String infoSource;
 
@@ -80,7 +80,7 @@ public class ItemDetailResDto {
                                       Integer likeNum, Boolean likeStatus, Integer scrapNum, Boolean scrapStatus,
                                       Long viewNum, UserInfoDto writerInfo, Boolean followStatus, Boolean hasMine,
                                       List<ItemImgResDto> imgList, List<ItemLinkResDto> linkList,
-                                      List<HashtagResponseDto> hashtagList
+                                      List<ItemHashtagResponseDto> hashtagList
     ) {
 
         return ItemDetailResDto.builder()

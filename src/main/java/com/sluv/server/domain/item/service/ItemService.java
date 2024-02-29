@@ -16,11 +16,11 @@ import com.sluv.server.domain.celeb.repository.CelebRepository;
 import com.sluv.server.domain.celeb.repository.NewCelebRepository;
 import com.sluv.server.domain.closet.entity.Closet;
 import com.sluv.server.domain.closet.repository.ClosetRepository;
-import com.sluv.server.domain.item.dto.HashtagResponseDto;
 import com.sluv.server.domain.item.dto.HotPlaceResDto;
 import com.sluv.server.domain.item.dto.ItemCategoryDto;
 import com.sluv.server.domain.item.dto.ItemDetailFixData;
 import com.sluv.server.domain.item.dto.ItemDetailResDto;
+import com.sluv.server.domain.item.dto.ItemHashtagResponseDto;
 import com.sluv.server.domain.item.dto.ItemImgResDto;
 import com.sluv.server.domain.item.dto.ItemLinkResDto;
 import com.sluv.server.domain.item.dto.ItemPostReqDto;
@@ -303,10 +303,10 @@ public class ItemService {
                 .map(ItemLinkResDto::of).toList();
 
         // 7. Hashtag
-        List<HashtagResponseDto> itemHashtags = itemHashtagRepository.findAllByItemId(itemId)
+        List<ItemHashtagResponseDto> itemHashtags = itemHashtagRepository.findAllByItemId(itemId)
                 .stream()
                 .map(itemHashtag ->
-                        HashtagResponseDto.of(itemHashtag.getHashtag(), null)
+                        ItemHashtagResponseDto.of(itemHashtag.getHashtag())
                 ).toList();
 
         return ItemDetailFixData.of(item, celeb, newCeleb, brand, newBrand, category, writerInfo,

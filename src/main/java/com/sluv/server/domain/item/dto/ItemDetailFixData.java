@@ -30,7 +30,7 @@ public class ItemDetailFixData implements Serializable {
     private String whereDiscovery;
     private Integer price;
     private String additionalInfo;
-    private List<HashtagResponseDto> hashTagList;
+    private List<ItemHashtagResponseDto> hashTagList;
     private String infoSource;
     private String color;
 
@@ -38,7 +38,7 @@ public class ItemDetailFixData implements Serializable {
                                        BrandSearchResDto brand, String newBrandName, ItemCategoryDto itemCategory,
                                        UserInfoDto writerInfo, List<ItemImgResDto> imgList,
                                        List<ItemLinkResDto> linkList,
-                                       List<HashtagResponseDto> hashtagList
+                                       List<ItemHashtagResponseDto> hashtagList
     ) {
 
         return ItemDetailFixData.builder()

@@ -772,7 +772,7 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
                 .leftJoin(item.celeb, celeb).fetchJoin()
                 .leftJoin(itemImg).on(itemImg.item.eq(item))
                 .leftJoin(itemScrap).on(itemScrap.item.eq(item).and(itemScrap.closet.in(closets)))
-                .where(item.in(items))
+                .where(item.in(items).and(itemImg.representFlag.eq(true)))
                 .groupBy(item)
                 .fetch();
 

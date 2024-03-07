@@ -326,7 +326,6 @@ public class ItemService {
             itemLikeRepository.deleteByUserIdAndItemId(user.getId(), itemId);
         }
 
-        item.decreaseViewNum();
     }
 
     @Transactional

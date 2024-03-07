@@ -146,11 +146,6 @@ public class Item extends BaseEntity {
         this.viewNum++;
     }
 
-    public void decreaseViewNum() {
-        // 레디스 적용전 임시
-        this.viewNum--;
-    }
-
     public void changeStatus(ItemStatus itemStatus) {
         this.itemStatus = itemStatus;
     }

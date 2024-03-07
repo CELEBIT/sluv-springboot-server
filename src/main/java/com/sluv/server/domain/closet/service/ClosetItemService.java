@@ -63,7 +63,6 @@ public class ClosetItemService {
         );
         log.info("Save Success with ItemScrap Id: {}", saveItemScrap.getId());
 
-        item.decreaseViewNum();
 
     }
 

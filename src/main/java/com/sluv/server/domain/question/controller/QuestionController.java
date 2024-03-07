@@ -1,6 +1,7 @@
 package com.sluv.server.domain.question.controller;
 
 import com.sluv.server.domain.question.dto.QuestionBuyPostReqDto;
+import com.sluv.server.domain.question.dto.QuestionBuySimpleResDto;
 import com.sluv.server.domain.question.dto.QuestionFindPostReqDto;
 import com.sluv.server.domain.question.dto.QuestionGetDetailResDto;
 import com.sluv.server.domain.question.dto.QuestionHomeResDto;
@@ -175,7 +176,7 @@ public class QuestionController {
             @Nullable @RequestParam("qType") String qType, Pageable pageable) {
         PaginationResDto<QuestionSimpleResDto> result = switch (qType) {
             case "Total" -> questionService.getTotalQuestionList(pageable);
-            case "Buy" -> questionService.getQuestionBuyList(null, pageable);
+//            case "Buy" -> questionService.getQuestionBuyList(null, pageable);
             case "Find" -> questionService.getQuestionFindList(null, pageable);
             case "How" -> questionService.getQuestionHowaboutList(pageable);
             case "Recommend" -> questionService.getQuestionRecommendList(null, pageable);
@@ -227,11 +228,11 @@ public class QuestionController {
                     """
     )
     @GetMapping("/buy")
-    public ResponseEntity<SuccessDataResponse<PaginationResDto<QuestionSimpleResDto>>> getQuestionBuyList(
+    public ResponseEntity<SuccessDataResponse<PaginationResDto<QuestionBuySimpleResDto>>> getQuestionBuyList(
             @Nullable @RequestParam("voteStatus") String voteStatus, Pageable pageable) {
 
         return ResponseEntity.ok().body(
-                SuccessDataResponse.<PaginationResDto<QuestionSimpleResDto>>builder()
+                SuccessDataResponse.<PaginationResDto<QuestionBuySimpleResDto>>builder()
                         .result(questionService.getQuestionBuyList(voteStatus, pageable))
                         .build()
         );

@@ -16,6 +16,7 @@ import com.sluv.server.domain.item.repository.ItemImgRepository;
 import com.sluv.server.domain.item.repository.ItemRepository;
 import com.sluv.server.domain.item.repository.ItemScrapRepository;
 import com.sluv.server.domain.question.dto.QuestionBuyPostReqDto;
+import com.sluv.server.domain.question.dto.QuestionBuySimpleResDto;
 import com.sluv.server.domain.question.dto.QuestionFindPostReqDto;
 import com.sluv.server.domain.question.dto.QuestionGetDetailResDto;
 import com.sluv.server.domain.question.dto.QuestionHomeResDto;
@@ -63,6 +64,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -429,16 +431,20 @@ public class QuestionService {
      * builder에 VoteNum, VotePercent 탑재
      */
     private QuestionVoteDataDto getVoteData(Long questionId, Long sortOrder) {
+        List<QuestionVote> questionVotes = questionVoteRepository.findAllByQuestionId(questionId);
 
         // 해당 SortOrder의 투표 수
-        Long voteNum = questionVoteRepository.countByQuestionIdAndVoteSortOrder(questionId, sortOrder);
-        // 전체 투표 수
-        Long totalVoteNum = questionVoteRepository.countByQuestionId(questionId);
+        Long voteNum = 0L;
+        for (QuestionVote questionVote : questionVotes) {
+            if (Objects.equals(questionVote.getVoteSortOrder(), sortOrder)) {
+                voteNum++;
+            }
+        }
 
         return QuestionVoteDataDto.of(
                 voteNum,
-                totalVoteNum != 0
-                        ? getVotePercent(voteNum, totalVoteNum)
+                questionVotes.size() != 0
+                        ? getVotePercent(voteNum, questionVotes.stream().count())
                         : 0
         );
     }
@@ -622,13 +628,54 @@ public class QuestionService {
     }
 
     @Transactional(readOnly = true)
-    public PaginationResDto<QuestionSimpleResDto> getQuestionBuyList(String voteStatus, Pageable pageable) {
+    public PaginationResDto<QuestionBuySimpleResDto> getQuestionBuyList(String voteStatus, Pageable pageable) {
         Page<QuestionBuy> questionPage = questionRepository.getQuestionBuyList(voteStatus, pageable);
-        List<QuestionSimpleResDto> content = questionPage.stream().map(question ->
-                getQuestionSimpleResDto(question, "Buy")
-        ).toList();
+
+        List<QuestionBuySimpleResDto> content = questionPage.stream().map(question -> {
+
+            List<QuestionImgResDto> imgList = questionImgRepository.findAllByQuestionId(question.getId())
+                    .stream()
+                    .map(questionImg -> {
+                        QuestionVoteDataDto voteDataDto = getVoteData(questionImg.getQuestion().getId(),
+                                (long) questionImg.getSortOrder());
+
+                        return QuestionImgResDto.of(questionImg, voteDataDto);
+                    }).toList();
+
+            // 아이템 이미지 URL
+            List<QuestionItemResDto> itemImgList = questionItemRepository.findAllByQuestionId(question.getId())
+                    .stream()
+                    .map(questionItem -> {
+                        ItemSimpleResDto itemSimpleResDto = ItemSimpleResDto.of(
+                                questionItem.getItem(),
+                                itemImgRepository.findMainImg(questionItem.getItem().getId()),
+                                null
+                        );
+                        QuestionVoteDataDto questionVoteDataDto = getVoteData(questionItem.getQuestion().getId(),
+                                (long) questionItem.getSortOrder());
+                        return QuestionItemResDto.of(questionItem, itemSimpleResDto, questionVoteDataDto);
+                    }).toList();
+
+            Long voteCount = getTotalVoteCount(imgList, itemImgList);
+
+            return QuestionBuySimpleResDto.of(question, voteCount, imgList, itemImgList, question.getVoteEndTime());
+        }).toList();
 
         return PaginationResDto.of(questionPage, content);
+    }
+
+    private Long getTotalVoteCount(List<QuestionImgResDto> imgList, List<QuestionItemResDto> itemImgList) {
+        long totalVoteCount = 0L;
+
+        for (QuestionImgResDto questionImgResDto : imgList) {
+            totalVoteCount += questionImgResDto.getVoteNum();
+        }
+
+        for (QuestionItemResDto questionItemResDto : itemImgList) {
+            totalVoteCount += questionItemResDto.getVoteNum();
+        }
+
+        return totalVoteCount;
     }
 
     /**
@@ -691,7 +738,6 @@ public class QuestionService {
 
     }
 
-    @Transactional(readOnly = true)
     private List<QuestionImgSimpleResDto> getQuestionImgSimpleList(Question question) {
 
         // Question이 QuestionBuy인 경우 모든 이미지를 순서대로 조회

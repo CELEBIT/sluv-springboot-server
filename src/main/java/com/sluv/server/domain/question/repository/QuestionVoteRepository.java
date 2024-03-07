@@ -1,9 +1,9 @@
 package com.sluv.server.domain.question.repository;
 
 import com.sluv.server.domain.question.entity.QuestionVote;
-import org.springframework.data.jpa.repository.JpaRepository;
-
+import java.util.List;
 import java.util.Optional;
+import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface QuestionVoteRepository extends JpaRepository<QuestionVote, Long> {
     Long countByQuestionIdAndVoteSortOrder(Long question_id, Long voteSortOrder);
@@ -13,4 +13,6 @@ public interface QuestionVoteRepository extends JpaRepository<QuestionVote, Long
     Optional<QuestionVote> findByQuestionIdAndUserId(Long questionId, Long userId);
 
     Boolean existsByQuestionIdAndUserId(Long questionId, Long id);
+
+    List<QuestionVote> findAllByQuestionId(Long questionId);
 }

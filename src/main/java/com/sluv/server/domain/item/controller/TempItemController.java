@@ -1,5 +1,6 @@
 package com.sluv.server.domain.item.controller;
 
+import com.sluv.server.domain.item.dto.TempItemCountResDto;
 import com.sluv.server.domain.item.dto.TempItemPostReqDto;
 import com.sluv.server.domain.item.dto.TempItemPostResDto;
 import com.sluv.server.domain.item.dto.TempItemResDto;
@@ -37,6 +38,17 @@ public class TempItemController {
         return ResponseEntity.ok().body(
                 SuccessDataResponse.<PaginationCountResDto<TempItemResDto>>builder()
                         .result(tempItemService.getTempItemList(user, pageable))
+                        .build()
+        );
+    }
+
+    @Operation(summary = "*임시저장 아이템 갯수 조회", description = "User 토큰 필요")
+    @GetMapping("/count")
+    public ResponseEntity<SuccessDataResponse<TempItemCountResDto>> getTempItemCount(
+            @AuthenticationPrincipal User user) {
+        return ResponseEntity.ok().body(
+                SuccessDataResponse.<TempItemCountResDto>builder()
+                        .result(tempItemService.countTempItemCount(user))
                         .build()
         );
     }

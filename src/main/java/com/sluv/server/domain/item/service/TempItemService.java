@@ -12,6 +12,7 @@ import com.sluv.server.domain.celeb.exception.CelebNotFoundException;
 import com.sluv.server.domain.celeb.exception.NewCelebNotFoundException;
 import com.sluv.server.domain.celeb.repository.CelebRepository;
 import com.sluv.server.domain.celeb.repository.NewCelebRepository;
+import com.sluv.server.domain.item.dto.TempItemCountResDto;
 import com.sluv.server.domain.item.dto.TempItemPostReqDto;
 import com.sluv.server.domain.item.dto.TempItemResDto;
 import com.sluv.server.domain.item.entity.ItemCategory;
@@ -167,4 +168,7 @@ public class TempItemService {
 
     }
 
+    public TempItemCountResDto countTempItemCount(User user) {
+        return TempItemCountResDto.of(tempItemRepository.countByUserId(user.getId()));
+    }
 }

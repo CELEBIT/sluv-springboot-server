@@ -73,9 +73,12 @@ public class TempItemService {
                 reqDto.getCategoryId() != null ? itemCategoryRepository.findById(reqDto.getCategoryId())
                         .orElseThrow(ItemCategoryNotFoundException::new)
                         : null;
+        TempItem tempItem = null;
 
-        TempItem tempItem = tempItemRepository.findById(reqDto.getId())
-                .orElse(null);
+        if (reqDto.getId() != null) {
+            tempItem = tempItemRepository.findById(reqDto.getId())
+                    .orElse(null);
+        }
 
         TempItem postTempItem;
         if (tempItem != null) {

@@ -628,7 +628,8 @@ public class QuestionService {
     }
 
     @Transactional(readOnly = true)
-    public PaginationResDto<QuestionBuySimpleResDto> getQuestionBuyList(String voteStatus, Pageable pageable) {
+    public PaginationResDto<QuestionBuySimpleResDto> getQuestionBuyList(User user, String voteStatus,
+                                                                        Pageable pageable) {
         Page<QuestionBuy> questionPage = questionRepository.getQuestionBuyList(voteStatus, pageable);
 
         List<QuestionBuySimpleResDto> content = questionPage.stream().map(question -> {
@@ -658,7 +659,11 @@ public class QuestionService {
 
             Long voteCount = getTotalVoteCount(imgList, itemImgList);
 
-            return QuestionBuySimpleResDto.of(question, voteCount, imgList, itemImgList, question.getVoteEndTime());
+            QuestionVote questionVote = questionVoteRepository.findByQuestionIdAndUserId(question.getId(), user.getId())
+                    .orElse(null);
+
+            return QuestionBuySimpleResDto.of(question, voteCount, imgList, itemImgList, question.getVoteEndTime(),
+                    questionVote);
         }).toList();
 
         return PaginationResDto.of(questionPage, content);

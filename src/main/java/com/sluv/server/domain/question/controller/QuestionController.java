@@ -229,11 +229,12 @@ public class QuestionController {
     )
     @GetMapping("/buy")
     public ResponseEntity<SuccessDataResponse<PaginationResDto<QuestionBuySimpleResDto>>> getQuestionBuyList(
-            @Nullable @RequestParam("voteStatus") String voteStatus, Pageable pageable) {
+            @AuthenticationPrincipal User user, @Nullable @RequestParam("voteStatus") String voteStatus,
+            Pageable pageable) {
 
         return ResponseEntity.ok().body(
                 SuccessDataResponse.<PaginationResDto<QuestionBuySimpleResDto>>builder()
-                        .result(questionService.getQuestionBuyList(voteStatus, pageable))
+                        .result(questionService.getQuestionBuyList(user, voteStatus, pageable))
                         .build()
         );
     }

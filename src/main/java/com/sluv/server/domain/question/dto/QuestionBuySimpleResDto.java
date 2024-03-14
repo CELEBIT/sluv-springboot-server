@@ -5,6 +5,7 @@ import com.sluv.server.domain.question.entity.QuestionBuy;
 import com.sluv.server.domain.question.entity.QuestionFind;
 import com.sluv.server.domain.question.entity.QuestionHowabout;
 import com.sluv.server.domain.question.entity.QuestionRecommend;
+import com.sluv.server.domain.question.entity.QuestionVote;
 import com.sluv.server.domain.user.dto.UserInfoDto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
@@ -31,6 +32,10 @@ public class QuestionBuySimpleResDto {
     private UserInfoDto user;
     @Schema(description = "Question 투표 수")
     private Long voteNum;
+    @Schema(description = "Question 투표 상태")
+    private Boolean voteStatus;
+    @Schema(description = "Question 투표 번호")
+    private Long voteSortOrder;
 
     //이 중에 뭐 살까
     @Schema(description = "QuestionBuy 게시글 이미지 URL 리스트")
@@ -44,7 +49,7 @@ public class QuestionBuySimpleResDto {
     public static QuestionBuySimpleResDto of(Question question, Long voteNum,
                                              List<QuestionImgResDto> imgList,
                                              List<QuestionItemResDto> itemImgList,
-                                             LocalDateTime voteEndTime) {
+                                             LocalDateTime voteEndTime, QuestionVote questionVote) {
 
         String qType = null;
 
@@ -68,6 +73,8 @@ public class QuestionBuySimpleResDto {
                 .imgList(imgList)
                 .itemImgList(itemImgList)
                 .voteEndTime(voteEndTime)
+                .voteStatus(questionVote != null)
+                .voteSortOrder(questionVote != null ? questionVote.getVoteSortOrder() : null)
                 .build();
     }
 }

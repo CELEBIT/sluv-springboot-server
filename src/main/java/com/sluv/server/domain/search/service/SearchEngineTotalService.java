@@ -24,8 +24,8 @@ import org.springframework.stereotype.Service;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class SearchTotalService {
-    private final SearchService searchService;
+public class SearchEngineTotalService {
+    private final SearchEngineService searchServiceImpl;
     private final RecentSearchRepository recentSearchRepository;
     private final SearchDataRepository searchDataRepository;
 
@@ -45,22 +45,27 @@ public class SearchTotalService {
 
         // Question 검색 -> 찾아주세요 -> 이거 어때 -> 이 중에 뭐 살까 -> 추천해 줘 순서
         Pageable questionPageable = PageRequest.of(0, questionSize);
-        CompletableFuture<PaginationResDto<ItemSimpleResDto>> searchItem = searchService.getSearchItem(user, keyword,
+        CompletableFuture<PaginationResDto<ItemSimpleResDto>> searchItem = searchServiceImpl.getSearchItem(user,
+                keyword,
                 dto, itemPageable);
-        CompletableFuture<PaginationResDto<QuestionSimpleResDto>> questionFind = searchService.getSearchQuestion(user,
+        CompletableFuture<PaginationResDto<QuestionSimpleResDto>> questionFind = searchServiceImpl.getSearchQuestion(
+                user,
                 keyword, "Find", questionPageable);
-        CompletableFuture<PaginationResDto<QuestionSimpleResDto>> questionHow = searchService.getSearchQuestion(user,
+        CompletableFuture<PaginationResDto<QuestionSimpleResDto>> questionHow = searchServiceImpl.getSearchQuestion(
+                user,
                 keyword, "How", questionPageable);
-        CompletableFuture<PaginationResDto<QuestionSimpleResDto>> questionBuy = searchService.getSearchQuestion(user,
+        CompletableFuture<PaginationResDto<QuestionSimpleResDto>> questionBuy = searchServiceImpl.getSearchQuestion(
+                user,
                 keyword, "Buy", questionPageable);
-        CompletableFuture<PaginationResDto<QuestionSimpleResDto>> questionRecommend = searchService.getSearchQuestion(
+        CompletableFuture<PaginationResDto<QuestionSimpleResDto>> questionRecommend = searchServiceImpl.getSearchQuestion(
                 user, keyword, "Recommend", questionPageable);
 //        List<QuestionSimpleResDto> result = searchService.getSearchQuestion(user, keyword, "Find", questionPageable).get().getContent().stream().toList();
 
         // User 검색
         Pageable userPageable = PageRequest.of(0, userSize);
 
-        CompletableFuture<PaginationResDto<UserSearchInfoDto>> searchUser = searchService.getSearchUser(user, keyword,
+        CompletableFuture<PaginationResDto<UserSearchInfoDto>> searchUser = searchServiceImpl.getSearchUser(user,
+                keyword,
                 userPageable);
 
         CompletableFuture.allOf(searchItem, questionFind, questionHow, questionBuy, questionRecommend, searchUser)

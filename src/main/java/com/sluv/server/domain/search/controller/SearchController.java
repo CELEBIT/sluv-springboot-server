@@ -7,8 +7,9 @@ import com.sluv.server.domain.search.dto.SearchFilterReqDto;
 import com.sluv.server.domain.search.dto.SearchItemCountResDto;
 import com.sluv.server.domain.search.dto.SearchKeywordResDto;
 import com.sluv.server.domain.search.dto.SearchTotalResDto;
+import com.sluv.server.domain.search.service.SearchEngineService;
+import com.sluv.server.domain.search.service.SearchEngineTotalService;
 import com.sluv.server.domain.search.service.SearchService;
-import com.sluv.server.domain.search.service.SearchTotalService;
 import com.sluv.server.domain.user.dto.UserSearchInfoDto;
 import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.global.common.response.PaginationResDto;
@@ -31,8 +32,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/app/search")
 @RequiredArgsConstructor
 public class SearchController {
+    private final SearchEngineService searchServiceImpl;
     private final SearchService searchService;
-    private final SearchTotalService searchTotalService;
+    private final SearchEngineTotalService searchEngineTotalService;
 
     @Operation(
             summary = "*Item 검색",
@@ -51,7 +53,7 @@ public class SearchController {
             Pageable pageable) throws ExecutionException, InterruptedException {
         return ResponseEntity.ok().body(
                 SuccessDataResponse.<PaginationResDto<ItemSimpleResDto>>builder()
-                        .result(searchService.getSearchItem(user, keyword, dto, pageable).get())
+                        .result(searchServiceImpl.getSearchItem(user, keyword, dto, pageable).get())
                         .build()
         );
     }
@@ -73,7 +75,7 @@ public class SearchController {
             Pageable pageable) throws ExecutionException, InterruptedException {
         return ResponseEntity.ok().body(
                 SuccessDataResponse.<PaginationResDto<QuestionSimpleResDto>>builder()
-                        .result(searchService.getSearchQuestion(user, keyword, qType, pageable).get())
+                        .result(searchServiceImpl.getSearchQuestion(user, keyword, qType, pageable).get())
                         .build()
         );
     }
@@ -94,7 +96,7 @@ public class SearchController {
             Pageable pageable) throws ExecutionException, InterruptedException {
         return ResponseEntity.ok().body(
                 SuccessDataResponse.<PaginationResDto<UserSearchInfoDto>>builder()
-                        .result(searchService.getSearchUser(user, keyword, pageable).get())
+                        .result(searchServiceImpl.getSearchUser(user, keyword, pageable).get())
                         .build()
         );
     }
@@ -114,7 +116,7 @@ public class SearchController {
             throws ExecutionException, InterruptedException {
         return ResponseEntity.ok().body(
                 SuccessDataResponse.<SearchTotalResDto>builder()
-                        .result(searchTotalService.getSearchTotal(user, keyword))
+                        .result(searchEngineTotalService.getSearchTotal(user, keyword))
                         .build()
         );
     }
@@ -131,7 +133,7 @@ public class SearchController {
             @RequestParam("keyword") String keyword, SearchFilterReqDto dto) {
         return ResponseEntity.ok().body(
                 SuccessDataResponse.<SearchItemCountResDto>builder()
-                        .result(searchService.getSearchItemCount(keyword, dto))
+                        .result(searchServiceImpl.getSearchItemCount(keyword, dto))
                         .build()
         );
     }

@@ -66,21 +66,21 @@ public class SearchService {
     @Async
     @Transactional
     public void postRecentSearch(User user, String keyword) {
-        RecentSearch recentSearch = RecentSearch.of(user, keyword);
-
-        log.info("Post RecentSearch -> User: {}, Keyword: {}", user.getId(), keyword);
-        recentSearchRepository.save(recentSearch);
-
+        if (!keyword.isEmpty() && !keyword.isBlank()) {
+            RecentSearch recentSearch = RecentSearch.of(user, keyword);
+            log.info("Post RecentSearch -> User: {}, Keyword: {}", user.getId(), keyword);
+            recentSearchRepository.save(recentSearch);
+        }
     }
 
     @Async
     @Transactional
     public void postSearchData(String keyword) {
-        SearchData searchData = SearchData.of(keyword);
-
-        log.info("Post SearchData -> Keyword: {}", keyword);
-        searchDataRepository.save(searchData);
-
+        if (!keyword.isEmpty() && !keyword.isBlank()) {
+            SearchData searchData = SearchData.of(keyword);
+            log.info("Post SearchData -> Keyword: {}", keyword);
+            searchDataRepository.save(searchData);
+        }
     }
 
     /**

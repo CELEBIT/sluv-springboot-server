@@ -32,8 +32,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/app/search")
 @RequiredArgsConstructor
 public class SearchController {
-    private final SearchEngineService searchServiceImpl;
     private final SearchService searchService;
+    private final SearchEngineService searchEngineService;
     private final SearchEngineTotalService searchEngineTotalService;
 
     @Operation(
@@ -53,7 +53,7 @@ public class SearchController {
             Pageable pageable) throws ExecutionException, InterruptedException {
         return ResponseEntity.ok().body(
                 SuccessDataResponse.<PaginationResDto<ItemSimpleResDto>>builder()
-                        .result(searchServiceImpl.getSearchItem(user, keyword, dto, pageable).get())
+                        .result(searchEngineService.getSearchItem(user, keyword, dto, pageable).get())
                         .build()
         );
     }
@@ -75,7 +75,7 @@ public class SearchController {
             Pageable pageable) throws ExecutionException, InterruptedException {
         return ResponseEntity.ok().body(
                 SuccessDataResponse.<PaginationResDto<QuestionSimpleResDto>>builder()
-                        .result(searchServiceImpl.getSearchQuestion(user, keyword, qType, pageable).get())
+                        .result(searchEngineService.getSearchQuestion(user, keyword, qType, pageable).get())
                         .build()
         );
     }
@@ -96,7 +96,7 @@ public class SearchController {
             Pageable pageable) throws ExecutionException, InterruptedException {
         return ResponseEntity.ok().body(
                 SuccessDataResponse.<PaginationResDto<UserSearchInfoDto>>builder()
-                        .result(searchServiceImpl.getSearchUser(user, keyword, pageable).get())
+                        .result(searchEngineService.getSearchUser(user, keyword, pageable).get())
                         .build()
         );
     }
@@ -133,7 +133,7 @@ public class SearchController {
             @RequestParam("keyword") String keyword, SearchFilterReqDto dto) {
         return ResponseEntity.ok().body(
                 SuccessDataResponse.<SearchItemCountResDto>builder()
-                        .result(searchServiceImpl.getSearchItemCount(keyword, dto))
+                        .result(searchEngineService.getSearchItemCount(keyword, dto))
                         .build()
         );
     }

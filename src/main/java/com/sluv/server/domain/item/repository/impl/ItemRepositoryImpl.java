@@ -823,4 +823,30 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
                 .where(item.id.eq(itemId))
                 .fetchOne();
     }
+
+    @Override
+    public List<Item> getSearchItemIds(String word) {
+        /*
+            1. 제목
+            2. 셀럽
+            3. 브랜드
+         */
+        return jpaQueryFactory.selectFrom(item)
+                .leftJoin(item.celeb, celeb).fetchJoin()
+                .leftJoin(item.newCeleb, newCeleb).fetchJoin()
+                .leftJoin(item.brand, brand).fetchJoin()
+                .leftJoin(item.newBrand, newBrand).fetchJoin()
+                .where(item.name.like("%" + word + "%")
+                        .or(item.celeb.celebNameKr.like("%" + word + "%"))
+                        .or(item.celeb.celebNameEn.like("%" + word + "%"))
+                        .or(item.celeb.parent.celebNameKr.like("%" + word + "%"))
+                        .or(item.celeb.parent.celebNameEn.like("%" + word + "%"))
+                        .or(item.newCeleb.celebName.like("%" + word + "%"))
+                        .or(item.brand.brandKr.like("%" + word + "%"))
+                        .or(item.brand.brandEn.like("%" + word + "%"))
+                        .or(item.newBrand.brandName.like("%" + word + "%"))
+                )
+                .orderBy(item.createdAt.desc())
+                .fetch();
+    }
 }

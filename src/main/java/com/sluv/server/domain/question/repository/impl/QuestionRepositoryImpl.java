@@ -23,6 +23,7 @@ import com.sluv.server.domain.question.entity.QuestionFind;
 import com.sluv.server.domain.question.entity.QuestionHowabout;
 import com.sluv.server.domain.question.entity.QuestionRecommend;
 import com.sluv.server.domain.user.entity.User;
+import com.ulisesbocchio.jasyptspringboot.util.Collections;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -496,5 +497,21 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
                 .leftJoin(question).on(dailyHotQuestion.question.eq(question)).fetchJoin()
                 .where(question.questionStatus.eq(ACTIVE))
                 .fetch();
+    }
+
+    @Override
+    public List<Question> getSearchQuestionIds(String word) {
+        List<Question> content = jpaQueryFactory.selectFrom(question)
+                .where(question.title.like("%" + word + "%")
+                        .or(question.content.like("%" + word + "%"))
+                ).fetch();
+
+        List<Question> questionFindContent = jpaQueryFactory.selectFrom(questionFind)
+                .where(questionFind.celeb.celebNameKr.like("%" + word + "%")
+                        .or(questionFind.celeb.celebNameEn.like("%" + word + "%"))
+                        .or(questionFind.newCeleb.celebName.like("%" + word + "%"))
+                ).fetch().stream().map(question -> (Question) question).toList();
+
+        return Collections.concat(content, questionFindContent);
     }
 }

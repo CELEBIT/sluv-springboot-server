@@ -70,4 +70,6 @@ public interface ItemRepositoryCustom {
     Page<Item> getUserAllRecentItem(User user, Pageable pageable);
 
     Item getItemByIdWithCelebAndBrand(Long itemId);
+
+    List<Item> getSearchItemIds(String word);
 }

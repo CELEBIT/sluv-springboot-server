@@ -547,7 +547,7 @@ public class QuestionService {
                 ).toList();
     }
 
-    private QuestionSimpleResDto getQuestionSimpleResDto(Question question, String qType) {
+    public QuestionSimpleResDto getQuestionSimpleResDto(Question question, String qType) {
 
         List<QuestionImgSimpleResDto> imgList = new ArrayList<>();
         List<QuestionImgSimpleResDto> itemImgList = new ArrayList<>();

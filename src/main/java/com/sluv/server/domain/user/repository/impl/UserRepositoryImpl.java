@@ -122,4 +122,11 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
                 .limit(10)
                 .fetch();
     }
+
+    @Override
+    public List<User> getSearchUserIds(String word) {
+        return jpaQueryFactory.selectFrom(user)
+                .where(user.nickname.like("%" + word + "%"))
+                .fetch();
+    }
 }

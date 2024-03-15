@@ -4,10 +4,6 @@ import com.sluv.server.domain.item.dto.ItemSimpleResDto;
 import com.sluv.server.domain.question.dto.QuestionSimpleResDto;
 import com.sluv.server.domain.search.dto.SearchFilterReqDto;
 import com.sluv.server.domain.search.dto.SearchTotalResDto;
-import com.sluv.server.domain.search.entity.RecentSearch;
-import com.sluv.server.domain.search.entity.SearchData;
-import com.sluv.server.domain.search.repository.RecentSearchRepository;
-import com.sluv.server.domain.search.repository.SearchDataRepository;
 import com.sluv.server.domain.user.dto.UserSearchInfoDto;
 import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.global.common.response.PaginationResDto;
@@ -25,9 +21,8 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @RequiredArgsConstructor
 public class SearchEngineTotalService {
-    private final SearchEngineService searchServiceImpl;
-    private final RecentSearchRepository recentSearchRepository;
-    private final SearchDataRepository searchDataRepository;
+    private final SearchEngineService searchEngineService;
+    private final SearchService searchService;
 
     /**
      * 토탈 검색 with ElasticSearch
@@ -41,30 +36,28 @@ public class SearchEngineTotalService {
         Pageable itemPageable = PageRequest.of(0, itemSize);
         SearchFilterReqDto dto = SearchFilterReqDto.builder().build();
 
-//        List<ItemSimpleResDto> searchItem = searchService.getSearchItem(user, keyword, dto, itemPageable).get().getContent();
-
         // Question 검색 -> 찾아주세요 -> 이거 어때 -> 이 중에 뭐 살까 -> 추천해 줘 순서
         Pageable questionPageable = PageRequest.of(0, questionSize);
-        CompletableFuture<PaginationResDto<ItemSimpleResDto>> searchItem = searchServiceImpl.getSearchItem(user,
+        CompletableFuture<PaginationResDto<ItemSimpleResDto>> searchItem = searchEngineService.getSearchItem(user,
                 keyword,
                 dto, itemPageable);
-        CompletableFuture<PaginationResDto<QuestionSimpleResDto>> questionFind = searchServiceImpl.getSearchQuestion(
+        CompletableFuture<PaginationResDto<QuestionSimpleResDto>> questionFind = searchEngineService.getSearchQuestion(
                 user,
                 keyword, "Find", questionPageable);
-        CompletableFuture<PaginationResDto<QuestionSimpleResDto>> questionHow = searchServiceImpl.getSearchQuestion(
+        CompletableFuture<PaginationResDto<QuestionSimpleResDto>> questionHow = searchEngineService.getSearchQuestion(
                 user,
                 keyword, "How", questionPageable);
-        CompletableFuture<PaginationResDto<QuestionSimpleResDto>> questionBuy = searchServiceImpl.getSearchQuestion(
+        CompletableFuture<PaginationResDto<QuestionSimpleResDto>> questionBuy = searchEngineService.getSearchQuestion(
                 user,
                 keyword, "Buy", questionPageable);
-        CompletableFuture<PaginationResDto<QuestionSimpleResDto>> questionRecommend = searchServiceImpl.getSearchQuestion(
+        CompletableFuture<PaginationResDto<QuestionSimpleResDto>> questionRecommend = searchEngineService.getSearchQuestion(
                 user, keyword, "Recommend", questionPageable);
 //        List<QuestionSimpleResDto> result = searchService.getSearchQuestion(user, keyword, "Find", questionPageable).get().getContent().stream().toList();
 
         // User 검색
         Pageable userPageable = PageRequest.of(0, userSize);
 
-        CompletableFuture<PaginationResDto<UserSearchInfoDto>> searchUser = searchServiceImpl.getSearchUser(user,
+        CompletableFuture<PaginationResDto<UserSearchInfoDto>> searchUser = searchEngineService.getSearchUser(user,
                 keyword,
                 userPageable);
 
@@ -99,28 +92,12 @@ public class SearchEngineTotalService {
         List<UserSearchInfoDto> resultUser = searchUser.get().getContent();
 
         // 최근 검색 등록
-        postRecentSearch(user, keyword);
+        searchService.postRecentSearch(user, keyword);
 
         // 서치 데이터 등록
-        postSearchData(keyword);
+        searchService.postSearchData(keyword);
 
         return SearchTotalResDto.of(resultItem, resultQuestion, resultUser);
     }
 
-
-    private void postRecentSearch(User user, String keyword) {
-        RecentSearch recentSearch = RecentSearch.of(user, keyword);
-
-        log.info("Post RecentSearch -> User: {}, Keyword: {}", user.getId(), keyword);
-        recentSearchRepository.save(recentSearch);
-
-    }
-
-    private void postSearchData(String keyword) {
-        SearchData searchData = SearchData.of(keyword);
-
-        log.info("Post SearchData -> Keyword: {}", keyword);
-        searchDataRepository.save(searchData);
-
-    }
 }

@@ -21,6 +21,7 @@ import java.util.concurrent.ExecutionException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.Nullable;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -64,14 +65,16 @@ public class SearchController {
                     Keyword로 Question 검색 with ElasticSearch \n
                     - Pagination 적용
                     - User Id Token 필요
-                      -> 필요 없지만 일관성을 위해 필요
+                      -> 필요 없지만 일관성을 위해 필요 \n
+                    - qtype : [Buy, Find, How, Recommend] \n
+                        -> 전체검색 시 qtype = null
                     """
     )
     @GetMapping("/question")
     public ResponseEntity<SuccessDataResponse<PaginationResDto<QuestionSimpleResDto>>> searchQuestion(
             @AuthenticationPrincipal User user,
             @RequestParam("keyword") String keyword,
-            @RequestParam("qtype") String qType,
+            @Nullable @RequestParam("qtype") String qType,
             Pageable pageable) throws ExecutionException, InterruptedException {
         return ResponseEntity.ok().body(
                 SuccessDataResponse.<PaginationResDto<QuestionSimpleResDto>>builder()

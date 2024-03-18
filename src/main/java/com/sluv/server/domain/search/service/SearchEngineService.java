@@ -63,98 +63,31 @@ public class SearchEngineService {
                                                                                        String qType,
                                                                                        Pageable pageable) {
         List<Long> searchQuestionIds = searchEngine.getSearchQuestionIds(keyword);
-        Page<?> searchQuestionPage = null;
+        Page<?> searchQuestionPage;
         // 조건에 맞는 Item Page 조회
-        if (qType.equals("Buy")) {
+        if (qType == null) {
+            searchQuestionPage =
+                    questionRepository.getSearchQuestion(searchQuestionIds, pageable);
+        } else if (qType.equals("Buy")) {
             searchQuestionPage =
                     questionRepository.getSearchQuestionBuy(searchQuestionIds, pageable);
-
-//            List<QuestionSimpleResDto> content = searchQuestionPage.stream().map(question ->
-//            {
-//                // 해당 Question의 item 이미지 리스트 구하기
-//                List<QuestionItem> questionItemList = questionItemRepository.findAllByQuestionId(question.getId());
-//                List<QuestionImgSimpleResDto> itemImgList = questionItemList.stream()
-//                        .map(questionItem -> {
-//                            ItemImg mainImg = itemImgRepository.findMainImg(questionItem.getItem().getId());
-//                            return QuestionImgSimpleResDto.of(mainImg);
-//                        }).toList();
-//
-//                // 해당 Question의 이미지 리스트 구하기
-//                List<QuestionImgSimpleResDto> imgList = questionImgRepository.findAllByQuestionId(question.getId())
-//                        .stream()
-//                        .map(QuestionImgSimpleResDto::of).toList();
-//
-//                // Question 좋아요 수
-//                Long likeNum = questionLikeRepository.countByQuestionId(question.getId());
-//
-//                // Question 댓글 수
-//                Long commentNum = commentRepository.countByQuestionId(question.getId());
-//
-//                return QuestionSimpleResDto.of(question, likeNum, commentNum, imgList, itemImgList, null);
-//            }).toList();
-
-//            return CompletableFuture.completedFuture(PaginationResDto.of(searchQuestionPage, content));
-
         } else if (qType.equals("Find")) {
             searchQuestionPage =
                     questionRepository.getSearchQuestionFind(searchQuestionIds, pageable);
-
-//            List<QuestionSimpleResDto> content = searchQuestionPage.stream().map(question -> {
-//
-//                // Question 좋아요 수
-//                Long likeNum = questionLikeRepository.countByQuestionId(question.getId());
-//
-//                // Question 댓글 수
-//                Long commentNum = commentRepository.countByQuestionId(question.getId());
-//
-//                return QuestionSimpleResDto.of(question, likeNum, commentNum, null, null, null);
-//
-//            }).toList();
-//
-//            return CompletableFuture.completedFuture(PaginationResDto.of(searchQuestionPage, content));
-
         } else if (qType.equals("How")) {
             searchQuestionPage =
                     questionRepository.getSearchQuestionHowabout(searchQuestionIds, pageable);
-
-//            List<QuestionSimpleResDto> content = searchQuestionPage.stream().map(question -> {
-//
-//                // Question 좋아요 수
-//                Long likeNum = questionLikeRepository.countByQuestionId(question.getId());
-//
-//                // Question 댓글 수
-//                Long commentNum = commentRepository.countByQuestionId(question.getId());
-//
-//                return QuestionSimpleResDto.of(question, likeNum, commentNum, null, null, null);
-//            }).toList();
-//
-//            return CompletableFuture.completedFuture(PaginationResDto.of(searchQuestionPage, content));
-
         } else if (qType.equals("Recommend")) {
             searchQuestionPage =
                     questionRepository.getSearchQuestionRecommend(searchQuestionIds, pageable);
-
-//            List<QuestionSimpleResDto> content = searchQuestionPage.stream().map(question ->
-//            {
-//                List<String> categoryList = questionRecommendCategoryRepository.findAllByQuestionId(question.getId())
-//                        .stream()
-//                        .map(QuestionRecommendCategory::getName).toList();
-//
-//                // Question 좋아요 수
-//                Long likeNum = questionLikeRepository.countByQuestionId(question.getId());
-//
-//                // Question 댓글 수
-//                Long commentNum = commentRepository.countByQuestionId(question.getId());
-//
-//                return QuestionSimpleResDto.of(question, likeNum, commentNum, null, null, categoryList);
-//            }).toList();
         } else {
             throw new QuestionTypeNotFoundException();
         }
 
-        List<QuestionSimpleResDto> content = searchQuestionPage.stream().map(question ->
-                questionService.getQuestionSimpleResDto((Question) question, qType)
-        ).toList();
+        List<QuestionSimpleResDto> content = searchQuestionPage.stream()
+                .map(question ->
+                        questionService.getQuestionSimpleResDto((Question) question, qType)
+                ).toList();
 
         // 최근 검색 등록
         searchService.postRecentSearch(user, keyword);

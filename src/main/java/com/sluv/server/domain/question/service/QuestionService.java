@@ -554,7 +554,8 @@ public class QuestionService {
         String celebName = null;
         List<String> categoryNameList = null;
 
-        if (!qType.equals("Buy")) {
+//        if (!qType.equals("Buy")) {
+        if (!(question instanceof QuestionBuy)) {
             // 이미지 URL
             QuestionImg questionImg = questionImgRepository.findByQuestionIdAndRepresentFlag(question.getId(), true);
 
@@ -587,7 +588,8 @@ public class QuestionService {
                     }).toList();
         }
 
-        if (qType.equals("Recommend")) {
+//        if (qType.equals("Recommend")) {
+        if (question instanceof QuestionRecommend) {
             categoryNameList = questionRecommendCategoryRepository.findAllByQuestionId(question.getId()).stream()
                     .map(QuestionRecommendCategory::getName).toList();
         }

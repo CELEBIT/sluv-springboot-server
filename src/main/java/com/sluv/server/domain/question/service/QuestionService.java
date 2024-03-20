@@ -664,7 +664,8 @@ public class QuestionService {
             QuestionVote questionVote = questionVoteRepository.findByQuestionIdAndUserId(question.getId(), user.getId())
                     .orElse(null);
 
-            return QuestionBuySimpleResDto.of(question, voteCount, imgList, itemImgList, question.getVoteEndTime(),
+            return QuestionBuySimpleResDto.of(user, question, voteCount, imgList, itemImgList,
+                    question.getVoteEndTime(),
                     questionVote);
         }).toList();
 

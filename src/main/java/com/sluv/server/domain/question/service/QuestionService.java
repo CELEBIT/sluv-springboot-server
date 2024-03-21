@@ -496,11 +496,8 @@ public class QuestionService {
 
         return questionRepository.getWaitQuestionBuy(user, questionId, interestedCeleb)
                 .stream()
-                .map(questionBuy ->
-                        getQuestionSimpleResDto(questionBuy,
-                                "Buy"
-                        )
-                ).toList();
+                .map(questionBuy -> getQuestionSimpleResDto(questionBuy, "Buy"))
+                .toList();
     }
 
     /**
@@ -510,11 +507,8 @@ public class QuestionService {
     public List<QuestionSimpleResDto> getWaitQuestionRecommend(User user, Long questionId) {
         return questionRepository.getWaitQuestionRecommend(user, questionId)
                 .stream()
-                .map(questionRecommend ->
-                        getQuestionSimpleResDto(questionRecommend,
-                                "Recommend"
-                        )
-                ).toList();
+                .map(questionRecommend -> getQuestionSimpleResDto(questionRecommend, "Recommend"))
+                .toList();
     }
 
     /**
@@ -524,11 +518,8 @@ public class QuestionService {
     public List<QuestionSimpleResDto> getWaitQuestionHowabout(User user, Long questionId) {
         return questionRepository.getWaitQuestionHowabout(user, questionId)
                 .stream()
-                .map(questionHowabout ->
-                        getQuestionSimpleResDto(questionHowabout,
-                                "How"
-                        )
-                ).toList();
+                .map(questionHowabout -> getQuestionSimpleResDto(questionHowabout, "How"))
+                .toList();
     }
 
     /**
@@ -540,11 +531,8 @@ public class QuestionService {
 
         return questionRepository.getWaitQuestionFind(user, questionId, interestedCeleb)
                 .stream()
-                .map(questionFind ->
-                        getQuestionSimpleResDto(questionFind,
-                                "Find"
-                        )
-                ).toList();
+                .map(questionFind -> getQuestionSimpleResDto(questionFind, "Find"))
+                .toList();
     }
 
     public QuestionSimpleResDto getQuestionSimpleResDto(Question question, String qType) {

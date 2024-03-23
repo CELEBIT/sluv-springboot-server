@@ -39,8 +39,9 @@ public class ItemSimpleResDto {
                                 : item.getNewBrand().getBrandName()
                 )
                 .celebName(
-                        item.getCeleb() != null
-                                ? item.getCeleb().getCelebNameKr()
+                        item.getCeleb() != null ? item.getCeleb().getParent() != null
+                                ? item.getCeleb().getParent().getCelebNameKr() + " " + item.getCeleb().getCelebNameKr()
+                                : item.getCeleb().getCelebNameKr()
                                 : item.getNewCeleb().getCelebName()
                 )
                 .itemName(item.getName())

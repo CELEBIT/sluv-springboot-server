@@ -207,8 +207,6 @@ public class UserService {
     public UserTermsResDto postTerms(User user) {
         user.changeTermStatus(!user.getTermsStatus());
         userRepository.save(user);
-        return UserTermsResDto.builder()
-                .termsStatus(user.getTermsStatus())
-                .build();
+        return UserTermsResDto.of(user);
     }
 }

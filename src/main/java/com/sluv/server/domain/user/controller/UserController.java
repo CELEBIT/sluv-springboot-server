@@ -188,4 +188,14 @@ public class UserController {
                         .build()
         );
     }
+
+    @Operation(summary = "*약관 동의 상태 조회", description = "광고성 정보 수신 및 마케팅 활용 동의 상태 조회")
+    @GetMapping("/terms")
+    public ResponseEntity<SuccessDataResponse<UserTermsResDto>> getUserTermsStatus(@AuthenticationPrincipal User user) {
+        return ResponseEntity.ok().body(
+                SuccessDataResponse.<UserTermsResDto>builder()
+                        .result(UserTermsResDto.of(user))
+                        .build()
+        );
+    }
 }

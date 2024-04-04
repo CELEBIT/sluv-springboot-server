@@ -68,9 +68,10 @@ public class CelebRepositoryImpl implements CelebRepositoryCustom {
 
             plusContent = jpaQueryFactory
                     .selectFrom(celeb)
-                    .where(celeb.parent.celebNameKr.like(teamName + "%").and(celeb.celebNameKr.like(memberName + "%"))
-                            .or(celeb.parent.celebNameEn.like(teamName + "%")
-                                    .and(celeb.celebNameEn.like(memberName + "%")))
+                    .where(celeb.parent.celebNameKr.like("%" + teamName + "%")
+                            .and(celeb.celebNameKr.like("%" + memberName + "%"))
+                            .or(celeb.parent.celebNameEn.like("%" + teamName + "%")
+                                    .and(celeb.celebNameEn.like("%" + memberName + "%")))
                     ).offset(pageable.getOffset())
                     .limit(pageable.getPageSize())
                     .fetch();
@@ -81,11 +82,11 @@ public class CelebRepositoryImpl implements CelebRepositoryCustom {
                 .leftJoin(celeb.parent)
                 .where(
                         // 2. [셀럽 이름과 일치]
-                        celeb.celebNameKr.like(celebName + "%")
-                                .or(celeb.celebNameEn.like(celebName + "%"))
+                        celeb.celebNameKr.like("%" + celebName + "%")
+                                .or(celeb.celebNameEn.like("%" + celebName + "%"))
                                 // 3. [그룹 이름과 일치]
-                                .or(celeb.parent.celebNameKr.like(celebName + "%"))
-                                .or(celeb.parent.celebNameEn.like(celebName + "%"))
+                                .or(celeb.parent.celebNameKr.like("%" + celebName + "%"))
+                                .or(celeb.parent.celebNameEn.like("%" + celebName + "%"))
                                 // 그룹이 검색되는 것을 방지.
                                 .and(celeb.subCelebList.isEmpty())
                 )
@@ -109,9 +110,10 @@ public class CelebRepositoryImpl implements CelebRepositoryCustom {
 
             countCelebPlusJPAQuery = jpaQueryFactory
                     .selectFrom(celeb)
-                    .where(celeb.parent.celebNameKr.like(teamName + "%").and(celeb.celebNameKr.like(memberName + "%"))
-                            .or(celeb.parent.celebNameEn.like(teamName + "%")
-                                    .and(celeb.celebNameEn.like(memberName + "%")))
+                    .where(celeb.parent.celebNameKr.like("%" + teamName + "%")
+                            .and(celeb.celebNameKr.like("%" + memberName + "%"))
+                            .or(celeb.parent.celebNameEn.like("%" + teamName + "%")
+                                    .and(celeb.celebNameEn.like("%" + memberName + "%")))
                     );
         } else {
             countCelebPlusJPAQuery = null;
@@ -122,11 +124,11 @@ public class CelebRepositoryImpl implements CelebRepositoryCustom {
                 .leftJoin(celeb.parent)
                 .where(
                         // 2. [셀럽 이름과 일치]
-                        celeb.celebNameKr.like(celebName + "%")
-                                .or(celeb.celebNameEn.like(celebName + "%"))
+                        celeb.celebNameKr.like("%" + celebName + "%")
+                                .or(celeb.celebNameEn.like("%" + celebName + "%"))
                                 // 3. [그룹 이름과 일치]
-                                .or(celeb.parent.celebNameKr.like(celebName + "%"))
-                                .or(celeb.parent.celebNameEn.like(celebName + "%"))
+                                .or(celeb.parent.celebNameKr.like("%" + celebName + "%"))
+                                .or(celeb.parent.celebNameEn.like("%" + celebName + "%"))
                                 // 그룹이 검색되는 것을 방지.
                                 .and(celeb.subCelebList.isEmpty())
                 )
@@ -196,8 +198,8 @@ public class CelebRepositoryImpl implements CelebRepositoryCustom {
                 .selectFrom(celeb)
                 .where(celeb.parent.isNull()
                         .and(
-                                celeb.celebNameKr.like(celebName + "%")
-                                        .or(celeb.celebNameEn.like(celebName + "%"))
+                                celeb.celebNameKr.like("%" + celebName + "%")
+                                        .or(celeb.celebNameEn.like("%" + celebName + "%"))
                         )
                 )
                 .fetch();
@@ -212,8 +214,8 @@ public class CelebRepositoryImpl implements CelebRepositoryCustom {
                 .from(celeb)
                 .where(celeb.parent.isNotNull()
                         .and(
-                                celeb.celebNameKr.like(celebName + "%")
-                                        .or(celeb.celebNameEn.like(celebName + "%"))
+                                celeb.celebNameKr.like("%" + celebName + "%")
+                                        .or(celeb.celebNameEn.like("%" + celebName + "%"))
                         )
                 )
                 .fetch();

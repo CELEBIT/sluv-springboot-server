@@ -23,6 +23,7 @@ import com.sluv.server.domain.user.dto.UserMypageResDto;
 import com.sluv.server.domain.user.dto.UserProfileImgReqDto;
 import com.sluv.server.domain.user.dto.UserProfileReqDto;
 import com.sluv.server.domain.user.dto.UserSearchInfoDto;
+import com.sluv.server.domain.user.dto.UserSocialDto;
 import com.sluv.server.domain.user.dto.UserTermsResDto;
 import com.sluv.server.domain.user.dto.UserWithdrawReqDto;
 import com.sluv.server.domain.user.entity.User;
@@ -223,5 +224,9 @@ public class UserService {
 
         userWithdrawRepository.save(UserWithdraw.toEntity(user, dto));
 
+    }
+
+    public UserSocialDto getUserSocialData(User user) {
+        return UserSocialDto.of(user);
     }
 }

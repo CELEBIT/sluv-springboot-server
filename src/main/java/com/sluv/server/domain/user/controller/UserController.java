@@ -9,6 +9,7 @@ import com.sluv.server.domain.user.dto.UserMypageResDto;
 import com.sluv.server.domain.user.dto.UserProfileImgReqDto;
 import com.sluv.server.domain.user.dto.UserProfileReqDto;
 import com.sluv.server.domain.user.dto.UserSearchInfoDto;
+import com.sluv.server.domain.user.dto.UserSocialDto;
 import com.sluv.server.domain.user.dto.UserTermsResDto;
 import com.sluv.server.domain.user.dto.UserWithdrawReqDto;
 import com.sluv.server.domain.user.entity.User;
@@ -102,6 +103,17 @@ public class UserController {
         return ResponseEntity.ok().body(
                 SuccessDataResponse.<PaginationResDto<ClosetResDto>>builder()
                         .result(userService.getUserCloset(user, userId, pageable))
+                        .build()
+        );
+    }
+
+    @Operation(summary = "*유저의 이메일, 소셜 종류 조회", description = "User 토큰 필요.")
+    @GetMapping("/social")
+    public ResponseEntity<SuccessDataResponse<UserSocialDto>> getUserSocialData(@AuthenticationPrincipal User user) {
+
+        return ResponseEntity.ok().body(
+                SuccessDataResponse.<UserSocialDto>builder()
+                        .result(userService.getUserSocialData(user))
                         .build()
         );
     }

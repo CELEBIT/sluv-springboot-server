@@ -24,12 +24,15 @@ import com.sluv.server.domain.user.dto.UserProfileImgReqDto;
 import com.sluv.server.domain.user.dto.UserProfileReqDto;
 import com.sluv.server.domain.user.dto.UserSearchInfoDto;
 import com.sluv.server.domain.user.dto.UserTermsResDto;
+import com.sluv.server.domain.user.dto.UserWithdrawReqDto;
 import com.sluv.server.domain.user.entity.User;
+import com.sluv.server.domain.user.entity.UserWithdraw;
 import com.sluv.server.domain.user.enums.UserStatus;
 import com.sluv.server.domain.user.exception.UserNicknameDuplicatedException;
 import com.sluv.server.domain.user.exception.UserNotFoundException;
 import com.sluv.server.domain.user.repository.FollowRepository;
 import com.sluv.server.domain.user.repository.UserRepository;
+import com.sluv.server.domain.user.repository.UserWithdrawRepository;
 import com.sluv.server.global.common.response.PaginationCountResDto;
 import com.sluv.server.global.common.response.PaginationResDto;
 import java.util.List;
@@ -54,6 +57,8 @@ public class UserService {
     private final ItemImgRepository itemImgRepository;
     private final ItemScrapRepository itemScrapRepository;
     private final ClosetRepository closetRepository;
+    private final UserWithdrawRepository userWithdrawRepository;
+
     private final ItemHelper itemHelper;
     private final QuestionDtoMapper questionDtoMapper;
     private final ItemCacheService itemCacheService;
@@ -208,5 +213,15 @@ public class UserService {
         user.changeTermStatus(!user.getTermsStatus());
         userRepository.save(user);
         return UserTermsResDto.of(user);
+    }
+
+    public void withdrawUser(User user, UserWithdrawReqDto dto) {
+        user.changeUserStatus(UserStatus.DELETED);
+        userRepository.save(user);
+
+        // TODO: 데이터 삭제 로직
+
+        userWithdrawRepository.save(UserWithdraw.toEntity(user, dto));
+
     }
 }

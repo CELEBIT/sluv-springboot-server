@@ -10,6 +10,7 @@ import com.sluv.server.domain.user.dto.UserProfileImgReqDto;
 import com.sluv.server.domain.user.dto.UserProfileReqDto;
 import com.sluv.server.domain.user.dto.UserSearchInfoDto;
 import com.sluv.server.domain.user.dto.UserTermsResDto;
+import com.sluv.server.domain.user.dto.UserWithdrawReqDto;
 import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.domain.user.service.UserService;
 import com.sluv.server.global.common.response.PaginationCountResDto;
@@ -197,5 +198,13 @@ public class UserController {
                         .result(UserTermsResDto.of(user))
                         .build()
         );
+    }
+
+    @Operation(summary = "*회원 탈퇴", description = "회원 탈퇴 기능")
+    @PostMapping("/withdraw")
+    public ResponseEntity<SuccessResponse> withdrawUser(@AuthenticationPrincipal User user,
+                                                        @RequestBody UserWithdrawReqDto dto) {
+        userService.withdrawUser(user, dto);
+        return ResponseEntity.ok().body(new SuccessResponse());
     }
 }

@@ -5,6 +5,7 @@ import static com.sluv.server.domain.item.entity.QItem.item;
 import static com.sluv.server.domain.user.entity.QFollow.follow;
 import static com.sluv.server.domain.user.entity.QUser.user;
 import static com.sluv.server.domain.user.enums.UserStatus.ACTIVE;
+import static com.sluv.server.domain.user.enums.UserStatus.DELETED;
 
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -128,5 +129,13 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
         return jpaQueryFactory.selectFrom(user)
                 .where(user.nickname.like("%" + word + "%"))
                 .fetch();
+    }
+
+    @Override
+    public long getNotDeleteUserCount() {
+        List<User> users = jpaQueryFactory.selectFrom(user)
+                .where(user.userStatus.ne(DELETED))
+                .fetch();
+        return users.stream().count();
     }
 }

@@ -15,4 +15,6 @@ public interface UserRepositoryCustom {
     List<User> getHotSluver(User user, Long celebId);
 
     List<User> getSearchUserIds(String word);
+
+    long getNotDeleteUserCount();
 }

@@ -29,6 +29,7 @@ public class AdminController {
     @GetMapping("/webhook")
     public void test(@AuthenticationPrincipal User user) {
         webHookService.sendSingupMessage(user);
+        webHookService.sendWithdrawMessage(user);
     }
 
 

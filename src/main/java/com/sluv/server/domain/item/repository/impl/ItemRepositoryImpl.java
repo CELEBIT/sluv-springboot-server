@@ -9,6 +9,7 @@ import static com.sluv.server.domain.closet.entity.QCloset.closet;
 import static com.sluv.server.domain.item.entity.QDayHotItem.dayHotItem;
 import static com.sluv.server.domain.item.entity.QEfficientItem.efficientItem;
 import static com.sluv.server.domain.item.entity.QItem.item;
+import static com.sluv.server.domain.item.entity.QItemCategory.itemCategory;
 import static com.sluv.server.domain.item.entity.QItemImg.itemImg;
 import static com.sluv.server.domain.item.entity.QItemLike.itemLike;
 import static com.sluv.server.domain.item.entity.QItemLink.itemLink;
@@ -29,6 +30,7 @@ import com.sluv.server.domain.celeb.entity.Celeb;
 import com.sluv.server.domain.closet.entity.Closet;
 import com.sluv.server.domain.item.dto.ItemSimpleResDto;
 import com.sluv.server.domain.item.entity.Item;
+import com.sluv.server.domain.item.entity.QItemCategory;
 import com.sluv.server.domain.item.entity.RecentItem;
 import com.sluv.server.domain.search.dto.SearchFilterReqDto;
 import com.sluv.server.domain.user.entity.User;
@@ -847,6 +849,19 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
                         .or(item.newBrand.brandName.like("%" + word + "%"))
                 )
                 .orderBy(item.createdAt.desc())
+                .fetch();
+    }
+
+    @Override
+    public List<Item> getItemContainKeyword(String keyword) {
+        QItemCategory parent = new QItemCategory("parent");
+        return jpaQueryFactory.selectFrom(item)
+                .leftJoin(item.category, itemCategory).fetchJoin()
+                .leftJoin(item.category.parent, parent).fetchJoin()
+                .leftJoin(item.brand, brand).fetchJoin()
+                .where(item.name.like("%" + keyword + "%"))
+                .orderBy(item.whenDiscovery.desc())
+                .limit(5)
                 .fetch();
     }
 }

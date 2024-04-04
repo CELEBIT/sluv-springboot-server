@@ -9,4 +9,6 @@ public interface BrandRepositoryCustom {
     Page<Brand> findByAllBrandKrOrBrandEnStartingWith(String brandName, Pageable pageable);
 
     List<Brand> findTop10By();
+
+    List<Brand> getBrandContainKeyword(String keyword);
 }

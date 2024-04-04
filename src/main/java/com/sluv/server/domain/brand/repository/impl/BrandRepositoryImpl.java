@@ -45,4 +45,14 @@ public class BrandRepositoryImpl implements BrandRepositoryCustom {
                 .limit(10)
                 .fetch();
     }
+
+    @Override
+    public List<Brand> getBrandContainKeyword(String keyword) {
+        return jpaQueryFactory.selectFrom(brand)
+                .where(brand.brandKr.like("%" + keyword + "%")
+                        .or(brand.brandKr.like("%" + keyword + "%"))
+                )
+                .limit(5)
+                .fetch();
+    }
 }

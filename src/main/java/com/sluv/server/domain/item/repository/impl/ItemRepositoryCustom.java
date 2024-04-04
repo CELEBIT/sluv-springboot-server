@@ -72,4 +72,6 @@ public interface ItemRepositoryCustom {
     Item getItemByIdWithCelebAndBrand(Long itemId);
 
     List<Item> getSearchItemIds(String word);
+
+    List<Item> getItemContainKeyword(String keyword);
 }

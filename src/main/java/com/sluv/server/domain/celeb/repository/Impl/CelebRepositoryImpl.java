@@ -33,7 +33,7 @@ public class CelebRepositoryImpl implements CelebRepositoryCustom {
         log.info("유저 {}의 관심셀럽 조회", _user.getId());
         QCeleb child = new QCeleb("childCeleb");
         QCelebCategory parentCelebCategory = new QCelebCategory("parentCelebCategory");
-        
+
         List<InterestedCeleb> fetch = jpaQueryFactory.selectFrom(interestedCeleb)
                 .leftJoin(interestedCeleb.celeb, celeb).fetchJoin()
                 .leftJoin(celeb.subCelebList, child).fetchJoin()
@@ -216,6 +216,20 @@ public class CelebRepositoryImpl implements CelebRepositoryCustom {
                                         .or(celeb.celebNameEn.like(celebName + "%"))
                         )
                 )
+                .fetch();
+    }
+
+    @Override
+    public List<Celeb> getCelebByContainKeyword(String keyword) {
+        QCeleb parent = new QCeleb("parent");
+        return jpaQueryFactory.selectFrom(celeb)
+                .leftJoin(celeb.parent, parent).fetchJoin()
+                .where(celeb.celebNameKr.like("%" + keyword + "%")
+                        .or(celeb.celebNameEn.like("%" + keyword + "%"))
+                        .or(celeb.parent.celebNameKr.like("%" + keyword + "%"))
+                        .or(celeb.parent.celebNameEn.like("%" + keyword + "%"))
+                )
+                .limit(5)
                 .fetch();
     }
 }

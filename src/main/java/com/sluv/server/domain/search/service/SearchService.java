@@ -1,7 +1,14 @@
 package com.sluv.server.domain.search.service;
 
+import com.sluv.server.domain.brand.dto.BrandSearchResDto;
+import com.sluv.server.domain.brand.repository.BrandRepository;
+import com.sluv.server.domain.celeb.dto.CelebSearchResDto;
+import com.sluv.server.domain.celeb.repository.CelebRepository;
+import com.sluv.server.domain.item.dto.ItemKeywordSearchResDto;
+import com.sluv.server.domain.item.repository.ItemRepository;
 import com.sluv.server.domain.search.dto.RecentSearchChipResDto;
 import com.sluv.server.domain.search.dto.SearchKeywordResDto;
+import com.sluv.server.domain.search.dto.SearchKeywordTotalResDto;
 import com.sluv.server.domain.search.entity.RecentSearch;
 import com.sluv.server.domain.search.entity.SearchData;
 import com.sluv.server.domain.search.entity.SearchRank;
@@ -27,6 +34,9 @@ public class SearchService {
     private final RecentSearchRepository recentSearchRepository;
     private final SearchRankRepository searchRankRepository;
     private final SearchDataRepository searchDataRepository;
+    private final CelebRepository celebRepository;
+    private final BrandRepository brandRepository;
+    private final ItemRepository itemRepository;
 
     @Transactional(readOnly = true)
     public List<RecentSearchChipResDto> getRecentSearch(User user) {
@@ -96,5 +106,23 @@ public class SearchService {
     public void deleteAllSearchKeyword(User user) {
         log.info("Delete {}'s All Recent Search Keyword", user.getId());
         recentSearchRepository.deleteAllByUserId(user.getId());
+    }
+
+    @Transactional(readOnly = true)
+    public SearchKeywordTotalResDto getAllDateByKeyword(User user, String keyword) {
+        // 1. 셀럽 2. 브랜드 3. 아이템
+        List<CelebSearchResDto> celebByContainKeyword = celebRepository.getCelebByContainKeyword(keyword).stream()
+                .map(CelebSearchResDto::of)
+                .toList();
+
+        List<BrandSearchResDto> brandByContainKeyword = brandRepository.getBrandContainKeyword(keyword).stream()
+                .map(BrandSearchResDto::of)
+                .toList();
+
+        List<ItemKeywordSearchResDto> itemByContainKeyword = itemRepository.getItemContainKeyword(keyword).stream()
+                .map(ItemKeywordSearchResDto::of)
+                .toList();
+
+        return SearchKeywordTotalResDto.of(celebByContainKeyword, brandByContainKeyword, itemByContainKeyword);
     }
 }

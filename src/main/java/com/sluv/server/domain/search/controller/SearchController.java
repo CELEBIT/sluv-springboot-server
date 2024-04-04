@@ -6,6 +6,7 @@ import com.sluv.server.domain.search.dto.RecentSearchChipResDto;
 import com.sluv.server.domain.search.dto.SearchFilterReqDto;
 import com.sluv.server.domain.search.dto.SearchItemCountResDto;
 import com.sluv.server.domain.search.dto.SearchKeywordResDto;
+import com.sluv.server.domain.search.dto.SearchKeywordTotalResDto;
 import com.sluv.server.domain.search.dto.SearchTotalResDto;
 import com.sluv.server.domain.search.service.SearchEngineService;
 import com.sluv.server.domain.search.service.SearchEngineTotalService;
@@ -221,6 +222,18 @@ public class SearchController {
         searchService.deleteAllSearchKeyword(user);
         return ResponseEntity.ok().body(
                 new SuccessResponse()
+        );
+    }
+
+    @Operation(summary = "*검색어 기준 브랜드, 셀럽, 아이템 검색 ", description = "각 5개씩")
+    @GetMapping("/allData")
+    public ResponseEntity<SuccessDataResponse<SearchKeywordTotalResDto>> getAllDateByKeyword(
+            @AuthenticationPrincipal User user,
+            @RequestParam("keyword") String keyword) {
+        return ResponseEntity.ok().body(
+                SuccessDataResponse.<SearchKeywordTotalResDto>builder()
+                        .result(searchService.getAllDateByKeyword(user, keyword))
+                        .build()
         );
     }
 }

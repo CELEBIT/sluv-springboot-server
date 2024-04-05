@@ -13,6 +13,7 @@ import com.sluv.server.domain.user.enums.UserAge;
 import com.sluv.server.domain.user.enums.UserGender;
 import com.sluv.server.domain.user.exception.UserNotFoundException;
 import com.sluv.server.domain.user.repository.UserRepository;
+import com.sluv.server.global.discord.WebHookService;
 import com.sluv.server.global.jwt.exception.InvalidateTokenException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpEntity;
@@ -29,6 +30,7 @@ import org.springframework.web.client.RestTemplate;
 public class KakaoUserService {
     private final UserRepository userRepository;
     private final ClosetService closetService;
+    private final WebHookService webHookService;
 
     public User kakaoLogin(AuthRequestDto request) throws JsonProcessingException {
         String accessToken = request.getAccessToken();
@@ -129,6 +131,7 @@ public class KakaoUserService {
 
             // 생성과 동시에 기본 Closet 생성
             closetService.postBasicCloset(user);
+            webHookService.sendSingupMessage(user);
         }
 
         return user;

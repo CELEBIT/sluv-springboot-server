@@ -35,14 +35,12 @@ public class DiscordWebHookService implements WebHookService {
         LocalTime localTime = now.toLocalTime().truncatedTo(ChronoUnit.SECONDS);
         String message = new StringBuilder()
                 .append("# 유저가 가입하였습니다.\n")
-                .append("- 닉네임: ").append(user.getNickname()).append("\n")
                 .append("- 연령대: ").append(user.getAgeRange()).append("\n")
                 .append("- 성별: ").append(user.getGender()).append("\n")
                 .append("- 가입 시간: ").append(date).append(" ").append(localTime).append("\n")
                 .append("### 현재 __**").append(userCount).append("명**__의 유저")
                 .toString();
 
-        System.out.println(message);
         WebHookMessage webHookMessage = new WebHookMessage(message);
 
         discordWebHookConnector.sendMessageForDiscord(webHookMessage, DISCORD_WEBHOOK_SIGNUP_URL);
@@ -66,7 +64,6 @@ public class DiscordWebHookService implements WebHookService {
                 .append("### 현재 __**").append(userCount).append("명**__의 유저")
                 .toString();
 
-        System.out.println(message);
         WebHookMessage webHookMessage = new WebHookMessage(message);
 
         discordWebHookConnector.sendMessageForDiscord(webHookMessage, DISCORD_WEBHOOK_WITHDRAW_URL);

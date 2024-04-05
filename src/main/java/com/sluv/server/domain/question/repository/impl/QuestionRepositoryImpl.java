@@ -514,4 +514,12 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
 
         return Collections.concat(content, questionFindContent);
     }
+
+    @Override
+    public void withdrawByUserId(Long userId) {
+        jpaQueryFactory.update(question)
+                .set(question.user.id, -1L)
+                .where(question.user.id.eq(userId))
+                .execute();
+    }
 }

@@ -17,4 +17,6 @@ public interface ClosetRepositoryCustom {
     List<ClosetResDto> getUserClosetList(User user);
 
     Boolean checkDuplicate(String name, Long closetId);
+
+    void withdrawAllByUserId(Long userId);
 }

@@ -864,4 +864,12 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
                 .limit(5)
                 .fetch();
     }
+
+    @Override
+    public void withdrawByUserId(Long userId) {
+        jpaQueryFactory.update(item)
+                .set(item.user.id, -1L)
+                .where(item.user.id.eq(userId))
+                .execute();
+    }
 }

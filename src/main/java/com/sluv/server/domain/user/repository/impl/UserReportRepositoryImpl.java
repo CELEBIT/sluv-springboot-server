@@ -1,10 +1,10 @@
 package com.sluv.server.domain.user.repository.impl;
 
+import static com.sluv.server.domain.user.entity.QUserReport.userReport;
+
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sluv.server.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
-
-import static com.sluv.server.domain.user.entity.QUserReport.userReport;
 
 @RequiredArgsConstructor
 public class UserReportRepositoryImpl implements UserReportRepositoryCustom {
@@ -18,5 +18,18 @@ public class UserReportRepositoryImpl implements UserReportRepositoryCustom {
                         .and(userReport.reported.eq(target))
                 )
                 .fetchFirst() != null;
+    }
+
+    @Override
+    public void withdrawByUserId(Long userId) {
+        jpaQueryFactory.update(userReport)
+                .set(userReport.reporter.id, -1L)
+                .where(userReport.reporter.id.eq(userId))
+                .execute();
+
+        jpaQueryFactory.update(userReport)
+                .set(userReport.reported.id, -1L)
+                .where(userReport.reported.id.eq(userId))
+                .execute();
     }
 }

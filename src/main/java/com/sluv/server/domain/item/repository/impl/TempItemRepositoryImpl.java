@@ -60,9 +60,11 @@ public class TempItemRepositoryImpl implements TempItemRepositoryCustom {
     }
 
     @Override
-    public List<TempItem> findAllExceptLast(User user) {
+    public List<TempItem> findAllExceptLast(Long userId) {
 
-        return jpaQueryFactory.selectFrom(tempItem).where(tempItem.user.eq(user)).orderBy(tempItem.updatedAt.desc())
+        return jpaQueryFactory.selectFrom(tempItem)
+                .where(tempItem.user.id.eq(userId))
+                .orderBy(tempItem.updatedAt.desc())
                 .offset(1).fetch();
     }
 

@@ -11,7 +11,7 @@ public interface TempItemRepositoryCustom {
     //    Page<TempItem> getTempItemList(User user, Pageable pageable);
     Page<TempItem> getTempItemList(User user, Pageable pageable);
 
-    List<TempItem> findAllExceptLast(User user);
+    List<TempItem> findAllExceptLast(Long userId);
 
     List<TempItemResDto> getTempItemResDto(List<TempItem> content);
 }

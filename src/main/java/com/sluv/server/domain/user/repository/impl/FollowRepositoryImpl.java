@@ -66,4 +66,18 @@ public class FollowRepositoryImpl implements FollowRepositoryCustom {
                 .map(u -> UserSearchInfoDto.of(u, followMap.containsKey(u.getId())))
                 .toList();
     }
+
+    @Override
+    public void deleteFolloweeByUserId(Long userId) {
+        jpaQueryFactory.delete(follow)
+                .where(follow.followee.id.eq(userId))
+                .execute();
+    }
+
+    @Override
+    public void deleteFollowerByUserId(Long userId) {
+        jpaQueryFactory.delete(follow)
+                .where(follow.follower.id.eq(userId))
+                .execute();
+    }
 }

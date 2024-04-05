@@ -150,9 +150,9 @@ public class TempItemService {
         tempItemRepository.deleteById(tempItemId);
     }
 
-    public void deleteAllTempItem(User user) {
+    public void deleteAllTempItem(Long userId) {
         // 1. 해당 유저의 모든 TempItem 조회
-        List<TempItem> tempItemList = tempItemRepository.findAllExceptLast(user);
+        List<TempItem> tempItemList = tempItemRepository.findAllExceptLast(userId);
 
         // 2. 모든 TempItem에 대한 관련된 삭제
         tempItemList.forEach(tempItem -> {

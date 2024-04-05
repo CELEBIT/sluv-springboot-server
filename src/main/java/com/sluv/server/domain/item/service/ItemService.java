@@ -49,7 +49,6 @@ import com.sluv.server.domain.item.repository.hashtag.ItemHashtagRepository;
 import com.sluv.server.domain.search.dto.SearchFilterReqDto;
 import com.sluv.server.domain.user.dto.UserInfoDto;
 import com.sluv.server.domain.user.entity.User;
-import com.sluv.server.domain.user.exception.UserNotFoundException;
 import com.sluv.server.domain.user.repository.FollowRepository;
 import com.sluv.server.domain.user.repository.UserRepository;
 import com.sluv.server.global.ai.AiModelService;
@@ -289,7 +288,7 @@ public class ItemService {
 
         // 4. 작성자 info
         User writer = userRepository.findById(item.getUser().getId())
-                .orElseThrow(UserNotFoundException::new);
+                .orElse(User.builder().id(-1L).build());
         UserInfoDto writerInfo = UserInfoDto.of(writer);
 
         // 5. Item 이미지들 조회

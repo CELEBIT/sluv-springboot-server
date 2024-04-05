@@ -74,4 +74,6 @@ public interface ItemRepositoryCustom {
     List<Item> getSearchItemIds(String word);
 
     List<Item> getItemContainKeyword(String keyword);
+
+    void withdrawByUserId(Long userId);
 }

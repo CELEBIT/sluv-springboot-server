@@ -14,6 +14,7 @@ import com.sluv.server.domain.item.repository.ItemImgRepository;
 import com.sluv.server.domain.item.repository.ItemRepository;
 import com.sluv.server.domain.item.repository.ItemScrapRepository;
 import com.sluv.server.domain.item.service.ItemCacheService;
+import com.sluv.server.domain.item.service.TempItemService;
 import com.sluv.server.domain.question.dto.QuestionSimpleResDto;
 import com.sluv.server.domain.question.entity.Question;
 import com.sluv.server.domain.question.enums.QuestionStatus;
@@ -36,6 +37,7 @@ import com.sluv.server.domain.user.repository.UserRepository;
 import com.sluv.server.domain.user.repository.UserWithdrawRepository;
 import com.sluv.server.global.common.response.PaginationCountResDto;
 import com.sluv.server.global.common.response.PaginationResDto;
+import com.sluv.server.global.discord.WebHookService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -63,6 +65,9 @@ public class UserService {
     private final ItemHelper itemHelper;
     private final QuestionDtoMapper questionDtoMapper;
     private final ItemCacheService itemCacheService;
+    private final WebHookService webHookService;
+    private final UserWithdrawDataService userWithdrawDataService;
+    private final TempItemService tempItemService;
 
     @Transactional
     public void postUserProfile(User user, UserProfileReqDto dto) {
@@ -220,9 +225,16 @@ public class UserService {
         user.changeUserStatus(UserStatus.DELETED);
         userRepository.save(user);
 
-        // TODO: 데이터 삭제 로직
+        userWithdrawDataService.withdrawItemByUserId(user.getId());
+        userWithdrawDataService.withdrawQuestionByUserId(user.getId());
+        userWithdrawDataService.withdrawCommentByUserId(user.getId());
+        userWithdrawDataService.withdrawClosetByUserId(user.getId());
+        userWithdrawDataService.withdrawFollowByUserId(user.getId());
+        userWithdrawDataService.withdrawCelebByUserId(user.getId());
+        userWithdrawDataService.withdrawUserByUserId(user.getId());
 
         userWithdrawRepository.save(UserWithdraw.toEntity(user, dto));
+        webHookService.sendWithdrawMessage(user);
 
     }
 

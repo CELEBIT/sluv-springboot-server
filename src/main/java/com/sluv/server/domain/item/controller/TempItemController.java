@@ -79,7 +79,7 @@ public class TempItemController {
     @Operation(summary = "*임시저장 아이템 전체삭제", description = "User 토큰 필요")
     @DeleteMapping("")
     public ResponseEntity<SuccessResponse> deleteAllTempItem(@AuthenticationPrincipal User user) {
-        tempItemService.deleteAllTempItem(user);
+        tempItemService.deleteAllTempItem(user.getId());
         return ResponseEntity.ok().body(new SuccessResponse());
     }
 }

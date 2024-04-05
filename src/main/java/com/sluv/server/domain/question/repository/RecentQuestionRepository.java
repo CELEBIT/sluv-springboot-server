@@ -6,4 +6,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface RecentQuestionRepository extends JpaRepository<RecentQuestion, Long>, RecentQuestionRepositoryCustom {
 
+    void deleteAllByUserId(Long userId);
 }

@@ -14,4 +14,8 @@ public interface FollowRepositoryCustom {
     Long getFollowingCount(User targetUser);
 
     List<UserSearchInfoDto> getUserSearchInfoDto(User nowUser, List<User> content, String target);
+
+    void deleteFolloweeByUserId(Long userId);
+
+    void deleteFollowerByUserId(Long userId);
 }

@@ -848,7 +848,7 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
                         .or(item.brand.brandEn.like("%" + word + "%"))
                         .or(item.newBrand.brandName.like("%" + word + "%"))
                 )
-                .orderBy(item.createdAt.desc())
+                .orderBy(item.whenDiscovery.desc())
                 .fetch();
     }
 

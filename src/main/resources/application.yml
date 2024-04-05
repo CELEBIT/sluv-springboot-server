@@ -60,6 +60,6 @@ aws:
     baseUrl: asset
 
 discord:
-  webHook:
+  webhook:
     signup: ENC(wvKiKsCnlSc/IdbNW5ymu7APd3STZiZFGe7Aogn6PJjpj22YO+HNxVWLetTJt6+r/7ShZ/B5SRJLHP/A9Vfpmk2R7mai7Ypa3SlPvoECUSv8Bg+KawlFdjjS7y6hU6aldCc735WhbJSDUwE3aZ8IjKi2phagn3xuldMlhnIZ+4A1WnpozCSiWw==)
     withdraw: ENC(eWZMiQS8KNxR8gPGkXuazXxyamoke+4+XdFz1KT2Kn3gQHalD66182TOj8pIEpvwSkb7Eimqhq5nY2lg1xlN9s5Uy9Re1DONDp6IDbjwCLkVpTF8XYO8uqJv1qL2kNHXie2ZFQGSpTK5CzRNWZtyzM5HAHvVxVJUdCuDxQNy/waVeE1EIHbskw==)

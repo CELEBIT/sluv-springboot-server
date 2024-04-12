@@ -27,6 +27,7 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sluv.server.domain.celeb.entity.Celeb;
+import com.sluv.server.domain.celeb.entity.QCeleb;
 import com.sluv.server.domain.closet.entity.Closet;
 import com.sluv.server.domain.item.dto.ItemSimpleResDto;
 import com.sluv.server.domain.item.entity.Item;
@@ -833,8 +834,10 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
             2. 셀럽
             3. 브랜드
          */
+        QCeleb parent = new QCeleb("parent");
         return jpaQueryFactory.selectFrom(item)
                 .leftJoin(item.celeb, celeb).fetchJoin()
+                .leftJoin(item.celeb.parent, parent).fetchJoin()
                 .leftJoin(item.newCeleb, newCeleb).fetchJoin()
                 .leftJoin(item.brand, brand).fetchJoin()
                 .leftJoin(item.newBrand, newBrand).fetchJoin()

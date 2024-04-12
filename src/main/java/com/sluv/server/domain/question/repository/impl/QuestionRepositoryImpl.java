@@ -1,5 +1,7 @@
 package com.sluv.server.domain.question.repository.impl;
 
+import static com.sluv.server.domain.celeb.entity.QCeleb.celeb;
+import static com.sluv.server.domain.celeb.entity.QNewCeleb.newCeleb;
 import static com.sluv.server.domain.comment.entity.QComment.comment;
 import static com.sluv.server.domain.question.entity.QDailyHotQuestion.dailyHotQuestion;
 import static com.sluv.server.domain.question.entity.QQuestion.question;
@@ -17,6 +19,7 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sluv.server.domain.celeb.entity.Celeb;
+import com.sluv.server.domain.celeb.entity.QCeleb;
 import com.sluv.server.domain.question.entity.Question;
 import com.sluv.server.domain.question.entity.QuestionBuy;
 import com.sluv.server.domain.question.entity.QuestionFind;
@@ -506,7 +509,11 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
                         .or(question.content.like("%" + word + "%"))
                 ).fetch();
 
+        QCeleb parent = new QCeleb("parent");
         List<Question> questionFindContent = jpaQueryFactory.selectFrom(questionFind)
+                .leftJoin(questionFind.celeb, celeb).fetchJoin()
+                .leftJoin(questionFind.celeb.parent, parent).fetchJoin()
+                .leftJoin(questionFind.newCeleb, newCeleb).fetchJoin()
                 .where(questionFind.celeb.celebNameKr.like("%" + word + "%")
                         .or(questionFind.celeb.celebNameEn.like("%" + word + "%"))
                         .or(questionFind.newCeleb.celebName.like("%" + word + "%"))

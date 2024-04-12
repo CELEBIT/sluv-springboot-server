@@ -37,8 +37,6 @@ public class DBSearchEngine implements SearchEngine {
 
             result.addAll(itemIds);
         }
-        
-        System.out.println("으악 : " + result.size());
         return result;
     }
 
@@ -49,8 +47,8 @@ public class DBSearchEngine implements SearchEngine {
 
         for (String word : keywords) {
             List<Question> searchQuestions = questionRepository.getSearchQuestionIds(word);
-            searchQuestions.sort(Comparator.comparing(Question::getCreatedAt).reversed());
             List<Long> searchQuestionIds = searchQuestions.stream().map(Question::getId).distinct().toList();
+            searchQuestions.sort(Comparator.comparing(Question::getCreatedAt).reversed());
             result.addAll(searchQuestionIds);
         }
 

@@ -10,8 +10,8 @@ spring:
         format_sql: true
   data:
     redis:
-      port: 6379
-      host: ENC(ajTgI0+nMC6cfK2bGTtX90cGtuWO4/JY)
+      port: 6792
+      host: ENC(0l6KNqPy3QznPKX1Oc8KKoAqZ/uQu4jA)
       password: ENC(MfBuf4wr2l1e1d0eOZTNXHFmPk9RI52b)
 
   security:

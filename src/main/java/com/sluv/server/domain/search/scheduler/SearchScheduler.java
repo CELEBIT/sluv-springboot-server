@@ -25,7 +25,7 @@ public class SearchScheduler {
     /**
      * SearchRank 업데이트
      */
-    @Scheduled(cron = "0 0 0 * * *") // 초 분 시 일 월 요일
+    @Scheduled(cron = "0 0 17 * * *") // 초 분 시 일 월 요일
     public void updateSearchRank() {
         log.info("SearchRank Update Time: {}", Calendar.getInstance().getTime());
 

@@ -62,7 +62,10 @@ public class QuestionSimpleResDto {
         } else if (question instanceof QuestionFind questionFind) {
             qType = "Find";
             celebName = questionFind.getCeleb() != null
-                    ? questionFind.getCeleb().getCelebNameKr()
+                    ? questionFind.getCeleb().getParent() != null
+                    ? questionFind.getCeleb().getParent().getCelebNameKr() + " "
+                    + questionFind.getCeleb().getCelebNameKr()
+                    : questionFind.getCeleb().getCelebNameKr()
                     : questionFind.getNewCeleb().getCelebName();
         } else if (question instanceof QuestionRecommend) {
             qType = "Recommend";

@@ -39,6 +39,7 @@ import com.sluv.server.global.common.response.PaginationCountResDto;
 import com.sluv.server.global.common.response.PaginationResDto;
 import com.sluv.server.global.discord.WebHookService;
 import java.util.List;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -209,7 +210,8 @@ public class UserService {
         List<User> userList = userRepository.getHotSluver(user, celebId);
 
         return userList.stream()
-                .map(_user -> UserSearchInfoDto.of(_user, followRepository.getFollowStatus(user, _user.getId())))
+                .map(_user -> UserSearchInfoDto.of(_user, followRepository.getFollowStatus(user, _user.getId()),
+                        Objects.equals(_user.getId(), user.getId())))
                 .toList();
 
 

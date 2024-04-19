@@ -10,6 +10,7 @@ import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.domain.user.enums.UserStatus;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 
@@ -63,7 +64,8 @@ public class FollowRepositoryImpl implements FollowRepositoryCustom {
                 .collect(Collectors.groupingBy(fol -> fol.getFollowee().getId()));
 
         return content.stream()
-                .map(u -> UserSearchInfoDto.of(u, followMap.containsKey(u.getId())))
+                .map(u -> UserSearchInfoDto.of(u, followMap.containsKey(u.getId()),
+                        Objects.equals(u.getId(), nowUser.getId())))
                 .toList();
     }
 

@@ -17,6 +17,7 @@ import com.sluv.server.domain.user.repository.FollowRepository;
 import com.sluv.server.domain.user.repository.UserRepository;
 import com.sluv.server.global.common.response.PaginationResDto;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -105,7 +106,8 @@ public class SearchEngineService {
         List<Long> searchUserIds = searchEngine.getSearchUserIds(keyword);
         Page<User> searchUserPage = userRepository.getSearchUser(searchUserIds, pageable);
         List<UserSearchInfoDto> content = searchUserPage.stream().map(searchUser ->
-                UserSearchInfoDto.of(searchUser, followRepository.getFollowStatus(user, searchUser.getId()))
+                UserSearchInfoDto.of(searchUser, followRepository.getFollowStatus(user, searchUser.getId()),
+                        Objects.equals(searchUser.getId(), user.getId()))
         ).toList();
 
         // 최근 검색 등록

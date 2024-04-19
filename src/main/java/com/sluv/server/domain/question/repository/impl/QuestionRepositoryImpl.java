@@ -375,7 +375,7 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
         if (voteStatus == null) {
             return predicate;
         } else if (voteStatus.equals("진행 중")) {
-            predicate = predicate.and(questionBuy.voteEndTime.after(now.plusDays(3)));
+            predicate = predicate.and(questionBuy.voteEndTime.after(now));
         } else if (voteStatus.equals("종료 임박")) {
             predicate = predicate.and(questionBuy.voteEndTime.between(now, now.plusDays(3)));
         } else if (voteStatus.equals("종료")) {

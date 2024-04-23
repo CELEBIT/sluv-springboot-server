@@ -6,6 +6,7 @@ import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sluv.server.domain.question.entity.QQuestion;
 import com.sluv.server.domain.question.entity.Question;
+import com.sluv.server.domain.question.enums.QuestionStatus;
 import com.sluv.server.domain.user.entity.User;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +24,8 @@ public class RecentQuestionRepositoryImpl implements RecentQuestionRepositoryCus
         List<Question> content = jpaQueryFactory.select(question)
                 .from(question)
                 .leftJoin(recentQuestion).on(recentQuestion.question.eq(question)).fetchJoin()
-                .where(recentQuestion.user.eq(user))
+                .where(recentQuestion.user.eq(user)
+                        .and(recentQuestion.question.questionStatus.eq(QuestionStatus.ACTIVE)))
                 .groupBy(recentQuestion.question)
                 .orderBy(recentQuestion.createdAt.max().desc())
                 .offset(pageable.getOffset())
@@ -34,7 +36,8 @@ public class RecentQuestionRepositoryImpl implements RecentQuestionRepositoryCus
         JPAQuery<Question> query = jpaQueryFactory.select(question)
                 .from(question)
                 .leftJoin(recentQuestion).on(recentQuestion.question.eq(question)).fetchJoin()
-                .where(recentQuestion.user.eq(user))
+                .where(recentQuestion.user.eq(user)
+                        .and(recentQuestion.question.questionStatus.eq(QuestionStatus.ACTIVE)))
                 .groupBy(recentQuestion.question)
                 .orderBy(recentQuestion.createdAt.max().desc());
 

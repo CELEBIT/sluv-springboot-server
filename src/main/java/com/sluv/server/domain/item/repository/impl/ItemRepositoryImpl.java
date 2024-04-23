@@ -386,7 +386,7 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
         List<Item> content = jpaQueryFactory.select(item)
                 .from(itemLike)
                 .leftJoin(itemLike).on(itemLink.item.eq(item))
-                .where(itemLike.user.eq(user))
+                .where(itemLike.user.eq(user).and(itemLink.item.itemStatus.eq(ACTIVE)))
                 .orderBy(itemLike.id.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -396,7 +396,7 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
         JPAQuery<Item> query = jpaQueryFactory.select(item)
                 .from(itemLike)
                 .leftJoin(itemLike).on(itemLink.item.eq(item)).fetchJoin()
-                .where(itemLike.user.eq(user))
+                .where(itemLike.user.eq(user).and(itemLink.item.itemStatus.eq(ACTIVE)))
                 .orderBy(itemLike.id.desc());
 
         return PageableExecutionUtils.getPage(content, pageable, () -> query.fetch().size());
@@ -797,7 +797,7 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
     public Page<Item> getUserAllRecentItem(User user, Pageable pageable) {
         List<RecentItem> fetch = jpaQueryFactory.selectFrom(recentItem)
                 .leftJoin(recentItem.item, item).fetchJoin()
-                .where(recentItem.user.eq(user))
+                .where(recentItem.user.eq(user).and(recentItem.item.itemStatus.eq(ACTIVE)))
                 .orderBy(recentItem.createdAt.max().desc())
                 .groupBy(recentItem.item)
                 .offset(pageable.getOffset())
@@ -805,7 +805,7 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
                 .fetch();
 
         JPAQuery<RecentItem> query = jpaQueryFactory.selectFrom(recentItem)
-                .where(recentItem.user.eq(user))
+                .where(recentItem.user.eq(user).and(recentItem.item.itemStatus.eq(ACTIVE)))
                 .groupBy(recentItem.item)
                 .orderBy(recentItem.createdAt.max().desc());
 

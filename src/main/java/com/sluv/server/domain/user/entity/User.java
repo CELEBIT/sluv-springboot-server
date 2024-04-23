@@ -70,6 +70,7 @@ public class User extends BaseEntity implements UserDetails {
                 .ageRange(userInfoDto.getAgeRange())
                 .gender(userInfoDto.getGender())
                 .userStatus(UserStatus.PENDING_PROFILE)
+                .termsStatus(false)
                 .build();
     }
 

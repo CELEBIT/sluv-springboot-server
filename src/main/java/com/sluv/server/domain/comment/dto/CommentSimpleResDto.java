@@ -15,6 +15,8 @@ import lombok.NoArgsConstructor;
 public class CommentSimpleResDto {
     @Schema(description = "Comment Id")
     private Long id;
+    @Schema(description = "Question Id")
+    private Long questionId;
     @Schema(description = "Comment가 소속한 Question의 제목")
     private String questionTitle;
     @Schema(description = "Comment 내용")
@@ -25,6 +27,7 @@ public class CommentSimpleResDto {
     public static CommentSimpleResDto of(Comment comment) {
         return CommentSimpleResDto.builder()
                 .id(comment.getId())
+                .questionId(comment.getQuestion().getId())
                 .questionTitle(comment.getQuestion().getTitle())
                 .content(comment.getContent())
                 .commentStatus(comment.getCommentStatus())

@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class ClosetItemController {
     private final ClosetItemService closetItemService;
 
-    @Operation(summary = "*현재 유저의 특정 옷장 상세조회", description = "User 토큰 필요. Pagination 적용. 가장 최근 Scrap 한 순서대로 정렬.")
+    @Operation(summary = "*옷장 상세조회", description = "User 토큰 필요. Pagination 적용. 가장 최근 Scrap 한 순서대로 정렬.")
     @GetMapping("/{closetId}")
     public ResponseEntity<ClosetDetailResDto<ItemSimpleResDto>> getClosetDetails(@AuthenticationPrincipal User user,
                                                                                  @PathVariable("closetId") Long closetId,

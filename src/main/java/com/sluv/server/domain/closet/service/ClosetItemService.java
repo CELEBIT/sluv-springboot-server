@@ -3,6 +3,7 @@ package com.sluv.server.domain.closet.service;
 import com.sluv.server.domain.closet.dto.ClosetDetailResDto;
 import com.sluv.server.domain.closet.dto.ClosetItemSelectReqDto;
 import com.sluv.server.domain.closet.entity.Closet;
+import com.sluv.server.domain.closet.enums.ClosetStatus;
 import com.sluv.server.domain.closet.exception.ClosetNotFoundException;
 import com.sluv.server.domain.closet.repository.ClosetRepository;
 import com.sluv.server.domain.item.dto.ItemSimpleResDto;
@@ -35,7 +36,7 @@ public class ClosetItemService {
     @Transactional(readOnly = true)
     public ClosetDetailResDto<ItemSimpleResDto> getClosetDetails(User user, Long closetId, Pageable pageable) {
         Closet closet = closetRepository.findById(closetId).orElseThrow(ClosetNotFoundException::new);
-        if (!closet.getUser().getId().equals(user.getId())) {
+        if (closet.getClosetStatus().equals(ClosetStatus.PRIVATE) && !closet.getUser().getId().equals(user.getId())) {
             log.info("User did Not Matched. User Id: {}, Closet Owner Id : {}", user.getId(),
                     closet.getUser().getId());
             throw new UserNotMatchedException();

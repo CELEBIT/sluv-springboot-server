@@ -50,7 +50,7 @@ public class CommentResDto {
 
         return CommentResDto.builder()
                 .id(comment.getId())
-                .user(UserInfoDto.of(user))
+                .user(UserInfoDto.of(comment.getUser()))
                 .content(comment.getContent())
                 .imgUrlList(imgList)
                 .itemList(itemList)

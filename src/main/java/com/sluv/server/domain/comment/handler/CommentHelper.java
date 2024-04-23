@@ -42,15 +42,7 @@ public class CommentHelper {
                     Boolean likeStatus = commentLikeRepository.existsByUserIdAndCommentId(user.getId(),
                             comment.getId());
 
-                    User commentUser;
-
-                    if (comment.getUser().getId() == -1) {
-                        commentUser = User.builder().id(-1L).build();
-                    } else {
-                        commentUser = comment.getUser();
-                    }
-
-                    return CommentResDto.of(comment, commentUser, imgList, itemList, likeNum, likeStatus);
+                    return CommentResDto.of(comment, user, imgList, itemList, likeNum, likeStatus);
                 }).toList();
     }
 }

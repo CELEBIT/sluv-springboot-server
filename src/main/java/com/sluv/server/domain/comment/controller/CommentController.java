@@ -3,7 +3,6 @@ package com.sluv.server.domain.comment.controller;
 import com.sluv.server.domain.comment.dto.CommentPostReqDto;
 import com.sluv.server.domain.comment.dto.CommentResDto;
 import com.sluv.server.domain.comment.dto.SubCommentPageResDto;
-import com.sluv.server.domain.comment.service.CommentReportService;
 import com.sluv.server.domain.comment.service.CommentService;
 import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.global.common.response.PaginationResDto;
@@ -28,7 +27,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/app/comment")
 public class CommentController {
     private final CommentService commentService;
-    private final CommentReportService commentReportService;
 
     @Operation(summary = "*Question 게시글의 댓글 조회", description = "User 토큰 필요. Pagination 적용.")
     @GetMapping("/{questionId}")

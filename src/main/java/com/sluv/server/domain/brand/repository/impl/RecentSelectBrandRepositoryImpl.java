@@ -16,13 +16,16 @@ public class RecentSelectBrandRepositoryImpl implements RecentSelectBrandReposit
 
     @Override
     public List<RecentSelectBrand> getRecentSelectBrandTop20(User user) {
-        return jpaQueryFactory.selectFrom(recentSelectBrand)
+        return jpaQueryFactory.select(recentSelectBrand).distinct()
+                .from(recentSelectBrand)
                 .leftJoin(recentSelectBrand.brand, brand).fetchJoin()
                 .leftJoin(recentSelectBrand.newBrand, newBrand).fetchJoin()
                 .where(recentSelectBrand.user.eq(user))
-                .groupBy(recentSelectBrand.brand, recentSelectBrand.newBrand)
+                .groupBy(recentSelectBrand.id, recentSelectBrand.brand, recentSelectBrand.newBrand)
                 .limit(20)
                 .orderBy(recentSelectBrand.createdAt.max().desc())
                 .fetch();
+
+//        return null;
     }
 }

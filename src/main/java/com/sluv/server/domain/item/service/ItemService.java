@@ -35,6 +35,7 @@ import com.sluv.server.domain.item.entity.RecentItem;
 import com.sluv.server.domain.item.entity.hashtag.ItemHashtag;
 import com.sluv.server.domain.item.enums.ItemStatus;
 import com.sluv.server.domain.item.exception.ItemCategoryNotFoundException;
+import com.sluv.server.domain.item.exception.ItemNotActiveException;
 import com.sluv.server.domain.item.exception.ItemNotFoundException;
 import com.sluv.server.domain.item.exception.hashtag.HashtagNotFoundException;
 import com.sluv.server.domain.item.repository.ItemCategoryRepository;
@@ -200,6 +201,11 @@ public class ItemService {
         // 1. Item 조회
         Item item = itemRepository.findById(itemId)
                 .orElseThrow(ItemNotFoundException::new);
+
+        if (item.getItemStatus() != ItemStatus.ACTIVE) {
+            System.out.println("status: " + item.getItemStatus());
+            throw new ItemNotActiveException();
+        }
 
         // 2. Item Detail 고정 데이터 조회 -> Cache Aside
         ItemDetailFixData fixData = cacheService.findItemDetailFixDataByItemId(itemId);

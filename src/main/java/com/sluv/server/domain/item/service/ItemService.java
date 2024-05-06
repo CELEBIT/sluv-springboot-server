@@ -294,7 +294,7 @@ public class ItemService {
 
         // 4. 작성자 info
         User writer = userRepository.findById(item.getUser().getId())
-                .orElse(User.builder().id(-1L).build());
+                .orElse(null);
         UserInfoDto writerInfo = UserInfoDto.of(writer);
 
         // 5. Item 이미지들 조회

@@ -6,6 +6,7 @@ import com.sluv.server.domain.question.entity.QuestionFind;
 import com.sluv.server.domain.question.entity.QuestionHowabout;
 import com.sluv.server.domain.question.entity.QuestionRecommend;
 import com.sluv.server.domain.user.dto.UserInfoDto;
+import com.sluv.server.domain.user.entity.User;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -27,7 +28,7 @@ public class QuestionHomeResDto {
     @Schema(description = "Question 이미지")
     private List<QuestionImgSimpleResDto> imgList;
 
-    public static QuestionHomeResDto of(Question question, List<QuestionImgSimpleResDto> imgList) {
+    public static QuestionHomeResDto of(Question question, User writer, List<QuestionImgSimpleResDto> imgList) {
 
         String qType = null;
         if (question instanceof QuestionBuy) {
@@ -44,7 +45,7 @@ public class QuestionHomeResDto {
                 .qType(qType)
                 .id(question.getId())
                 .title(question.getTitle())
-                .user(UserInfoDto.of(question.getUser()))
+                .user(UserInfoDto.of(writer))
                 .imgList(imgList)
                 .build();
     }

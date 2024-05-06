@@ -57,6 +57,7 @@ import com.sluv.server.domain.question.repository.QuestionRepository;
 import com.sluv.server.domain.question.repository.QuestionVoteRepository;
 import com.sluv.server.domain.question.repository.RecentQuestionRepository;
 import com.sluv.server.domain.user.entity.User;
+import com.sluv.server.domain.user.repository.UserRepository;
 import com.sluv.server.global.cache.CacheService;
 import com.sluv.server.global.common.response.PaginationResDto;
 import java.time.LocalDateTime;
@@ -91,6 +92,7 @@ public class QuestionService {
     private final ItemScrapRepository itemScrapRepository;
     private final ClosetRepository closetRepository;
     private final QuestionVoteRepository questionVoteRepository;
+    private final UserRepository userRepository;
     private final CacheService cacheService;
 
 
@@ -325,7 +327,7 @@ public class QuestionService {
         }
 
         // 작성자
-        User writer = question.getUser();
+        User writer = userRepository.findById(question.getUser().getId()).orElse(null);
 
         // Question img List
         List<QuestionImgResDto> questionImgList = questionImgRepository.findAllByQuestionId(questionId).
@@ -412,7 +414,7 @@ public class QuestionService {
                 question, qType, writer,
                 questionImgList, questionItemList,
                 questionLikeNum, questionCommentNum, currentUserLike,
-                user.getId().equals(writer.getId()),
+                writer != null && user.getId().equals(writer.getId()),
                 celeb, newCeleb,
                 voteEndTime, totalVoteNum, voteStatus,
                 recommendCategoryList
@@ -588,7 +590,9 @@ public class QuestionService {
         // Question 댓글 수
         Long commentNum = commentRepository.countByQuestionId(question.getId());
 
-        return QuestionSimpleResDto.of(question, likeNum, commentNum,
+        User writer = userRepository.findById(question.getUser().getId()).orElse(null);
+
+        return QuestionSimpleResDto.of(question, writer, likeNum, commentNum,
                 imgList, itemImgList, categoryNameList);
     }
 
@@ -652,7 +656,10 @@ public class QuestionService {
             QuestionVote questionVote = questionVoteRepository.findByQuestionIdAndUserId(question.getId(), user.getId())
                     .orElse(null);
 
-            return QuestionBuySimpleResDto.of(user, question, voteCount, imgList, itemImgList,
+            User writer = userRepository.findById(question.getUser().getId())
+                    .orElse(null);
+
+            return QuestionBuySimpleResDto.of(user, question, writer, voteCount, imgList, itemImgList,
                     question.getVoteEndTime(),
                     questionVote);
         }).toList();
@@ -726,7 +733,8 @@ public class QuestionService {
 
         List<QuestionHomeResDto> result = dailyHoyQuestionList.stream().map(question -> {
             List<QuestionImgSimpleResDto> questionImgSimpleList = getQuestionImgSimpleList(question);
-            return QuestionHomeResDto.of(question, questionImgSimpleList);
+            User writer = userRepository.findById(question.getUser().getId()).orElse(null);
+            return QuestionHomeResDto.of(question, writer, questionImgSimpleList);
 
         }).toList();
 
@@ -798,8 +806,9 @@ public class QuestionService {
 
             Long commentNum = commentRepository.countByQuestionId(question.getId());
             Long likeNum = questionLikeRepository.countByQuestionId(question.getId());
+            User writer = userRepository.findById(question.getUser().getId()).orElse(null);
 
-            return QuestionSimpleResDto.of(question, likeNum, commentNum, imgList, itemImgList, categoryList);
+            return QuestionSimpleResDto.of(question, writer, likeNum, commentNum, imgList, itemImgList, categoryList);
         }).toList();
 
         return PaginationResDto.of(page, content);

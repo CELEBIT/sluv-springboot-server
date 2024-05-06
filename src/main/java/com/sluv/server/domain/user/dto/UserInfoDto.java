@@ -21,9 +21,9 @@ public class UserInfoDto implements Serializable {
     private String profileImgUrl;
 
     public static UserInfoDto of(User user) {
-        if (user.getId() == -1) {
+        if (user == null) {
             return UserInfoDto.builder()
-                    .id(user.getId())
+                    .id(-1L)
                     .build();
         }
 

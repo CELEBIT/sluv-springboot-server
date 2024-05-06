@@ -6,6 +6,7 @@ import com.sluv.server.domain.question.entity.QuestionFind;
 import com.sluv.server.domain.question.entity.QuestionHowabout;
 import com.sluv.server.domain.question.entity.QuestionRecommend;
 import com.sluv.server.domain.user.dto.UserInfoDto;
+import com.sluv.server.domain.user.entity.User;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -49,7 +50,7 @@ public class QuestionSimpleResDto {
     @Schema(description = "QuestionRecommend 게시글 카테고리 리스트")
     private List<String> categoryName;
 
-    public static QuestionSimpleResDto of(Question question, Long likeNum, Long commentNum,
+    public static QuestionSimpleResDto of(Question question, User writer, Long likeNum, Long commentNum,
                                           List<QuestionImgSimpleResDto> imgList,
                                           List<QuestionImgSimpleResDto> itemImgList,
                                           List<String> categoryName) {
@@ -78,7 +79,7 @@ public class QuestionSimpleResDto {
                 .id(question.getId())
                 .title(question.getTitle())
                 .content(question.getContent())
-                .user(UserInfoDto.of(question.getUser()))
+                .user(UserInfoDto.of(writer))
                 .likeNum(likeNum)
                 .viewNum(question.getSearchNum())
                 .commentNum(commentNum)

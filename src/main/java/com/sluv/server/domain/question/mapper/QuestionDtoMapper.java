@@ -16,6 +16,8 @@ import com.sluv.server.domain.question.repository.QuestionImgRepository;
 import com.sluv.server.domain.question.repository.QuestionItemRepository;
 import com.sluv.server.domain.question.repository.QuestionLikeRepository;
 import com.sluv.server.domain.question.repository.QuestionRecommendCategoryRepository;
+import com.sluv.server.domain.user.entity.User;
+import com.sluv.server.domain.user.repository.UserRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -30,6 +32,7 @@ public class QuestionDtoMapper {
     private final QuestionLikeRepository questionLikeRepository;
     private final QuestionRecommendCategoryRepository questionRecommendCategoryRepository;
     private final CommentRepository commentRepository;
+    private final UserRepository userRepository;
 
     public QuestionSimpleResDto dtoBuildByQuestionType(Question question) {
         String qType = null;
@@ -79,6 +82,8 @@ public class QuestionDtoMapper {
         // Question 댓글 수
         Long commentNum = commentRepository.countByQuestionId(question.getId());
 
-        return QuestionSimpleResDto.of(question, likeNum, commentNum, imgList, itemImgList, categoryList);
+        User writer = userRepository.findById(question.getUser().getId()).orElse(null);
+
+        return QuestionSimpleResDto.of(question, writer, likeNum, commentNum, imgList, itemImgList, categoryList);
     }
 }

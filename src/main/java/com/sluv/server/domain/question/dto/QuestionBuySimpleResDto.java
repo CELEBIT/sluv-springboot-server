@@ -50,7 +50,7 @@ public class QuestionBuySimpleResDto {
     private Boolean hasMine;
 
 
-    public static QuestionBuySimpleResDto of(User user, Question question, Long voteNum,
+    public static QuestionBuySimpleResDto of(User user, Question question, User writer, Long voteNum,
                                              List<QuestionImgResDto> imgList,
                                              List<QuestionItemResDto> itemImgList,
                                              LocalDateTime voteEndTime, QuestionVote questionVote) {
@@ -72,7 +72,7 @@ public class QuestionBuySimpleResDto {
                 .id(question.getId())
                 .title(question.getTitle())
                 .content(question.getContent())
-                .user(UserInfoDto.of(question.getUser()))
+                .user(UserInfoDto.of(writer))
                 .voteNum(voteNum)
                 .imgList(imgList)
                 .itemImgList(itemImgList)

@@ -9,6 +9,7 @@ import com.sluv.server.domain.comment.repository.CommentItemRepository;
 import com.sluv.server.domain.comment.repository.CommentLikeRepository;
 import com.sluv.server.domain.item.helper.ItemHelper;
 import com.sluv.server.domain.user.entity.User;
+import com.sluv.server.domain.user.repository.UserRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -20,6 +21,7 @@ public class CommentHelper {
     private final CommentImgRepository commentImgRepository;
     private final CommentItemRepository commentItemRepository;
     private final CommentLikeRepository commentLikeRepository;
+    private final UserRepository userRepository;
     private final ItemHelper itemHelper;
 
     public List<CommentResDto> getCommentResDtos(User user, Page<Comment> commentPage) {
@@ -42,7 +44,9 @@ public class CommentHelper {
                     Boolean likeStatus = commentLikeRepository.existsByUserIdAndCommentId(user.getId(),
                             comment.getId());
 
-                    return CommentResDto.of(comment, user, imgList, itemList, likeNum, likeStatus);
+                    User writer = userRepository.findById(comment.getUser().getId()).orElse(null);
+
+                    return CommentResDto.of(comment, writer, user, imgList, itemList, likeNum, likeStatus);
                 }).toList();
     }
 }

@@ -61,18 +61,16 @@ public class QuestionGetDetailResDto {
     @Schema(description = "QuestionRecommend Category 리스트")
     private List<String> recommendCategoryList;
 
-    public static QuestionGetDetailResDto of(Question question, String qType, User user,
+    public static QuestionGetDetailResDto of(Question question, String qType, User writer,
                                              List<QuestionImgResDto> imgList, List<QuestionItemResDto> itemList,
                                              Long likeNum, Long commentNum, Boolean hasLike, Boolean hasMine,
                                              CelebChipResDto celeb, CelebChipResDto newCeleb,
                                              LocalDateTime voteEndTime, Long totalVoteNum, Long voteStatus,
                                              List<String> recommendCategoryList) {
 
-        UserInfoDto writer = UserInfoDto.of(user);
-
         return QuestionGetDetailResDto.builder()
                 .qType(qType)
-                .user(writer)
+                .user(UserInfoDto.of(writer))
                 .title(question.getTitle())
                 .content(question.getContent())
                 .imgList(imgList)

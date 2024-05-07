@@ -354,7 +354,9 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
     public List<Item> getRecentTop2Item(User targetUser) {
 
         return jpaQueryFactory.selectFrom(item)
-                .where(item.user.eq(targetUser))
+                .where(item.user.eq(targetUser)
+                        .and(item.itemStatus.eq(ACTIVE))
+                )
                 .limit(2)
                 .orderBy(item.id.desc())
                 .fetch();

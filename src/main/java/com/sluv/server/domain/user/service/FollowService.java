@@ -56,8 +56,7 @@ public class FollowService {
     public PaginationResDto<UserSearchInfoDto> getUserFollowing(User user, Long userId, Pageable pageable) {
         // Following 들 조회
         Page<User> followerPage = userRepository.getAllFollowing(userId, pageable);
-        System.out.println("hasNext: " + followerPage.hasNext() + ", page: " + followerPage.getNumber());
-        System.out.println("TotalPageNum: " + followerPage.getTotalPages());
+
         // UserSearchInfoDto로 가공
         List<UserSearchInfoDto> content =
                 followRepository.getUserSearchInfoDto(user, followerPage.getContent(), "followee");

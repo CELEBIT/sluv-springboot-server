@@ -21,11 +21,4 @@ public class ItemReportRepositoryImpl implements ItemReportRepositoryCustom {
                 .fetchFirst() != null;
     }
 
-    @Override
-    public void withdrawByUserId(Long userId) {
-        jpaQueryFactory.update(itemReport)
-                .set(itemReport.reporter.id, -1L)
-                .where(itemReport.reporter.id.eq(userId))
-                .execute();
-    }
 }

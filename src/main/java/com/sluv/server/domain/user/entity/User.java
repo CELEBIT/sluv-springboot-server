@@ -74,6 +74,22 @@ public class User extends BaseEntity implements UserDetails {
                 .build();
     }
 
+    public static User toDeletedUser(User user) {
+        String nicknameHashCode = String.valueOf(user.nickname.hashCode());
+        return User.builder()
+                .id(user.getId())
+                .email(nicknameHashCode + "@" + nicknameHashCode + "-withdraw.sluv")
+                .nickname(nicknameHashCode)
+                .snsType(user.getSnsType())
+                .profileImgUrl(null)
+                .ageRange(user.getAgeRange())
+                .gender(user.getGender())
+                .userStatus(user.getUserStatus())
+                .termsStatus(user.getTermsStatus())
+                .build();
+
+    }
+
     public void changeProfileImgUrl(String profileImgUrl) {
         this.profileImgUrl = profileImgUrl;
     }

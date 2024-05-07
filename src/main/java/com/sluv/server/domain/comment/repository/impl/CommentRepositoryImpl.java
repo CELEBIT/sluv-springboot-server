@@ -115,11 +115,4 @@ public class CommentRepositoryImpl implements CommentRepositoryCustom {
         return PageableExecutionUtils.getPage(content, pageable, () -> query.fetch().size());
     }
 
-    @Override
-    public void withdrawByUserId(Long userId) {
-        jpaQueryFactory.update(comment)
-                .set(comment.user.id, -1L)
-                .where(comment.user.id.eq(userId))
-                .execute();
-    }
 }

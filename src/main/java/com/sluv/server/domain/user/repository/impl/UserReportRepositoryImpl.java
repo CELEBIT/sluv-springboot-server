@@ -23,13 +23,14 @@ public class UserReportRepositoryImpl implements UserReportRepositoryCustom {
     @Override
     public void withdrawByUserId(Long userId) {
         jpaQueryFactory.update(userReport)
-                .set(userReport.reporter.id, -1L)
+//                .set(userReport.reporter.id, -1L)
+                .set(userReport.reporter.id, 2L)
                 .where(userReport.reporter.id.eq(userId))
                 .execute();
 
-        jpaQueryFactory.update(userReport)
-                .set(userReport.reported.id, -1L)
-                .where(userReport.reported.id.eq(userId))
-                .execute();
+//        jpaQueryFactory.update(userReport)
+//                .set(userReport.reported.id, -1L)
+//                .where(userReport.reported.id.eq(userId))
+//                .execute();
     }
 }

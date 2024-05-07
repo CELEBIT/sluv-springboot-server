@@ -75,5 +75,4 @@ public interface ItemRepositoryCustom {
 
     List<Item> getItemContainKeyword(String keyword);
 
-    void withdrawByUserId(Long userId);
 }

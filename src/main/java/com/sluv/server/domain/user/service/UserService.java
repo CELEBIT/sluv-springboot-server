@@ -229,8 +229,6 @@ public class UserService {
 
         userWithdrawDataService.withdrawItemByUserId(user.getId());
         userWithdrawDataService.withdrawQuestionByUserId(user.getId());
-        userWithdrawDataService.withdrawCommentByUserId(user.getId());
-        userWithdrawDataService.withdrawClosetByUserId(user.getId());
         userWithdrawDataService.withdrawFollowByUserId(user.getId());
         userWithdrawDataService.withdrawCelebByUserId(user.getId());
         userWithdrawDataService.withdrawUserByUserId(user.getId());

@@ -1,13 +1,11 @@
 package com.sluv.server.domain.user.service;
 
-import com.sluv.server.domain.closet.repository.ClosetRepository;
 import com.sluv.server.domain.comment.repository.CommentRepository;
 import com.sluv.server.domain.item.dto.ItemSimpleResDto;
 import com.sluv.server.domain.item.entity.Item;
 import com.sluv.server.domain.item.entity.ItemImg;
 import com.sluv.server.domain.item.repository.ItemImgRepository;
 import com.sluv.server.domain.item.repository.ItemRepository;
-import com.sluv.server.domain.item.repository.ItemScrapRepository;
 import com.sluv.server.domain.question.dto.QuestionImgSimpleResDto;
 import com.sluv.server.domain.question.dto.QuestionSimpleResDto;
 import com.sluv.server.domain.question.entity.Question;
@@ -23,6 +21,7 @@ import com.sluv.server.domain.question.repository.QuestionLikeRepository;
 import com.sluv.server.domain.question.repository.QuestionRecommendCategoryRepository;
 import com.sluv.server.domain.question.repository.RecentQuestionRepository;
 import com.sluv.server.domain.user.entity.User;
+import com.sluv.server.domain.user.repository.UserRepository;
 import com.sluv.server.global.common.response.PaginationCountResDto;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -37,17 +36,15 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class UserRecentService {
 
-    //    private final RecentItemRepository recentItemRepository;
     private final ItemRepository itemRepository;
-    private final ClosetRepository closetRepository;
     private final ItemImgRepository itemImgRepository;
-    private final ItemScrapRepository itemScrapRepository;
     private final QuestionImgRepository questionImgRepository;
     private final QuestionItemRepository questionItemRepository;
     private final QuestionLikeRepository questionLikeRepository;
     private final RecentQuestionRepository recentQuestionRepository;
     private final QuestionRecommendCategoryRepository questionRecommendCategoryRepository;
     private final CommentRepository commentRepository;
+    private final UserRepository userRepository;
 
 
     @Transactional(readOnly = true)
@@ -100,7 +97,9 @@ public class UserRecentService {
             // Question 댓글 수
             Long commentNum = commentRepository.countByQuestionId(question.getId());
 
-            return QuestionSimpleResDto.of(question, likeNum, commentNum, imgList, itemImgList, categoryList);
+            User writer = userRepository.findById(question.getUser().getId()).orElse(null);
+
+            return QuestionSimpleResDto.of(question, writer, likeNum, commentNum, imgList, itemImgList, categoryList);
 
 
         }).toList();

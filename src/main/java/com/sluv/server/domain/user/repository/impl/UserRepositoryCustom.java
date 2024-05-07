@@ -17,4 +17,6 @@ public interface UserRepositoryCustom {
     List<User> getSearchUserIds(String word);
 
     long getNotDeleteUserCount();
+
+    List<User> getDeletedUsersAfter7Days();
 }

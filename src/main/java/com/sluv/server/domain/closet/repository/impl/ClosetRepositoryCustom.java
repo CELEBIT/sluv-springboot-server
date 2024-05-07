@@ -18,5 +18,4 @@ public interface ClosetRepositoryCustom {
 
     Boolean checkDuplicate(String name, Long closetId);
 
-    void withdrawAllByUserId(Long userId);
 }

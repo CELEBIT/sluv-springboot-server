@@ -12,12 +12,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@Transactional
 @RequiredArgsConstructor
 public class UserReportService {
     private final UserRepository userRepository;
     private final UserReportRepository userReportRepository;
 
+    @Transactional
     public void postUserReport(User user, Long userId, UserReportReqDto dto) {
         // 피신고자 검색
         User target = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);

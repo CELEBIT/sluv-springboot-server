@@ -14,5 +14,4 @@ public interface CommentRepositoryCustom {
 
     Page<Comment> getUserAllComment(User user, Pageable pageable);
 
-    void withdrawByUserId(Long userId);
 }

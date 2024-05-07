@@ -5,6 +5,4 @@ import com.sluv.server.domain.user.entity.User;
 
 public interface ItemReportRepositoryCustom {
     Boolean findExistence(User user, Item target);
-
-    void withdrawByUserId(Long userId);
 }

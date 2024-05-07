@@ -11,6 +11,7 @@ import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sluv.server.domain.user.entity.Follow;
 import com.sluv.server.domain.user.entity.User;
+import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -137,5 +138,13 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
                 .where(user.userStatus.ne(DELETED))
                 .fetch();
         return users.stream().count();
+    }
+
+    @Override
+    public List<User> getDeletedUsersAfter7Days() {
+        return jpaQueryFactory.selectFrom(user)
+                .where(user.userStatus.eq(DELETED)
+                        .and(user.updatedAt.before(LocalDateTime.now().minusDays(7)))
+                ).fetch();
     }
 }

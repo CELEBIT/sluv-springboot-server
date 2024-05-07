@@ -52,5 +52,4 @@ public interface QuestionRepositoryCustom {
 
     List<Question> getSearchQuestionIds(String word);
 
-    void withdrawByUserId(Long userId);
 }

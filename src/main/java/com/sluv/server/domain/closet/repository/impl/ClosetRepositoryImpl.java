@@ -100,11 +100,4 @@ public class ClosetRepositoryImpl implements ClosetRepositoryCustom {
         return query.fetch().size() > 0;
     }
 
-    @Override
-    public void withdrawAllByUserId(Long userId) {
-        jpaQueryFactory.update(closet)
-                .set(closet.user.id, -1L)
-                .where(closet.user.id.eq(userId))
-                .execute();
-    }
 }

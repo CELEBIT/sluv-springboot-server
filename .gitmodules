@@ -1,3 +1,4 @@
 [submodule "src/main/resources"]
 	path = src/main/resources
 	url = git@github.com:CELEBIT/sluv-springboot-server-env.git
+	branch = main

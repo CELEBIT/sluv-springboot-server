@@ -29,9 +29,9 @@ class BrandRepositoryTest {
 
     @AfterEach
     void tearDown() {
-        recentSelectBrandRepository.deleteAllInBatch();
-        brandRepository.deleteAllInBatch();
-        userRepository.deleteAllInBatch();
+        recentSelectBrandRepository.deleteAll();
+        brandRepository.deleteAll();
+        userRepository.deleteAll();
     }
 
     @DisplayName("한글 혹은 영어 이름으로 브랜드를 검색할 수 있다.")

@@ -3,7 +3,7 @@ package com.sluv.server.domain.brand.service;
 import com.sluv.server.domain.brand.dto.NewBrandPostReqDto;
 import com.sluv.server.domain.brand.repository.NewBrandRepository;
 import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,9 +18,9 @@ public class NewBrandServiceTest {
     @Autowired
     private NewBrandRepository newBrandRepository;
 
-    @BeforeEach
+    @AfterEach
     void clear() {
-        newBrandRepository.deleteAllInBatch();
+        newBrandRepository.deleteAll();
     }
 
     @DisplayName("뉴브랜드를 저장한다.")

@@ -1,17 +1,18 @@
 package com.sluv.server.domain.brand.service;
 
-import static com.sluv.server.fixture.UserFixture.카카오유저1_생성;
+import static com.sluv.server.fixture.UserFixture.카카오_유저_생성;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.sluv.server.domain.brand.dto.RecentSelectBrandReqDto;
 import com.sluv.server.domain.brand.entity.Brand;
 import com.sluv.server.domain.brand.entity.RecentSelectBrand;
 import com.sluv.server.domain.brand.repository.BrandRepository;
+import com.sluv.server.domain.brand.repository.NewBrandRepository;
 import com.sluv.server.domain.brand.repository.RecentSelectBrandRepository;
 import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.domain.user.repository.UserRepository;
 import java.util.List;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,9 @@ public class RecentSelectBrandServiceTest {
     private BrandRepository brandRepository;
 
     @Autowired
+    private NewBrandRepository newBrandRepository;
+
+    @Autowired
     private RecentSelectBrandService recentSelectBrandService;
 
     @Autowired
@@ -32,27 +36,29 @@ public class RecentSelectBrandServiceTest {
     @Autowired
     private UserRepository userRepository;
 
-    @BeforeEach
+    @AfterEach
     void clear() {
-        recentSelectBrandRepository.deleteAllInBatch();
-        brandRepository.deleteAllInBatch();
-        userRepository.deleteAllInBatch();
+        recentSelectBrandRepository.deleteAll();
+        newBrandRepository.deleteAll();
+        brandRepository.deleteAll();
+        userRepository.deleteAll();
     }
 
     @DisplayName("최근 검색한 브랜드를 저장한다.")
     @Test
     void postRecentSelectBrandTest() {
         //given
-        User user = 카카오유저1_생성();
+        User user = 카카오_유저_생성();
         userRepository.save(user);
-
-        Brand saveBrand = brandRepository.save(
-                Brand.builder().brandKr("브랜드1").brandEn("brand1").brandImgUrl(null).build()
-        );
+        Brand brand = Brand.builder()
+                .brandKr("브랜드1")
+                .brandEn("brand1")
+                .brandImgUrl(null)
+                .build();
+        brandRepository.save(brand);
 
         //when
-        recentSelectBrandService.postRecentSelectBrand(user, new RecentSelectBrandReqDto(saveBrand.getId(), null));
-
+        recentSelectBrandService.postRecentSelectBrand(user, new RecentSelectBrandReqDto(brand.getId(), null));
         //then
         assertThat(recentSelectBrandRepository.findAll()).hasSize(1);
     }
@@ -61,7 +67,8 @@ public class RecentSelectBrandServiceTest {
     @Test
     void deleteAllRecentSelectBrandTest() {
         //given
-        User user = 카카오유저1_생성();
+        User user = 카카오_유저_생성();
+        user.changeNickname("deleteAllRecentSelectBrandTest");
         userRepository.save(user);
 
         Brand saveBrand = brandRepository.save(
@@ -81,7 +88,7 @@ public class RecentSelectBrandServiceTest {
     @Test
     void deleteRecentSelectBrandTest() {
         //given
-        User user = 카카오유저1_생성();
+        User user = 카카오_유저_생성();
         userRepository.save(user);
 
         Brand brand1 = Brand.builder().brandKr("브랜드1").brandEn("brand1").brandImgUrl(null).build();

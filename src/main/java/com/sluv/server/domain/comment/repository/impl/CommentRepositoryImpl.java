@@ -115,4 +115,14 @@ public class CommentRepositoryImpl implements CommentRepositoryCustom {
         return PageableExecutionUtils.getPage(content, pageable, () -> query.fetch().size());
     }
 
+    @Override
+    public Long countCommentByUserIdInActiveQuestion(Long userId, CommentStatus commentStatus) {
+        List<Comment> comments = jpaQueryFactory.selectFrom(comment)
+                .where(comment.user.id.eq(userId)
+                        .and(comment.question.questionStatus.eq(QuestionStatus.ACTIVE))
+                        .and(comment.commentStatus.eq(CommentStatus.ACTIVE))
+                ).fetch();
+
+        return comments.stream().count();
+    }
 }

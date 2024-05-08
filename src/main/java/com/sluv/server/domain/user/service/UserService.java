@@ -5,6 +5,7 @@ import com.sluv.server.domain.closet.entity.Closet;
 import com.sluv.server.domain.closet.repository.ClosetRepository;
 import com.sluv.server.domain.comment.dto.CommentSimpleResDto;
 import com.sluv.server.domain.comment.entity.Comment;
+import com.sluv.server.domain.comment.enums.CommentStatus;
 import com.sluv.server.domain.comment.repository.CommentRepository;
 import com.sluv.server.domain.item.dto.ItemSimpleResDto;
 import com.sluv.server.domain.item.entity.Item;
@@ -100,7 +101,8 @@ public class UserService {
 
             Long questionNum = questionRepository.countByUserIdAndQuestionStatus(targetUser.getId(),
                     QuestionStatus.ACTIVE);
-            Long commentNum = commentRepository.countByUserId(targetUser.getId());
+            Long commentNum = commentRepository.countCommentByUserIdInActiveQuestion(targetUser.getId(),
+                    CommentStatus.ACTIVE);
 
             communityCount = questionNum + commentNum;
 

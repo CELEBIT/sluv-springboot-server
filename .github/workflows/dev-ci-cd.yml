@@ -10,6 +10,9 @@ jobs:
     steps:
       - name: Checkout Latest Repo
         uses: actions/checkout@v3
+        token: ${{ secrets.TOKEN_OF_GITHUB }}
+        submodules: true
+        출처: https://lelecoder.com/152 [lelecoder:티스토리]
       - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:

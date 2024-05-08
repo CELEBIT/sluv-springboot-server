@@ -167,7 +167,10 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
                 .leftJoin(item.celeb, celeb).fetchJoin()
                 .leftJoin(itemImg).on(itemImg.item.eq(item)).fetchJoin()
                 .leftJoin(itemScrap).on(itemScrap.item.eq(item).and(itemScrap.closet.in(closets))).fetchJoin()
-                .where(itemScrap.closet.eq(closets).and(itemImg.representFlag.eq(true)))
+                .where(itemScrap.closet.eq(closets)
+                        .and(itemImg.representFlag.eq(true))
+                        .and(item.itemStatus.eq(ACTIVE))
+                )
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .orderBy(itemScrap.createdAt.desc())
@@ -180,7 +183,10 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
                 .leftJoin(item.celeb, celeb).fetchJoin()
                 .leftJoin(itemImg).on(itemImg.item.eq(item)).fetchJoin()
                 .leftJoin(itemScrap).on(itemScrap.item.eq(item).and(itemScrap.closet.in(closets))).fetchJoin()
-                .where(itemScrap.closet.eq(closets).and(itemImg.representFlag.eq(true)))
+                .where(itemScrap.closet.eq(closets)
+                        .and(itemImg.representFlag.eq(true))
+                        .and(item.itemStatus.eq(ACTIVE))
+                )
                 .orderBy(itemScrap.createdAt.desc());
 
         return PageableExecutionUtils.getPage(content.stream()

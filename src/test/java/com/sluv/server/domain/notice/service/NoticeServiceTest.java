@@ -1,7 +1,6 @@
 package com.sluv.server.domain.notice.service;
 
-import static com.sluv.server.domain.notice.enums.NoticeStatus.ACTIVE;
-import static com.sluv.server.domain.notice.enums.NoticeType.ETC;
+import static com.sluv.server.fixture.NoticeFixture.공지_생성;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.sluv.server.domain.notice.dto.NoticeDetailResDto;
@@ -35,19 +34,8 @@ public class NoticeServiceTest {
     @Test
     void getAllNoticeTest() {
         // given
-        Notice notice1 = Notice.builder()
-                .title("NOTICE1")
-                .content("공지사항")
-                .noticeType(ETC)
-                .status(ACTIVE)
-                .build();
-
-        Notice notice2 = Notice.builder()
-                .title("NOTICE2")
-                .content("공지사항")
-                .noticeType(ETC)
-                .status(ACTIVE)
-                .build();
+        Notice notice1 = 공지_생성("NOTICE1", "공지사항");
+        Notice notice2 = 공지_생성("NOTICE2", "공지사항");
         noticeRepository.saveAll(List.of(notice1, notice2));
 
         PageRequest pageable = PageRequest.of(0, 1);
@@ -65,18 +53,13 @@ public class NoticeServiceTest {
     @Test
     void getNoticeDetail() {
         // given
-        Notice notice1 = Notice.builder()
-                .title("NOTICE1")
-                .content("공지사항")
-                .noticeType(ETC)
-                .status(ACTIVE)
-                .build();
-        noticeRepository.save(notice1);
+        Notice notice = 공지_생성("NOTICE1", "공지사항");
+        noticeRepository.save(notice);
 
         // when
-        NoticeDetailResDto notice = noticeService.getNoticeDetail(notice1.getId());
+        NoticeDetailResDto noticeDetail = noticeService.getNoticeDetail(notice.getId());
 
         // then
-        assertThat(notice).extracting("title").isEqualTo("NOTICE1");
+        assertThat(noticeDetail).extracting("title").isEqualTo("NOTICE1");
     }
 }

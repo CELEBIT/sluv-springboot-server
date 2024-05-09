@@ -209,14 +209,14 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public List<UserSearchInfoDto> getHotSluver(User user, Long celebId) {
-        List<User> userList = userRepository.getHotSluver(user, celebId);
+        List<User> userList = userRepository.getHotSluver(celebId);
 
         return userList.stream()
-                .map(_user -> UserSearchInfoDto.of(_user, followRepository.getFollowStatus(user, _user.getId()),
-                        Objects.equals(_user.getId(), user.getId())))
-                .toList();
-
-
+                .map(hotSluver -> {
+                    boolean isMine = user != null && Objects.equals(hotSluver.getId(), user.getId());
+                    Boolean followStatus = followRepository.getFollowStatus(user, hotSluver.getId());
+                    return UserSearchInfoDto.of(hotSluver, followStatus, isMine);
+                }).toList();
     }
 
     public UserTermsResDto postTerms(User user) {

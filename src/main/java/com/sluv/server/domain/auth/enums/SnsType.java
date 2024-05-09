@@ -7,7 +7,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 public enum SnsType {
     KAKAO,
     GOOGLE,
-    APPLE;
+    APPLE,
+    ETC;
 
     public static SnsType fromString(String text) {
         for (SnsType snsType : SnsType.values()) {

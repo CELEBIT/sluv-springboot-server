@@ -12,7 +12,7 @@ public interface UserRepositoryCustom {
 
     Page<User> getAllFollowing(Long userId, Pageable pageable);
 
-    List<User> getHotSluver(User user, Long celebId);
+    List<User> getHotSluver(Long celebId);
 
     List<User> getSearchUserIds(String word);
 

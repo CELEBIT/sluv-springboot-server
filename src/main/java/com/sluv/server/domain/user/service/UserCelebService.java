@@ -68,10 +68,25 @@ public class UserCelebService {
      */
     @Transactional(readOnly = true)
     public List<InterestedCelebParentResDto> getInterestedCelebByPostTime(User user) {
-        return celebRepository.findInterestedCeleb(user)
-                .stream()
-                .map(InterestedCelebParentResDto::of)
-                .toList();
+        List<InterestedCelebParentResDto> dtos;
+        if (user != null) {
+            dtos = celebRepository.findInterestedCeleb(user)
+                    .stream()
+                    .map(InterestedCelebParentResDto::of)
+                    .toList();
+        } else {
+            dtos = celebRepository.findTop10Celeb()
+                    .stream()
+                    .map(celeb -> {
+                        if (celeb.getParent() != null) {
+                            celeb = celeb.getParent();
+                        }
+                        return InterestedCelebParentResDto.of(celeb);
+                    })
+                    .distinct()
+                    .toList();
+        }
+        return dtos;
     }
 
     @Transactional

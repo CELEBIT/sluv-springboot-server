@@ -172,7 +172,6 @@ public class CelebRepositoryImpl implements CelebRepositoryCustom {
                 .orderBy(recentSelectCeleb.celeb.count().desc())
                 .limit(10)
                 .fetch();
-
         return fetch.stream().map(RecentSelectCeleb::getCeleb).toList();
     }
 

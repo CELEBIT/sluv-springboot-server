@@ -91,7 +91,7 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
      * 전체 / 셀럽 별 인기 스러버 조회
      */
     @Override
-    public List<User> getHotSluver(User _user, Long celebId) {
+    public List<User> getHotSluver(Long celebId) {
 
         JPAQuery<User> query = jpaQueryFactory.selectFrom(user)
                 .leftJoin(follow).on(follow.followee.eq(user)).fetchJoin()

@@ -56,6 +56,7 @@ import com.sluv.server.global.ai.AiModelService;
 import com.sluv.server.global.cache.CacheService;
 import com.sluv.server.global.common.enums.ItemImgOrLinkStatus;
 import com.sluv.server.global.common.response.PaginationResDto;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -203,7 +204,7 @@ public class ItemService {
                 .orElseThrow(ItemNotFoundException::new);
 
         if (item.getItemStatus() != ItemStatus.ACTIVE) {
-            System.out.println("status: " + item.getItemStatus());
+            log.error("ItemId: {}'s status: {}", itemId, item.getItemStatus());
             throw new ItemNotActiveException();
         }
 
@@ -214,28 +215,35 @@ public class ItemService {
             cacheService.saveItemDetailFixData(itemId, fixData);
         }
 
-        // 3. 최근 본 아이템 등록
-        recentItemRepository.save(RecentItem.of(item, user));
-
-        // 4. 좋아요 수
+        // 3. 좋아요 수
         Integer likeNum = itemLikeRepository.countByItemId(item.getId());
 
-        // 5. 스크랩 수
+        // 4. 스크랩 수
         Integer scrapNum = itemScrapRepository.countByItemId(item.getId());
 
-        // 6. 조회수
-        increaseViewNum(user.getId(), item);
-        Long viewNum = item.getViewNum();
+        List<Closet> closetList = new ArrayList<>();
 
-        // 7. 좋아요 여부
-        boolean likeStatus = itemLikeRepository.existsByUserIdAndItemId(user.getId(), itemId);
+        if (user != null) {
+            // 5. 최근 본 아이템 등록
+            recentItemRepository.save(RecentItem.of(item, user));
 
-        // 8. 팔로우 여부
+            // 6. 조회수
+            increaseViewNum(user.getId(), item);
+
+            // 7. 스크랩 여부
+            closetList = closetRepository.findAllByUserId(user.getId());
+        }
+
+        boolean scrapStatus = itemScrapRepository.getItemScrapStatus(item, closetList);
+
+        // 8. 좋아요 여부
+        boolean likeStatus = user != null && itemLikeRepository.existsByUserIdAndItemId(user.getId(), itemId);
+
+        // 9. 팔로우 여부
         boolean followStatus = followRepository.getFollowStatus(user, fixData.getWriter().getId());
 
-        // 9. 스크랩 여부
-        List<Closet> closetList = closetRepository.findAllByUserId(user.getId());
-        boolean scrapStatus = itemScrapRepository.getItemScrapStatus(item, closetList);
+        // 10. 본인의 게시글 여부
+        boolean hasMine = user != null && item.getUser().getId().equals(user.getId());
 
         // Dto 조립
         return ItemDetailResDto.of(
@@ -249,10 +257,10 @@ public class ItemService {
                 likeStatus,
                 scrapNum,
                 scrapStatus,
-                viewNum,
+                item.getViewNum(),
                 fixData.getWriter(),
                 followStatus,
-                item.getUser().getId().equals(user.getId()),
+                hasMine,
                 fixData.getImgList(),
                 fixData.getLinkList(),
                 fixData.getHashTagList()
@@ -390,7 +398,6 @@ public class ItemService {
         Page<Item> itemPage = itemRepository.getNowBuyItem(pageable, dto);
         List<ItemSimpleResDto> content = itemRepository.getItemSimpleResDto(user, itemPage.getContent());
         return PaginationResDto.of(itemPage, content);
-
     }
 
     @Transactional(readOnly = true)
@@ -407,9 +414,7 @@ public class ItemService {
     @Transactional(readOnly = true)
     public PaginationResDto<ItemSimpleResDto> getLuxuryItem(User user, Pageable pageable, SearchFilterReqDto dto) {
         Page<Item> itemPage = itemRepository.getLuxuryItem(pageable, dto);
-
         List<ItemSimpleResDto> content = itemRepository.getItemSimpleResDto(user, itemPage.getContent());
-
         return PaginationResDto.of(itemPage, content);
     }
 
@@ -449,7 +454,12 @@ public class ItemService {
 
     @Transactional(readOnly = true)
     public List<ItemSimpleResDto> getCurationItem(User user) {
-        List<Celeb> interestedCeleb = celebRepository.findInterestedCeleb(user);
+        List<Celeb> interestedCeleb;
+        if (user != null) {
+            interestedCeleb = celebRepository.findInterestedCeleb(user);
+        } else {
+            interestedCeleb = celebRepository.findTop10Celeb();
+        }
         List<Item> itemList = itemRepository.getCurationItem(user, interestedCeleb);
 
         return itemRepository.getItemSimpleResDto(user, itemList);
@@ -457,7 +467,12 @@ public class ItemService {
 
     @Transactional(readOnly = true)
     public List<ItemSimpleResDto> getHowAboutItem(User user) {
-        List<Celeb> interestedCeleb = celebRepository.findInterestedCeleb(user);
+        List<Celeb> interestedCeleb;
+        if (user != null) {
+            interestedCeleb = celebRepository.findInterestedCeleb(user);
+        } else {
+            interestedCeleb = celebRepository.findTop10Celeb();
+        }
         List<Item> itemList = itemRepository.getHowAboutItem(user, interestedCeleb);
 
         return itemRepository.getItemSimpleResDto(user, itemList);

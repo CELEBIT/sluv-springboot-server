@@ -87,7 +87,15 @@ public class User extends BaseEntity implements UserDetails {
                 .userStatus(user.getUserStatus())
                 .termsStatus(user.getTermsStatus())
                 .build();
+    }
 
+    public static User toVisitUser() {
+        return User.builder()
+                .id(0L)
+                .email("user@visitent-visit.sluv")
+                .nickname("visitent")
+                .snsType(SnsType.ETC)
+                .build();
     }
 
     public void changeProfileImgUrl(String profileImgUrl) {

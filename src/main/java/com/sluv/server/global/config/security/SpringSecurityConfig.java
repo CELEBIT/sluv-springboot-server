@@ -39,8 +39,6 @@ public class SpringSecurityConfig {
             "/app/celeb/recent/{celebId}",
 
             // item
-            "/app/item",
-            "/app/item/{ItemId}",
             "/app/item/{ItemId}/like",
             "/app/item/temp",
             "/app/item/temp/{tempItemId}",
@@ -71,9 +69,10 @@ public class SpringSecurityConfig {
 
                 .authorizeHttpRequests((request) -> request // 허용 범위 설정
                         .requestMatchers(HttpMethod.OPTIONS, "/**/*").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/app/*/*").permitAll()
                         .requestMatchers(HttpMethod.GET, "/app/item/category").permitAll()
                         .requestMatchers(HttpMethod.GET, "/app/item/hashtag").permitAll()
-                        .requestMatchers(AUTH_URL).authenticated() // 허용범위
+                        .requestMatchers(AUTH_URL).authenticated() // 체크 범위.
                         .anyRequest().permitAll()
                 )
                 .exceptionHandling().authenticationEntryPoint(customAuthenticationEntryPoint)

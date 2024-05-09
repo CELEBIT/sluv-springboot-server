@@ -23,13 +23,13 @@ spring:
       password: 1234
     oauth2:
       client:
-        android: 924373234165-adalqufkonkljl23qk6vv4g3bnc9imfr.apps.googleusercontent.com
-        apple: 924373234165-hfd08tk9pt36g4e9r54hqhpe9ircrv4q.apps.googleusercontent.com
+        android: test
+        apple: test
 
   elasticsearch:
-    uri: http://awseb-awseb-clwnl48v6djo-1067213661.ap-northeast-2.elb.amazonaws.com
+    uri: test
   ai-model:
-    uri: http://ec2-43-203-108-7.ap-northeast-2.compute.amazonaws.com
+    uri: test
 
 jasypt:
   encryptor:
@@ -44,17 +44,17 @@ jwt:
 
 apple:
   #  nonce: 1
-  clientId: Sluv.sluv-ios-renew
-  openKey: https://appleid.apple.com/auth/keys
-  iss: https://appleid.apple.com
+  clientId: test
+  openKey: test
+  iss: test
 
 aws:
   s3:
-    accessKey: AKIA5R23H6YS5ZD6OOCH
-    secretKey: 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
+    accessKey: test
+    secretKey: test
     region: ap-northeast-2
-    bucketName: elasticbeanstalk-ap-northeast-2-931662394917
-    baseUrl: asset
+    bucketName: test
+    baseUrl: test
 
 discord:
   webhook:

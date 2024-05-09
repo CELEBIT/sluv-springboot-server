@@ -21,6 +21,10 @@ public class FollowRepositoryImpl implements FollowRepositoryCustom {
     @Override
     public Boolean getFollowStatus(User _user, Long targetUserId) {
 
+        if (_user == null) {
+            return false;
+        }
+
         return jpaQueryFactory.selectFrom(user)
                 .leftJoin(follow).on(follow.follower.eq(user)).fetchJoin()
                 .leftJoin(follow).on(follow.followee.eq(user)).fetchJoin()

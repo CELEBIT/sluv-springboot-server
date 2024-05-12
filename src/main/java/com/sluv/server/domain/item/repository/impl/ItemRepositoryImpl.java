@@ -395,8 +395,7 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
     public Page<Item> getAllByUserLikeItem(User user, Pageable pageable) {
         List<Item> content = jpaQueryFactory.select(item)
                 .from(itemLike)
-                .leftJoin(itemLike).on(itemLink.item.eq(item))
-                .where(itemLike.user.eq(user).and(itemLink.item.itemStatus.eq(ACTIVE)))
+                .where(itemLike.user.eq(user).and(itemLike.item.itemStatus.eq(ACTIVE)))
                 .orderBy(itemLike.id.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -405,8 +404,8 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
         // Count Query
         JPAQuery<Item> query = jpaQueryFactory.select(item)
                 .from(itemLike)
-                .leftJoin(itemLike).on(itemLink.item.eq(item)).fetchJoin()
-                .where(itemLike.user.eq(user).and(itemLink.item.itemStatus.eq(ACTIVE)))
+                .leftJoin(item).on(itemLike.item.eq(item))
+                .where(itemLike.user.eq(user).and(itemLike.item.itemStatus.eq(ACTIVE)))
                 .orderBy(itemLike.id.desc());
 
         return PageableExecutionUtils.getPage(content, pageable, () -> query.fetch().size());

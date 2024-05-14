@@ -5,4 +5,5 @@ import com.sluv.server.domain.item.repository.impl.RecentItemRepositoryCustom;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface RecentItemRepository extends JpaRepository<RecentItem, Long>, RecentItemRepositoryCustom {
+    void deleteAllByUserId(Long userId);
 }

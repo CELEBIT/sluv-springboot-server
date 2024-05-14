@@ -23,13 +23,16 @@ public class UserSearchInfoDto {
     private String profileImgUrl;
     @Schema(description = "현재 사용자의 팔로우 여부")
     private Boolean followStatus;
+    @Schema(description = "현재 사용자 여부")
+    private Boolean isMine;
 
-    public static UserSearchInfoDto of(User user, Boolean followStatus){
+    public static UserSearchInfoDto of(User user, Boolean followStatus, Boolean isMine) {
         return UserSearchInfoDto.builder()
                 .id(user.getId())
                 .nickName(user.getNickname())
                 .profileImgUrl(user.getProfileImgUrl())
                 .followStatus(followStatus)
+                .isMine(isMine)
                 .build();
     }
 }

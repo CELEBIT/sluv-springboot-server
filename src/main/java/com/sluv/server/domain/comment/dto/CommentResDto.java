@@ -5,13 +5,12 @@ import com.sluv.server.domain.comment.enums.CommentStatus;
 import com.sluv.server.domain.user.dto.UserInfoDto;
 import com.sluv.server.domain.user.entity.User;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.time.LocalDateTime;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.time.LocalDateTime;
-import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -43,15 +42,15 @@ public class CommentResDto {
     private CommentStatus commentStatus;
 
 
-    public static CommentResDto of(Comment comment, User user,
+    public static CommentResDto of(Comment comment, User writer, User user,
                                    List<CommentImgDto> imgList,
                                    List<CommentItemResDto> itemList,
                                    Integer likeNum,
-                                   Boolean likeStatus){
+                                   Boolean likeStatus) {
 
         return CommentResDto.builder()
                 .id(comment.getId())
-                .user(UserInfoDto.of(user))
+                .user(UserInfoDto.of(writer))
                 .content(comment.getContent())
                 .imgUrlList(imgList)
                 .itemList(itemList)

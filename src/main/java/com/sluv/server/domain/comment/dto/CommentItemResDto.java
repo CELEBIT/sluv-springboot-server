@@ -19,7 +19,7 @@ public class CommentItemResDto {
     @Schema(description = "Comment 아이템 순서")
     private Integer sortOrder;
 
-    public static CommentItemResDto of(CommentItem commentItem, ItemImg mainImg, Boolean scrapStatus){
+    public static CommentItemResDto of(CommentItem commentItem, ItemImg mainImg, Boolean scrapStatus) {
 
         ItemSimpleResDto itemSimpleResDto = ItemSimpleResDto.of(commentItem.getItem(), mainImg, scrapStatus);
 

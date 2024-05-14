@@ -2,9 +2,12 @@ package com.sluv.server.domain.celeb.dto;
 
 import com.sluv.server.domain.celeb.entity.Celeb;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.*;
-
 import java.util.List;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Data
 @Getter
@@ -21,7 +24,7 @@ public class InterestedCelebParentResDto {
     @Schema(description = "하위 Celeb 리스트")
     private List<InterestedCelebChildResDto> subCelebList;
 
-    public static InterestedCelebParentResDto of(Celeb celeb){
+    public static InterestedCelebParentResDto of(Celeb celeb) {
         List<InterestedCelebChildResDto> subDtoList = null;
         if (!celeb.getSubCelebList().isEmpty()) {
             subDtoList = celeb.getSubCelebList().stream()
@@ -33,8 +36,8 @@ public class InterestedCelebParentResDto {
                 .celebNameKr(celeb.getCelebNameKr())
                 .celebCategory(
                         celeb.getCelebCategory().getParent() != null
-                        ? celeb.getCelebCategory().getParent().getName()
-                        : celeb.getCelebCategory().getName()
+                                ? celeb.getCelebCategory().getParent().getName()
+                                : celeb.getCelebCategory().getName()
                 )
                 .subCelebList(subDtoList)
                 .build();

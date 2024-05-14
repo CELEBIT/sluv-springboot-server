@@ -8,12 +8,25 @@ import com.sluv.server.domain.item.dto.TempItemPostReqDto;
 import com.sluv.server.domain.item.enums.ItemStatus;
 import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.global.common.entity.BaseEntity;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.*;
-
 import java.time.LocalDateTime;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Getter
@@ -24,31 +37,32 @@ import java.time.LocalDateTime;
 @Table(name = "temp_item")
 public class TempItem extends BaseEntity {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "temp_item_id")
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     @NotNull
     private User user;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "celeb_id")
     private Celeb celeb;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "new_celeb_id")
     private NewCeleb newCeleb;
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "item_category_id")
     private ItemCategory category;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "brand_id")
     private Brand brand;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "new_brand_id")
     private NewBrand newBrand;
 
@@ -77,6 +91,26 @@ public class TempItem extends BaseEntity {
                                     ItemCategory category, Brand brand, NewBrand newBrand,
                                     TempItemPostReqDto dto) {
         return TempItem.builder()
+                .user(user)
+                .celeb(celeb)
+                .newCeleb(newCeleb)
+                .category(category)
+                .brand(brand)
+                .newBrand(newBrand)
+                .name(dto.getItemName())
+                .whenDiscovery(dto.getWhenDiscovery())
+                .whereDiscovery(dto.getWhereDiscovery())
+                .price(dto.getPrice())
+                .additionalInfo(dto.getAdditionalInfo())
+                .infoSource(dto.getInfoSource())
+                .build();
+    }
+
+    public static TempItem toEntity(Long id, User user, Celeb celeb, NewCeleb newCeleb,
+                                    ItemCategory category, Brand brand, NewBrand newBrand,
+                                    TempItemPostReqDto dto) {
+        return TempItem.builder()
+                .id(id)
                 .user(user)
                 .celeb(celeb)
                 .newCeleb(newCeleb)

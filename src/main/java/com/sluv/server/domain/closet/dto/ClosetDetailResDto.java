@@ -1,5 +1,6 @@
 package com.sluv.server.domain.closet.dto;
 
+import com.sluv.server.domain.closet.entity.Closet;
 import com.sluv.server.domain.closet.enums.ClosetColor;
 import com.sluv.server.domain.closet.enums.ClosetStatus;
 import com.sluv.server.global.common.response.PaginationResDto;
@@ -7,6 +8,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
+import org.springframework.data.domain.Page;
 
 @Getter
 @NoArgsConstructor
@@ -25,11 +27,18 @@ public class ClosetDetailResDto<T> extends PaginationResDto<T> {
     @Schema(description = "Closet에 있는 아이템 개수")
     private Long itemNum;
 
-//    public ClosetDetailResDto(Boolean hasNext, Integer page, List<T> content, String coverImgUrl, String title, ClosetStatus closetStatus, Long itemNum) {
-//        super(hasNext, page, content);
-//        this.coverImgUrl = coverImgUrl;
-//        this.title = title;
-//        this.closetStatus = closetStatus;
-//        this.itemNum = itemNum;
-//    }
+    public static <T> ClosetDetailResDto<T> of(Page<T> page, Closet closet) {
+        String coverImg = closet.getCoverImgUrl() == null ? null : closet.getCoverImgUrl();
+        return ClosetDetailResDto.<T>builder()
+                .hasNext(page.hasNext())
+                .page(page.getNumber())
+                .content(page.getContent())
+                .id(closet.getId())
+                .coverImgUrl(coverImg)
+                .name(closet.getName())
+                .closetStatus(closet.getClosetStatus())
+                .colorScheme(closet.getColor())
+                .itemNum(page.getTotalElements())
+                .build();
+    }
 }

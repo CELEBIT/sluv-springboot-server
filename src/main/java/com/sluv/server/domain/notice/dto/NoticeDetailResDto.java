@@ -3,12 +3,11 @@ package com.sluv.server.domain.notice.dto;
 import com.sluv.server.domain.notice.entity.Notice;
 import com.sluv.server.domain.notice.enums.NoticeType;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.time.LocalDateTime;
 
 @Data
 @AllArgsConstructor
@@ -25,7 +24,7 @@ public class NoticeDetailResDto {
     @Schema(description = "공지사항 타입")
     private NoticeType noticeType;
 
-    public static NoticeDetailResDto of(Notice notice){
+    public static NoticeDetailResDto of(Notice notice) {
 
         return NoticeDetailResDto.builder()
                 .title(notice.getTitle())

@@ -17,7 +17,7 @@ public class NewCelebPostResDto {
     @Schema(description = "생성된 newCeleb의 이름")
     private String newCelebName;
 
-    public static NewCelebPostResDto of(NewCeleb newCeleb){
+    public static NewCelebPostResDto of(NewCeleb newCeleb) {
         return NewCelebPostResDto.builder()
                 .newCelebId(newCeleb.getId())
                 .newCelebName(newCeleb.getCelebName())

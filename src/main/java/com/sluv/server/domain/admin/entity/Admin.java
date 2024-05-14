@@ -1,9 +1,13 @@
 package com.sluv.server.domain.admin.entity;
 
 import com.sluv.server.global.common.entity.BaseEntity;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,22 +18,26 @@ import lombok.NoArgsConstructor;
 @Table(name = "admin")
 public class Admin extends BaseEntity {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "admin_id")
     private Long id;
 
     @NotNull
-    @Size(max = 45)
-    private String userName;
+    private String email;
 
     @NotNull
-    @Size(max = 45)
+    private String name;
+
+    @NotNull
     private String pwd;
 
     @Builder
-    public Admin(Long id, String userName, String pwd) {
+    public Admin(Long id, String email, String name, String pwd) {
         this.id = id;
-        this.userName = userName;
+        this.email = email;
+        this.name = name;
         this.pwd = pwd;
     }
 }

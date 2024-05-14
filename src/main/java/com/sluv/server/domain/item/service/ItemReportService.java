@@ -8,11 +8,12 @@ import com.sluv.server.domain.item.exception.ItemReportDuplicateException;
 import com.sluv.server.domain.item.repository.ItemReportRepository;
 import com.sluv.server.domain.item.repository.ItemRepository;
 import com.sluv.server.domain.user.entity.User;
-import com.sluv.server.global.common.enums.ReportStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class ItemReportService {
     private final ItemReportRepository itemReportRepository;
@@ -27,10 +28,10 @@ public class ItemReportService {
         boolean existence = itemReportRepository.findExistence(user, target);
 
         // 중복 신고라면 Exception 발생
-        if(existence){
+        if (existence) {
             throw new ItemReportDuplicateException();
-        }else {
-        // 중복이 아니라면 신고 접수
+        } else {
+            // 중복이 아니라면 신고 접수
             itemReportRepository.save(
                     ItemReport.toEntity(target, user, dto)
             );

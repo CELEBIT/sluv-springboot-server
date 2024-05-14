@@ -5,15 +5,13 @@ import com.sluv.server.domain.brand.entity.Brand;
 import com.sluv.server.domain.celeb.dto.CelebDto;
 import com.sluv.server.domain.celeb.dto.NewCelebPostResDto;
 import com.sluv.server.domain.item.entity.TempItem;
-import com.sluv.server.domain.item.entity.hashtag.Hashtag;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.time.LocalDateTime;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.time.LocalDateTime;
-import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -21,8 +19,7 @@ import java.util.List;
 @Builder
 public class TempItemResDto {
     /**
-     * 착용사진, 셀럽, 아이템 종류, 브랜드, 상품명, 금액대
-     * 날짜, 장소, 추가 정보, 구매 링크
+     * 착용사진, 셀럽, 아이템 종류, 브랜드, 상품명, 금액대 날짜, 장소, 추가 정보, 구매 링크
      */
 
     @Schema(description = "item Id")
@@ -46,7 +43,7 @@ public class TempItemResDto {
     @Schema(description = "추가정보")
     private String additionalInfo;
     @Schema(description = "해쉬태그 리스트")
-    private List<Hashtag> hashTagList;
+    private List<ItemHashtagResponseDto> hashTagList;
     @Schema(description = "item 링크 리스트 ")
     private List<ItemLinkResDto> linkList;
     @Schema(description = "추가정보를 발견한 출처")
@@ -60,10 +57,29 @@ public class TempItemResDto {
     @Schema(description = "최신 update 시점")
     private LocalDateTime updatedAt;
 
-    public static TempItemResDto of(TempItem tempItem, CelebDto celeb, NewCelebPostResDto newCeleb,
-                                    Brand brand, NewBrandPostResDto newBrand, ItemCategoryDto itemCategory,
-                                    List<ItemImgResDto> imgList, List<ItemLinkResDto> linkList, List<Hashtag> hashtagList
-                                    ){
+    public static TempItemResDto of(TempItem tempItem, List<ItemImgResDto> imgList, List<ItemLinkResDto> linkList,
+                                    List<ItemHashtagResponseDto> hashtagList
+    ) {
+
+        CelebDto celeb = tempItem.getCeleb() != null ?
+                CelebDto.of(tempItem.getCeleb())
+                : null;
+
+        ItemCategoryDto itemCategory = tempItem.getCategory() != null ?
+                ItemCategoryDto.of(tempItem.getCategory())
+                : null;
+
+        Brand brand = tempItem.getBrand() != null
+                ? tempItem.getBrand()
+                : null;
+
+        NewCelebPostResDto newCeleb = tempItem.getNewCeleb() != null
+                ? NewCelebPostResDto.of(tempItem.getNewCeleb())
+                : null;
+
+        NewBrandPostResDto newBrand = tempItem.getNewBrand() != null
+                ? NewBrandPostResDto.of(tempItem.getNewBrand())
+                : null;
 
         return TempItemResDto.builder()
                 .id(tempItem.getId())

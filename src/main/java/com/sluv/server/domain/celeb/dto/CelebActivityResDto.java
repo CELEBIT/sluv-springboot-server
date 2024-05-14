@@ -15,7 +15,7 @@ public class CelebActivityResDto {
     @Schema(description = "셀럽의 활동명")
     private String activityName;
 
-    public static CelebActivityResDto of(CelebActivity celebActivity){
+    public static CelebActivityResDto of(CelebActivity celebActivity) {
         return CelebActivityResDto.builder()
                 .activityName(celebActivity.getActivityName())
                 .build();

@@ -1,37 +1,34 @@
 package com.sluv.server.domain.auth.service;
 
+import static com.sluv.server.domain.auth.enums.SnsType.APPLE;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sluv.server.domain.auth.dto.AuthRequestDto;
-import com.sluv.server.domain.auth.dto.AuthResponseDto;
 import com.sluv.server.domain.auth.dto.SocialUserInfoDto;
 import com.sluv.server.domain.closet.service.ClosetService;
-import com.sluv.server.domain.user.dto.UserIdDto;
 import com.sluv.server.domain.user.entity.User;
+import com.sluv.server.domain.user.enums.UserAge;
+import com.sluv.server.domain.user.enums.UserGender;
 import com.sluv.server.domain.user.exception.UserNotFoundException;
 import com.sluv.server.domain.user.repository.UserRepository;
-import com.sluv.server.global.jwt.JwtProvider;
-
+import com.sluv.server.global.discord.WebHookService;
 import com.sluv.server.global.jwt.exception.ExpiredTokenException;
 import com.sluv.server.global.jwt.exception.InvalidateTokenException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-
 import java.math.BigInteger;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.security.*;
-
+import java.security.KeyFactory;
+import java.security.PublicKey;
 import java.security.spec.RSAPublicKeySpec;
 import java.util.Base64;
-
-import static com.sluv.server.domain.auth.enums.SnsType.APPLE;
-
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 
 
 @Service
@@ -39,7 +36,8 @@ import static com.sluv.server.domain.auth.enums.SnsType.APPLE;
 public class AppleUserService {
     private final UserRepository userRepository;
     private final ClosetService closetService;
-    private final JwtProvider jwtProvider;
+    private final WebHookService webHookService;
+
     private final ObjectMapper objectMapper = new ObjectMapper();
     @Value("${apple.clientId}")
     private String clientId;
@@ -50,11 +48,11 @@ public class AppleUserService {
     @Value("${apple.iss}")
     private String issUrl;
 
-    public AuthResponseDto appleLogin(AuthRequestDto request) throws Exception {
+    public User appleLogin(AuthRequestDto request) throws Exception {
         String identityToken = request.getAccessToken();
 
         // 1. 검증
-        if(!verifyIdToken(identityToken)){
+        if (!verifyIdToken(identityToken)) {
             throw new InvalidateTokenException();
         }
 
@@ -62,12 +60,7 @@ public class AppleUserService {
         SocialUserInfoDto userInfo = getAppleUserInfo(identityToken);
 
         // 3. idToken의 정보로 DB 탐색 및 등록
-        User appleUser = registerAppleUserIfNeed(userInfo);
-
-        // 4. userToken 생성
-        return AuthResponseDto.builder()
-                .token(createUserToken(appleUser))
-                .build();
+        return registerAppleUserIfNeed(userInfo);
     }
 
     /**
@@ -77,14 +70,13 @@ public class AppleUserService {
      * @return 유효 여부
      * @throws Exception
      */
-    private boolean verifyIdToken(String identityToken) throws Exception{
+    private boolean verifyIdToken(String identityToken) throws Exception {
         String[] pieces = identityToken.split("\\.");
         if (pieces.length != 3) {
             return false;
         }
         String header = new String(Base64.getUrlDecoder().decode(pieces[0]));
         String payload = new String(Base64.getUrlDecoder().decode(pieces[1]));
-
 
         JsonNode headerNode = objectMapper.readTree(header);
         JsonNode payloadNode = objectMapper.readTree(payload);
@@ -116,7 +108,7 @@ public class AppleUserService {
             throw new ExpiredTokenException();
         }
 
-        if(getPublicKeyFromPEM(identityToken, idKid) == null){
+        if (getPublicKeyFromPEM(identityToken, idKid) == null) {
             return false;
         }
 
@@ -132,7 +124,7 @@ public class AppleUserService {
      * @return
      * @throws Exception
      */
-    public Claims getPublicKeyFromPEM(String identityToken, String identityKid) throws Exception{
+    public Claims getPublicKeyFromPEM(String identityToken, String identityKid) throws Exception {
         JsonNode correctKey = getApplePublicKey(identityKid);
         String tN = correctKey.get("n").asText();
         String tE = correctKey.get("e").asText();
@@ -149,8 +141,8 @@ public class AppleUserService {
         PublicKey publicKey = keyFactory.generatePublic(publicKeySpec);
 
         JwtParser parser = Jwts.parserBuilder()
-                                .setSigningKey(publicKey)
-                                .build();
+                .setSigningKey(publicKey)
+                .build();
 
         return parser.parseClaimsJws(identityToken).getBody();
     }
@@ -165,7 +157,6 @@ public class AppleUserService {
 
     private JsonNode getApplePublicKey(String identityKid) throws Exception {
         URL url = new URL(appleOpenKeys);
-
 
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("GET");
@@ -189,17 +180,6 @@ public class AppleUserService {
     }
 
     /**
-     * == user 정보를 기반으로 user Access Token 생성 ==
-     *
-     * @param user
-     * @return user Access Token
-     */
-    private String createUserToken(User user) {
-
-        return jwtProvider.createAccessToken(UserIdDto.of(user.getId()));
-    }
-
-    /**
      * identityToken의 정보 SocialUserDto로 변환
      *
      * @param identityToken
@@ -216,32 +196,32 @@ public class AppleUserService {
         String email = jsonNode.get("email").asText();
 
         String profileImgUrl;
-        try{
+        try {
             profileImgUrl = jsonNode.get("picture").asText();
-        }catch (Exception e){
+        } catch (Exception e) {
             profileImgUrl = null;
         }
 
         String gender;
 
-        try{
+        try {
             gender = jsonNode.get("gender").asText();
-        }catch (Exception e){
+        } catch (Exception e) {
             gender = null;
         }
 
         String ageRange;
-        try{
+        try {
             ageRange = jsonNode.get("birthdate").asText();
-        }catch (Exception e){
+        } catch (Exception e) {
             ageRange = null;
         }
 
         return SocialUserInfoDto.builder()
                 .email(email)
                 .profileImgUrl(profileImgUrl)
-                .gender(gender)
-                .ageRange(ageRange)
+                .gender(convertGender(gender))
+                .ageRange(convertAge(ageRange))
                 .build();
     }
 
@@ -255,7 +235,7 @@ public class AppleUserService {
     private User registerAppleUserIfNeed(SocialUserInfoDto userInfoDto) {
         User user = userRepository.findByEmail(userInfoDto.getEmail()).orElse(null);
 
-        if(user == null) {
+        if (user == null) {
             userRepository.save(
                     User.toEntity(userInfoDto, APPLE)
             );
@@ -265,7 +245,35 @@ public class AppleUserService {
 
             // 생성과 동시에 기본 Closet 생성
             closetService.postBasicCloset(user);
+            webHookService.sendSingupMessage(user);
         }
         return user;
+    }
+
+    private UserGender convertGender(String gender) {
+        UserGender userGender = UserGender.UNKNOWN;
+        if (gender != null) {
+            if (gender.equals("male")) {
+                userGender = UserGender.MALE;
+            }
+            if (gender.equals("female")) {
+                userGender = UserGender.FEMALE;
+            }
+        }
+        return userGender;
+    }
+
+    private UserAge convertAge(String age) {
+        UserAge userGender = UserAge.UNKNOWN;
+        if (age != null) {
+            int startAge = Integer.parseInt(age.split("-")[0]);
+            for (UserAge value : UserAge.values()) {
+                if (startAge == value.getStartAge()) {
+                    userGender = value;
+                    break;
+                }
+            }
+        }
+        return userGender;
     }
 }

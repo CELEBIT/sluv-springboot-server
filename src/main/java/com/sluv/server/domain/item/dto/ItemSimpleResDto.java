@@ -14,8 +14,7 @@ import lombok.NoArgsConstructor;
 @Builder
 public class ItemSimpleResDto {
     /**
-     * Item 세부 검색 시 하단에 등장하는
-     * 연관 Item 정보를 전달
+     * Item 세부 검색 시 하단에 등장하는 연관 Item 정보를 전달
      */
     @Schema(description = "아이템 Id")
     private Long itemId;
@@ -31,8 +30,6 @@ public class ItemSimpleResDto {
     private Boolean scrapStatus;
 
     public static ItemSimpleResDto of(Item item, ItemImg mainImg, Boolean scrapStatus) {
-
-
         return ItemSimpleResDto.builder()
                 .itemId(item.getId())
                 .imgUrl(mainImg.getItemImgUrl())
@@ -42,8 +39,9 @@ public class ItemSimpleResDto {
                                 : item.getNewBrand().getBrandName()
                 )
                 .celebName(
-                        item.getCeleb() != null
-                                ? item.getCeleb().getCelebNameKr()
+                        item.getCeleb() != null ? item.getCeleb().getParent() != null
+                                ? item.getCeleb().getParent().getCelebNameKr() + " " + item.getCeleb().getCelebNameKr()
+                                : item.getCeleb().getCelebNameKr()
                                 : item.getNewCeleb().getCelebName()
                 )
                 .itemName(item.getName())

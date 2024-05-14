@@ -14,7 +14,7 @@ public class UserIdDto {
     @Schema(description = "사용자 Id")
     private Long id;
 
-    public static UserIdDto of(Long userId){
+    public static UserIdDto of(Long userId) {
         return UserIdDto.builder()
                 .id(userId)
                 .build();

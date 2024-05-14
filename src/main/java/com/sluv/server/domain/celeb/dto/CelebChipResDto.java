@@ -21,14 +21,14 @@ public class CelebChipResDto {
     @Schema(description = "셀럽 이름")
     private String celebName;
 
-    public static CelebChipResDto of(Celeb celeb){
+    public static CelebChipResDto of(Celeb celeb) {
         return CelebChipResDto.builder()
                 .celebId(celeb.getId())
                 .celebName(celeb.getCelebNameKr())
                 .build();
     }
 
-    public static CelebChipResDto of(NewCeleb celeb){
+    public static CelebChipResDto of(NewCeleb celeb) {
         return CelebChipResDto.builder()
                 .celebId(celeb.getId())
                 .celebName(celeb.getCelebName())

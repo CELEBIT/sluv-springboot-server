@@ -1,26 +1,31 @@
 package com.sluv.server.domain.question.repository.impl;
 
+import static com.sluv.server.domain.question.entity.QRecentQuestion.recentQuestion;
+
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.sluv.server.domain.question.entity.RecentQuestion;
+import com.sluv.server.domain.question.entity.QQuestion;
+import com.sluv.server.domain.question.entity.Question;
+import com.sluv.server.domain.question.enums.QuestionStatus;
 import com.sluv.server.domain.user.entity.User;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
 
-import java.util.List;
-
-import static com.sluv.server.domain.question.entity.QRecentQuestion.recentQuestion;
-
 @RequiredArgsConstructor
-public class RecentQuestionRepositoryImpl implements RecentQuestionRepositoryCustom{
+public class RecentQuestionRepositoryImpl implements RecentQuestionRepositoryCustom {
     private final JPAQueryFactory jpaQueryFactory;
 
     @Override
-    public Page<RecentQuestion> getUserAllRecentQuestion(User user, Pageable pageable) {
-        List<RecentQuestion> content = jpaQueryFactory.selectFrom(recentQuestion)
-                .where(recentQuestion.user.eq(user))
+    public Page<Question> getUserAllRecentQuestion(User user, Pageable pageable) {
+        QQuestion question = new QQuestion("question");
+        List<Question> content = jpaQueryFactory.select(question)
+                .from(question)
+                .leftJoin(recentQuestion).on(recentQuestion.question.eq(question)).fetchJoin()
+                .where(recentQuestion.user.eq(user)
+                        .and(recentQuestion.question.questionStatus.eq(QuestionStatus.ACTIVE)))
                 .groupBy(recentQuestion.question)
                 .orderBy(recentQuestion.createdAt.max().desc())
                 .offset(pageable.getOffset())
@@ -28,8 +33,11 @@ public class RecentQuestionRepositoryImpl implements RecentQuestionRepositoryCus
                 .fetch();
 
         // Count Query
-        JPAQuery<RecentQuestion> query = jpaQueryFactory.selectFrom(recentQuestion)
-                .where(recentQuestion.user.eq(user))
+        JPAQuery<Question> query = jpaQueryFactory.select(question)
+                .from(question)
+                .leftJoin(recentQuestion).on(recentQuestion.question.eq(question)).fetchJoin()
+                .where(recentQuestion.user.eq(user)
+                        .and(recentQuestion.question.questionStatus.eq(QuestionStatus.ACTIVE)))
                 .groupBy(recentQuestion.question)
                 .orderBy(recentQuestion.createdAt.max().desc());
 

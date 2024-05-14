@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class NoticeController {
     private final NoticeService noticeService;
+
     @Operation(
             summary = "공지사항 리스트 조회",
             description = """
@@ -27,7 +28,7 @@ public class NoticeController {
                     """
     )
     @GetMapping("")
-    public ResponseEntity<SuccessDataResponse<PaginationResDto<NoticeSimpleResDto>>> getAllNotice(Pageable pageable){
+    public ResponseEntity<SuccessDataResponse<PaginationResDto<NoticeSimpleResDto>>> getAllNotice(Pageable pageable) {
 
         return ResponseEntity.ok().body(
                 SuccessDataResponse.<PaginationResDto<NoticeSimpleResDto>>builder()
@@ -44,7 +45,8 @@ public class NoticeController {
                     """
     )
     @GetMapping("/{noticeId}")
-    public ResponseEntity<SuccessDataResponse<NoticeDetailResDto>> getNoticeDetail(@PathVariable("noticeId") Long noticeId){
+    public ResponseEntity<SuccessDataResponse<NoticeDetailResDto>> getNoticeDetail(
+            @PathVariable("noticeId") Long noticeId) {
 
         return ResponseEntity.ok().body(
                 SuccessDataResponse.<NoticeDetailResDto>builder()

@@ -1,18 +1,19 @@
 package com.sluv.server.domain.auth.service;
 
+import static com.sluv.server.domain.auth.enums.SnsType.KAKAO;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sluv.server.domain.auth.dto.AuthRequestDto;
-import com.sluv.server.domain.auth.dto.AuthResponseDto;
 import com.sluv.server.domain.auth.dto.SocialUserInfoDto;
 import com.sluv.server.domain.closet.service.ClosetService;
-import com.sluv.server.domain.user.dto.UserIdDto;
 import com.sluv.server.domain.user.entity.User;
+import com.sluv.server.domain.user.enums.UserAge;
+import com.sluv.server.domain.user.enums.UserGender;
 import com.sluv.server.domain.user.exception.UserNotFoundException;
 import com.sluv.server.domain.user.repository.UserRepository;
-
-import com.sluv.server.global.jwt.JwtProvider;
+import com.sluv.server.global.discord.WebHookService;
 import com.sluv.server.global.jwt.exception.InvalidateTokenException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpEntity;
@@ -23,29 +24,21 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
-import static com.sluv.server.domain.auth.enums.SnsType.GOOGLE;
-import static com.sluv.server.domain.auth.enums.SnsType.KAKAO;
-
 
 @Service
 @RequiredArgsConstructor
 public class KakaoUserService {
     private final UserRepository userRepository;
     private final ClosetService closetService;
-    private final JwtProvider jwtProvider;
+    private final WebHookService webHookService;
 
-    public AuthResponseDto kakaoLogin(AuthRequestDto request) throws JsonProcessingException {
+    public User kakaoLogin(AuthRequestDto request) throws JsonProcessingException {
         String accessToken = request.getAccessToken();
         // 1. accessToken으로 user 정보 요청
         SocialUserInfoDto userInfo = getKakaoUserInfo(accessToken);
 
         // 2. user 정보로 DB 탐색 및 등록
-        User kakaoUser = registerKakaoUserIfNeed(userInfo);
-
-        // 3. userToken 생성
-        return AuthResponseDto.builder()
-                .token(createUserToken(kakaoUser))
-                .build();
+        return registerKakaoUserIfNeed(userInfo);
     }
 
     /**
@@ -73,7 +66,7 @@ public class KakaoUserService {
             );
 
             return convertResponseToSocialUserInfoDto(response);
-        }catch (Exception e){
+        } catch (Exception e) {
             throw new InvalidateTokenException();
         }
     }
@@ -85,7 +78,8 @@ public class KakaoUserService {
      * @return SocialUserInfoDto
      * @throws JsonProcessingException
      */
-    private static SocialUserInfoDto convertResponseToSocialUserInfoDto(ResponseEntity<String> response) throws JsonProcessingException {
+    private static SocialUserInfoDto convertResponseToSocialUserInfoDto(ResponseEntity<String> response)
+            throws JsonProcessingException {
         // responseBody에 있는 정보를 꺼냄
         String responseBody = response.getBody();
 
@@ -97,24 +91,24 @@ public class KakaoUserService {
                 .get("profile_image").asText();
 
         String gender;
-        try{
+        try {
             gender = jsonNode.get("kakao_account").get("gender").asText();
-        }catch (Exception e){
+        } catch (Exception e) {
             gender = null;
         }
 
         String ageRange;
-        try{
-            ageRange = jsonNode.get("kakao_account").get("age_range").asText();
-        }catch (Exception e){
+        try {
+            ageRange = jsonNode.get("kakao_account").get("ageRange").asText();
+        } catch (Exception e) {
             ageRange = null;
         }
 
         return SocialUserInfoDto.builder()
                 .email(email)
                 .profileImgUrl(profileImgUrl)
-                .gender(gender)
-                .ageRange(ageRange)
+                .gender(convertGender(gender))
+                .ageRange(convertAge(ageRange))
                 .build();
     }
 
@@ -128,29 +122,57 @@ public class KakaoUserService {
     private User registerKakaoUserIfNeed(SocialUserInfoDto userInfoDto) {
         User user = userRepository.findByEmail(userInfoDto.getEmail()).orElse(null);
 
-        if(user == null) {
+        if (user == null) {
             userRepository.save(
-                    User.toEntity(userInfoDto, GOOGLE)
+                    User.toEntity(userInfoDto, KAKAO)
             );
             user = userRepository.findByEmail(userInfoDto.getEmail())
-                                            .orElseThrow(UserNotFoundException::new);
+                    .orElseThrow(UserNotFoundException::new);
 
             // 생성과 동시에 기본 Closet 생성
             closetService.postBasicCloset(user);
+            webHookService.sendSingupMessage(user);
         }
 
         return user;
     }
 
-    /**
-     * == user 정보를 기반으로 user Access Token 생성 ==
-     *
-     * @param user
-     * @return user Access Token
-     */
-    private String createUserToken(User user) {
+    private static UserGender convertGender(String gender) {
+        UserGender userGender = UserGender.UNKNOWN;
+        if (gender != null) {
+            userGender = getUserGender(userGender, gender);
+        }
+        return userGender;
+    }
 
-        return jwtProvider.createAccessToken(UserIdDto.of(user.getId()));
+    private static UserGender getUserGender(UserGender userGender, String gender) {
+        if (gender.equals("male")) {
+            userGender = UserGender.MALE;
+        }
+        if (gender.equals("female")) {
+            userGender = UserGender.FEMALE;
+        }
+        return userGender;
+    }
+
+    private static UserAge convertAge(String age) {
+
+        UserAge userGender = UserAge.UNKNOWN;
+        if (age != null) {
+            userGender = getUserAge(userGender, age);
+        }
+        return userGender;
+    }
+
+    private static UserAge getUserAge(UserAge userGender, String age) {
+        int startAge = Integer.parseInt(age.split("~")[0]);
+        for (UserAge value : UserAge.values()) {
+            if (startAge == value.getStartAge()) {
+                userGender = value;
+                break;
+            }
+        }
+        return userGender;
     }
 
 }

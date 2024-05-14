@@ -3,7 +3,17 @@ package com.sluv.server.domain.item.entity;
 import com.sluv.server.domain.item.dto.ItemLinkResDto;
 import com.sluv.server.global.common.entity.BaseEntity;
 import com.sluv.server.global.common.enums.ItemImgOrLinkStatus;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -19,11 +29,12 @@ import lombok.NoArgsConstructor;
 @Table(name = "item_link")
 public class ItemLink extends BaseEntity {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "item_link_id")
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "item_id")
     @NotNull
     private Item item;
@@ -42,7 +53,7 @@ public class ItemLink extends BaseEntity {
     private ItemImgOrLinkStatus itemImgOrLinkStatus = ItemImgOrLinkStatus.ACTIVE;
 
 
-    public static ItemLink toEntity(Item item , ItemLinkResDto dto){
+    public static ItemLink toEntity(Item item, ItemLinkResDto dto) {
         return ItemLink.builder()
                 .item(item)
                 .linkName(dto.getLinkName())

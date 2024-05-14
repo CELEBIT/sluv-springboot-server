@@ -1,14 +1,18 @@
 package com.sluv.server.domain.question.dto;
 
-import com.sluv.server.domain.question.entity.*;
+import com.sluv.server.domain.question.entity.Question;
+import com.sluv.server.domain.question.entity.QuestionBuy;
+import com.sluv.server.domain.question.entity.QuestionFind;
+import com.sluv.server.domain.question.entity.QuestionHowabout;
+import com.sluv.server.domain.question.entity.QuestionRecommend;
 import com.sluv.server.domain.user.dto.UserInfoDto;
+import com.sluv.server.domain.user.entity.User;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -45,23 +49,28 @@ public class QuestionSimpleResDto {
     //추천해 줘
     @Schema(description = "QuestionRecommend 게시글 카테고리 리스트")
     private List<String> categoryName;
-    public static QuestionSimpleResDto of(Question question, Long likeNum, Long commentNum,
-                                          List<QuestionImgSimpleResDto> imgList, List<QuestionImgSimpleResDto> itemImgList,
-                                          List<String> categoryName){
+
+    public static QuestionSimpleResDto of(Question question, User writer, Long likeNum, Long commentNum,
+                                          List<QuestionImgSimpleResDto> imgList,
+                                          List<QuestionImgSimpleResDto> itemImgList,
+                                          List<String> categoryName) {
 
         String celebName = null;
         String qType = null;
 
-        if(question instanceof QuestionBuy){
+        if (question instanceof QuestionBuy) {
             qType = "Buy";
-        }else if(question instanceof QuestionFind questionFind){
+        } else if (question instanceof QuestionFind questionFind) {
             qType = "Find";
             celebName = questionFind.getCeleb() != null
-                    ? questionFind.getCeleb().getCelebNameKr()
+                    ? questionFind.getCeleb().getParent() != null
+                    ? questionFind.getCeleb().getParent().getCelebNameKr() + " "
+                    + questionFind.getCeleb().getCelebNameKr()
+                    : questionFind.getCeleb().getCelebNameKr()
                     : questionFind.getNewCeleb().getCelebName();
-        }else if(question instanceof QuestionRecommend){
+        } else if (question instanceof QuestionRecommend) {
             qType = "Recommend";
-        }else if(question instanceof QuestionHowabout) {
+        } else if (question instanceof QuestionHowabout) {
             qType = "How";
         }
 
@@ -70,7 +79,7 @@ public class QuestionSimpleResDto {
                 .id(question.getId())
                 .title(question.getTitle())
                 .content(question.getContent())
-                .user(UserInfoDto.of(question.getUser()))
+                .user(UserInfoDto.of(writer))
                 .likeNum(likeNum)
                 .viewNum(question.getSearchNum())
                 .commentNum(commentNum)

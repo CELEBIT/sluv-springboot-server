@@ -1,19 +1,16 @@
 package com.sluv.server.global.common.exception;
 
+import static com.sluv.server.global.common.exception.ErrorCode.DB_ACCESS_ERROR;
+import static com.sluv.server.global.common.exception.ErrorCode.ENUM_ERROR;
+import static com.sluv.server.global.common.exception.ErrorCode.INTERNAL_SERVER_ERROR;
+
 import com.sluv.server.global.common.response.ErrorResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
-
-import static com.sluv.server.global.common.exception.ErrorCode.*;
-import static com.sluv.server.global.common.exception.ErrorCode.DB_ACCESS_ERROR;
-import static com.sluv.server.global.common.exception.ErrorCode.INTERNAL_SERVER_ERROR;
 
 @RestControllerAdvice
 @Slf4j
@@ -25,11 +22,11 @@ public class GlobalExceptionHandler {
     /**
      * == Application Exception ==
      *
-     * @exception ApplicationException
      * @return Each errorCode
+     * @throws ApplicationException
      */
     @ExceptionHandler(ApplicationException.class)
-    public ResponseEntity<ErrorResponse> applicationException(ApplicationException exception){
+    public ResponseEntity<ErrorResponse> applicationException(ApplicationException exception) {
         log.error(
                 LOG_CODE_FORMAT,
                 "ApplicationException",
@@ -67,31 +64,31 @@ public class GlobalExceptionHandler {
     /**
      * == 런타임 Exception ==
      *
-     * @exception RuntimeException
      * @return INTERNAL_SERVER_ERROR
+     * @throws RuntimeException
      */
 
     @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<ErrorResponse> runtimeException(RuntimeException exception){
-       log.error(
-               LOG_FORMAT,
-               "RuntimeException",
-               exception.getClass().getSimpleName(),
-               exception.getMessage()
-       );
+    public ResponseEntity<ErrorResponse> runtimeException(RuntimeException exception) {
+        log.error(
+                LOG_FORMAT,
+                "RuntimeException",
+                exception.getClass().getSimpleName(),
+                exception.getMessage()
+        );
 
-       return ResponseEntity.internalServerError()
-               .body(ErrorResponse.customBuilder()
-                       .errorCode(INTERNAL_SERVER_ERROR)
-                       .build()
-               );
+        return ResponseEntity.internalServerError()
+                .body(ErrorResponse.customBuilder()
+                        .errorCode(INTERNAL_SERVER_ERROR)
+                        .build()
+                );
     }
 
     /**
      * == DB Exception ==
      *
-     * @exception DataAccessException
      * @return DB_ACCESS_ERROR
+     * @throws DataAccessException
      */
 
     @ExceptionHandler(DataAccessException.class)
@@ -113,8 +110,8 @@ public class GlobalExceptionHandler {
     /**
      * == 기타 Exception ==
      *
-     * @exception Exception
      * @return INTERNAL_SERVER_ERROR
+     * @throws Exception
      */
 
     @ExceptionHandler(Exception.class)
@@ -127,8 +124,8 @@ public class GlobalExceptionHandler {
         );
         return ResponseEntity.internalServerError()
                 .body(ErrorResponse.customBuilder()
-                                    .errorCode(INTERNAL_SERVER_ERROR)
-                                    .build()
+                        .errorCode(INTERNAL_SERVER_ERROR)
+                        .build()
                 );
 
     }

@@ -1,14 +1,17 @@
 package com.sluv.server.domain.question.dto;
 
-import com.sluv.server.domain.question.entity.*;
+import com.sluv.server.domain.question.entity.Question;
+import com.sluv.server.domain.question.entity.QuestionBuy;
+import com.sluv.server.domain.question.entity.QuestionFind;
+import com.sluv.server.domain.question.entity.QuestionHowabout;
+import com.sluv.server.domain.question.entity.QuestionRecommend;
 import com.sluv.server.domain.user.dto.UserInfoDto;
 import com.sluv.server.domain.user.entity.User;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-
-import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -25,16 +28,16 @@ public class QuestionHomeResDto {
     @Schema(description = "Question 이미지")
     private List<QuestionImgSimpleResDto> imgList;
 
-    public static QuestionHomeResDto of(Question question, List<QuestionImgSimpleResDto> imgList){
+    public static QuestionHomeResDto of(Question question, User writer, List<QuestionImgSimpleResDto> imgList) {
 
         String qType = null;
-        if(question instanceof QuestionBuy){
+        if (question instanceof QuestionBuy) {
             qType = "Buy";
-        }else if(question instanceof QuestionFind){
+        } else if (question instanceof QuestionFind) {
             qType = "Find";
-        }else if(question instanceof QuestionRecommend){
+        } else if (question instanceof QuestionRecommend) {
             qType = "Recommend";
-        }else if(question instanceof QuestionHowabout) {
+        } else if (question instanceof QuestionHowabout) {
             qType = "How";
         }
 
@@ -42,7 +45,7 @@ public class QuestionHomeResDto {
                 .qType(qType)
                 .id(question.getId())
                 .title(question.getTitle())
-                .user(UserInfoDto.of(question.getUser()))
+                .user(UserInfoDto.of(writer))
                 .imgList(imgList)
                 .build();
     }

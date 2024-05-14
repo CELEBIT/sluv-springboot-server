@@ -10,6 +10,9 @@ jobs:
     steps:
       - name: Checkout Latest Repo
         uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.TOKEN_OF_GITHUB }}
+          submodules: true
       - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:
@@ -17,7 +20,7 @@ jobs:
           distribution: 'temurin'
 
       - name: Grant execute permission for gradlew
-        run : chmod +x gradlew
+        run: chmod +x gradlew
 
       - name: Build with Gradle
         run: ./gradlew clean build
@@ -42,19 +45,17 @@ jobs:
           replace-with: '-'
           flags: 'g'
 
-      - name: Beanstalk Deploy
-        uses: einaregilsson/beanstalk-deploy@v21
+
+      - name: Deploy to Local Server
+        uses: appleboy/ssh-action@master
         with:
-          aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          application_name: sluv-dev
-          environment_name: Sluvdev-env
-          version_label: "github-action--${{ steps.format-time.outputs.replaced }}"
-          region: ap-northeast-2
-          deployment_package: Dockerrun.aws.json
-          wait_for_environment_recovery: 180
-  
-          
+          host: ${{ secrets.LOCAL_SERVER_HOST }}
+          username: ${{ secrets.LOCAL_SERVER_USER }}
+          password: ${{ secrets.LOCAL_SERVER_SSH_PASSWORD }}
+          script: |
+            chmod +x /home/sluv/deploy_script.sh
+            echo ${{ secrets.LOCAL_SERVER_SUDO_PASSWORD }} | sudo -S /home/sluv/deploy_script.sh
+
   current-time:
     needs: dev-ci-cd
     runs-on: ubuntu-latest
@@ -68,20 +69,15 @@ jobs:
 
       - name: Print Current Time
         run: echo "Current Time=${{steps.current-time.outputs.formattedTime}}" # current-time 에서 지정한 포맷대로 현재 시간 출력
-        shell: bash      
-  
-  ## slack
-  action-slack:
+        shell: bash
+
+  ## discord
+  action-discord:
     needs: dev-ci-cd
     runs-on: ubuntu-latest
     steps:
-        - name: Slack Alarm
-          uses: 8398a7/action-slack@v3
-          with:
-              status: ${{ job.status }}
-              author_name: GitHub-Actions CI/CD
-              fields: repo,message,commit,author,ref,job,took
-          env:
-              SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }} # required
-          if: always() # Pick up events even if the job fails or is canceled.
-  
+      - name: Discord Alarm
+        uses: tsickert/discord-webhook@v5.3.0
+        with:
+          webhook-url: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          content: "Build ${{ job.status }}"

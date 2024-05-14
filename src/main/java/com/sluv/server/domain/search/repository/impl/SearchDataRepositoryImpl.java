@@ -1,20 +1,19 @@
 package com.sluv.server.domain.search.repository.impl;
 
+import static com.sluv.server.domain.search.entity.QSearchData.searchData;
+
 import com.querydsl.core.Tuple;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sluv.server.domain.search.entity.SearchData;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
 
-import java.util.List;
-
-import static com.sluv.server.domain.search.entity.QSearchData.searchData;
-
 @RequiredArgsConstructor
-public class SearchDataRepositoryImpl implements SearchDataRepositoryCustom{
+public class SearchDataRepositoryImpl implements SearchDataRepositoryCustom {
     private final JPAQueryFactory jpaQueryFactory;
 
     @Override

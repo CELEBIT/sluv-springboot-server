@@ -11,20 +11,23 @@ import com.sluv.server.domain.brand.repository.NewBrandRepository;
 import com.sluv.server.domain.brand.repository.RecentSelectBrandRepository;
 import com.sluv.server.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class RecentSelectBrandService {
     private final BrandRepository brandRepository;
     private final NewBrandRepository newBrandRepository;
     private final RecentSelectBrandRepository recentSelectBrandRepository;
 
-    public void postRecentSelectBrand(User user, RecentSelectBrandReqDto dto){
+    @Transactional
+    public void postRecentSelectBrand(User user, RecentSelectBrandReqDto dto) {
         Brand brand = dto.getBrandId() != null
                 ? brandRepository.findById(dto.getBrandId())
-                                .orElseThrow(BrandNotFoundException::new)
+                .orElseThrow(BrandNotFoundException::new)
                 : null;
 
         NewBrand newBrand = dto.getNewBrandId() != null
@@ -43,11 +46,11 @@ public class RecentSelectBrandService {
     }
 
     @Transactional
-    public void deleteRecentSelectBrand(User user, Long id, String flag){
-        if(flag.equals("Y")){
-            recentSelectBrandRepository.deleteByUserIdAndBrandId(user.getId(), id);
-        }else{
-            recentSelectBrandRepository.deleteByUserIdAndNewBrandId(user.getId(), id);
+    public void deleteRecentSelectBrand(User user, Long brandId, String flag) {
+        if (flag.equals("Y")) {
+            recentSelectBrandRepository.deleteByUserIdAndBrandId(user.getId(), brandId);
+        } else {
+            recentSelectBrandRepository.deleteByUserIdAndNewBrandId(user.getId(), brandId);
         }
     }
 }

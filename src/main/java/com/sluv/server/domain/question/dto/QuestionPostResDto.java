@@ -14,7 +14,7 @@ public class QuestionPostResDto {
     @Schema(description = "생성된 Question의 Id")
     private Long id;
 
-    public static QuestionPostResDto of(Long questionId){
+    public static QuestionPostResDto of(Long questionId) {
         return QuestionPostResDto.builder()
                 .id(questionId)
                 .build();

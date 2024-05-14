@@ -6,21 +6,20 @@ import com.sluv.server.domain.brand.entity.NewBrand;
 import com.sluv.server.domain.brand.repository.NewBrandRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
 public class NewBrandService {
     private final NewBrandRepository newBrandRepository;
 
-    public NewBrandPostResDto postNewBrand(NewBrandPostReqDto dto){
+    @Transactional
+    public NewBrandPostResDto postNewBrand(NewBrandPostReqDto dto) {
 
-        NewBrand newBrand = newBrandRepository.save(
-                NewBrand.toEntity(dto)
-        );
+        NewBrand newBrand = newBrandRepository.save(NewBrand.toEntity(dto));
 
         return NewBrandPostResDto.of(newBrand);
     }
-
 
 
 }

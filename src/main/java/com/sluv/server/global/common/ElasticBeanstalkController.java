@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class ElasticBeanstalkController {
 
     @GetMapping("/")
-    public HttpStatusCode elasticBeanstalkOK(){
+    public HttpStatusCode elasticBeanstalkOK() {
         return HttpStatusCode.valueOf(200);
     }
 }

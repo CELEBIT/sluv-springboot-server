@@ -13,7 +13,6 @@ import com.sluv.server.domain.user.enums.UserAge;
 import com.sluv.server.domain.user.enums.UserGender;
 import com.sluv.server.domain.user.exception.UserNotFoundException;
 import com.sluv.server.domain.user.repository.UserRepository;
-import com.sluv.server.global.discord.WebHookService;
 import com.sluv.server.global.jwt.exception.ExpiredTokenException;
 import com.sluv.server.global.jwt.exception.InvalidateTokenException;
 import io.jsonwebtoken.Claims;
@@ -36,7 +35,6 @@ import org.springframework.stereotype.Service;
 public class AppleUserService {
     private final UserRepository userRepository;
     private final ClosetService closetService;
-    private final WebHookService webHookService;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
     @Value("${apple.clientId}")
@@ -245,7 +243,6 @@ public class AppleUserService {
 
             // 생성과 동시에 기본 Closet 생성
             closetService.postBasicCloset(user);
-            webHookService.sendSingupMessage(user);
         }
         return user;
     }

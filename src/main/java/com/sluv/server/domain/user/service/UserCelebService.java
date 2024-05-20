@@ -14,6 +14,7 @@ import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.domain.user.enums.UserStatus;
 import com.sluv.server.domain.user.exception.UserNotFoundException;
 import com.sluv.server.domain.user.repository.UserRepository;
+import com.sluv.server.global.discord.WebHookService;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
@@ -31,6 +32,8 @@ public class UserCelebService {
     private final CelebRepository celebRepository;
     private final CelebCategoryRepository celebCategoryRepository;
     private final InterestedCelebRepository interestedCelebRepository;
+
+    private final WebHookService webHookService;
 
     /**
      * User가 선택한 관심 셀럽을 검색 관심 샐럼의 상위 카테고리를 기준으로 묶어서 Response
@@ -106,6 +109,7 @@ public class UserCelebService {
         if (user.getUserStatus().equals(UserStatus.PENDING_CELEB)) {
             user.changeUserStatus(UserStatus.ACTIVE);
             userRepository.save(user);
+            webHookService.sendSingupMessage(user);
         }
     }
 

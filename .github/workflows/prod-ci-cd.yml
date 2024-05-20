@@ -1,8 +1,8 @@
-name: dev CI/CD
+name: prod CI/CD
 
 on:
   push:
-    branches: [ develop ]
+    branches: [ main ]
 
 jobs:
   dev-ci-cd:
@@ -28,9 +28,9 @@ jobs:
       - name: Docker build
         run: |
           docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_TOKEN }}
-          docker build -t sluv-springboot-main-cicd . 
-          docker tag sluv-springboot-main-cicd sluv2323/sluv-springboot-main-cicd:latest
-          docker push sluv2323/sluv-springboot-main-cicd:latest
+          docker build -t sluv-springboot-prod-cicd . 
+          docker tag sluv-springboot-prod-cicd sluv2323/sluv-springboot-prod-cicd:latest
+          docker push sluv2323/sluv-springboot-prod-cicd:latest
 
       - name: Get timestamp
         uses: gerred/actions/current-time@master
@@ -53,11 +53,11 @@ jobs:
           username: ${{ secrets.LOCAL_SERVER_USER }}
           password: ${{ secrets.LOCAL_SERVER_SSH_PASSWORD }}
           script: |
-            chmod +x /home/sluv/dev_deploy_script.sh
-            echo ${{ secrets.LOCAL_SERVER_SUDO_PASSWORD }} | sudo -S /home/sluv/dev_deploy_script.sh
+            chmod +x /home/sluv/prod_deploy_script.sh
+            echo ${{ secrets.LOCAL_SERVER_SUDO_PASSWORD }} | sudo -S /home/sluv/prod_deploy_script.sh
 
   current-time:
-    needs: dev-ci-cd
+    needs: prod-ci-cd
     runs-on: ubuntu-latest
     steps:
       - name: Get Current Time
@@ -73,11 +73,11 @@ jobs:
 
   ## discord
   action-discord:
-    needs: dev-ci-cd
+    needs: prod-ci-cd
     runs-on: ubuntu-latest
     steps:
       - name: Discord Alarm
         uses: tsickert/discord-webhook@v5.3.0
         with:
           webhook-url: ${{ secrets.DISCORD_WEBHOOK_URL }}
-          content: "Dev Deploy ${{ job.status }}"
+          content: "Prod Deploy ${{ job.status }}"

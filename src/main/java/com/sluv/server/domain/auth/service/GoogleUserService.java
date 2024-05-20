@@ -14,7 +14,6 @@ import com.sluv.server.domain.user.enums.UserAge;
 import com.sluv.server.domain.user.enums.UserGender;
 import com.sluv.server.domain.user.exception.UserNotFoundException;
 import com.sluv.server.domain.user.repository.UserRepository;
-import com.sluv.server.global.discord.WebHookService;
 import com.sluv.server.global.jwt.exception.InvalidateTokenException;
 import java.util.Arrays;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +27,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class GoogleUserService {
     private final UserRepository userRepository;
     private final ClosetService closetService;
-    private final WebHookService webHookService;
 
 
     @Value("${spring.security.oauth2.client.android}")
@@ -107,7 +105,6 @@ public class GoogleUserService {
 
             // 생성과 동시에 기본 Closet 생성
             closetService.postBasicCloset(user);
-            webHookService.sendSingupMessage(user);
         }
 
         return user;

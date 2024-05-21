@@ -2,6 +2,8 @@ spring:
   config:
     activate:
       on-profile: test
+---
+spring:
   h2:
     console:
       enabled: true
@@ -14,9 +16,12 @@ spring:
   jpa:
     hibernate:
       ddl-auto: create
+    properties:
+      hibernate:
+        format_sql: false
   data:
     redis:
-      port: 6792
+      port: 6793
       host: ENC(0l6KNqPy3QznPKX1Oc8KKoAqZ/uQu4jA)
       password: ENC(MfBuf4wr2l1e1d0eOZTNXHFmPk9RI52b)
 

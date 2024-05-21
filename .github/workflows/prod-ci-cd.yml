@@ -5,7 +5,7 @@ on:
     branches: [ main ]
 
 jobs:
-  dev-ci-cd:
+  prod-ci-cd:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Latest Repo

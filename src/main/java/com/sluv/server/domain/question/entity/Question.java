@@ -86,8 +86,4 @@ public class Question {
         this.searchNum++;
     }
 
-    public void decreaseSearchNum() {
-        this.searchNum--;
-    }
-
 }

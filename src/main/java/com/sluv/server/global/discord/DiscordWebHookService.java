@@ -42,7 +42,7 @@ public class DiscordWebHookService implements WebHookService {
                 .append("- 연령대: ").append(user.getAgeRange()).append("\n")
                 .append("- 성별: ").append(user.getGender()).append("\n")
                 .append("- 가입 시간: ").append(date).append(" ").append(localTime).append("\n")
-                .append("### 현재 __**").append(activeUser).append("명**__의 **활성화** 유저")
+                .append("### 현재 __**").append(activeUser).append("명**__의 **활성화** 유저").append("\n")
                 .append("### 현재 __**").append(userCount).append("명**__의 유저")
                 .toString();
 
@@ -68,7 +68,7 @@ public class DiscordWebHookService implements WebHookService {
                 .append("- 연령대: ").append(user.getAgeRange()).append("\n")
                 .append("- 성별: ").append(user.getGender()).append("\n")
                 .append("- 탈퇴 시간: ").append(date).append(" ").append(localTime).append("\n")
-                .append("### 현재 __**").append(activeUser).append("명**__의 **활성화** 유저")
+                .append("### 현재 __**").append(activeUser).append("명**__의 **활성화** 유저").append("\n")
                 .append("### 현재 __**").append(userCount).append("명**__의 유저")
                 .toString();
 

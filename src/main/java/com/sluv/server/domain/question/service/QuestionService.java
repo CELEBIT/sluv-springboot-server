@@ -281,7 +281,6 @@ public class QuestionService {
                     QuestionLike.toEntity(user, question)
             );
         }
-        question.decreaseSearchNum();
 
     }
 

@@ -62,7 +62,7 @@ public class RedisService implements CacheService {
     @Override
     public void saveUserViewItemId(Long userId, Long itemId) {
         ValueOperations<String, Long> userViewItemCache = redisStringLongTemplate.opsForValue();
-        userViewItemCache.set("userItem:" + userId + "::" + itemId, 0L, 20, TimeUnit.MINUTES);
+        userViewItemCache.set("userItem:" + userId + "::" + itemId, 0L, 1, TimeUnit.HOURS);
     }
 
     @Override
@@ -76,7 +76,7 @@ public class RedisService implements CacheService {
     @Override
     public void saveUserViewQuestionId(Long userId, Long questionId) {
         ValueOperations<String, Long> userViewQuestionCache = redisStringLongTemplate.opsForValue();
-        userViewQuestionCache.set("userQuestion:" + userId + "::" + questionId, 0L, 20, TimeUnit.MINUTES);
+        userViewQuestionCache.set("userQuestion:" + userId + "::" + questionId, 0L, 1, TimeUnit.HOURS);
     }
 
     @Override

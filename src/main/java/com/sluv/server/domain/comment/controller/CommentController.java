@@ -54,6 +54,18 @@ public class CommentController {
         );
     }
 
+    @Operation(summary = "*댓글 상세 조회", description = "User 토큰 필요. Pagination 적용.")
+    @GetMapping("/detail/{commentId}")
+    public ResponseEntity<SuccessDataResponse<CommentResDto>> getCommentDetail(
+            @AuthenticationPrincipal User user,
+            @PathVariable("commentId") Long commentId) {
+        return ResponseEntity.ok().body(
+                SuccessDataResponse.<CommentResDto>builder()
+                        .result(commentService.getCommentDetail(user, commentId))
+                        .build()
+        );
+    }
+
     @Operation(summary = "*댓글 작성", description = "User 토큰 필요")
     @PostMapping("/{questionId}")
     public ResponseEntity<SuccessResponse> postComment(@AuthenticationPrincipal User user,

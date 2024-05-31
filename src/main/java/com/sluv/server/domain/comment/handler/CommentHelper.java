@@ -12,7 +12,6 @@ import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.domain.user.repository.UserRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -24,7 +23,7 @@ public class CommentHelper {
     private final UserRepository userRepository;
     private final ItemHelper itemHelper;
 
-    public List<CommentResDto> getCommentResDtos(User user, Page<Comment> commentPage) {
+    public List<CommentResDto> getCommentResDtos(User user, List<Comment> commentPage) {
         return commentPage
                 .stream()
                 .map(comment -> {

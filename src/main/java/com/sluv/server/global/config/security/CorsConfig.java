@@ -13,7 +13,8 @@ public class CorsConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("https://www.sluv.co.kr", "http://localhost:3000"));
+        configuration.setAllowedOrigins(
+                Arrays.asList("https://www.sluv.co.kr", "http://localhost:3000", "https://sluv-server.store"));
         configuration.addAllowedHeader("Authorization");
         configuration.addAllowedHeader("Content-Type");
         configuration.addAllowedMethod("*");

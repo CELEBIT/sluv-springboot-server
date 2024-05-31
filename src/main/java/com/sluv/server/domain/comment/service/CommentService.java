@@ -47,9 +47,25 @@ public class CommentService {
         Page<Comment> commentPage = commentRepository.getAllQuestionComment(questionId, pageable);
 
         // Content 제작
-        List<CommentResDto> content = commentHelper.getCommentResDtos(user, commentPage);
+        List<CommentResDto> content = commentHelper.getCommentResDtos(user, commentPage.getContent());
 
         return PaginationResDto.of(commentPage, content);
+    }
+
+    /**
+     * 댓글 상세 조회
+     */
+    @Transactional(readOnly = true)
+    public CommentResDto getCommentDetail(User user, Long commentId) {
+        // 댓글 조회
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(CommentNotFoundException::new);
+
+        // Content 제작
+        List<CommentResDto> content = commentHelper.getCommentResDtos(user, List.of(comment));
+
+        return content.get(0);
+
     }
 
     /**
@@ -61,7 +77,7 @@ public class CommentService {
         Page<Comment> commentPage = commentRepository.getAllSubComment(commentId, pageable);
 
         // Content 제작
-        List<CommentResDto> content = commentHelper.getCommentResDtos(user, commentPage);
+        List<CommentResDto> content = commentHelper.getCommentResDtos(user, commentPage.getContent());
 
         // 남은 댓글 수. 총 댓글 수 - ((현재 페이지 +1)*페이지당 size)가 0보다 작으면 0, 아닐 경우 해당 값
         long restCommentNum =

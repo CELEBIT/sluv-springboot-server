@@ -121,7 +121,7 @@ public class ItemService {
 
         // 추가될 NewBrand 확인
         NewBrand newBrand = null;
-        if (reqDto.getNewCelebId() != null) {
+        if (reqDto.getNewBrandId() != null) {
             newBrand = newBrandRepository.findById(reqDto.getNewBrandId())
                     .orElseThrow(NewBrandNotFoundException::new);
         }

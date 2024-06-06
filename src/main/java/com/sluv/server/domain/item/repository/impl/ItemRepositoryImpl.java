@@ -461,7 +461,7 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
                 .leftJoin(itemLink).on(itemLink.item.eq(item))
                 .where(item.itemStatus.eq(ACTIVE).and(itemLink.item.isNotNull()))
                 .groupBy(item)
-                .orderBy(item.whenDiscovery.desc());
+                .orderBy(item.createdAt.desc());
         // Filter 추가
         addFilterWhere(query, dto);
 
@@ -476,7 +476,7 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
                 .leftJoin(itemLink).on(itemLink.item.eq(item))
                 .where(item.itemStatus.eq(ACTIVE).and(itemLink.item.isNotNull()))
                 .groupBy(item)
-                .orderBy(item.whenDiscovery.desc());
+                .orderBy(item.createdAt.desc());
         // Filter 추가
         addFilterWhere(countQuery, dto);
 
@@ -495,7 +495,7 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
                 .where(item.itemStatus.eq(ACTIVE)
 //                        .and(item.createdAt.between(nowTime.minusHours(1L), nowTime))
                 )
-                .orderBy(item.createdAt.desc())
+                .orderBy(item.whenDiscovery.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
@@ -505,7 +505,7 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
                 .where(item.itemStatus.eq(ACTIVE)
 //                        .and(item.createdAt.between(nowTime.minusHours(1L), nowTime))
                 )
-                .orderBy(item.createdAt.desc());
+                .orderBy(item.whenDiscovery.desc());
 
         return PageableExecutionUtils.getPage(content, pageable, () -> countQuery.fetch().size());
     }

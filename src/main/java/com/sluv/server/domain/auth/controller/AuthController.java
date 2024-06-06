@@ -33,7 +33,7 @@ public class AuthController {
     private final CacheService cacheService;
 
 
-    @Operation(summary = "소셜 로그인", description = "토큰 만료 시 error code : 4002")
+    @Operation(summary = "소셜 로그인", description = "KAKAO:[AccessToken], GOOGLE, APPLE: [IdToken]")
     @PostMapping("/social-login")
     public ResponseEntity<SuccessDataResponse<AuthResponseDto>> socialLogin(@RequestBody AuthRequestDto request)
             throws Exception {

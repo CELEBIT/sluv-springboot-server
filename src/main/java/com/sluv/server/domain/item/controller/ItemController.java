@@ -198,7 +198,7 @@ public class ItemController {
         );
     }
 
-    @Operation(summary = "*최신 등록 아이템 조회", description = "1시간 동안 최신 등록된 아이템 조회. User 토큰 필요. Pagination 적용.")
+    @Operation(summary = "*실시간 뉴 아이템 조회", description = "WhenDiscovery 기준 아이템 조회. User 토큰 필요. Pagination 적용.")
     @GetMapping("/new")
     public ResponseEntity<SuccessDataResponse<PaginationResDto<ItemSimpleResDto>>> getNewItem(
             @AuthenticationPrincipal User user,

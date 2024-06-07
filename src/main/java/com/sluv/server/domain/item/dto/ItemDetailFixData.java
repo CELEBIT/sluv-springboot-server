@@ -1,7 +1,11 @@
 package com.sluv.server.domain.item.dto;
 
 import com.sluv.server.domain.brand.dto.BrandSearchResDto;
+import com.sluv.server.domain.brand.dto.NewBrandPostResDto;
+import com.sluv.server.domain.brand.entity.NewBrand;
 import com.sluv.server.domain.celeb.dto.CelebSearchResDto;
+import com.sluv.server.domain.celeb.dto.NewCelebPostResDto;
+import com.sluv.server.domain.celeb.entity.NewCeleb;
 import com.sluv.server.domain.item.entity.Item;
 import com.sluv.server.domain.user.dto.UserInfoDto;
 import java.io.Serializable;
@@ -19,11 +23,11 @@ import lombok.NoArgsConstructor;
 public class ItemDetailFixData implements Serializable {
     private List<ItemImgResDto> imgList;
     private CelebSearchResDto celeb;
-    private String newCelebName;
+    private NewCelebPostResDto newCeleb;
     private ItemCategoryDto category;
     private String itemName;
     private BrandSearchResDto brand;
-    private String newBrandName;
+    private NewBrandPostResDto newBrand;
     private List<ItemLinkResDto> linkList;
     private UserInfoDto writer;
     private LocalDateTime whenDiscovery;
@@ -34,21 +38,24 @@ public class ItemDetailFixData implements Serializable {
     private String infoSource;
     private String color;
 
-    public static ItemDetailFixData of(Item item, CelebSearchResDto celeb, String newCelebName,
-                                       BrandSearchResDto brand, String newBrandName, ItemCategoryDto itemCategory,
+    public static ItemDetailFixData of(Item item, CelebSearchResDto celeb, NewCeleb newCeleb,
+                                       BrandSearchResDto brand, NewBrand newBrand, ItemCategoryDto itemCategory,
                                        UserInfoDto writerInfo, List<ItemImgResDto> imgList,
                                        List<ItemLinkResDto> linkList,
                                        List<ItemHashtagResponseDto> hashtagList
     ) {
 
+        NewCelebPostResDto newCelebPostResDto = newCeleb == null ? null : NewCelebPostResDto.of(newCeleb);
+        NewBrandPostResDto newBrandPostResDto = newBrand == null ? null : NewBrandPostResDto.of(newBrand);
+
         return ItemDetailFixData.builder()
                 .imgList(imgList)
                 .celeb(celeb)
-                .newCelebName(newCelebName)
+                .newCeleb(newCelebPostResDto)
                 .category(itemCategory)
                 .itemName(item.getName())
                 .brand(brand)
-                .newBrandName(newBrandName)
+                .newBrand(newBrandPostResDto)
                 .linkList(linkList)
                 .writer(writerInfo)
                 .whenDiscovery(item.getWhenDiscovery())

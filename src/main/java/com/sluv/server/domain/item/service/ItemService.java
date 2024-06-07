@@ -249,9 +249,9 @@ public class ItemService {
         return ItemDetailResDto.of(
                 item,
                 fixData.getCeleb(),
-                fixData.getNewCelebName(),
+                fixData.getNewCeleb(),
                 fixData.getBrand(),
-                fixData.getNewBrandName(),
+                fixData.getNewBrand(),
                 fixData.getCategory(),
                 likeNum,
                 likeStatus,
@@ -287,17 +287,9 @@ public class ItemService {
                 ? CelebSearchResDto.of(item.getCeleb())
                 : null;
 
-        String newCeleb = item.getNewCeleb() != null ?
-                item.getNewCeleb().getCelebName()
-                : null;
-
         // 3. Brand
         BrandSearchResDto brand = item.getBrand() != null ?
                 BrandSearchResDto.of(item.getBrand())
-                : null;
-
-        String newBrand = item.getNewBrand() != null ?
-                item.getNewBrand().getBrandName()
                 : null;
 
         // 4. 작성자 info
@@ -322,7 +314,7 @@ public class ItemService {
                         ItemHashtagResponseDto.of(itemHashtag.getHashtag())
                 ).toList();
 
-        return ItemDetailFixData.of(item, celeb, newCeleb, brand, newBrand, category, writerInfo,
+        return ItemDetailFixData.of(item, celeb, item.getNewCeleb(), brand, item.getNewBrand(), category, writerInfo,
                 imgList, linkList, itemHashtags);
     }
 

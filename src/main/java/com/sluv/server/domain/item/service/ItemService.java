@@ -138,7 +138,8 @@ public class ItemService {
         Item postItem;
         // Item 수정이라면, 기존의 Item의 Id를 추가.
         if (item != null) {
-            postItem = Item.toEntity(item.getId(), user, celeb, newCeleb, itemCategory, brand, newBrand, reqDto);
+            postItem = Item.toEntity(item.getId(), user, celeb, newCeleb, itemCategory, brand, newBrand, reqDto,
+                    item.getViewNum());
         } else {
             // Item 생성
             postItem = Item.toEntity(user, celeb, newCeleb, itemCategory, brand, newBrand, reqDto);

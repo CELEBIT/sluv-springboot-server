@@ -139,6 +139,7 @@ public class Item extends BaseEntity {
                 .additionalInfo(dto.getAdditionalInfo())
                 .infoSource(dto.getInfoSource())
                 .viewNum(viewNum)
+                .color(null)
                 .build();
     }
 

@@ -1,5 +1,7 @@
 package com.sluv.server.global.discord;
 
+import com.sluv.server.domain.brand.entity.NewBrand;
+import com.sluv.server.domain.celeb.entity.NewCeleb;
 import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.domain.user.enums.UserStatus;
 import com.sluv.server.domain.user.repository.UserRepository;
@@ -22,6 +24,10 @@ public class DiscordWebHookService implements WebHookService {
     private String DISCORD_WEBHOOK_SIGNUP_URL;
     @Value("${discord.webhook.withdraw}")
     private String DISCORD_WEBHOOK_WITHDRAW_URL;
+    @Value("${discord.webhook.new-brand}")
+    private String DISCORD_WEBHOOK_NEW_BRAND_URL;
+    @Value("${discord.webhook.new-celeb}")
+    private String DISCORD_WEBHOOK_NEW_CELEB_URL;
 
     private final DiscordWebHookConnector discordWebHookConnector;
     private final UserRepository userRepository;
@@ -76,5 +82,41 @@ public class DiscordWebHookService implements WebHookService {
 
         discordWebHookConnector.sendMessageForDiscord(webHookMessage, DISCORD_WEBHOOK_WITHDRAW_URL);
 
+    }
+
+    @Override
+    @Async("asyncThreadPoolExecutor")
+    @Transactional
+    public void sendCreateNewBrandMessage(NewBrand newBrand) {
+        LocalDateTime now = LocalDateTime.now();
+        LocalDate date = now.toLocalDate();
+        LocalTime localTime = now.toLocalTime().truncatedTo(ChronoUnit.SECONDS);
+        String message = new StringBuilder()
+                .append("# NewBrand가 등록되었습니다.\n")
+                .append("- 이름: ").append(newBrand.getBrandName()).append("\n")
+                .append("- 등록 시간: ").append(date).append(" ").append(localTime).append("\n")
+                .toString();
+
+        WebHookMessage webHookMessage = new WebHookMessage(message);
+
+        discordWebHookConnector.sendMessageForDiscord(webHookMessage, DISCORD_WEBHOOK_NEW_BRAND_URL);
+    }
+
+    @Override
+    @Async("asyncThreadPoolExecutor")
+    @Transactional
+    public void sendCreateNewCelebMessage(NewCeleb newCeleb) {
+        LocalDateTime now = LocalDateTime.now();
+        LocalDate date = now.toLocalDate();
+        LocalTime localTime = now.toLocalTime().truncatedTo(ChronoUnit.SECONDS);
+        String message = new StringBuilder()
+                .append("# NewCeleb이 등록되었습니다.\n")
+                .append("- 이름: ").append(newCeleb.getCelebName()).append("\n")
+                .append("- 등록 시간: ").append(date).append(" ").append(localTime).append("\n")
+                .toString();
+
+        WebHookMessage webHookMessage = new WebHookMessage(message);
+
+        discordWebHookConnector.sendMessageForDiscord(webHookMessage, DISCORD_WEBHOOK_NEW_CELEB_URL);
     }
 }

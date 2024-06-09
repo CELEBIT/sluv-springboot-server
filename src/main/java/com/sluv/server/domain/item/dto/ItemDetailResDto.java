@@ -1,7 +1,9 @@
 package com.sluv.server.domain.item.dto;
 
 import com.sluv.server.domain.brand.dto.BrandSearchResDto;
+import com.sluv.server.domain.brand.dto.NewBrandPostResDto;
 import com.sluv.server.domain.celeb.dto.CelebSearchResDto;
+import com.sluv.server.domain.celeb.dto.NewCelebPostResDto;
 import com.sluv.server.domain.item.entity.Item;
 import com.sluv.server.domain.user.dto.UserInfoDto;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -29,7 +31,7 @@ public class ItemDetailResDto {
     @Schema(description = "celeb")
     private CelebSearchResDto celeb;
     @Schema(description = "새로운 Celeb")
-    private String newCelebName;
+    private NewCelebPostResDto newCeleb;
     @Schema(description = "아이템 카테고리")
     private ItemCategoryDto category;
     @Schema(description = "아이템명")
@@ -37,7 +39,7 @@ public class ItemDetailResDto {
     @Schema(description = "브랜드")
     private BrandSearchResDto brand;
     @Schema(description = "새로운 Brand")
-    private String newBrandName;
+    private NewBrandPostResDto newBrand;
     @Schema(description = "좋아요 수")
     private Integer likeNum;
     @Schema(description = "좋아요 여부")
@@ -75,8 +77,9 @@ public class ItemDetailResDto {
     @Schema(description = "현재 유저가 작성한 글인지 판단")
     private Boolean hasMine;
 
-    public static ItemDetailResDto of(Item item, CelebSearchResDto celeb, String newCelebName,
-                                      BrandSearchResDto brand, String newBrandName, ItemCategoryDto itemCategory,
+    public static ItemDetailResDto of(Item item, CelebSearchResDto celeb, NewCelebPostResDto newCeleb,
+                                      BrandSearchResDto brand, NewBrandPostResDto newBrand,
+                                      ItemCategoryDto itemCategory,
                                       Integer likeNum, Boolean likeStatus, Integer scrapNum, Boolean scrapStatus,
                                       Long viewNum, UserInfoDto writerInfo, Boolean followStatus, Boolean hasMine,
                                       List<ItemImgResDto> imgList, List<ItemLinkResDto> linkList,
@@ -86,11 +89,11 @@ public class ItemDetailResDto {
         return ItemDetailResDto.builder()
                 .imgList(imgList)
                 .celeb(celeb)
-                .newCelebName(newCelebName)
+                .newCeleb(newCeleb)
                 .category(itemCategory)
                 .itemName(item.getName())
                 .brand(brand)
-                .newBrandName(newBrandName)
+                .newBrand(newBrand)
                 .likeNum(likeNum)
                 .likeStatus(likeStatus)
                 .scrapNum(scrapNum)

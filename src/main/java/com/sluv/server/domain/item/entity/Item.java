@@ -123,7 +123,7 @@ public class Item extends BaseEntity {
      */
     public static Item toEntity(Long id, User user, Celeb celeb, NewCeleb newCeleb,
                                 ItemCategory itemCategory, Brand brand, NewBrand newBrand,
-                                ItemPostReqDto dto) {
+                                ItemPostReqDto dto, Long viewNum) {
         return Item.builder()
                 .id(id)
                 .user(user)
@@ -138,8 +138,9 @@ public class Item extends BaseEntity {
                 .price(dto.getPrice())
                 .additionalInfo(dto.getAdditionalInfo())
                 .infoSource(dto.getInfoSource())
+                .viewNum(viewNum)
+                .color(null)
                 .build();
-
     }
 
     public void increaseViewNum() {

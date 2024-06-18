@@ -13,6 +13,7 @@ import static com.sluv.server.domain.question.entity.QQuestionRecommend.question
 import static com.sluv.server.domain.question.entity.QQuestionRecommendCategory.questionRecommendCategory;
 import static com.sluv.server.domain.question.enums.QuestionStatus.ACTIVE;
 
+import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -134,7 +135,7 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
                 .where(questionBuy.id.ne(questionId)
                         .and(questionBuy.questionStatus.eq(ACTIVE))
                         .and(questionBuy.voteEndTime.gt(nowTime))
-                        .and(questionBuy.user.ne(user))
+                        .and(getUserNeOrNullInQuestion(user))
                 )
                 .orderBy(questionBuy.voteEndTime.asc())
                 .limit(4)
@@ -150,7 +151,7 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
                 .from(questionRecommend)
                 .where(questionRecommend.id.ne(questionId)
                         .and(questionRecommend.questionStatus.eq(ACTIVE))
-                        .and(questionRecommend.user.ne(user))
+                        .and(getUserNeOrNullInQuestion(user))
                         .and(questionRecommend.commentList.size().eq(0))
                 )
                 .orderBy(questionRecommend.createdAt.desc())
@@ -167,7 +168,7 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
                 .from(questionHowabout)
                 .where(questionHowabout.id.ne(questionId)
                         .and(questionHowabout.questionStatus.eq(ACTIVE))
-                        .and(questionHowabout.user.ne(user))
+                        .and(getUserNeOrNullInQuestion(user))
                         .and(questionHowabout.commentList.size().eq(0))
                 )
                 .orderBy(questionHowabout.createdAt.desc())
@@ -186,12 +187,20 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
                 .from(questionFind)
                 .where(questionFind.id.ne(questionId)
                         .and(questionFind.questionStatus.eq(ACTIVE))
-                        .and(questionFind.user.ne(user))
+                        .and(getUserNeOrNullInQuestion(user))
                         .and(questionFind.commentList.size().eq(0))
                 )
                 .orderBy(questionFind.createdAt.desc())
                 .limit(4)
                 .fetch();
+    }
+
+    private static BooleanBuilder getUserNeOrNullInQuestion(User user) {
+        BooleanBuilder whereClause = new BooleanBuilder();
+        if (user != null) {
+            whereClause.and(question.user.ne(user));
+        }
+        return whereClause;
     }
 
     /**

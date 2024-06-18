@@ -304,7 +304,7 @@ public class QuestionService {
     }
 
     @Transactional
-    public QuestionGetDetailResDto getQuestionDetail(User user, Long questionId) {
+    public QuestionGetDetailResDto getQuestionDetail(User nowUser, Long questionId) {
         Question question = questionRepository.findById(questionId).orElseThrow(QuestionNotFoundException::new);
 
         // Question Type 분류
@@ -342,11 +342,18 @@ public class QuestionService {
                         }
                 ).toList();
 
+        List<Closet> closetList;
+
+        if (nowUser != null) {
+            closetList = closetRepository.findAllByUserId(nowUser.getId());
+        } else {
+            closetList = new ArrayList<>();
+        }
+
         // Question Item List
         List<QuestionItemResDto> questionItemList = questionItemRepository.findAllByQuestionId(questionId)
                 .stream()
                 .map(questionItem -> {
-                    List<Closet> closetList = closetRepository.findAllByUserId(user.getId());
                     ItemSimpleResDto itemSimpleResDto = ItemSimpleResDto.of(
                             questionItem.getItem(),
                             itemImgRepository.findMainImg(questionItem.getItem().getId()),
@@ -368,7 +375,8 @@ public class QuestionService {
         Long questionCommentNum = commentRepository.countByQuestionId(questionId);
 
         // hasLike 검색
-        Boolean currentUserLike = questionLikeRepository.existsByQuestionIdAndUserId(questionId, user.getId());
+        Boolean currentUserLike =
+                nowUser != null && questionLikeRepository.existsByQuestionIdAndUserId(questionId, nowUser.getId());
 
         CelebChipResDto celeb = null;
         CelebChipResDto newCeleb = null;
@@ -388,8 +396,11 @@ public class QuestionService {
             }
             case "Buy" -> {
                 QuestionBuy questionBuy = (QuestionBuy) question;
-                QuestionVote questionVote = questionVoteRepository.findByQuestionIdAndUserId(questionId, user.getId())
-                        .orElse(null);
+                QuestionVote questionVote =
+                        nowUser != null ?
+                                questionVoteRepository.findByQuestionIdAndUserId(questionId, nowUser.getId())
+                                        .orElse(null)
+                                : null;
                 voteEndTime = questionBuy.getVoteEndTime();
                 totalVoteNum = questionVoteRepository.countByQuestionId(questionId);
                 voteStatus = questionVote != null
@@ -402,18 +413,18 @@ public class QuestionService {
         }
 
         // RecentQuestion 등록
-        recentQuestionRepository.save(
-                RecentQuestion.toEntity(user, qType, question)
-        );
+        if (nowUser != null) {
+            recentQuestionRepository.save(RecentQuestion.toEntity(nowUser, qType, question));
 
-        // SearchNum 증가
-        increaseQuestionViewNum(user.getId(), question);
+            // SearchNum 증가
+            increaseQuestionViewNum(nowUser.getId(), question);
+        }
 
         return QuestionGetDetailResDto.of(
                 question, qType, writer,
                 questionImgList, questionItemList,
                 questionLikeNum, questionCommentNum, currentUserLike,
-                writer != null && user.getId().equals(writer.getId()),
+                writer != null && nowUser != null && nowUser.getId().equals(writer.getId()),
                 celeb, newCeleb,
                 voteEndTime, totalVoteNum, voteStatus,
                 recommendCategoryList
@@ -493,7 +504,11 @@ public class QuestionService {
      */
     @Transactional(readOnly = true)
     public List<QuestionSimpleResDto> getWaitQuestionBuy(User user, Long questionId) {
-        List<Celeb> interestedCeleb = celebRepository.findInterestedCeleb(user);
+
+        List<Celeb> interestedCeleb = new ArrayList<>();
+        if (user != null) {
+            interestedCeleb = celebRepository.findInterestedCeleb(user);
+        }
 
         return questionRepository.getWaitQuestionBuy(user, questionId, interestedCeleb)
                 .stream()
@@ -528,7 +543,11 @@ public class QuestionService {
      */
     @Transactional(readOnly = true)
     public List<QuestionSimpleResDto> getWaitQuestionFind(User user, Long questionId) {
-        List<Celeb> interestedCeleb = celebRepository.findInterestedCeleb(user);
+        List<Celeb> interestedCeleb = new ArrayList<>();
+
+        if (user != null) {
+            interestedCeleb = celebRepository.findInterestedCeleb(user);
+        }
 
         return questionRepository.getWaitQuestionFind(user, questionId, interestedCeleb)
                 .stream()

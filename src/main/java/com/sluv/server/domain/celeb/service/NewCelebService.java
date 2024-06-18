@@ -18,10 +18,12 @@ public class NewCelebService {
 
     @Transactional
     public NewCelebPostResDto postNewCeleb(NewCelebPostReqDto dto) {
-        NewCeleb newCeleb = newCelebRepository.save(
-                NewCeleb.toEntity(dto)
-        );
-        webHookService.sendCreateNewCelebMessage(newCeleb);
+        NewCeleb newCeleb = newCelebRepository.findByCelebName(dto.getNewCelebName()).orElse(null);
+
+        if (newCeleb == null) {
+            newCeleb = newCelebRepository.save(NewCeleb.toEntity(dto));
+            webHookService.sendCreateNewCelebMessage(newCeleb);
+        }
 
         return NewCelebPostResDto.of(newCeleb);
     }

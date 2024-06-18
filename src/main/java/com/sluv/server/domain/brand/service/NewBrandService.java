@@ -17,9 +17,12 @@ public class NewBrandService {
 
     @Transactional
     public NewBrandPostResDto postNewBrand(NewBrandPostReqDto dto) {
+        NewBrand newBrand = newBrandRepository.findByBrandName(dto.getNewBrandName()).orElse(null);
 
-        NewBrand newBrand = newBrandRepository.save(NewBrand.toEntity(dto));
-        webHookService.sendCreateNewBrandMessage(newBrand);
+        if (newBrand == null) {
+            newBrand = newBrandRepository.save(NewBrand.toEntity(dto));
+            webHookService.sendCreateNewBrandMessage(newBrand);
+        }
 
         return NewBrandPostResDto.of(newBrand);
     }

@@ -7,12 +7,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sluv.server.domain.auth.dto.AuthRequestDto;
 import com.sluv.server.domain.auth.dto.SocialUserInfoDto;
-import com.sluv.server.domain.closet.service.ClosetService;
 import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.domain.user.enums.UserAge;
 import com.sluv.server.domain.user.enums.UserGender;
-import com.sluv.server.domain.user.exception.UserNotFoundException;
-import com.sluv.server.domain.user.repository.UserRepository;
 import com.sluv.server.global.jwt.exception.ExpiredTokenException;
 import com.sluv.server.global.jwt.exception.InvalidateTokenException;
 import io.jsonwebtoken.Claims;
@@ -33,8 +30,8 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class AppleUserService {
-    private final UserRepository userRepository;
-    private final ClosetService closetService;
+
+    private final AuthService authService;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
     @Value("${apple.clientId}")
@@ -58,7 +55,7 @@ public class AppleUserService {
         SocialUserInfoDto userInfo = getAppleUserInfo(identityToken);
 
         // 3. idToken의 정보로 DB 탐색 및 등록
-        return registerAppleUserIfNeed(userInfo);
+        return authService.getOrCreateUser(userInfo, APPLE);
     }
 
     /**
@@ -221,30 +218,6 @@ public class AppleUserService {
                 .gender(convertGender(gender))
                 .ageRange(convertAge(ageRange))
                 .build();
-    }
-
-    /**
-     * == identityToken을 기반으로 user 등록 및 조회 ==
-     *
-     * @param userInfoDto
-     * @return User
-     */
-
-    private User registerAppleUserIfNeed(SocialUserInfoDto userInfoDto) {
-        User user = userRepository.findByEmail(userInfoDto.getEmail()).orElse(null);
-
-        if (user == null) {
-            userRepository.save(
-                    User.toEntity(userInfoDto, APPLE)
-            );
-
-            user = userRepository.findByEmail(userInfoDto.getEmail())
-                    .orElseThrow(UserNotFoundException::new);
-
-            // 생성과 동시에 기본 Closet 생성
-            closetService.postBasicCloset(user);
-        }
-        return user;
     }
 
     private UserGender convertGender(String gender) {

@@ -8,12 +8,9 @@ import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.gson.GsonFactory;
 import com.sluv.server.domain.auth.dto.AuthRequestDto;
 import com.sluv.server.domain.auth.dto.SocialUserInfoDto;
-import com.sluv.server.domain.closet.service.ClosetService;
 import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.domain.user.enums.UserAge;
 import com.sluv.server.domain.user.enums.UserGender;
-import com.sluv.server.domain.user.exception.UserNotFoundException;
-import com.sluv.server.domain.user.repository.UserRepository;
 import com.sluv.server.global.jwt.exception.InvalidateTokenException;
 import java.util.Arrays;
 import lombok.RequiredArgsConstructor;
@@ -25,8 +22,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 public class GoogleUserService {
-    private final UserRepository userRepository;
-    private final ClosetService closetService;
+
+    private final AuthService authService;
 
 
     @Value("${spring.security.oauth2.client.android}")
@@ -43,7 +40,7 @@ public class GoogleUserService {
         SocialUserInfoDto verifiedIdToken = verifyIdToken(idToken);
 
         // 2. user 정보로 DB 탐색 및 등록
-        return registerGoogleUserIfNeed(verifiedIdToken);
+        return authService.getOrCreateUser(verifiedIdToken, GOOGLE);
     }
 
     /**
@@ -86,28 +83,6 @@ public class GoogleUserService {
                 .gender(UserGender.UNKNOWN)
                 .ageRange(UserAge.UNKNOWN)
                 .build();
-    }
-
-    /**
-     * == Google에서 받은 정보로 DB에서 유저 탐색 ==
-     *
-     * @param googleUserInfoDto
-     * @return DB에 등록된 user
-     * @throws , BaseException(NOT_FOUND_USER)
-     */
-    private User registerGoogleUserIfNeed(SocialUserInfoDto googleUserInfoDto) {
-        User user = userRepository.findByEmail(googleUserInfoDto.getEmail()).orElse(null);
-
-        if (user == null) {
-            userRepository.save(User.toEntity(googleUserInfoDto, GOOGLE));
-
-            user = userRepository.findByEmail(googleUserInfoDto.getEmail()).orElseThrow(UserNotFoundException::new);
-
-            // 생성과 동시에 기본 Closet 생성
-            closetService.postBasicCloset(user);
-        }
-
-        return user;
     }
 
 }

@@ -7,12 +7,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sluv.server.domain.auth.dto.AuthRequestDto;
 import com.sluv.server.domain.auth.dto.SocialUserInfoDto;
-import com.sluv.server.domain.closet.service.ClosetService;
 import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.domain.user.enums.UserAge;
 import com.sluv.server.domain.user.enums.UserGender;
-import com.sluv.server.domain.user.exception.UserNotFoundException;
-import com.sluv.server.domain.user.repository.UserRepository;
 import com.sluv.server.global.jwt.exception.InvalidateTokenException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpEntity;
@@ -27,8 +24,8 @@ import org.springframework.web.client.RestTemplate;
 @Service
 @RequiredArgsConstructor
 public class KakaoUserService {
-    private final UserRepository userRepository;
-    private final ClosetService closetService;
+
+    private final AuthService authService;
 
     public User kakaoLogin(AuthRequestDto request) throws JsonProcessingException {
         String accessToken = request.getAccessToken();
@@ -36,7 +33,7 @@ public class KakaoUserService {
         SocialUserInfoDto userInfo = getKakaoUserInfo(accessToken);
 
         // 2. user 정보로 DB 탐색 및 등록
-        return registerKakaoUserIfNeed(userInfo);
+        return authService.getOrCreateUser(userInfo, KAKAO);
     }
 
     /**
@@ -108,30 +105,6 @@ public class KakaoUserService {
                 .gender(convertGender(gender))
                 .ageRange(convertAge(ageRange))
                 .build();
-    }
-
-    /**
-     * == KAKAO에서 받은 정보로 DB에서 유저 탐색 ==
-     *
-     * @param userInfoDto
-     * @return DB에 등록된 user
-     * @throws , BaseException(NOT_FOUND_USER)
-     */
-    private User registerKakaoUserIfNeed(SocialUserInfoDto userInfoDto) {
-        User user = userRepository.findByEmail(userInfoDto.getEmail()).orElse(null);
-
-        if (user == null) {
-            userRepository.save(
-                    User.toEntity(userInfoDto, KAKAO)
-            );
-            user = userRepository.findByEmail(userInfoDto.getEmail())
-                    .orElseThrow(UserNotFoundException::new);
-
-            // 생성과 동시에 기본 Closet 생성
-            closetService.postBasicCloset(user);
-        }
-
-        return user;
     }
 
     private static UserGender convertGender(String gender) {

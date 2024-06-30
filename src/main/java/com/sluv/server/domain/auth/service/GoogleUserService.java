@@ -40,7 +40,7 @@ public class GoogleUserService {
         SocialUserInfoDto verifiedIdToken = verifyIdToken(idToken);
 
         // 2. user 정보로 DB 탐색 및 등록
-        return authService.getOrCreateUser(verifiedIdToken, GOOGLE);
+        return authService.getOrCreateUser(verifiedIdToken, GOOGLE, request.getFcm());
     }
 
     /**

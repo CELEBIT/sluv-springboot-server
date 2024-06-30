@@ -51,6 +51,8 @@ public class User extends BaseEntity implements UserDetails {
     @Column(columnDefinition = "TEXT")
     private String profileImgUrl;
 
+    private String fcmToken;
+
     @Enumerated(EnumType.STRING)
     private UserAge ageRange;
 
@@ -62,15 +64,19 @@ public class User extends BaseEntity implements UserDetails {
 
     private Boolean termsStatus;
 
-    public static User toEntity(SocialUserInfoDto userInfoDto, SnsType snsType) {
+    private Boolean alarmStatus;
+
+    public static User toEntity(SocialUserInfoDto userInfoDto, SnsType snsType, String fcm) {
         return User.builder()
                 .email(userInfoDto.getEmail())
                 .snsType(snsType)
                 .profileImgUrl(userInfoDto.getProfileImgUrl())
+                .fcmToken(fcm)
                 .ageRange(userInfoDto.getAgeRange())
                 .gender(userInfoDto.getGender())
                 .userStatus(UserStatus.PENDING_PROFILE)
                 .termsStatus(false)
+                .alarmStatus(true)
                 .build();
     }
 
@@ -82,10 +88,12 @@ public class User extends BaseEntity implements UserDetails {
                 .nickname(nicknameHashCode)
                 .snsType(user.getSnsType())
                 .profileImgUrl(null)
+                .fcmToken(null)
                 .ageRange(user.getAgeRange())
                 .gender(user.getGender())
                 .userStatus(user.getUserStatus())
                 .termsStatus(user.getTermsStatus())
+                .alarmStatus(user.alarmStatus)
                 .build();
     }
 
@@ -112,6 +120,14 @@ public class User extends BaseEntity implements UserDetails {
 
     public void changeTermStatus(Boolean termsStatus) {
         this.termsStatus = termsStatus;
+    }
+
+    public void changeFcmToken(String fcmToken) {
+        this.fcmToken = fcmToken;
+    }
+
+    public void changeAlarmStatus(Boolean alarmStatus) {
+        this.alarmStatus = alarmStatus;
     }
 
     @Override

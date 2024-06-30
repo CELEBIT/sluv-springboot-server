@@ -33,7 +33,7 @@ public class KakaoUserService {
         SocialUserInfoDto userInfo = getKakaoUserInfo(accessToken);
 
         // 2. user 정보로 DB 탐색 및 등록
-        return authService.getOrCreateUser(userInfo, KAKAO);
+        return authService.getOrCreateUser(userInfo, KAKAO, request.getFcm());
     }
 
     /**

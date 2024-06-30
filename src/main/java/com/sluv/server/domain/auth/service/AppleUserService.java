@@ -55,7 +55,7 @@ public class AppleUserService {
         SocialUserInfoDto userInfo = getAppleUserInfo(identityToken);
 
         // 3. idToken의 정보로 DB 탐색 및 등록
-        return authService.getOrCreateUser(userInfo, APPLE);
+        return authService.getOrCreateUser(userInfo, APPLE, request.getFcm());
     }
 
     /**

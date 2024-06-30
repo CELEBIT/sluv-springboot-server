@@ -1,5 +1,6 @@
 package com.sluv.server.domain.question.service;
 
+import com.sluv.server.domain.alarm.service.QuestionAlarmService;
 import com.sluv.server.domain.celeb.dto.CelebChipResDto;
 import com.sluv.server.domain.celeb.entity.Celeb;
 import com.sluv.server.domain.celeb.entity.NewCeleb;
@@ -93,7 +94,9 @@ public class QuestionService {
     private final ClosetRepository closetRepository;
     private final QuestionVoteRepository questionVoteRepository;
     private final UserRepository userRepository;
+
     private final CacheService cacheService;
+    private final QuestionAlarmService questionAlarmService;
 
 
     @Transactional
@@ -276,10 +279,8 @@ public class QuestionService {
             questionLikeRepository.deleteByQuestionIdAndUserId(questionId, user.getId());
         } else {
             // like가 없다면 등록
-
-            questionLikeRepository.save(
-                    QuestionLike.toEntity(user, question)
-            );
+            questionLikeRepository.save(QuestionLike.toEntity(user, question));
+            questionAlarmService.sendAlarmAboutQuestionLike(user.getId(), question.getId());
         }
 
     }

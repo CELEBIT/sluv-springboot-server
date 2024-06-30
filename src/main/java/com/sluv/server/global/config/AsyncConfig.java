@@ -31,4 +31,15 @@ public class AsyncConfig {
         executor.initialize();
         return executor;
     }
+
+    @Bean(name = "alarmThreadPoolExecutor")
+    public Executor getAlarmExecutor() {
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setCorePoolSize(30);
+        executor.setMaxPoolSize(60);
+        executor.setQueueCapacity(600);
+        executor.setThreadNamePrefix("Sluv-Alarm-Thread-");
+        executor.initialize();
+        return executor;
+    }
 }

@@ -22,7 +22,7 @@ public class ItemAlarmService {
 
     private static final String ALARM_TITLE = "[스럽]";
 
-    @Async
+    @Async("alarmThreadPoolExecutor")
     public void sendAlarmAboutItemLike(Long userId, Long itemId) {
         User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
         Item item = itemRepository.findById(itemId).orElseThrow(ItemNotFoundException::new);
@@ -33,7 +33,7 @@ public class ItemAlarmService {
         );
     }
 
-    @Async
+    @Async("alarmThreadPoolExecutor")
     public void sendAlarmAboutItemEdit(Long userId, Long itemId, Long itemEditReqId) {
         User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
         Item item = itemRepository.findById(itemId).orElseThrow(ItemNotFoundException::new);

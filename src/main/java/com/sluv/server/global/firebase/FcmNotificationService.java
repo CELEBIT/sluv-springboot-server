@@ -23,9 +23,9 @@ public class FcmNotificationService {
     private final UserRepository userRepository;
 
     public void sendFCMNotification(Long userId, String title, String body, AlarmType alarmType, Long id) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(UserNotFoundException::new);
-        if (user.getFcmToken() != null) { // user.getAlarmStatus()
+        User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+
+        if (user.getAlarmStatus()) { // 알람 허용 시
             Notification notification = Notification.builder()
                     .setTitle(title)
                     .setBody(body)
@@ -52,7 +52,7 @@ public class FcmNotificationService {
         List<User> users = userRepository.findAllById(userIds);
 
         for (User user : users) {
-            if (user.getFcmToken() != null) { // user.getAlarmStatus()
+            if (user.getAlarmStatus()) { // 알람 허용 시
                 Notification notification = Notification.builder()
                         .setTitle(title)
                         .setBody(body)

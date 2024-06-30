@@ -12,7 +12,8 @@ public enum AlarmMessage {
     QUESTION_COMMENT("%s 님이 회원님이 올린 게시글에 댓글을 남겼어요"),
     COMMENT_LIKE("%s 님이 회원님이 올린 댓글을 좋아해요"),
     COMMENT_SUB("%s 님이 회원님이 올린 댓글에 답글을 남겼어요"),
-    COMMENT_REPORT_BY_AI("회원님이 올린 댓글이 부적절하여 클린봇에 의해 삭제되었어요");
+    COMMENT_REPORT_BY_AI("회원님이 올린 댓글이 부적절하여 클린봇에 의해 삭제되었어요"),
+    USER_FOLLOW("%s 님이 회원님을 팔로우하기 시작했어요");
 
     private final String message;
 

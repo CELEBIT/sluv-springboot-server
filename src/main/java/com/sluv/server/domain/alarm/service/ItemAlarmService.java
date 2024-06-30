@@ -34,11 +34,10 @@ public class ItemAlarmService {
     }
 
     @Async("alarmThreadPoolExecutor")
-    public void sendAlarmAboutItemEdit(Long userId, Long itemId, Long itemEditReqId) {
-        User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+    public void sendAlarmAboutItemEdit(Long itemId, Long itemEditReqId) {
         Item item = itemRepository.findById(itemId).orElseThrow(ItemNotFoundException::new);
 
-        String message = AlarmMessage.getMessageWithUserName(user.getNickname(), AlarmMessage.ITEM_EDIT);
+        String message = AlarmMessage.ITEM_EDIT.getMessage();
         fcmNotificationService.sendFCMNotification(
                 item.getUser().getId(), ALARM_TITLE, message, AlarmType.EDIT, itemEditReqId
         );

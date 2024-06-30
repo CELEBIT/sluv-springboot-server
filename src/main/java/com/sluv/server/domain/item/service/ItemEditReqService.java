@@ -1,6 +1,6 @@
 package com.sluv.server.domain.item.service;
 
-import com.sluv.server.domain.alarm.service.AlarmService;
+import com.sluv.server.domain.alarm.service.ItemAlarmService;
 import com.sluv.server.domain.item.dto.ItemEditReqDto;
 import com.sluv.server.domain.item.entity.Item;
 import com.sluv.server.domain.item.entity.ItemEditReq;
@@ -18,12 +18,12 @@ import org.springframework.transaction.annotation.Transactional;
 public class ItemEditReqService {
     private final ItemEditReqRepository itemEditReqRepository;
     private final ItemRepository itemRepository;
-    private final AlarmService alarmService;
+    private final ItemAlarmService itemAlarmService;
 
     public void postItemEdit(User user, Long itemId, ItemEditReqDto dto) {
         Item item = itemRepository.findById(itemId).orElseThrow(ItemNotFoundException::new);
         ItemEditReq itemEditReq = itemEditReqRepository.save(ItemEditReq.toEntity(user, item, dto));
-        alarmService.sendAlarmAboutItemEdit(user.getId(), item.getId(), itemEditReq.getId());
+        itemAlarmService.sendAlarmAboutItemEdit(user.getId(), item.getId(), itemEditReq.getId());
 
     }
 }

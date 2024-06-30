@@ -1,6 +1,6 @@
 package com.sluv.server.domain.item.service;
 
-import com.sluv.server.domain.alarm.service.AlarmService;
+import com.sluv.server.domain.alarm.service.ItemAlarmService;
 import com.sluv.server.domain.brand.dto.BrandSearchResDto;
 import com.sluv.server.domain.brand.entity.Brand;
 import com.sluv.server.domain.brand.entity.NewBrand;
@@ -91,7 +91,7 @@ public class ItemService {
 
     private final AiModelService aiModelService;
     private final CacheService cacheService;
-    private final AlarmService alarmService;
+    private final ItemAlarmService itemAlarmService;
 
     @Transactional
     public ItemPostResDto postItem(User user, ItemPostReqDto reqDto) {
@@ -328,7 +328,7 @@ public class ItemService {
         boolean likeExist = itemLikeRepository.existsByUserIdAndItemId(user.getId(), itemId);
         if (!likeExist) {
             itemLikeRepository.save(ItemLike.toEntity(item, user));
-            alarmService.sendAlarmAboutItemLike(user.getId(), itemId);
+            itemAlarmService.sendAlarmAboutItemLike(user.getId(), itemId);
         } else {
             itemLikeRepository.deleteByUserIdAndItemId(user.getId(), itemId);
         }

@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class AlarmService {
+public class ItemAlarmService {
     private final FcmNotificationService fcmNotificationService;
     private final UserRepository userRepository;
     private final ItemRepository itemRepository;

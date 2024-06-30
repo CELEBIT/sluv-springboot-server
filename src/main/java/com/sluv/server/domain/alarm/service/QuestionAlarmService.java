@@ -2,6 +2,9 @@ package com.sluv.server.domain.alarm.service;
 
 import com.sluv.server.domain.alarm.enums.AlarmMessage;
 import com.sluv.server.domain.alarm.enums.AlarmType;
+import com.sluv.server.domain.comment.entity.Comment;
+import com.sluv.server.domain.comment.exception.CommentNotFoundException;
+import com.sluv.server.domain.comment.repository.CommentRepository;
 import com.sluv.server.domain.question.entity.Question;
 import com.sluv.server.domain.question.exception.QuestionNotFoundException;
 import com.sluv.server.domain.question.repository.QuestionRepository;
@@ -19,6 +22,7 @@ public class QuestionAlarmService {
     private final FcmNotificationService fcmNotificationService;
     private final UserRepository userRepository;
     private final QuestionRepository questionRepository;
+    private final CommentRepository commentRepository;
 
     private static final String ALARM_TITLE = "[스럽]";
 
@@ -30,6 +34,18 @@ public class QuestionAlarmService {
         String message = AlarmMessage.getMessageWithUserName(user.getNickname(), AlarmMessage.QUESTION_LIKE);
         fcmNotificationService.sendFCMNotification(
                 question.getUser().getId(), ALARM_TITLE, message, AlarmType.QUESTION, question.getId()
+        );
+    }
+
+    @Async("alarmThreadPoolExecutor")
+    public void sendAlarmAboutQuestionComment(Long userId, Long questionId, Long commentId) {
+        User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+        Question question = questionRepository.findById(questionId).orElseThrow(QuestionNotFoundException::new);
+        Comment comment = commentRepository.findById(commentId).orElseThrow(CommentNotFoundException::new);
+
+        String message = AlarmMessage.getMessageWithUserName(user.getNickname(), AlarmMessage.QUESTION_LIKE);
+        fcmNotificationService.sendFCMNotification(
+                question.getUser().getId(), ALARM_TITLE, message, AlarmType.COMMENT, comment.getId()
         );
     }
 

@@ -1,5 +1,6 @@
 package com.sluv.server.domain.comment.service;
 
+import com.sluv.server.domain.alarm.service.QuestionAlarmService;
 import com.sluv.server.domain.comment.dto.CommentPostReqDto;
 import com.sluv.server.domain.comment.dto.CommentResDto;
 import com.sluv.server.domain.comment.dto.SubCommentPageResDto;
@@ -37,6 +38,8 @@ public class CommentService {
     private final CommentHelper commentHelper;
     private final CommentItemManager commentItemManager;
     private final CommentImgManager commentImgManager;
+
+    private final QuestionAlarmService questionAlarmService;
 
     /**
      * 댓글 조회
@@ -98,13 +101,12 @@ public class CommentService {
         log.info("댓글 등록 - 사용자 : {}, 질문 게시글 : {}, 댓글 내용 {}", user.getId(), questionId, dto.getContent());
         Question question = questionRepository.findById(questionId).orElseThrow(QuestionNotFoundException::new);
 
-        Comment comment = commentRepository.save(
-                Comment.toEntity(user, question, dto.getContent())
-        );
-
+        Comment comment = commentRepository.save(Comment.toEntity(user, question, dto.getContent()));
         commentItemManager.saveCommentItem(dto, comment);
         commentImgManager.saveCommentImg(dto, comment);
+
         aiModelService.censorComment(comment);
+        questionAlarmService.sendAlarmAboutQuestionComment(user.getId(), question.getId(), comment.getId());
 
     }
 
@@ -121,13 +123,12 @@ public class CommentService {
         // Parent Comment 조회
         Comment parentComment = commentRepository.findById(commentId).orElseThrow(CommentNotFoundException::new);
 
-        Comment comment = commentRepository.save(
-                Comment.toEntity(user, question, dto.getContent(), parentComment)
-        );
-
+        Comment comment = commentRepository.save(Comment.toEntity(user, question, dto.getContent(), parentComment));
         commentItemManager.saveCommentItem(dto, comment);
         commentImgManager.saveCommentImg(dto, comment);
+
         aiModelService.censorComment(comment);
+        questionAlarmService.sendAlarmAboutQuestionComment(user.getId(), question.getId(), comment.getId());
     }
 
     /**

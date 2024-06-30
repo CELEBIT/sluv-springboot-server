@@ -14,7 +14,7 @@ public class CorsConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(
-                Arrays.asList("https://www.sluv.co.kr", "http://localhost:3000", "https://sluv-server.store"));
+                Arrays.asList("https://www.sluv.co.kr", "http://localhost:3000", "https://sluv-server.co.kr"));
         configuration.addAllowedHeader("Authorization");
         configuration.addAllowedHeader("Content-Type");
         configuration.addAllowedMethod("*");

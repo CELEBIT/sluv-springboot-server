@@ -41,7 +41,7 @@ public class FcmNotificationService {
             try {
                 firebaseMessaging.send(message);
             } catch (FirebaseMessagingException e) {
-                e.printStackTrace();
+                log.error(e.getMessage());
                 throw new FcmConnectException();
             }
         }
@@ -68,7 +68,7 @@ public class FcmNotificationService {
                 try {
                     firebaseMessaging.send(message);
                 } catch (FirebaseMessagingException e) {
-                    e.printStackTrace();
+                    log.error(e.getMessage());
                     throw new FcmConnectException();
                 }
             }

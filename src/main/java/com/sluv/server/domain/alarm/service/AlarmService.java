@@ -44,14 +44,4 @@ public class AlarmService {
         );
     }
 
-    @Async
-    public void sendAlarmAboutItemReport(Long userId, Long itemId, Long itemEditReqId) {
-        User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
-        Item item = itemRepository.findById(itemId).orElseThrow(ItemNotFoundException::new);
-
-        String message = AlarmMessage.getMessageWithUserName(user.getNickname(), AlarmMessage.ITEM_EDIT);
-        fcmNotificationService.sendFCMNotification(
-                item.getUser().getId(), ALARM_TITLE, message, AlarmType.EDIT, itemEditReqId
-        );
-    }
 }

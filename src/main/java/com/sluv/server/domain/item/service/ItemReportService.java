@@ -22,19 +22,17 @@ public class ItemReportService {
 
     public void postItemReport(User user, Long itemId, ItemReportReqDto dto) {
         // 신고대상 Item 검색.
-        Item target = itemRepository.findById(itemId).orElseThrow(ItemNotFoundException::new);
+        Item item = itemRepository.findById(itemId).orElseThrow(ItemNotFoundException::new);
 
         // 신고 중복여부 확인
-        boolean existence = itemReportRepository.findExistence(user, target);
+        boolean existence = itemReportRepository.findExistence(user, item);
 
         // 중복 신고라면 Exception 발생
         if (existence) {
             throw new ItemReportDuplicateException();
         } else {
             // 중복이 아니라면 신고 접수
-            itemReportRepository.save(
-                    ItemReport.toEntity(target, user, dto)
-            );
+            itemReportRepository.save(ItemReport.toEntity(item, user, dto));
         }
     }
 }

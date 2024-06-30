@@ -1,6 +1,7 @@
 package com.sluv.server.domain.item.service;
 
 import com.sluv.server.domain.alarm.service.ItemAlarmService;
+import com.sluv.server.domain.alarm.service.UserAlarmService;
 import com.sluv.server.domain.brand.dto.BrandSearchResDto;
 import com.sluv.server.domain.brand.entity.Brand;
 import com.sluv.server.domain.brand.entity.NewBrand;
@@ -92,6 +93,7 @@ public class ItemService {
     private final AiModelService aiModelService;
     private final CacheService cacheService;
     private final ItemAlarmService itemAlarmService;
+    private final UserAlarmService userAlarmService;
 
     @Transactional
     public ItemPostResDto postItem(User user, ItemPostReqDto reqDto) {
@@ -148,9 +150,7 @@ public class ItemService {
         }
 
         // 완성된 Item save
-        Item newItem = itemRepository.save(
-                postItem
-        );
+        Item newItem = itemRepository.save(postItem);
 
         // 기존의 Img, Link, Hashtag가 있다면 모두 삭제
         itemImgRepository.deleteAllByItemId(newItem.getId());
@@ -190,6 +190,11 @@ public class ItemService {
         }
 
         aiModelService.getItemColor(newItem);
+
+        if (reqDto.getId() == null) { // 새 아이템 등록 시
+            userAlarmService.sendAlarmAboutFollowItem(user.getId(), newItem.getId());
+        }
+        
         return ItemPostResDto.of(newItem.getId());
     }
 

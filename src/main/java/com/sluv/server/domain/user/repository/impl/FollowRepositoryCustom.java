@@ -1,6 +1,7 @@
 package com.sluv.server.domain.user.repository.impl;
 
 import com.sluv.server.domain.user.dto.UserSearchInfoDto;
+import com.sluv.server.domain.user.entity.Follow;
 import com.sluv.server.domain.user.entity.User;
 import java.util.List;
 
@@ -18,4 +19,6 @@ public interface FollowRepositoryCustom {
     void deleteFolloweeByUserId(Long userId);
 
     void deleteFollowerByUserId(Long userId);
+
+    List<Follow> getAllFollower(Long userId);
 }

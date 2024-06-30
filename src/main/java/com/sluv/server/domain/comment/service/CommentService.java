@@ -129,6 +129,7 @@ public class CommentService {
 
         aiModelService.censorComment(comment);
         commentAlarmService.sendAlarmAboutComment(user.getId(), comment.getId());
+        commentAlarmService.sendAlarmAboutSubComment(user.getId(), comment.getId());
     }
 
     /**

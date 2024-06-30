@@ -1,7 +1,6 @@
 package com.sluv.server.domain.comment.service;
 
 import com.sluv.server.domain.alarm.service.CommentAlarmService;
-import com.sluv.server.domain.alarm.service.QuestionAlarmService;
 import com.sluv.server.domain.comment.dto.CommentPostReqDto;
 import com.sluv.server.domain.comment.dto.CommentResDto;
 import com.sluv.server.domain.comment.dto.SubCommentPageResDto;
@@ -40,7 +39,6 @@ public class CommentService {
     private final CommentItemManager commentItemManager;
     private final CommentImgManager commentImgManager;
 
-    private final QuestionAlarmService questionAlarmService;
     private final CommentAlarmService commentAlarmService;
 
     /**
@@ -108,7 +106,7 @@ public class CommentService {
         commentImgManager.saveCommentImg(dto, comment);
 
         aiModelService.censorComment(comment);
-        questionAlarmService.sendAlarmAboutQuestionComment(user.getId(), question.getId(), comment.getId());
+        commentAlarmService.sendAlarmAboutComment(user.getId(), comment.getId());
 
     }
 
@@ -130,7 +128,7 @@ public class CommentService {
         commentImgManager.saveCommentImg(dto, comment);
 
         aiModelService.censorComment(comment);
-        questionAlarmService.sendAlarmAboutQuestionComment(user.getId(), question.getId(), comment.getId());
+        commentAlarmService.sendAlarmAboutComment(user.getId(), comment.getId());
     }
 
     /**

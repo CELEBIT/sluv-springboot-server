@@ -33,4 +33,15 @@ public class CommentAlarmService {
         );
     }
 
+    @Async("alarmThreadPoolExecutor")
+    public void sendAlarmAboutComment(Long userId, Long commentId) {
+        User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+        Comment comment = commentRepository.findById(commentId).orElseThrow(CommentNotFoundException::new);
+
+        String message = AlarmMessage.getMessageWithUserName(user.getNickname(), AlarmMessage.QUESTION_COMMENT);
+        fcmNotificationService.sendFCMNotification(
+                comment.getQuestion().getUser().getId(), ALARM_TITLE, message, AlarmType.COMMENT, comment.getId()
+        );
+    }
+
 }

@@ -9,6 +9,7 @@ import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.domain.user.exception.UserNotFoundException;
 import com.sluv.server.domain.user.repository.UserRepository;
 import com.sluv.server.global.firebase.exception.FcmConnectException;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -42,6 +43,34 @@ public class FcmNotificationService {
             } catch (FirebaseMessagingException e) {
                 e.printStackTrace();
                 throw new FcmConnectException();
+            }
+        }
+    }
+
+    public void sendFCMNotificationMulticast(List<Long> userIds, String title, String body, AlarmType alarmType,
+                                             Long id) {
+        List<User> users = userRepository.findAllById(userIds);
+
+        for (User user : users) {
+            if (user.getFcmToken() != null) { // user.getAlarmStatus()
+                Notification notification = Notification.builder()
+                        .setTitle(title)
+                        .setBody(body)
+                        .build();
+
+                Message message = Message.builder()
+                        .setToken(user.getFcmToken())
+                        .setNotification(notification)
+                        .putData("type", alarmType.getName())
+                        .putData("id", id.toString())
+                        .build();
+
+                try {
+                    firebaseMessaging.send(message);
+                } catch (FirebaseMessagingException e) {
+                    e.printStackTrace();
+                    throw new FcmConnectException();
+                }
             }
         }
     }

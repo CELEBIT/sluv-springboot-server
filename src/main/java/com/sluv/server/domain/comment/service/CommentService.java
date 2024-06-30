@@ -1,5 +1,6 @@
 package com.sluv.server.domain.comment.service;
 
+import com.sluv.server.domain.alarm.service.CommentAlarmService;
 import com.sluv.server.domain.alarm.service.QuestionAlarmService;
 import com.sluv.server.domain.comment.dto.CommentPostReqDto;
 import com.sluv.server.domain.comment.dto.CommentResDto;
@@ -40,6 +41,7 @@ public class CommentService {
     private final CommentImgManager commentImgManager;
 
     private final QuestionAlarmService questionAlarmService;
+    private final CommentAlarmService commentAlarmService;
 
     /**
      * 댓글 조회
@@ -187,9 +189,8 @@ public class CommentService {
 
         if (!commentListStatus) {
             Comment comment = commentRepository.findById(commentId).orElseThrow(CommentNotFoundException::new);
-            commentLikeRepository.save(
-                    CommentLike.toEntity(user, comment)
-            );
+            commentLikeRepository.save(CommentLike.toEntity(user, comment));
+            commentAlarmService.sendAlarmAboutCommentLike(user.getId(), comment.getId());
         } else {
             commentLikeRepository.deleteByUserIdAndCommentId(user.getId(), commentId);
         }

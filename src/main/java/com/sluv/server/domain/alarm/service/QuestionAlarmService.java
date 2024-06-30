@@ -43,7 +43,7 @@ public class QuestionAlarmService {
         Question question = questionRepository.findById(questionId).orElseThrow(QuestionNotFoundException::new);
         Comment comment = commentRepository.findById(commentId).orElseThrow(CommentNotFoundException::new);
 
-        String message = AlarmMessage.getMessageWithUserName(user.getNickname(), AlarmMessage.QUESTION_LIKE);
+        String message = AlarmMessage.getMessageWithUserName(user.getNickname(), AlarmMessage.QUESTION_COMMENT);
         fcmNotificationService.sendFCMNotification(
                 question.getUser().getId(), ALARM_TITLE, message, AlarmType.COMMENT, comment.getId()
         );

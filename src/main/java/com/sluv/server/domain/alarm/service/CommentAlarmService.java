@@ -55,4 +55,14 @@ public class CommentAlarmService {
         );
     }
 
+    @Async("alarmThreadPoolExecutor")
+    public void sendAlarmAboutReportByAI(Long commentId) {
+        Comment comment = commentRepository.findById(commentId).orElseThrow(CommentNotFoundException::new);
+
+        String message = AlarmMessage.COMMENT_REPORT_BY_AI.getMessage();
+        fcmNotificationService.sendFCMNotification(
+                comment.getUser().getId(), ALARM_TITLE, message, AlarmType.COMMENT, comment.getId()
+        );
+    }
+
 }

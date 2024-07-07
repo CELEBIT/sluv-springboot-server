@@ -1,5 +1,6 @@
 package com.sluv.server.domain.alarm.service;
 
+import com.sluv.server.domain.alarm.dto.AlarmElement;
 import com.sluv.server.domain.alarm.enums.AlarmMessage;
 import com.sluv.server.domain.alarm.enums.AlarmType;
 import com.sluv.server.domain.comment.entity.Comment;
@@ -21,52 +22,46 @@ public class CommentAlarmService {
     private final UserRepository userRepository;
     private final CommentRepository commentRepository;
 
+    private final AlarmService alarmService;
+
     private static final String ALARM_TITLE = "[스럽]";
 
     @Async("alarmThreadPoolExecutor")
     public void sendAlarmAboutCommentLike(Long userId, Long commentId) {
         User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
         Comment comment = commentRepository.findById(commentId).orElseThrow(CommentNotFoundException::new);
-
         String message = AlarmMessage.getMessageWithUserName(user.getNickname(), AlarmMessage.COMMENT_LIKE);
-
-        fcmNotificationService.sendFCMNotification(
-                comment.getUser().getId(), ALARM_TITLE, message, AlarmType.COMMENT, getIdsAboutComment(comment)
-        );
+        sendMessageTypeComment(comment.getUser().getId(), comment, message);
     }
 
     @Async("alarmThreadPoolExecutor")
     public void sendAlarmAboutComment(Long userId, Long commentId) {
         User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
         Comment comment = commentRepository.findById(commentId).orElseThrow(CommentNotFoundException::new);
-
         String message = AlarmMessage.getMessageWithUserName(user.getNickname(), AlarmMessage.QUESTION_COMMENT);
-
-        fcmNotificationService.sendFCMNotification(
-                comment.getQuestion().getUser().getId(), ALARM_TITLE, message, AlarmType.COMMENT,
-                getIdsAboutComment(comment)
-        );
+        sendMessageTypeComment(comment.getQuestion().getUser().getId(), comment, message);
     }
 
     @Async("alarmThreadPoolExecutor")
     public void sendAlarmAboutSubComment(Long userId, Long commentId) {
         User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
         Comment comment = commentRepository.findById(commentId).orElseThrow(CommentNotFoundException::new);
-
         String message = AlarmMessage.getMessageWithUserName(user.getNickname(), AlarmMessage.COMMENT_SUB);
-
-        fcmNotificationService.sendFCMNotification(
-                comment.getUser().getId(), ALARM_TITLE, message, AlarmType.COMMENT, getIdsAboutComment(comment)
-        );
+        sendMessageTypeComment(comment.getUser().getId(), comment, message);
     }
 
     @Async("alarmThreadPoolExecutor")
     public void sendAlarmAboutReportByAI(Long commentId) {
         Comment comment = commentRepository.findById(commentId).orElseThrow(CommentNotFoundException::new);
-
         String message = AlarmMessage.COMMENT_REPORT_BY_AI.getMessage();
+        sendMessageTypeComment(comment.getUser().getId(), comment, message);
+    }
+
+    private void sendMessageTypeComment(Long receiverId, Comment comment, String message) {
+        AlarmElement alarmElement = AlarmElement.of(null, comment.getQuestion(), comment, null);
+        alarmService.saveAlarm(comment.getUser(), ALARM_TITLE, message, AlarmType.COMMENT, alarmElement);
         fcmNotificationService.sendFCMNotification(
-                comment.getUser().getId(), ALARM_TITLE, message, AlarmType.COMMENT, getIdsAboutComment(comment)
+                receiverId, ALARM_TITLE, message, AlarmType.COMMENT, getIdsAboutComment(comment)
         );
     }
 

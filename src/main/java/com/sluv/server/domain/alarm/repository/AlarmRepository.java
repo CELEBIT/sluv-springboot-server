@@ -1,4 +1,7 @@
 package com.sluv.server.domain.alarm.repository;
 
-public interface AlarmRepository {
+import com.sluv.server.domain.alarm.entity.Alarm;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface AlarmRepository extends JpaRepository<Alarm, Long> {
 }

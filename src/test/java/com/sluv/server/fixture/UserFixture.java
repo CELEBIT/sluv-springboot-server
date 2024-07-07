@@ -16,7 +16,7 @@ public class UserFixture {
                 .gender(UserGender.UNKNOWN)
                 .build();
 
-        return User.toEntity(userSocialInfo, SnsType.KAKAO);
+        return User.toEntity(userSocialInfo, SnsType.KAKAO, "testfcm");
     }
 
     public static User 구글_유저_생성() {
@@ -27,7 +27,7 @@ public class UserFixture {
                 .gender(UserGender.UNKNOWN)
                 .build();
 
-        return User.toEntity(userSocialInfo, SnsType.GOOGLE);
+        return User.toEntity(userSocialInfo, SnsType.GOOGLE, "testfcm");
     }
 
     public static User 애플_유저_생성() {
@@ -38,6 +38,6 @@ public class UserFixture {
                 .gender(UserGender.UNKNOWN)
                 .build();
 
-        return User.toEntity(userSocialInfo, SnsType.APPLE);
+        return User.toEntity(userSocialInfo, SnsType.APPLE, "testfcm");
     }
 }

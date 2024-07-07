@@ -9,6 +9,7 @@ import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.domain.user.exception.UserNotFoundException;
 import com.sluv.server.domain.user.repository.UserRepository;
 import com.sluv.server.global.firebase.FcmNotificationService;
+import java.util.HashMap;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -28,8 +29,9 @@ public class CommentAlarmService {
         Comment comment = commentRepository.findById(commentId).orElseThrow(CommentNotFoundException::new);
 
         String message = AlarmMessage.getMessageWithUserName(user.getNickname(), AlarmMessage.COMMENT_LIKE);
+
         fcmNotificationService.sendFCMNotification(
-                comment.getUser().getId(), ALARM_TITLE, message, AlarmType.COMMENT, comment.getId()
+                comment.getUser().getId(), ALARM_TITLE, message, AlarmType.COMMENT, getIdsAboutComment(comment)
         );
     }
 
@@ -39,8 +41,10 @@ public class CommentAlarmService {
         Comment comment = commentRepository.findById(commentId).orElseThrow(CommentNotFoundException::new);
 
         String message = AlarmMessage.getMessageWithUserName(user.getNickname(), AlarmMessage.QUESTION_COMMENT);
+
         fcmNotificationService.sendFCMNotification(
-                comment.getQuestion().getUser().getId(), ALARM_TITLE, message, AlarmType.COMMENT, comment.getId()
+                comment.getQuestion().getUser().getId(), ALARM_TITLE, message, AlarmType.COMMENT,
+                getIdsAboutComment(comment)
         );
     }
 
@@ -50,8 +54,9 @@ public class CommentAlarmService {
         Comment comment = commentRepository.findById(commentId).orElseThrow(CommentNotFoundException::new);
 
         String message = AlarmMessage.getMessageWithUserName(user.getNickname(), AlarmMessage.COMMENT_SUB);
+
         fcmNotificationService.sendFCMNotification(
-                comment.getUser().getId(), ALARM_TITLE, message, AlarmType.COMMENT, comment.getId()
+                comment.getUser().getId(), ALARM_TITLE, message, AlarmType.COMMENT, getIdsAboutComment(comment)
         );
     }
 
@@ -61,8 +66,15 @@ public class CommentAlarmService {
 
         String message = AlarmMessage.COMMENT_REPORT_BY_AI.getMessage();
         fcmNotificationService.sendFCMNotification(
-                comment.getUser().getId(), ALARM_TITLE, message, AlarmType.COMMENT, comment.getId()
+                comment.getUser().getId(), ALARM_TITLE, message, AlarmType.COMMENT, getIdsAboutComment(comment)
         );
+    }
+
+    private HashMap<String, Long> getIdsAboutComment(Comment comment) {
+        HashMap<String, Long> ids = new HashMap<>();
+        ids.put("questionId", comment.getQuestion().getId());
+        ids.put("commentId", comment.getId());
+        return ids;
     }
 
 }

@@ -9,6 +9,7 @@ import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.domain.user.exception.UserNotFoundException;
 import com.sluv.server.domain.user.repository.UserRepository;
 import com.sluv.server.global.firebase.FcmNotificationService;
+import java.util.HashMap;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -29,8 +30,15 @@ public class QuestionAlarmService {
 
         String message = AlarmMessage.getMessageWithUserName(user.getNickname(), AlarmMessage.QUESTION_LIKE);
         fcmNotificationService.sendFCMNotification(
-                question.getUser().getId(), ALARM_TITLE, message, AlarmType.QUESTION, question.getId()
+                question.getUser().getId(), ALARM_TITLE, message, AlarmType.QUESTION,
+                getIdAboutQuestion(question.getId())
         );
+    }
+
+    private HashMap<String, Long> getIdAboutQuestion(Long questionId) {
+        HashMap<String, Long> ids = new HashMap<>();
+        ids.put("questionId", questionId);
+        return ids;
     }
 
 }

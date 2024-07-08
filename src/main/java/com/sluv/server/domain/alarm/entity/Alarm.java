@@ -19,9 +19,11 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity(name = "alarm")
+@Getter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -55,6 +57,10 @@ public class Alarm extends BaseEntity {
     @JoinColumn(name = "comment_id")
     private Comment comment;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "follower_id")
+    private User follower;
+
     public static Alarm toEntity(User user, String title, String body, AlarmType alarmType, AlarmElement alarmElement) {
         return Alarm.builder()
                 .user(user)
@@ -64,6 +70,7 @@ public class Alarm extends BaseEntity {
                 .item(alarmElement.getItem())
                 .question(alarmElement.getQuestion())
                 .comment(alarmElement.getComment())
+                .follower(alarmElement.getUser())
                 .build();
     }
 

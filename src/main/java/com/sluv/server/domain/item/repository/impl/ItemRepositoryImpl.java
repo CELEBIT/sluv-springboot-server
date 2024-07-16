@@ -858,12 +858,15 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
             3. 브랜드
          */
         QCeleb parent = new QCeleb("parent");
+        QItemCategory parentCategory = new QItemCategory("parentCategory");
         return jpaQueryFactory.selectFrom(item)
                 .leftJoin(item.celeb, celeb).fetchJoin()
                 .leftJoin(item.celeb.parent, parent).fetchJoin()
                 .leftJoin(item.newCeleb, newCeleb).fetchJoin()
                 .leftJoin(item.brand, brand).fetchJoin()
                 .leftJoin(item.newBrand, newBrand).fetchJoin()
+                .leftJoin(item.category, itemCategory).fetchJoin()
+                .leftJoin(item.category.parent, parentCategory).fetchJoin()
                 .where(item.name.like("%" + word + "%")
                         .or(item.celeb.celebNameKr.like("%" + word + "%"))
                         .or(item.celeb.celebNameEn.like("%" + word + "%"))
@@ -873,6 +876,8 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
                         .or(item.brand.brandKr.like("%" + word + "%"))
                         .or(item.brand.brandEn.like("%" + word + "%"))
                         .or(item.newBrand.brandName.like("%" + word + "%"))
+                        .or(item.category.name.like("%" + word + "%"))
+                        .or(item.category.parent.name.like("%" + word + "%"))
                 )
                 .orderBy(item.whenDiscovery.desc())
                 .fetch();

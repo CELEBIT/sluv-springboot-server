@@ -43,9 +43,8 @@ public class SearchService {
         List<RecentSearchChipResDto> result
                 = recentSearchRepository.getRecentSearch(user)
                 .stream()
-                .map(recentSearch ->
-                        RecentSearchChipResDto.of(recentSearch.getSearchWord())
-                ).toList();
+                .map(recentSearch -> RecentSearchChipResDto.of(recentSearch.getSearchWord()))
+                .toList();
 
         return result;
     }
@@ -55,9 +54,8 @@ public class SearchService {
         List<SearchRank> searchRankList = searchRankRepository.findAllByOrderBySearchCountDesc();
         return searchRankList
                 .stream()
-                .map(searchRank ->
-                        SearchKeywordResDto.of(searchRank.getSearchWord())
-                ).toList();
+                .map(searchRank -> SearchKeywordResDto.of(searchRank.getSearchWord()))
+                .toList();
     }
 
     @Transactional(readOnly = true)
@@ -65,10 +63,8 @@ public class SearchService {
         Page<SearchData> searchDataPage = searchDataRepository.getSearchKeyword(keyword, pageable);
 
         List<SearchKeywordResDto> content = searchDataPage.stream()
-                .map(searchData ->
-                        SearchKeywordResDto.of(searchData.getSearchWord()
-                        )
-                ).toList();
+                .map(searchData -> SearchKeywordResDto.of(searchData.getSearchWord()))
+                .toList();
 
         return PaginationResDto.of(searchDataPage, content);
     }

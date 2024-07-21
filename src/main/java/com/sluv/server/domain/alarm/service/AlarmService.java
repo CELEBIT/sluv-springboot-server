@@ -4,6 +4,8 @@ import com.sluv.server.domain.alarm.dto.AlarmElement;
 import com.sluv.server.domain.alarm.dto.AlarmResponse;
 import com.sluv.server.domain.alarm.entity.Alarm;
 import com.sluv.server.domain.alarm.enums.AlarmType;
+import com.sluv.server.domain.alarm.exception.AlarmAccessDeniedException;
+import com.sluv.server.domain.alarm.exception.AlarmNotFoundException;
 import com.sluv.server.domain.alarm.repository.AlarmRepository;
 import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.global.common.response.PaginationResDto;
@@ -13,8 +15,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class AlarmService {
 
@@ -34,9 +38,18 @@ public class AlarmService {
         alarmRepository.saveAll(alarms);
     }
 
+    @Transactional(readOnly = true)
     public PaginationResDto<AlarmResponse> getAlarmsByUserId(Long userId, Pageable pageable) {
         Page<Alarm> alarmPage = alarmRepository.findAllByUserId(userId, pageable);
         List<AlarmResponse> content = alarmPage.stream().map(AlarmResponse::of).toList();
         return PaginationResDto.of(alarmPage, content);
+    }
+
+    public void deleteAlarm(User user, Long alarmId) {
+        Alarm alarm = alarmRepository.findById(alarmId).orElseThrow(AlarmNotFoundException::new);
+        if (!alarm.getUser().getId().equals(user.getId())) {
+            throw new AlarmAccessDeniedException();
+        }
+        alarmRepository.deleteById(alarmId);
     }
 }

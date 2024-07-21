@@ -5,11 +5,14 @@ import com.sluv.server.domain.alarm.service.AlarmService;
 import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.global.common.response.PaginationResDto;
 import com.sluv.server.global.common.response.SuccessDataResponse;
+import com.sluv.server.global.common.response.SuccessResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -28,6 +31,13 @@ public class AlarmController {
                         .result(alarmService.getAlarmsByUserId(user.getId(), pageable))
                         .build()
         );
+    }
+
+    @DeleteMapping("/{alarmId}")
+    public ResponseEntity<SuccessResponse> deleteAlarm(@AuthenticationPrincipal User user,
+                                                       @PathVariable("alarmId") Long alarmId) {
+        alarmService.deleteAlarm(user, alarmId);
+        return ResponseEntity.ok().body(new SuccessResponse());
     }
 
 }

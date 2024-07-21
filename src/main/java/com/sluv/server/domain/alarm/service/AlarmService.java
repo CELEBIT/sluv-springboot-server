@@ -52,4 +52,8 @@ public class AlarmService {
         }
         alarmRepository.deleteById(alarmId);
     }
+
+    public void deleteAllAlarm(User user) {
+        alarmRepository.deleteAllByUserId(user.getId());
+    }
 }

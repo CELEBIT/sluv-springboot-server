@@ -40,4 +40,10 @@ public class AlarmController {
         return ResponseEntity.ok().body(new SuccessResponse());
     }
 
+    @DeleteMapping("/all")
+    public ResponseEntity<SuccessResponse> deleteAllAlarm(@AuthenticationPrincipal User user) {
+        alarmService.deleteAllAlarm(user);
+        return ResponseEntity.ok().body(new SuccessResponse());
+    }
+
 }

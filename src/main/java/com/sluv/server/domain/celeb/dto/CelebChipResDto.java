@@ -22,9 +22,14 @@ public class CelebChipResDto {
     private String celebName;
 
     public static CelebChipResDto of(Celeb celeb) {
+
+        String celebName = celeb.getParent() != null
+                ? celeb.getParent().getCelebNameKr() + " " + celeb.getCelebNameKr()
+                : celeb.getCelebNameKr();
+
         return CelebChipResDto.builder()
                 .celebId(celeb.getId())
-                .celebName(celeb.getCelebNameKr())
+                .celebName(celebName)
                 .build();
     }
 

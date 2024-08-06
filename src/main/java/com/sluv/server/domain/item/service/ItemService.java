@@ -58,7 +58,9 @@ import com.sluv.server.global.cache.CacheService;
 import com.sluv.server.global.common.enums.ItemImgOrLinkStatus;
 import com.sluv.server.global.common.response.PaginationResDto;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -464,15 +466,9 @@ public class ItemService {
 
     @Transactional(readOnly = true)
     public List<ItemSimpleResDto> getHowAboutItem(User user) {
-        List<Celeb> interestedCeleb;
-        if (user != null) {
-            interestedCeleb = celebRepository.findInterestedCeleb(user);
-        } else {
-            interestedCeleb = celebRepository.findTop10Celeb();
-        }
-        List<Item> itemList = itemRepository.getHowAboutItem(user, interestedCeleb);
-
-        return itemRepository.getItemSimpleResDto(user, itemList);
+        List<Item> items = itemRepository.findAll();
+        Collections.shuffle(items, new Random());
+        return itemRepository.getItemSimpleResDto(user, items.subList(0, 4));
     }
 
     @Transactional(readOnly = true)

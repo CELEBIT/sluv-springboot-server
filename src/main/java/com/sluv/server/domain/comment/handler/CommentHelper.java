@@ -40,7 +40,7 @@ public class CommentHelper {
                     // 해당 Comment의 좋아요 수
                     Integer likeNum = commentLikeRepository.countByCommentId(comment.getId());
                     // 현재 유저의 해당 Comment 좋아요 여부
-                    Boolean likeStatus = commentLikeRepository.existsByUserIdAndCommentId(user.getId(),
+                    Boolean likeStatus = user != null && commentLikeRepository.existsByUserIdAndCommentId(user.getId(),
                             comment.getId());
 
                     User writer = userRepository.findById(comment.getUser().getId()).orElse(null);

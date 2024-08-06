@@ -48,6 +48,8 @@ public class CommentResDto {
                                    Integer likeNum,
                                    Boolean likeStatus) {
 
+        boolean hasMine = user != null && comment.getUser().getId().equals(user.getId());
+
         return CommentResDto.builder()
                 .id(comment.getId())
                 .user(UserInfoDto.of(writer))
@@ -57,7 +59,7 @@ public class CommentResDto {
                 .createdAt(comment.getCreatedAt())
                 .likeNum(likeNum)
                 .likeStatus(likeStatus)
-                .hasMine(comment.getUser().getId().equals(user.getId()))
+                .hasMine(hasMine)
                 .modifyStatus(!comment.getCreatedAt().equals(comment.getUpdatedAt()))
                 .commentStatus(comment.getCommentStatus())
                 .build();

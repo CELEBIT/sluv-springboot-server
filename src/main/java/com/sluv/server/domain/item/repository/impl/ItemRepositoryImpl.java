@@ -556,9 +556,7 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
     public List<Item> updateLuxuryItem() {
         return jpaQueryFactory.select(item)
                 .from(item)
-                .where(item.itemStatus.eq(ACTIVE)
-                        .and(item.price.goe(1000000))
-                )
+                .where(item.itemStatus.eq(ACTIVE).and(item.price.goe(500000)))
                 .fetch();
     }
 

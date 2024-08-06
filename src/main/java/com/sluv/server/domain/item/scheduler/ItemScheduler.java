@@ -11,7 +11,9 @@ import com.sluv.server.domain.item.repository.ItemRepository;
 import com.sluv.server.domain.item.repository.LuxuryItemRepository;
 import com.sluv.server.domain.item.repository.WeekHotItemRepository;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -42,14 +44,11 @@ public class ItemScheduler {
 
         log.info("Get LuxuryItem. Time: {}", Calendar.getInstance().getTime());
         List<Item> newLuxuryItem = itemRepository.updateLuxuryItem();
+        Collections.shuffle(newLuxuryItem, new Random());
 
         log.info("Save LuxuryItem. Time: {}", Calendar.getInstance().getTime());
 
-        newLuxuryItem.forEach(item ->
-                luxuryItemRepository.save(
-                        LuxuryItem.toEntity(item)
-                )
-        );
+        newLuxuryItem.subList(0, 10).forEach(item -> luxuryItemRepository.save(LuxuryItem.toEntity(item)));
     }
 
     /**

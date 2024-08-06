@@ -239,6 +239,7 @@ public class ItemController {
         );
     }
 
+    @Deprecated
     @Operation(summary = "*일간/주간 HOT 아이템 조회", description = "User 토큰 필요. 정적으로 21개 조회.")
     @GetMapping("/hotItem")
     public ResponseEntity<SuccessDataResponse<List<ItemSimpleResDto>>> getHotItem(@AuthenticationPrincipal User user,

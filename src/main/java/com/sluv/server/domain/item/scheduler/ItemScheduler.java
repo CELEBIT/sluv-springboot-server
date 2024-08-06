@@ -63,14 +63,11 @@ public class ItemScheduler {
 
         log.info("Get EfficientItem. Time: {}", Calendar.getInstance().getTime());
         List<Item> newEfficientItem = itemRepository.updateEfficientItem();
+        Collections.shuffle(newEfficientItem, new Random());
 
         log.info("Save EfficientItem. Time: {}", Calendar.getInstance().getTime());
 
-        newEfficientItem.forEach(item ->
-                efficientItemRepository.save(
-                        EfficientItem.toEntity(item)
-                )
-        );
+        newEfficientItem.subList(0, 10).forEach(item -> efficientItemRepository.save(EfficientItem.toEntity(item)));
     }
 
     /**

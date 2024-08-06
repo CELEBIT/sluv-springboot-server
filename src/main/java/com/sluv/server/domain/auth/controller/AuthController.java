@@ -61,7 +61,7 @@ public class AuthController {
     @GetMapping("/auto-login")
     public ResponseEntity<SuccessDataResponse<AutoLoginResponseDto>> autoLogin(@AuthenticationPrincipal User user) {
         cacheService.visitMember(user.getId());
-        authService.checkFcm(user.getId());
+//        authService.checkFcm(user.getId()); FCM 확인 로직 잠시 제거 24.08.06
         return ResponseEntity.ok().body(
                 SuccessDataResponse.<AutoLoginResponseDto>builder()
                         .result(AutoLoginResponseDto.of(user))

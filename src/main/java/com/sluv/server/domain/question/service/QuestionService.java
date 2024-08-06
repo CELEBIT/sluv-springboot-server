@@ -557,6 +557,7 @@ public class QuestionService {
     }
 
     public QuestionSimpleResDto getQuestionSimpleResDto(Question question, String qType) {
+        log.warn("아악2");
 
         List<QuestionImgSimpleResDto> imgList = new ArrayList<>();
         List<QuestionImgSimpleResDto> itemImgList = new ArrayList<>();

@@ -86,4 +86,11 @@ public class FollowRepositoryImpl implements FollowRepositoryCustom {
                 .where(follow.follower.id.eq(userId))
                 .execute();
     }
+
+    @Override
+    public List<Follow> getAllFollower(Long userId) {
+        return jpaQueryFactory.selectFrom(follow)
+                .where(follow.followee.id.eq(userId))
+                .fetch();
+    }
 }

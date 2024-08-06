@@ -2,6 +2,7 @@ package com.sluv.server.domain.auth.controller;
 
 import com.sluv.server.domain.auth.dto.AuthRequestDto;
 import com.sluv.server.domain.auth.dto.AuthResponseDto;
+import com.sluv.server.domain.auth.dto.AutoLoginRequestDto;
 import com.sluv.server.domain.auth.dto.AutoLoginResponseDto;
 import com.sluv.server.domain.auth.enums.SnsType;
 import com.sluv.server.domain.auth.service.AppleUserService;
@@ -11,6 +12,7 @@ import com.sluv.server.domain.auth.service.KakaoUserService;
 import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.global.cache.CacheService;
 import com.sluv.server.global.common.response.SuccessDataResponse;
+import com.sluv.server.global.common.response.SuccessResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -59,6 +61,7 @@ public class AuthController {
     @GetMapping("/auto-login")
     public ResponseEntity<SuccessDataResponse<AutoLoginResponseDto>> autoLogin(@AuthenticationPrincipal User user) {
         cacheService.visitMember(user.getId());
+        authService.checkFcm(user.getId());
         return ResponseEntity.ok().body(
                 SuccessDataResponse.<AutoLoginResponseDto>builder()
                         .result(AutoLoginResponseDto.of(user))
@@ -66,4 +69,11 @@ public class AuthController {
         );
     }
 
+    @Operation(summary = "*FCM 토큰 갱신", description = "FCM 토큰을 갱신")
+    @PostMapping("/fcm")
+    public ResponseEntity<SuccessResponse> changeFcm(@AuthenticationPrincipal User user,
+                                                     @RequestBody AutoLoginRequestDto dto) {
+        authService.changeFcm(user.getId(), dto.getFcm());
+        return ResponseEntity.ok().body(new SuccessResponse());
+    }
 }

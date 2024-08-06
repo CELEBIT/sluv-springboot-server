@@ -1,5 +1,6 @@
 package com.sluv.server.domain.item.service;
 
+import com.sluv.server.domain.alarm.service.ItemAlarmService;
 import com.sluv.server.domain.brand.dto.BrandSearchResDto;
 import com.sluv.server.domain.brand.entity.Brand;
 import com.sluv.server.domain.brand.entity.NewBrand;
@@ -57,7 +58,9 @@ import com.sluv.server.global.cache.CacheService;
 import com.sluv.server.global.common.enums.ItemImgOrLinkStatus;
 import com.sluv.server.global.common.response.PaginationResDto;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -90,6 +93,7 @@ public class ItemService {
 
     private final AiModelService aiModelService;
     private final CacheService cacheService;
+    private final ItemAlarmService itemAlarmService;
 
     @Transactional
     public ItemPostResDto postItem(User user, ItemPostReqDto reqDto) {
@@ -146,9 +150,7 @@ public class ItemService {
         }
 
         // 완성된 Item save
-        Item newItem = itemRepository.save(
-                postItem
-        );
+        Item newItem = itemRepository.save(postItem);
 
         // 기존의 Img, Link, Hashtag가 있다면 모두 삭제
         itemImgRepository.deleteAllByItemId(newItem.getId());
@@ -188,6 +190,11 @@ public class ItemService {
         }
 
         aiModelService.getItemColor(newItem);
+
+        if (reqDto.getId() == null) { // 새 아이템 등록 시
+            itemAlarmService.sendAlarmAboutFollowItem(user.getId(), newItem.getId());
+        }
+
         return ItemPostResDto.of(newItem.getId());
     }
 
@@ -325,9 +332,8 @@ public class ItemService {
 
         boolean likeExist = itemLikeRepository.existsByUserIdAndItemId(user.getId(), itemId);
         if (!likeExist) {
-            itemLikeRepository.save(
-                    ItemLike.toEntity(item, user)
-            );
+            itemLikeRepository.save(ItemLike.toEntity(item, user));
+            itemAlarmService.sendAlarmAboutItemLike(user.getId(), itemId);
         } else {
             itemLikeRepository.deleteByUserIdAndItemId(user.getId(), itemId);
         }
@@ -460,15 +466,9 @@ public class ItemService {
 
     @Transactional(readOnly = true)
     public List<ItemSimpleResDto> getHowAboutItem(User user) {
-        List<Celeb> interestedCeleb;
-        if (user != null) {
-            interestedCeleb = celebRepository.findInterestedCeleb(user);
-        } else {
-            interestedCeleb = celebRepository.findTop10Celeb();
-        }
-        List<Item> itemList = itemRepository.getHowAboutItem(user, interestedCeleb);
-
-        return itemRepository.getItemSimpleResDto(user, itemList);
+        List<Item> items = itemRepository.findAll();
+        Collections.shuffle(items, new Random());
+        return itemRepository.getItemSimpleResDto(user, items.subList(0, 4));
     }
 
     @Transactional(readOnly = true)

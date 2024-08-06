@@ -239,6 +239,7 @@ public class ItemController {
         );
     }
 
+    @Deprecated
     @Operation(summary = "*일간/주간 HOT 아이템 조회", description = "User 토큰 필요. 정적으로 21개 조회.")
     @GetMapping("/hotItem")
     public ResponseEntity<SuccessDataResponse<List<ItemSimpleResDto>>> getHotItem(@AuthenticationPrincipal User user,
@@ -293,9 +294,9 @@ public class ItemController {
     }
 
     /**
-     * 현재 실시간 -> 24시간 기준 추가 예정 10개가 안되면 최신순으로 랜덤으로 채우기
+     * 전체 아이템 중 랜덤으로 4개 조회, 홈 회면 접속 할 때마다 리프레쉬
      */
-    @Operation(summary = "*이 아이템은 어때요 아이템 조회", description = "User 토큰 필요. 정적으로 4개. 24시간 기준.")
+    @Operation(summary = "*이 아이템은 어때요 아이템 조회", description = "User 토큰 필요.")
     @GetMapping("/howabout")
     public ResponseEntity<SuccessDataResponse<List<ItemSimpleResDto>>> getHowAboutItem(
             @AuthenticationPrincipal User user) {

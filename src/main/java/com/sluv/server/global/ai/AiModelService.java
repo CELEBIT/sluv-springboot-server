@@ -1,5 +1,6 @@
 package com.sluv.server.global.ai;
 
+import com.sluv.server.domain.alarm.service.CommentAlarmService;
 import com.sluv.server.domain.comment.entity.Comment;
 import com.sluv.server.domain.comment.enums.CommentStatus;
 import com.sluv.server.domain.comment.repository.CommentRepository;
@@ -20,6 +21,8 @@ public class AiModelService {
     private final CommentRepository commentRepository;
     private final ItemRepository itemRepository;
     private final ItemImgRepository itemImgRepository;
+    
+    private final CommentAlarmService commentAlarmService;
 
     @Async(value = "asyncThreadPoolExecutor")
     public void censorComment(Comment comment) {
@@ -28,6 +31,7 @@ public class AiModelService {
         if (isMalicious) {
             comment.changeStatus(CommentStatus.BLOCKED);
             commentRepository.save(comment);
+            commentAlarmService.sendAlarmAboutReportByAI(comment.getId());
         }
     }
 

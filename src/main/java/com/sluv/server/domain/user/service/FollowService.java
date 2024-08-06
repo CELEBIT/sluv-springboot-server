@@ -1,5 +1,6 @@
 package com.sluv.server.domain.user.service;
 
+import com.sluv.server.domain.alarm.service.UserAlarmService;
 import com.sluv.server.domain.user.dto.UserSearchInfoDto;
 import com.sluv.server.domain.user.entity.Follow;
 import com.sluv.server.domain.user.entity.User;
@@ -23,6 +24,8 @@ public class FollowService {
     private final UserRepository userRepository;
     private final FollowRepository followRepository;
 
+    private final UserAlarmService userAlarmService;
+
     @Transactional
     public void postUserFollow(User user, Long userId) {
         // target이 될 유저 검색
@@ -36,6 +39,7 @@ public class FollowService {
         } else {
             // Follow 정보 등록.
             followRepository.save(Follow.toEntity(user, targetUser));
+            userAlarmService.sendAlarmAboutFollow(user.getId(), targetUser.getId());
         }
 
     }

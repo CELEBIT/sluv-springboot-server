@@ -12,8 +12,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RequestMapping("/app/alarm")
@@ -31,6 +33,13 @@ public class AlarmController {
                         .result(alarmService.getAlarmsByUserId(user.getId(), pageable))
                         .build()
         );
+    }
+
+    @PatchMapping("/read")
+    public ResponseEntity<SuccessResponse> pathAlarmStatusToRead(@AuthenticationPrincipal User user,
+                                                                 @RequestParam Long alarmId) {
+        alarmService.patchAlarmStatusToRead(user, alarmId);
+        return ResponseEntity.ok().body(new SuccessResponse());
     }
 
     @DeleteMapping("/{alarmId}")

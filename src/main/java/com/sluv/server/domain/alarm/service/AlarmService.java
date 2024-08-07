@@ -1,5 +1,7 @@
 package com.sluv.server.domain.alarm.service;
 
+import static com.sluv.server.domain.alarm.enums.AlarmStatus.READ;
+
 import com.sluv.server.domain.alarm.dto.AlarmElement;
 import com.sluv.server.domain.alarm.dto.AlarmResponse;
 import com.sluv.server.domain.alarm.entity.Alarm;
@@ -11,6 +13,7 @@ import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.global.common.response.PaginationResDto;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -56,4 +59,12 @@ public class AlarmService {
     public void deleteAllAlarm(User user) {
         alarmRepository.deleteAllByUserId(user.getId());
     }
+
+    public void patchAlarmStatusToRead(User user, Long alarmId) {
+        Alarm alarm = alarmRepository.findById(alarmId).orElseThrow(AlarmNotFoundException::new);
+        if (Objects.equals(alarm.getUser().getId(), user.getId())) {
+            alarm.changeStatus(READ);
+        }
+    }
+
 }

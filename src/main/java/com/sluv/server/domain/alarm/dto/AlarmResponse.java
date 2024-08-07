@@ -1,6 +1,7 @@
 package com.sluv.server.domain.alarm.dto;
 
 import com.sluv.server.domain.alarm.entity.Alarm;
+import com.sluv.server.domain.alarm.enums.AlarmStatus;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,6 +16,7 @@ public class AlarmResponse {
     private Long alarmId;
     private String title;
     private String body;
+    private String type;
 
     private Long itemId;
     private Long questionId;
@@ -23,6 +25,7 @@ public class AlarmResponse {
 
 
     private LocalDateTime cratedAt;
+    private AlarmStatus alarmStatus;
 
     public static AlarmResponse of(Alarm alarm) {
 
@@ -35,11 +38,13 @@ public class AlarmResponse {
                 .alarmId(alarm.getId())
                 .title(alarm.getTitle())
                 .body(alarm.getBody())
+                .type(alarm.getAlarmType().getName())
                 .itemId(itemId)
                 .questionId(questionId)
                 .commentId(commentId)
                 .followerId(followerId)
                 .cratedAt(alarm.getCreatedAt())
+                .alarmStatus(alarm.getAlarmStatus())
                 .build();
     }
 

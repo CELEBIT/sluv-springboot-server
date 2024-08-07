@@ -1,6 +1,9 @@
 package com.sluv.server.domain.alarm.entity;
 
+import static com.sluv.server.domain.alarm.enums.AlarmStatus.ACTIVE;
+
 import com.sluv.server.domain.alarm.dto.AlarmElement;
+import com.sluv.server.domain.alarm.enums.AlarmStatus;
 import com.sluv.server.domain.alarm.enums.AlarmType;
 import com.sluv.server.domain.comment.entity.Comment;
 import com.sluv.server.domain.item.entity.Item;
@@ -61,6 +64,9 @@ public class Alarm extends BaseEntity {
     @JoinColumn(name = "follower_id")
     private User follower;
 
+    @Enumerated(EnumType.STRING)
+    private AlarmStatus alarmStatus;
+
     public static Alarm toEntity(User user, String title, String body, AlarmType alarmType, AlarmElement alarmElement) {
         return Alarm.builder()
                 .user(user)
@@ -71,7 +77,12 @@ public class Alarm extends BaseEntity {
                 .question(alarmElement.getQuestion())
                 .comment(alarmElement.getComment())
                 .follower(alarmElement.getUser())
+                .alarmStatus(ACTIVE)
                 .build();
+    }
+
+    public void changeStatus(AlarmStatus alarmStatus) {
+        this.alarmStatus = alarmStatus;
     }
 
 }

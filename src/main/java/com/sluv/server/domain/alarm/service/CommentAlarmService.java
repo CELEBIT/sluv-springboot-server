@@ -31,34 +31,34 @@ public class CommentAlarmService {
         User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
         Comment comment = commentRepository.findById(commentId).orElseThrow(CommentNotFoundException::new);
         String message = AlarmMessage.getMessageWithUserName(user.getNickname(), AlarmMessage.COMMENT_LIKE);
-        sendMessageTypeComment(comment.getUser().getId(), comment, message);
+        sendMessageTypeComment(comment.getUser().getId(), comment, message, user);
     }
 
     @Async("alarmThreadPoolExecutor")
-    public void sendAlarmAboutComment(Long userId, Long commentId) {
+    public void sendAlarmAboutComment(Long userId, Long commentId, User sender) {
         User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
         Comment comment = commentRepository.findById(commentId).orElseThrow(CommentNotFoundException::new);
         String message = AlarmMessage.getMessageWithUserName(user.getNickname(), AlarmMessage.QUESTION_COMMENT);
-        sendMessageTypeComment(comment.getQuestion().getUser().getId(), comment, message);
+        sendMessageTypeComment(comment.getQuestion().getUser().getId(), comment, message, sender);
     }
 
     @Async("alarmThreadPoolExecutor")
-    public void sendAlarmAboutSubComment(Long userId, Long commentId) {
+    public void sendAlarmAboutSubComment(Long userId, Long commentId, User sender) {
         User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
         Comment comment = commentRepository.findById(commentId).orElseThrow(CommentNotFoundException::new);
         String message = AlarmMessage.getMessageWithUserName(user.getNickname(), AlarmMessage.COMMENT_SUB);
-        sendMessageTypeComment(comment.getUser().getId(), comment, message);
+        sendMessageTypeComment(comment.getUser().getId(), comment, message, sender);
     }
 
     @Async("alarmThreadPoolExecutor")
-    public void sendAlarmAboutReportByAI(Long commentId) {
+    public void sendAlarmAboutReportByAI(Long commentId, User sender) {
         Comment comment = commentRepository.findById(commentId).orElseThrow(CommentNotFoundException::new);
         String message = AlarmMessage.COMMENT_REPORT_BY_AI.getMessage();
-        sendMessageTypeComment(comment.getUser().getId(), comment, message);
+        sendMessageTypeComment(comment.getUser().getId(), comment, message, sender);
     }
 
-    private void sendMessageTypeComment(Long receiverId, Comment comment, String message) {
-        AlarmElement alarmElement = AlarmElement.of(null, comment.getQuestion(), comment, null);
+    private void sendMessageTypeComment(Long receiverId, Comment comment, String message, User sender) {
+        AlarmElement alarmElement = AlarmElement.of(null, comment.getQuestion(), comment, sender);
         alarmService.saveAlarm(comment.getUser(), ALARM_TITLE, message, AlarmType.COMMENT, alarmElement);
         fcmNotificationService.sendFCMNotification(
                 receiverId, ALARM_TITLE, message, AlarmType.COMMENT, getIdsAboutComment(comment)

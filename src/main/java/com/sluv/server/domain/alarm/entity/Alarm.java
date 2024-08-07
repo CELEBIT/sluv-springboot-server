@@ -61,8 +61,8 @@ public class Alarm extends BaseEntity {
     private Comment comment;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "follower_id")
-    private User follower;
+    @JoinColumn(name = "sender_id")
+    private User sender;
 
     @Enumerated(EnumType.STRING)
     private AlarmStatus alarmStatus;
@@ -76,7 +76,7 @@ public class Alarm extends BaseEntity {
                 .item(alarmElement.getItem())
                 .question(alarmElement.getQuestion())
                 .comment(alarmElement.getComment())
-                .follower(alarmElement.getUser())
+                .sender(alarmElement.getUser())
                 .alarmStatus(ACTIVE)
                 .build();
     }

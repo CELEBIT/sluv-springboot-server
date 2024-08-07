@@ -31,11 +31,11 @@ public class QuestionAlarmService {
         User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
         Question question = questionRepository.findById(questionId).orElseThrow(QuestionNotFoundException::new);
         String message = AlarmMessage.getMessageWithUserName(user.getNickname(), AlarmMessage.QUESTION_LIKE);
-        sendMessageTypeQuestion(user, question, message);
+        sendMessageTypeQuestion(user, question, message, user);
     }
 
-    private void sendMessageTypeQuestion(User user, Question question, String message) {
-        AlarmElement alarmElement = AlarmElement.of(null, question, null, null);
+    private void sendMessageTypeQuestion(User user, Question question, String message, User sender) {
+        AlarmElement alarmElement = AlarmElement.of(null, question, null, sender);
         alarmService.saveAlarm(user, ALARM_TITLE, message, AlarmType.QUESTION, alarmElement);
         fcmNotificationService.sendFCMNotification(
                 question.getUser().getId(), ALARM_TITLE, message, AlarmType.QUESTION,

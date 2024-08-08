@@ -35,14 +35,14 @@ public class ItemAlarmService {
         User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
         Item item = itemRepository.findById(itemId).orElseThrow(ItemNotFoundException::new);
         String message = AlarmMessage.getMessageWithUserName(user.getNickname(), AlarmMessage.ITEM_LIKE);
-        sendMessageTypeItem(user, item, message);
+        sendMessageTypeItem(user, item, message, user);
     }
 
     @Async("alarmThreadPoolExecutor")
-    public void sendAlarmAboutItemEdit(Long itemId, Long itemEditReqId) {
+    public void sendAlarmAboutItemEdit(Long itemId, Long itemEditReqId, User sender) {
         Item item = itemRepository.findById(itemId).orElseThrow(ItemNotFoundException::new);
         String message = AlarmMessage.ITEM_EDIT.getMessage();
-        sendMessageTypeItemEdit(itemEditReqId, item, message);
+        sendMessageTypeItemEdit(itemEditReqId, item, message, sender);
     }
 
     @Async("alarmThreadPoolExecutor")
@@ -53,33 +53,33 @@ public class ItemAlarmService {
                 .toList();
 
         String message = AlarmMessage.getMessageWithUserName(user.getNickname(), AlarmMessage.USER_FOLLOW_ITEM);
-        sendMulticastMessageTypeItem(follower, item, message);
+        sendMulticastMessageTypeItem(follower, item, message, user);
     }
 
-    private void sendMessageTypeItem(User user, Item item, String message) {
-        AlarmElement alarmElement = AlarmElement.of(item, null, null, null);
+    private void sendMessageTypeItem(User user, Item item, String message, User sender) {
+        AlarmElement alarmElement = AlarmElement.of(item, null, null, sender);
         alarmService.saveAlarm(user, ALARM_TITLE, message, AlarmType.ITEM, alarmElement);
         fcmNotificationService.sendFCMNotification(
                 item.getUser().getId(), ALARM_TITLE, message, AlarmType.ITEM, getIdAboutItem(item.getId())
         );
     }
 
-    private void sendMulticastMessageTypeItem(List<User> follower, Item item, String message) {
+    private void sendMulticastMessageTypeItem(List<User> follower, Item item, String message, User sender) {
 
         List<Long> followerIds = follower
                 .stream()
                 .map(User::getId)
                 .toList();
 
-        AlarmElement alarmElement = AlarmElement.of(item, null, null, null);
+        AlarmElement alarmElement = AlarmElement.of(item, null, null, sender);
         alarmService.saveAllAlarm(follower, ALARM_TITLE, message, AlarmType.ITEM, alarmElement);
         fcmNotificationService.sendFCMNotificationMulticast(
                 followerIds, ALARM_TITLE, message, AlarmType.ITEM, getIdAboutItem(item.getId())
         );
     }
 
-    private void sendMessageTypeItemEdit(Long itemEditReqId, Item item, String message) {
-        AlarmElement alarmElement = AlarmElement.of(item, null, null, null);
+    private void sendMessageTypeItemEdit(Long itemEditReqId, Item item, String message, User sender) {
+        AlarmElement alarmElement = AlarmElement.of(item, null, null, sender);
         alarmService.saveAlarm(item.getUser(), ALARM_TITLE, message, AlarmType.EDIT, alarmElement);
         fcmNotificationService.sendFCMNotification(
                 item.getUser().getId(), ALARM_TITLE, message, AlarmType.EDIT, getIdAboutItemEdit(itemEditReqId)

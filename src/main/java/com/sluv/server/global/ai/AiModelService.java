@@ -21,7 +21,7 @@ public class AiModelService {
     private final CommentRepository commentRepository;
     private final ItemRepository itemRepository;
     private final ItemImgRepository itemImgRepository;
-    
+
     private final CommentAlarmService commentAlarmService;
 
     @Async(value = "asyncThreadPoolExecutor")
@@ -31,7 +31,7 @@ public class AiModelService {
         if (isMalicious) {
             comment.changeStatus(CommentStatus.BLOCKED);
             commentRepository.save(comment);
-            commentAlarmService.sendAlarmAboutReportByAI(comment.getId());
+            commentAlarmService.sendAlarmAboutReportByAI(comment.getId(), null);
         }
     }
 

@@ -10,4 +10,6 @@ public interface ItemRepository extends JpaRepository<Item, Long>, ItemRepositor
     Long countByUserIdAndItemStatus(Long user_id, ItemStatus itemStatus);
 
     List<Item> findAllByUserId(Long userId);
+
+    List<Item> findAllByItemStatus(ItemStatus itemStatus);
 }

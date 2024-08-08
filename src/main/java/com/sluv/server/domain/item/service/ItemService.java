@@ -1,5 +1,7 @@
 package com.sluv.server.domain.item.service;
 
+import static com.sluv.server.domain.item.enums.ItemStatus.ACTIVE;
+
 import com.sluv.server.domain.alarm.service.ItemAlarmService;
 import com.sluv.server.domain.brand.dto.BrandSearchResDto;
 import com.sluv.server.domain.brand.entity.Brand;
@@ -211,7 +213,7 @@ public class ItemService {
         Item item = itemRepository.findById(itemId)
                 .orElseThrow(ItemNotFoundException::new);
 
-        if (item.getItemStatus() != ItemStatus.ACTIVE) {
+        if (item.getItemStatus() != ACTIVE) {
             log.error("ItemId: {}'s status: {}", itemId, item.getItemStatus());
             throw new ItemNotActiveException();
         }
@@ -466,7 +468,7 @@ public class ItemService {
 
     @Transactional(readOnly = true)
     public List<ItemSimpleResDto> getHowAboutItem(User user) {
-        List<Item> items = itemRepository.findAll();
+        List<Item> items = itemRepository.findAllByItemStatus(ACTIVE);
         Collections.shuffle(items, new Random());
         return itemRepository.getItemSimpleResDto(user, items.subList(0, 4));
     }

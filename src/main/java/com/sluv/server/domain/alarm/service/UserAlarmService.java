@@ -31,11 +31,11 @@ public class UserAlarmService {
 
     }
 
-    private void sendMessageTypeUser(User user, User targetUser, String message) {
-        AlarmElement alarmElement = AlarmElement.of(null, null, null, user);
+    private void sendMessageTypeUser(User sender, User targetUser, String message) {
+        AlarmElement alarmElement = AlarmElement.of(null, null, null, sender);
         alarmService.saveAlarm(targetUser, ALARM_TITLE, message, AlarmType.QUESTION, alarmElement);
         fcmNotificationService.sendFCMNotification(
-                targetUser.getId(), ALARM_TITLE, message, AlarmType.USER, getIdAboutUser(user.getId())
+                targetUser.getId(), ALARM_TITLE, message, AlarmType.USER, getIdAboutUser(sender.getId())
         );
     }
 

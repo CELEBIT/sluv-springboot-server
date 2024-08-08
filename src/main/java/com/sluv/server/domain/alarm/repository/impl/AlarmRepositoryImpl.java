@@ -1,6 +1,7 @@
 package com.sluv.server.domain.alarm.repository.impl;
 
 import static com.sluv.server.domain.alarm.entity.QAlarm.alarm;
+import static com.sluv.server.domain.alarm.enums.AlarmStatus.DELETED;
 
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -19,13 +20,13 @@ public class AlarmRepositoryImpl implements AlarmRepositoryCustom {
     @Override
     public Page<Alarm> findAllByUserId(Long userId, Pageable pageable) {
         List<Alarm> fetch = jpaQueryFactory.selectFrom(alarm)
-                .where(alarm.user.id.eq(userId))
+                .where(alarm.user.id.eq(userId).and(alarm.alarmStatus.ne(DELETED)))
                 .orderBy(alarm.createdAt.desc())
                 .fetch();
 
         // Count Query
         JPAQuery<Alarm> countQuery = jpaQueryFactory.selectFrom(alarm)
-                .where(alarm.user.id.eq(userId))
+                .where(alarm.user.id.eq(userId).and(alarm.alarmStatus.ne(DELETED)))
                 .orderBy(alarm.createdAt.desc());
 
         return PageableExecutionUtils.getPage(fetch, pageable, () -> countQuery.stream().count());

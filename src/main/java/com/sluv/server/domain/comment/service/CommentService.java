@@ -106,7 +106,7 @@ public class CommentService {
         commentImgManager.saveCommentImg(dto, comment);
 
         aiModelService.censorComment(comment);
-        commentAlarmService.sendAlarmAboutComment(user.getId(), comment.getId());
+        commentAlarmService.sendAlarmAboutComment(user.getId(), comment.getId(), user);
 
     }
 
@@ -128,8 +128,8 @@ public class CommentService {
         commentImgManager.saveCommentImg(dto, comment);
 
         aiModelService.censorComment(comment);
-        commentAlarmService.sendAlarmAboutComment(user.getId(), comment.getId());
-        commentAlarmService.sendAlarmAboutSubComment(user.getId(), comment.getId());
+        commentAlarmService.sendAlarmAboutComment(user.getId(), comment.getId(), user);
+        commentAlarmService.sendAlarmAboutSubComment(user.getId(), comment.getId(), user);
     }
 
     /**

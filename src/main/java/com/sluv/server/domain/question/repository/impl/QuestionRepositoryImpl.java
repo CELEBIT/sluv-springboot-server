@@ -533,4 +533,16 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
         return Collections.concat(content, questionFindContent);
     }
 
+    @Override
+    public List<QuestionBuy> getEndTimeBetweenNow(int voteEndCheckPeriod) {
+        int periodToMinutes = voteEndCheckPeriod / 1000 / 60;
+        LocalDateTime now = LocalDateTime.now();
+
+        return jpaQueryFactory.selectFrom(questionBuy)
+                .where(questionBuy.questionStatus.eq(ACTIVE)
+                        .and(questionBuy.voteEndTime.between(now.minusMinutes(periodToMinutes), now))
+                )
+                .fetch();
+
+    }
 }

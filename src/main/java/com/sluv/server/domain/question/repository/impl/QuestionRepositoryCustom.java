@@ -52,4 +52,5 @@ public interface QuestionRepositoryCustom {
 
     List<Question> getSearchQuestionIds(String word);
 
+    List<QuestionBuy> getEndTimeBetweenNow(int voteEndCheckPeriod);
 }

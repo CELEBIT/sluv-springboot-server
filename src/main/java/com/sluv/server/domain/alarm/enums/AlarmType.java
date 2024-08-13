@@ -12,7 +12,9 @@ public enum AlarmType {
     NOTICE("notice"),
     COMMENT("comment"),
     REPORT("report"),
-    EDIT("edit");
+    EDIT("edit"),
+    VOTE("vote"),
+    THANKS("thanks");
 
     private final String name;
 }

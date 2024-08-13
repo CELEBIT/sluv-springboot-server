@@ -1,7 +1,9 @@
 package com.sluv.server.domain.question.scheduler;
 
+import com.sluv.server.domain.alarm.service.QuestionAlarmService;
 import com.sluv.server.domain.question.entity.DailyHotQuestion;
 import com.sluv.server.domain.question.entity.Question;
+import com.sluv.server.domain.question.entity.QuestionBuy;
 import com.sluv.server.domain.question.repository.DailyHotQuestionRepository;
 import com.sluv.server.domain.question.repository.QuestionRepository;
 import java.util.Calendar;
@@ -20,6 +22,9 @@ public class QuestionScheduler {
 
     private final DailyHotQuestionRepository dailyHotQuestionRepository;
     private final QuestionRepository questionRepository;
+    private final QuestionAlarmService questionAlarmService;
+
+    private static final int VOTE_END_CHECK_PERIOD = 60000; // 1분
 
     /**
      * 일간 HOT Question
@@ -42,4 +47,15 @@ public class QuestionScheduler {
                 )
         );
     }
+
+    /**
+     * 투표 종료 확인
+     */
+    @Scheduled(fixedRate = VOTE_END_CHECK_PERIOD) // 초 분 시 일 월 요일
+    public void checkQuestionVoteEnd() {
+        log.info("QuestionVoteEnd Check Time: {}", Calendar.getInstance().getTime());
+        List<QuestionBuy> endTimeBetweenNow = questionRepository.getEndTimeBetweenNow(VOTE_END_CHECK_PERIOD);
+        endTimeBetweenNow.forEach(questionBuy -> questionAlarmService.sendAlarmAboutQuestionVote(questionBuy.getId()));
+    }
+
 }

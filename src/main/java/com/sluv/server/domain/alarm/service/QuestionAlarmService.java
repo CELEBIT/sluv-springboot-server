@@ -31,14 +31,14 @@ public class QuestionAlarmService {
         User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
         Question question = questionRepository.findById(questionId).orElseThrow(QuestionNotFoundException::new);
         String message = AlarmMessage.getMessageWithUserName(user.getNickname(), AlarmMessage.QUESTION_LIKE);
-        sendMessageTypeQuestion(user, question, message, user);
+        sendMessageTypeQuestion(user, question, message, user, AlarmType.QUESTION);
     }
 
-    private void sendMessageTypeQuestion(User user, Question question, String message, User sender) {
+    private void sendMessageTypeQuestion(User user, Question question, String message, User sender, AlarmType type) {
         AlarmElement alarmElement = AlarmElement.of(null, question, null, sender);
         alarmService.saveAlarm(user, ALARM_TITLE, message, AlarmType.QUESTION, alarmElement);
         fcmNotificationService.sendFCMNotification(
-                question.getUser().getId(), ALARM_TITLE, message, AlarmType.QUESTION,
+                question.getUser().getId(), ALARM_TITLE, message, type,
                 getIdAboutQuestion(question.getId())
         );
     }
@@ -47,6 +47,13 @@ public class QuestionAlarmService {
         HashMap<String, Long> ids = new HashMap<>();
         ids.put("questionId", questionId);
         return ids;
+    }
+
+    @Async("alarmThreadPoolExecutor")
+    public void sendAlarmAboutQuestionVote(Long questionId) {
+        Question question = questionRepository.findById(questionId).orElseThrow(QuestionNotFoundException::new);
+        String message = AlarmMessage.QUESTION_VOTE.getMessage();
+        sendMessageTypeQuestion(question.getUser(), question, message, null, AlarmType.VOTE);
     }
 
 }

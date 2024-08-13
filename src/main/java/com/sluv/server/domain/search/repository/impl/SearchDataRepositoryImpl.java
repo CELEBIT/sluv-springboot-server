@@ -6,6 +6,7 @@ import com.querydsl.core.Tuple;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sluv.server.domain.search.entity.SearchData;
+import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -18,9 +19,11 @@ public class SearchDataRepositoryImpl implements SearchDataRepositoryCustom {
 
     @Override
     public List<Tuple> getTopData() {
+        LocalDateTime now = LocalDateTime.now();
 
         return jpaQueryFactory.select(searchData, searchData.count())
                 .from(searchData)
+                .where(searchData.createdAt.between(now.minusDays(31), now))
                 .groupBy(searchData.searchWord)
                 .orderBy(searchData.searchWord.count().desc())
                 .limit(12)

@@ -55,7 +55,9 @@ public class QuestionScheduler {
     public void checkQuestionVoteEnd() {
         log.info("QuestionVoteEnd Check Time: {}", Calendar.getInstance().getTime());
         List<QuestionBuy> endTimeBetweenNow = questionRepository.getEndTimeBetweenNow(VOTE_END_CHECK_PERIOD);
+        endTimeBetweenNow.forEach(questionBuy -> System.out.println("dd: " + questionBuy.getId()));
         endTimeBetweenNow.forEach(questionBuy -> questionAlarmService.sendAlarmAboutQuestionVote(questionBuy.getId()));
+
     }
 
 }

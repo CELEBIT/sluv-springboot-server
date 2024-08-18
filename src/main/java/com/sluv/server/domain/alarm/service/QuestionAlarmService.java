@@ -36,7 +36,7 @@ public class QuestionAlarmService {
 
     private void sendMessageTypeQuestion(User user, Question question, String message, User sender, AlarmType type) {
         AlarmElement alarmElement = AlarmElement.of(null, question, null, sender);
-        alarmService.saveAlarm(user, ALARM_TITLE, message, AlarmType.QUESTION, alarmElement);
+        alarmService.saveAlarm(user, ALARM_TITLE, message, type, alarmElement);
         fcmNotificationService.sendFCMNotification(
                 question.getUser().getId(), ALARM_TITLE, message, type,
                 getIdAboutQuestion(question.getId())

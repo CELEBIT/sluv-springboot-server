@@ -10,7 +10,9 @@ import com.sluv.server.domain.alarm.enums.AlarmType;
 import com.sluv.server.domain.alarm.exception.AlarmAccessDeniedException;
 import com.sluv.server.domain.alarm.exception.AlarmNotFoundException;
 import com.sluv.server.domain.alarm.repository.AlarmRepository;
+import com.sluv.server.domain.item.entity.ItemImg;
 import com.sluv.server.domain.item.repository.ItemImgRepository;
+import com.sluv.server.domain.question.dto.QuestionImgSimpleResDto;
 import com.sluv.server.domain.question.repository.QuestionImgRepository;
 import com.sluv.server.domain.user.entity.User;
 import com.sluv.server.global.common.response.PaginationResDto;
@@ -55,45 +57,26 @@ public class AlarmService {
     }
 
     private AlarmImages getAlarmImages(Alarm alarm) {
-        String mainImageUrl = null;
+        List<QuestionImgSimpleResDto> images = new ArrayList<>();
         String useImageUrl = null;
-        if (alarm.getAlarmType().equals(AlarmType.ITEM)) {
-            mainImageUrl = itemImgRepository.findMainImg(alarm.getItem().getId()).getItemImgUrl();
+
+        if (alarm.getSender() != null) {
             useImageUrl = alarm.getSender().getProfileImgUrl();
         }
 
-        if (alarm.getAlarmType().equals(AlarmType.QUESTION)) {
-            mainImageUrl = questionImgRepository.findByQuestionIdAndRepresentFlag(alarm.getQuestion().getId(), true)
-                    .getImgUrl();
-            useImageUrl = alarm.getSender().getProfileImgUrl();
+        if (alarm.getItem() != null) {
+            ItemImg mainImg = itemImgRepository.findMainImg(alarm.getItem().getId());
+            images.add(QuestionImgSimpleResDto.of(mainImg));
         }
 
-        if (alarm.getAlarmType().equals(AlarmType.COMMENT)) {
-            mainImageUrl = questionImgRepository.findByQuestionIdAndRepresentFlag(alarm.getQuestion().getId(), true)
-                    .getImgUrl();
-            useImageUrl = alarm.getSender().getProfileImgUrl();
+        if (alarm.getQuestion() != null) {
+            images = questionImgRepository.findAllByQuestionId(alarm.getQuestion().getId())
+                    .stream()
+                    .map(QuestionImgSimpleResDto::of)
+                    .toList();
         }
 
-        if (alarm.getAlarmType().equals(AlarmType.USER)) {
-            useImageUrl = alarm.getSender().getProfileImgUrl();
-        }
-
-        if (alarm.getAlarmType().equals(AlarmType.REPORT)) {
-            if (alarm.getItem() != null) {
-                mainImageUrl = itemImgRepository.findMainImg(alarm.getItem().getId()).getItemImgUrl();
-            }
-
-            if (alarm.getQuestion() != null) {
-                mainImageUrl = questionImgRepository.findByQuestionIdAndRepresentFlag(alarm.getQuestion().getId(), true)
-                        .getImgUrl();
-            }
-        }
-
-        if (alarm.getAlarmType().equals(AlarmType.EDIT)) {
-            mainImageUrl = itemImgRepository.findMainImg(alarm.getItem().getId()).getItemImgUrl();
-        }
-
-        return AlarmImages.of(mainImageUrl, useImageUrl);
+        return AlarmImages.of(images, useImageUrl);
     }
 
     public void deleteAlarm(User user, Long alarmId) {

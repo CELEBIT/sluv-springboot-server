@@ -2,7 +2,9 @@ package com.sluv.server.domain.alarm.dto;
 
 import com.sluv.server.domain.alarm.entity.Alarm;
 import com.sluv.server.domain.alarm.enums.AlarmStatus;
+import com.sluv.server.domain.question.dto.QuestionImgSimpleResDto;
 import java.time.LocalDateTime;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -23,7 +25,7 @@ public class AlarmResponse {
     private Long commentId;
     private Long followerId;
 
-    private String mainImageUrl;
+    private List<QuestionImgSimpleResDto> images;
     private String userImageUrl;
 
 
@@ -46,7 +48,7 @@ public class AlarmResponse {
                 .questionId(questionId)
                 .commentId(commentId)
                 .followerId(followerId)
-                .mainImageUrl(alarmImages.getMainImageUrl())
+                .images(alarmImages.getImages())
                 .userImageUrl(alarmImages.getUserImageUrl())
                 .cratedAt(alarm.getCreatedAt())
                 .alarmStatus(alarm.getAlarmStatus())

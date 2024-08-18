@@ -1,5 +1,7 @@
 package com.sluv.server.domain.alarm.dto;
 
+import com.sluv.server.domain.question.dto.QuestionImgSimpleResDto;
+import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -7,13 +9,13 @@ import lombok.Getter;
 @Builder
 public class AlarmImages {
 
-    private String mainImageUrl;
+    private List<QuestionImgSimpleResDto> images;
 
     private String userImageUrl;
 
-    public static AlarmImages of(String mainImageUrl, String userImageUrl) {
+    public static AlarmImages of(List<QuestionImgSimpleResDto> images, String userImageUrl) {
         return AlarmImages.builder()
-                .mainImageUrl(mainImageUrl)
+                .images(images)
                 .userImageUrl(userImageUrl)
                 .build();
     }

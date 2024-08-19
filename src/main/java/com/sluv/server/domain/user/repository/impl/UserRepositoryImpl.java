@@ -2,6 +2,7 @@ package com.sluv.server.domain.user.repository.impl;
 
 import static com.sluv.server.domain.celeb.entity.QInterestedCeleb.interestedCeleb;
 import static com.sluv.server.domain.item.entity.QItem.item;
+import static com.sluv.server.domain.item.entity.QItemLike.itemLike;
 import static com.sluv.server.domain.user.entity.QFollow.follow;
 import static com.sluv.server.domain.user.entity.QUser.user;
 import static com.sluv.server.domain.user.enums.UserStatus.ACTIVE;
@@ -9,6 +10,7 @@ import static com.sluv.server.domain.user.enums.UserStatus.DELETED;
 
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.sluv.server.domain.item.enums.ItemStatus;
 import com.sluv.server.domain.user.entity.Follow;
 import com.sluv.server.domain.user.entity.User;
 import java.time.LocalDateTime;
@@ -92,14 +94,29 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
      */
     @Override
     public List<User> getHotSluver(Long celebId) {
+        LocalDateTime now = LocalDateTime.now();
 
         JPAQuery<User> query = jpaQueryFactory.selectFrom(user)
-                .leftJoin(follow).on(follow.followee.eq(user)).fetchJoin()
-                .leftJoin(item).on(item.user.eq(user)).fetchJoin()
-//                .leftJoin(itemLike).on(itemLike.item.user.eq(user)).fetchJoin()
-//                .leftJoin(questionLike).on(questionLike.question.user.eq(user)).fetchJoin()
-//                .leftJoin(commentLike).on(commentLike.comment.user.eq(user)).fetchJoin()
-                .where(user.userStatus.eq(ACTIVE))
+                .leftJoin(follow).on(follow.followee.eq(user))
+                .leftJoin(item).on(item.user.eq(user))
+                .leftJoin(itemLike).on(itemLike.item.eq(item))
+//                .leftJoin(question).on(question.user.eq(user))
+//                .leftJoin(questionLike).on(questionLike.question.eq(question))
+//                .leftJoin(comment).on(comment.user.eq(user))
+//                .leftJoin(commentLike).on(commentLike.comment.eq(comment))
+                .where(user.userStatus.eq(ACTIVE)
+                                .or(follow.createdAt.goe(now.minusDays(31)))
+                                .or(item.itemStatus.eq(ItemStatus.ACTIVE)
+                                        .and(item.createdAt.goe(now.minusDays(31)))
+                                )
+//                        .or(question.questionStatus.eq(QuestionStatus.ACTIVE)
+//                                .and(question.createdAt.goe(now.minusDays(31)))
+//                        )
+//                        .or(comment.commentStatus.eq(CommentStatus.ACTIVE)
+//                                .and(comment.createdAt.goe(now.minusDays(31)))
+//                        )
+
+                )
                 .groupBy(user);
 
         if (celebId != null) {
@@ -116,7 +133,7 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
                 .orderBy(
                         follow.count()
                                 .add(item.count())
-//                                .add(itemLike.count())
+                                .add(itemLike.count())
 //                                .add(questionLike.count())
 //                                .add(commentLike.count())
                                 .desc()

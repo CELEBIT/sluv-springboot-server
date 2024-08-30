@@ -2,6 +2,7 @@ package com.sluv.server.domain.alarm.service;
 
 import static com.sluv.server.domain.alarm.enums.AlarmStatus.READ;
 
+import com.sluv.server.domain.alarm.dto.AlarmCheckResponse;
 import com.sluv.server.domain.alarm.dto.AlarmElement;
 import com.sluv.server.domain.alarm.dto.AlarmImages;
 import com.sluv.server.domain.alarm.dto.AlarmResponse;
@@ -96,6 +97,11 @@ public class AlarmService {
         if (Objects.equals(alarm.getUser().getId(), user.getId())) {
             alarm.changeStatus(READ);
         }
+    }
+
+    public AlarmCheckResponse checkAlarmAllRead(Long userId) {
+        Boolean isAllRead = alarmRepository.checkAllRead(userId);
+        return AlarmCheckResponse.of(isAllRead);
     }
 
 }

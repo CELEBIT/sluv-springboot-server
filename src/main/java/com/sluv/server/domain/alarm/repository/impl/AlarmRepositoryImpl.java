@@ -1,6 +1,7 @@
 package com.sluv.server.domain.alarm.repository.impl;
 
 import static com.sluv.server.domain.alarm.entity.QAlarm.alarm;
+import static com.sluv.server.domain.alarm.enums.AlarmStatus.ACTIVE;
 import static com.sluv.server.domain.alarm.enums.AlarmStatus.DELETED;
 
 import com.querydsl.jpa.impl.JPAQuery;
@@ -31,4 +32,14 @@ public class AlarmRepositoryImpl implements AlarmRepositoryCustom {
 
         return PageableExecutionUtils.getPage(fetch, pageable, () -> countQuery.stream().count());
     }
+
+    @Override
+    public Boolean checkAllRead(Long userId) {
+        List<Alarm> fetch = jpaQueryFactory.selectFrom(alarm)
+                .where(alarm.user.id.eq(userId)
+                        .and(alarm.alarmStatus.eq(ACTIVE))
+                ).fetch();
+        return fetch.isEmpty();
+    }
+
 }

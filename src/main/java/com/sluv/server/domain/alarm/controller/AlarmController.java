@@ -1,5 +1,6 @@
 package com.sluv.server.domain.alarm.controller;
 
+import com.sluv.server.domain.alarm.dto.AlarmCheckResponse;
 import com.sluv.server.domain.alarm.dto.AlarmResponse;
 import com.sluv.server.domain.alarm.service.AlarmService;
 import com.sluv.server.domain.user.entity.User;
@@ -53,6 +54,16 @@ public class AlarmController {
     public ResponseEntity<SuccessResponse> deleteAllAlarm(@AuthenticationPrincipal User user) {
         alarmService.deleteAllAlarm(user);
         return ResponseEntity.ok().body(new SuccessResponse());
+    }
+
+    @GetMapping("/check")
+    public ResponseEntity<SuccessDataResponse<AlarmCheckResponse>> checkAlarmAllRead(@AuthenticationPrincipal User user) {
+        AlarmCheckResponse response = alarmService.checkAlarmAllRead(user.getId());
+        return ResponseEntity.ok().body(
+                SuccessDataResponse.<AlarmCheckResponse>builder()
+                        .result(response)
+                        .build()
+        );
     }
 
 }

@@ -894,4 +894,25 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
                 .fetch();
     }
 
+    @Override
+    public Page<Item> getTrendItems(Pageable pageable) {
+        List<Long> trendCelebIds = List.of(133L, 865L);
+        List<Item> content = jpaQueryFactory.selectFrom(item)
+                .where(item.itemStatus.eq(ACTIVE)
+                        .and(item.celeb.id.in(trendCelebIds).or(item.celeb.parent.id.in(trendCelebIds)))
+                )
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .orderBy(item.whenDiscovery.desc())
+                .fetch();
+
+        // Count Query
+        JPAQuery<Item> countQuery = jpaQueryFactory.selectFrom(item)
+                .where(item.itemStatus.eq(ACTIVE)
+                        .and(item.celeb.id.in(trendCelebIds).or(item.celeb.parent.id.in(trendCelebIds)))
+                );
+
+        return PageableExecutionUtils.getPage(content, pageable, () -> countQuery.fetch().size());
+    }
+
 }

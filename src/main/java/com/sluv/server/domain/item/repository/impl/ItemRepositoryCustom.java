@@ -75,4 +75,5 @@ public interface ItemRepositoryCustom {
 
     List<Item> getItemContainKeyword(String keyword);
 
+    Page<Item> getTrendItems(Pageable pageable);
 }

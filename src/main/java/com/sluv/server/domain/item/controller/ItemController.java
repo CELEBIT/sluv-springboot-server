@@ -307,4 +307,16 @@ public class ItemController {
                         .build()
         );
     }
+
+    @Operation(summary = "*트랜드 셀럽의 아이템", description = "홈 화면 직접 선정한 셀럽의 아이템 조회")
+    @GetMapping("/trend")
+    public ResponseEntity<SuccessDataResponse<List<ItemSimpleResDto>>> getTrendItems(
+            @AuthenticationPrincipal User user, Pageable pageable) {
+        return ResponseEntity.ok().body(
+                SuccessDataResponse.<List<ItemSimpleResDto>>builder()
+                        .result(itemService.getTrendItems(user, pageable))
+                        .build()
+        );
+    }
+
 }

@@ -506,4 +506,10 @@ public class ItemService {
         List<Item> sameClosetItems = itemRepository.getSameClosetItems(itemId, recentAddClosetList);
         return itemRepository.getItemSimpleResDto(user, sameClosetItems);
     }
+
+    @Transactional(readOnly = true)
+    public List<ItemSimpleResDto> getTrendItems(User user, Pageable pageable) {
+        Page<Item> itemPage = itemRepository.getTrendItems(pageable);
+        return itemRepository.getItemSimpleResDto(user, itemPage.getContent());
+    }
 }

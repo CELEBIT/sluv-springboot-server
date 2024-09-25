@@ -1,0 +1,21 @@
+plugins {
+    id 'java'
+}
+
+group 'com.sluv'
+version 'unspecified'
+
+bootJar.enabled = true
+
+jar.enabled = false
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    
+    implementation project(":sluv-domain")
+    implementation project(":sluv-common")
+}
+
+tasks.named('test') {
+    dependsOn ':sluv-domain:test', ':sluv-common:test'
+}

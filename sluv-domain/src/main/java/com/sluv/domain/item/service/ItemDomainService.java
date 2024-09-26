@@ -197,4 +197,10 @@ public class ItemDomainService {
     public List<Item> getYesterdayHotItem() {
         return itemRepository.getYesterdayHotItem();
     }
+
+    @Transactional(readOnly = true)
+    public Page<Item> getTrendItems(Pageable pageable) {
+        return itemRepository.getTrendItems(pageable);
+    }
+
 }

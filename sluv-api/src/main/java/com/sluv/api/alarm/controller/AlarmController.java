@@ -1,5 +1,6 @@
 package com.sluv.api.alarm.controller;
 
+import com.sluv.api.alarm.dto.AlarmCheckResponse;
 import com.sluv.api.alarm.dto.AlarmResponse;
 import com.sluv.api.alarm.service.AlarmService;
 import com.sluv.api.common.response.PaginationResponse;
@@ -44,6 +45,12 @@ public class AlarmController {
     public ResponseEntity<SuccessResponse> deleteAllAlarm(@CurrentUserId Long userId) {
         alarmService.deleteAllAlarm(userId);
         return ResponseEntity.ok().body(SuccessResponse.create());
+    }
+
+    @GetMapping("/check")
+    public ResponseEntity<SuccessDataResponse<AlarmCheckResponse>> checkAlarmAllRead(@CurrentUserId Long userId) {
+        AlarmCheckResponse response = alarmService.checkAlarmAllRead(userId);
+        return ResponseEntity.ok().body(SuccessDataResponse.create(response));
     }
 
 }

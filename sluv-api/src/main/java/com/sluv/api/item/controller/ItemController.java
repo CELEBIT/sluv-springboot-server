@@ -236,4 +236,13 @@ public class ItemController {
         List<ItemSimpleDto> response = itemService.getHowAboutItem(userId);
         return ResponseEntity.ok().body(SuccessDataResponse.create(response));
     }
+
+    @Operation(summary = "*트랜드 셀럽의 아이템", description = "홈 화면 직접 선정한 셀럽의 아이템 조회")
+    @GetMapping("/trend")
+    public ResponseEntity<SuccessDataResponse<List<ItemSimpleDto>>> getTrendItems(
+            @CurrentUserId Long userId, Pageable pageable) {
+        List<ItemSimpleDto> response = itemService.getTrendItems(userId, pageable);
+        return ResponseEntity.ok().body(SuccessDataResponse.create(response));
+    }
+
 }

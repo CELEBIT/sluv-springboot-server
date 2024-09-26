@@ -1,5 +1,6 @@
 package com.sluv.api.alarm.service;
 
+import com.sluv.api.alarm.dto.AlarmCheckResponse;
 import com.sluv.api.alarm.dto.AlarmResponse;
 import com.sluv.api.common.response.PaginationResponse;
 import com.sluv.domain.alarm.dto.AlarmImages;
@@ -68,6 +69,11 @@ public class AlarmService {
 
     public void deleteAllAlarm(Long useId) {
         alarmDomainService.deleteAllAlarm(useId);
+    }
+
+    public AlarmCheckResponse checkAlarmAllRead(Long userId) {
+        Boolean isAllRead = alarmDomainService.checkAllRead(userId);
+        return AlarmCheckResponse.of(isAllRead);
     }
 
 }

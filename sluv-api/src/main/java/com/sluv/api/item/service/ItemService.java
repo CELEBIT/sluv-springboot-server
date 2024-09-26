@@ -488,4 +488,12 @@ public class ItemService {
         List<Item> sameClosetItems = itemDomainService.getSameClosetItems(itemId, recentAddClosets);
         return itemDomainService.getItemSimpleDto(user, sameClosetItems);
     }
+
+    @Transactional(readOnly = true)
+    public List<ItemSimpleDto> getTrendItems(Long userId, Pageable pageable) {
+        User user = userDomainService.findById(userId);
+        Page<Item> itemPage = itemDomainService.getTrendItems(pageable);
+        return itemDomainService.getItemSimpleDto(user, itemPage.getContent());
+    }
+
 }

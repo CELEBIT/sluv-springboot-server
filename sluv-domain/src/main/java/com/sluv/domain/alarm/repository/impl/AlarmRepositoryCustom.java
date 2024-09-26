@@ -6,4 +6,6 @@ import org.springframework.data.domain.Pageable;
 
 public interface AlarmRepositoryCustom {
     Page<Alarm> findAllByUserId(Long userId, Pageable pageable);
+
+    Boolean checkAllRead(Long userId);
 }

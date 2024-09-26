@@ -8,14 +8,15 @@ import com.sluv.domain.alarm.exception.AlarmAccessDeniedException;
 import com.sluv.domain.alarm.exception.AlarmNotFoundException;
 import com.sluv.domain.alarm.repository.AlarmRepository;
 import com.sluv.domain.user.entity.User;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -64,6 +65,11 @@ public class AlarmDomainService {
     @Transactional(readOnly = true)
     public Page<Alarm> findAllByUserId(Long userId, Pageable pageable) {
         return alarmRepository.findAllByUserId(userId, pageable);
+    }
+
+    @Transactional(readOnly = true)
+    public Boolean checkAllRead(Long userId) {
+        return alarmRepository.checkAllRead(userId);
     }
 
 }

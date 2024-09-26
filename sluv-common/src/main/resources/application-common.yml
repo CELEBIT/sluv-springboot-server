@@ -1,0 +1,36 @@
+spring:
+  application:
+    name: common
+  config:
+    import: optional:classpath:env/.env[.properties]
+
+jasypt:
+  encryptor:
+    bean: ${JASYPT_ENCRYPTOR_BEAN}
+    password: ${JASYPT_ENCRYPTOR_PASSWORD}
+
+jwt:
+  secret: ${JWT_SECRET}
+  expiration-seconds: ${JWT_EXPIRATION_SECONDS}
+  type: ${JWT_TYPE}
+  header: ${JWT_HEADER}
+
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
+
+logging:
+  level:
+    org.hibernate.SQL: info
+
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+
+logging:
+  level:
+    org.hibernate.SQL: debug

@@ -1,0 +1,49 @@
+spring:
+  application:
+    name: infra
+  config:
+    import: optional:classpath:env/.env[.properties]
+  data:
+    redis:
+      port: ${REDIS_PORT}
+      host: ${REDIS_HOST}
+      password: ${REDIS_PASSWORD}
+      repositories:
+        enabled: false
+
+  security:
+    oauth2:
+      client:
+        android: ${OAUTH_ANDROID}
+        apple: ${OAUTH_APPLE}
+
+elasticsearch:
+  uri: ${ELASTICSEARCH_HOST}
+
+ai-model:
+  uri: ${AI_HOST}:${AI_PORT}
+
+apple:
+  #  nonce: 1
+  clientId: ${APPLE_CLIENT_ID}
+  openKey: ${APPLE_OPEN_KEY}
+  iss: ${APPLE_ISS}
+
+aws:
+  s3:
+    accessKey: ${AWS_S3_ACCESS_KEY}
+    secretKey: ${AWS_S3_SECRET_KEY}
+    region: ${AWS_S3_REGION}
+    bucketName: ${AWS_S3_BUCKET_NAME}
+    baseUrl: ${AWS_S3_BASE_URL}
+
+discord:
+  webhook:
+    signup: ${DISCORD_WEBHOOK_SIGNUP}
+    withdraw: ${DISCORD_WEBHOOK_WITHDRAW}
+    new-brand: ${DISCORD_WEBHOOK_NEW_BRAND}
+    new-celeb: ${DISCORD_WEBHOOK_NEW_CELEB}
+
+fcm:
+  key:
+    path: ${FCM_KEY_PATH}

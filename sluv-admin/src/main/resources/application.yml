@@ -1,0 +1,38 @@
+spring:
+  application:
+    name: admin
+  profiles:
+    include:
+      - domain
+      - common
+      - infra
+    active: dev
+
+#  security:
+#    user:
+#      name: user
+#      password: 1234
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
+
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+
+---
+spring:
+  config:
+    activate:
+      on-profile: local
+
+---
+spring:
+  config:
+    activate:
+      on-profile: test
+

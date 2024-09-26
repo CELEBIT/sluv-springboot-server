@@ -1,13 +1,16 @@
-name: dev CI/CD
+name: Admin-Module CI/CD
 
 on:
   push:
-    branches: [ to_multi-module ]
+    branches: [ main, develop ]
     paths:
-      - 'api-module/**'
+      - 'sluv-admin/**'
+      - 'sluv-domain/**'
+      - 'sluv-common/**'
+      - 'sluv-infra/**'
 
 jobs:
-  dev-ci-cd:
+  admin-ci-cd:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Latest Repo
@@ -26,14 +29,14 @@ jobs:
         run: chmod +x gradlew
 
       - name: Build with Gradle
-        run: ./gradlew :sluv-api:clean :sluv-api:build
+        run: ./gradlew :sluv-admin:clean :sluv-admin:build
 
       - name: Docker build
         run: |
           docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_TOKEN }}
-          docker build -t sluv-api-module ./sluv-api 
-          docker tag sluv-api-module sluv2323/sluv-api-module:latest
-          docker push sluv2323/sluv-api-module:latest
+          docker build -t sluv-springboot-${{ github.ref_name }}-admin-module sluv-admin/.
+          docker tag sluv-springboot-${{ github.ref_name }}-admin-module sluv2323/sluv-springboot-${{ github.ref_name }}-admin-module:latest
+          docker push sluv2323/sluv-springboot-${{ github.ref_name }}-admin-module:latest
 
       - name: Get timestamp
         uses: gerred/actions/current-time@master
@@ -56,11 +59,11 @@ jobs:
           username: ${{ secrets.LOCAL_SERVER_USER }}
           password: ${{ secrets.LOCAL_SERVER_SSH_PASSWORD }}
           script: |
-            chmod +x /home/sluv/api_module_deploy_script.sh
-            echo ${{ secrets.LOCAL_SERVER_SUDO_PASSWORD }} | sudo -S /home/sluv/api_module_deploy_script.sh
+            echo ${{ secrets.LOCAL_SERVER_SUDO_PASSWORD }} | sudo -S chmod +x /home/sluv/dev-server/dev-deploy-script.sh
+            echo ${{ secrets.LOCAL_SERVER_SUDO_PASSWORD }} | sudo -S /home/sluv/dev-server/dev-deploy-script.sh
 
   current-time:
-    needs: dev-ci-cd
+    needs: admin-ci-cd
     runs-on: ubuntu-latest
     steps:
       - name: Get Current Time
@@ -76,7 +79,7 @@ jobs:
 
   ## discord
   action-discord:
-    needs: dev-ci-cd
+    needs: admin-ci-cd
     runs-on: ubuntu-latest
     steps:
       - name: Discord Alarm

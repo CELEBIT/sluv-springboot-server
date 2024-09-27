@@ -87,4 +87,4 @@ jobs:
         uses: tsickert/discord-webhook@v5.3.0
         with:
           webhook-url: ${{ secrets.DISCORD_WEBHOOK_URL }}
-          content: "Dev ${{ github.ref_name }} Module Deploy ${{ job.status }}"
+          content: "Dev ${{ github.ref_name }} Batch-Module Deploy ${{ job.status }}"

@@ -1,0 +1,90 @@
+name: Batch-Module CI/CD
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'sluv-batch/**'
+      - 'sluv-domain/**'
+      - 'sluv-common/**'
+      - 'sluv-infra/**'
+
+jobs:
+  batch-ci-cd:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Latest Repo
+        uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.TOKEN_OF_GITHUB }}
+          submodules: true
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Build with Gradle
+        run: ./gradlew :sluv-batch:clean :sluv-batch:build
+
+      - name: Docker build
+        run: |
+          docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_TOKEN }}
+          docker build -t sluv-springboot-${{ github.ref_name }}-batch-module sluv-batch/.
+          docker tag sluv-springboot-${{ github.ref_name }}-batch-module sluv2323/sluv-springboot-${{ github.ref_name }}-batch-module:latest
+          docker push sluv2323/sluv-springboot-${{ github.ref_name }}-batch-module:latest
+
+      - name: Get timestamp
+        uses: gerred/actions/current-time@master
+        id: current-time
+
+      - name: Run string replace
+        uses: frabert/replace-string-action@master
+        id: format-time
+        with:
+          pattern: '[:\.]+'
+          string: "${{ steps.current-time.outputs.time }}"
+          replace-with: '-'
+          flags: 'g'
+
+
+      - name: Deploy to Local Server
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.LOCAL_SERVER_HOST }}
+          username: ${{ secrets.LOCAL_SERVER_USER }}
+          password: ${{ secrets.LOCAL_SERVER_SSH_PASSWORD }}
+          script: |
+            branchName=${{ github.ref_name }}
+            echo ${{ secrets.LOCAL_SERVER_SUDO_PASSWORD }} | sudo -S chmod +x /home/sluv/${branchName}-server/${branchName}-deploy-script.sh
+            echo ${{ secrets.LOCAL_SERVER_SUDO_PASSWORD }} | sudo -S /home/sluv/${branchName}-server/${branchName}-deploy-script.sh
+
+  current-time:
+    needs: batch-ci-cd
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get Current Time
+        uses: 1466587594/get-current-time@v2
+        id: current-time
+        with:
+          format: YYYY-MM-DDTHH:mm:ss
+          utcOffset: "+09:00" # 기준이 UTC이기 때문에 한국시간인 KST를 맞추기 위해 +9시간 추가
+
+      - name: Print Current Time
+        run: echo "Current Time=${{steps.current-time.outputs.formattedTime}}" # current-time 에서 지정한 포맷대로 현재 시간 출력
+        shell: bash
+
+  ## discord
+  action-discord:
+    needs: batch-ci-cd
+    runs-on: ubuntu-latest
+    steps:
+      - name: Discord Alarm
+        uses: tsickert/discord-webhook@v5.3.0
+        with:
+          webhook-url: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          content: "Dev ${{ github.ref_name }} Batch-Module Deploy ${{ job.status }}"

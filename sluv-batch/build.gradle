@@ -1,0 +1,24 @@
+plugins {
+    id 'java'
+}
+
+group 'com.sluv'
+version 'unspecified'
+
+repositories {
+    mavenCentral()
+}
+
+bootJar.enabled = true
+
+jar.enabled = false
+
+dependencies {
+    implementation project(':sluv-domain')
+    implementation project(':sluv-common')
+    implementation project(':sluv-infra')
+}
+
+tasks.named('test') {
+    dependsOn ':sluv-domain:test', ':sluv-common:test', ':sluv-infra:test'
+}

@@ -1,0 +1,30 @@
+plugins {
+    id 'java'
+}
+
+group 'com.sluv'
+version 'unspecified'
+
+bootJar.enabled = true
+
+jar.enabled = false
+
+dependencies {
+
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+
+    //swagger
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.3'
+
+    testImplementation 'org.springframework.security:spring-security-test'
+
+    implementation project(':sluv-domain')
+    implementation project(':sluv-common')
+    implementation project(':sluv-infra')
+
+}
+
+//tasks.named('test') {
+//    dependsOn ':sluv-domain:test', ':sluv-common:test', ':sluv-infra:test'
+//}

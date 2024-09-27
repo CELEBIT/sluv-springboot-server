@@ -251,6 +251,7 @@ public class ItemService {
     }
 
     //    @Cacheable(cacheNames = "item", key = "#itemId")
+    @Transactional
     public ItemDetailFixData getItemDetailFixData(Item item) {
         Long itemId = item.getId();
 

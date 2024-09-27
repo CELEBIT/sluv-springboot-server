@@ -12,7 +12,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,12 +23,10 @@ public class AlarmDomainService {
 
     private final AlarmRepository alarmRepository;
 
-    @Transactional
     public void saveAlarm(User user, String title, String body, AlarmType alarmType, AlarmElement alarmElement) {
         alarmRepository.save(Alarm.toEntity(user, title, body, alarmType, alarmElement));
     }
 
-    @Transactional
     public void saveAllAlarm(List<User> users, String title, String body, AlarmType alarmType,
                              AlarmElement alarmElement) {
 
@@ -40,7 +37,6 @@ public class AlarmDomainService {
         alarmRepository.saveAll(alarms);
     }
 
-    @Transactional
     public void deleteAlarm(Long userId, Long alarmId) {
         Alarm alarm = alarmRepository.findById(alarmId).orElseThrow(AlarmNotFoundException::new);
         if (!alarm.getUser().getId().equals(userId)) {
@@ -49,12 +45,10 @@ public class AlarmDomainService {
         alarmRepository.deleteById(alarmId);
     }
 
-    @Transactional
     public void deleteAllAlarm(Long userId) {
         alarmRepository.deleteAllByUserId(userId);
     }
 
-    @Transactional
     public void patchAlarmStatusToRead(Long userId, Long alarmId) {
         Alarm alarm = alarmRepository.findById(alarmId).orElseThrow(AlarmNotFoundException::new);
         if (Objects.equals(alarm.getUser().getId(), userId)) {
@@ -62,12 +56,10 @@ public class AlarmDomainService {
         }
     }
 
-    @Transactional(readOnly = true)
     public Page<Alarm> findAllByUserId(Long userId, Pageable pageable) {
         return alarmRepository.findAllByUserId(userId, pageable);
     }
 
-    @Transactional(readOnly = true)
     public Boolean checkAllRead(Long userId) {
         return alarmRepository.checkAllRead(userId);
     }

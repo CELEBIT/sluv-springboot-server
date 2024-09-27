@@ -11,7 +11,6 @@ import com.sluv.domain.user.exception.UserNotFoundException;
 import com.sluv.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -22,13 +21,11 @@ public class AdminDomainService {
 
 //    private final JwtProvider jwtProvider;
 
-    @Transactional(readOnly = true)
     public String getAdminPasswordByEmail(String email) {
         Admin admin = adminRepository.findByEmail(email).orElseThrow(AdminNotFoundException::new);
         return admin.getPwd();
     }
 
-    @Transactional(readOnly = true)
     public String getUserTokenByAdmin(boolean isMatched, Long userId) {
         if (!isMatched) {
             throw new AdminPasswordNotMatchException();

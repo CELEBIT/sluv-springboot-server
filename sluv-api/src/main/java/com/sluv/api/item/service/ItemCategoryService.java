@@ -4,14 +4,14 @@ import com.sluv.api.item.dto.ItemCategoryChildResponseDto;
 import com.sluv.api.item.dto.ItemCategoryParentResponseDto;
 import com.sluv.domain.item.entity.ItemCategory;
 import com.sluv.domain.item.service.ItemCategoryDomainService;
-import java.util.List;
-import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.Objects;
+
 @Service
-@Transactional
 @RequiredArgsConstructor
 public class ItemCategoryService {
 

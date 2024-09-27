@@ -5,15 +5,15 @@ import com.sluv.api.notice.dto.NoticeDetailResponse;
 import com.sluv.api.notice.dto.NoticeSimpleResponse;
 import com.sluv.domain.notice.entity.Notice;
 import com.sluv.domain.notice.service.NoticeDomainService;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
-@Transactional
 @RequiredArgsConstructor
 public class NoticeService {
 

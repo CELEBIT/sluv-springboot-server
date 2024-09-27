@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@Transactional
 @RequiredArgsConstructor
 public class ItemEditReqService {
     private final ItemEditReqDomainService itemEditReqDomainService;
@@ -21,6 +20,7 @@ public class ItemEditReqService {
     private final ItemAlarmService itemAlarmService;
     private final UserDomainService userDomainService;
 
+    @Transactional
     public void postItemEdit(Long userId, Long itemId, ItemEditReqDto dto) {
         Item item = itemDomainService.findById(itemId);
         User user = userDomainService.findById(userId);

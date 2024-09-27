@@ -31,17 +31,17 @@ import com.sluv.domain.item.service.hashtag.HashtagDomainService;
 import com.sluv.domain.item.service.hashtag.TempItemHashtagDomainService;
 import com.sluv.domain.user.entity.User;
 import com.sluv.domain.user.service.UserDomainService;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 @Service
-@Transactional
 @RequiredArgsConstructor
 public class TempItemService {
 
@@ -60,7 +60,7 @@ public class TempItemService {
 
     private final ItemHelper itemHelper;
 
-
+    @Transactional
     public Long postTempItem(Long userId, TempItemPostReqDto reqDto) {
         User user = userDomainService.findById(userId);
         Celeb celeb = reqDto.getCelebId() != null ? celebDomainService.findById(reqDto.getCelebId())
@@ -160,6 +160,7 @@ public class TempItemService {
 
     }
 
+    @Transactional
     public void deleteTempItem(Long tempItemId) {
         // 관련된 삭제
         // 1. tempItemImg 삭제
@@ -173,6 +174,7 @@ public class TempItemService {
         tempItemDomainService.deleteById(tempItemId);
     }
 
+    @Transactional
     public void deleteAllTempItem(Long userId) {
         // 1. 해당 유저의 모든 TempItem 조회
         List<TempItem> tempItemList = tempItemDomainService.findAllExceptLast(userId);
@@ -191,6 +193,7 @@ public class TempItemService {
 
     }
 
+    @Transactional(readOnly = true)
     public TempItemCountResDto countTempItemCount(Long userId) {
         return TempItemCountResDto.of(tempItemDomainService.countByUserId(userId));
     }

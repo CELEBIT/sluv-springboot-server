@@ -1,7 +1,5 @@
 package com.sluv.api.auth.service;
 
-import static com.sluv.domain.auth.enums.SnsType.APPLE;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -12,9 +10,13 @@ import com.sluv.domain.user.entity.User;
 import com.sluv.domain.user.enums.UserAge;
 import com.sluv.domain.user.enums.UserGender;
 import com.sluv.infra.oauth.apple.ApplePlatformClient;
-import java.util.Base64;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Base64;
+
+import static com.sluv.domain.auth.enums.SnsType.APPLE;
 
 
 @Service
@@ -26,6 +28,7 @@ public class AppleUserService {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
+    @Transactional
     public User appleLogin(AuthRequest request) throws Exception {
         String identityToken = request.getAccessToken();
 

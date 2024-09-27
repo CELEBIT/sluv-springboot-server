@@ -8,16 +8,16 @@ import com.sluv.api.item.helper.HashtagHelper;
 import com.sluv.domain.item.dto.hashtag.HashtagCountDto;
 import com.sluv.domain.item.entity.hashtag.Hashtag;
 import com.sluv.domain.item.service.hashtag.HashtagDomainService;
-import java.util.List;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.Optional;
+
 @Service
-@Transactional
 @RequiredArgsConstructor
 public class HashtagService {
 
@@ -32,6 +32,7 @@ public class HashtagService {
         return PaginationResponse.create(hashtagPage, dtoList);
     }
 
+    @Transactional
     public HashtagPostResponseDto postHashtag(HashtagRequestDto requestDto) {
 
         // 해당 Hashtag가 있는지 검색

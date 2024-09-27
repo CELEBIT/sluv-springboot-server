@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,6 +28,7 @@ public class AlarmService {
     private final QuestionImgDomainService questionImgDomainService;
 
 
+    @Transactional(readOnly = true)
     public PaginationResponse<AlarmResponse> getAlarmsByUserId(Long userId, Pageable pageable) {
         Page<Alarm> alarmPage = alarmDomainService.findAllByUserId(userId, pageable);
         List<AlarmResponse> content = alarmPage.stream()
@@ -35,6 +37,7 @@ public class AlarmService {
         return PaginationResponse.create(alarmPage, content);
     }
 
+    @Transactional(readOnly = true)
     private AlarmImages getAlarmImages(Alarm alarm) {
         List<QuestionImgSimpleDto> images = new ArrayList<>();
         String useImageUrl = null;
@@ -58,19 +61,22 @@ public class AlarmService {
         return AlarmImages.of(images, useImageUrl);
     }
 
+    @Transactional
     public void patchAlarmStatusToRead(Long userId, Long alarmId) {
         alarmDomainService.patchAlarmStatusToRead(userId, alarmId);
     }
 
+    @Transactional
     public void deleteAlarm(Long userId, Long alarmId) {
         alarmDomainService.deleteAlarm(userId, alarmId);
     }
 
-
+    @Transactional
     public void deleteAllAlarm(Long useId) {
         alarmDomainService.deleteAllAlarm(useId);
     }
 
+    @Transactional(readOnly = true)
     public AlarmCheckResponse checkAlarmAllRead(Long userId) {
         Boolean isAllRead = alarmDomainService.checkAllRead(userId);
         return AlarmCheckResponse.of(isAllRead);

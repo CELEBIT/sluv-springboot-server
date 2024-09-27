@@ -7,6 +7,7 @@ import com.sluv.domain.celeb.service.NewCelebDomainService;
 import com.sluv.infra.discord.WebHookService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -15,6 +16,7 @@ public class NewCelebService {
     private final NewCelebDomainService newCelebDomainService;
     private final WebHookService webHookService;
 
+    @Transactional
     public NewCelebPostResponse postNewCeleb(NewCelebPostRequest dto) {
         NewCeleb newCeleb = newCelebDomainService.findByCelebNameOrNull(dto.getNewCelebName());
 

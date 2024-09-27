@@ -10,11 +10,12 @@ import com.sluv.domain.user.entity.User;
 import com.sluv.domain.user.exception.UserNotFoundException;
 import com.sluv.domain.user.repository.UserRepository;
 import com.sluv.infra.firebase.exception.FcmConnectException;
-import java.util.HashMap;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
+import java.util.HashMap;
+import java.util.List;
 
 @Service
 @Slf4j

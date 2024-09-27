@@ -45,7 +45,6 @@ import java.util.Objects;
 
 @Service
 @Slf4j
-@Transactional
 @RequiredArgsConstructor
 public class UserService {
     private final UserDomainService userDomainService;
@@ -150,6 +149,7 @@ public class UserService {
         return PaginationResponse.create(closetPage, content);
     }
 
+    @Transactional
     public void patchUserProfileImg(Long userId, UserProfileImgReqDto dto) {
         User user = userDomainService.findById(userId);
         log.info("User Profile Img Change. User: {}", user.getId());
@@ -158,6 +158,7 @@ public class UserService {
         userDomainService.saveUser(user);
     }
 
+    @Transactional
     public void deleteUserProfileImg(Long userId) {
         User user = userDomainService.findById(userId);
         log.info("User Profile Img Delete. User: {}", user.getId());
@@ -224,6 +225,7 @@ public class UserService {
                 }).toList();
     }
 
+    @Transactional
     public UserTermsResDto postTerms(Long userId) {
         User user = userDomainService.findById(userId);
         user.changeTermStatus(!user.getTermsStatus());
@@ -231,6 +233,7 @@ public class UserService {
         return UserTermsResDto.of(user);
     }
 
+    @Transactional
     public void withdrawUser(Long userId, UserWithdrawReqDto dto) {
         User user = userDomainService.findById(userId);
         user.changeUserStatus(UserStatus.DELETED);
@@ -247,11 +250,13 @@ public class UserService {
 
     }
 
+    @Transactional(readOnly = true)
     public UserSocialDto getUserSocialData(Long userId) {
         User user = userDomainService.findById(userId);
         return UserSocialDto.of(user);
     }
 
+    @Transactional(readOnly = true)
     public UserTermsResDto findUserTermsStatus(Long userId) {
         User user = userDomainService.findById(userId);
         return UserTermsResDto.of(user);

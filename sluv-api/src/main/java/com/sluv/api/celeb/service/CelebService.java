@@ -13,13 +13,15 @@ import com.sluv.domain.celeb.service.CelebDomainService;
 import com.sluv.domain.celeb.service.RecentSelectCelebDomainService;
 import com.sluv.domain.user.entity.User;
 import com.sluv.domain.user.service.UserDomainService;
-import java.util.Comparator;
-import java.util.List;
-import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -30,6 +32,7 @@ public class CelebService {
     private final CelebCategoryDomainService celebCategoryDomainService;
     private final RecentSelectCelebDomainService recentSelectCelebDomainService;
 
+    @Transactional(readOnly = true)
     public PaginationResponse<CelebSearchResponse> searchCeleb(String celebName, Pageable pageable) {
         Page<Celeb> celebPage = celebDomainService.searchCeleb(celebName, pageable);
 
@@ -41,6 +44,7 @@ public class CelebService {
 
     }
 
+    @Transactional(readOnly = true)
     public List<RecentSelectCelebResponse> getUserRecentSelectCeleb(Long userId) {
         User user = userDomainService.findById(userId);
         List<RecentSelectCeleb> recentSelectCelebList = recentSelectCelebDomainService.getRecentSelectCelebTop20(user);
@@ -51,6 +55,7 @@ public class CelebService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
     public List<CelebSearchResponse> getTop10Celeb() {
         return celebDomainService.findTop10Celeb()
                 .stream()
@@ -58,6 +63,7 @@ public class CelebService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
     public List<CelebSearchByCategoryResponse> getCelebByCategory() {
         // Parent Id가 null인 CelebCategory를 모두 조회
         List<CelebCategory> categoryList = celebCategoryDomainService.findAllByParentIdIsNull();
@@ -88,6 +94,7 @@ public class CelebService {
         categoryList.set(2, tempCategory);
     }
 
+    @Transactional(readOnly = true)
     public List<CelebSearchByCategoryResponse> searchInterestedCelebByName(String celebName) {
         // 1. Parent Celeb과 일치
         List<Celeb> celebByParent = celebDomainService.searchInterestedCelebByParent(celebName);

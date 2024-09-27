@@ -19,7 +19,6 @@ import java.util.HashMap;
 import static com.sluv.common.constant.ConstantData.ALARM_TITLE;
 
 @Service
-@Transactional
 @RequiredArgsConstructor
 public class QuestionAlarmService {
 
@@ -29,6 +28,7 @@ public class QuestionAlarmService {
 
     private final FcmNotificationService fcmNotificationService;
 
+    @Transactional
     @Async("alarmThreadPoolExecutor")
     public void sendAlarmAboutQuestionLike(Long userId, Long questionId) {
         User user = userDomainService.findById(userId);
@@ -52,6 +52,7 @@ public class QuestionAlarmService {
         return ids;
     }
 
+    @Transactional
     @Async("alarmThreadPoolExecutor")
     public void sendAlarmAboutQuestionVote(Long questionId) {
         Question question = questionDomainService.findById(questionId);

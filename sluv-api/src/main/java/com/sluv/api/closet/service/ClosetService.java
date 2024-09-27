@@ -13,11 +13,12 @@ import com.sluv.domain.item.service.ItemScrapDomainService;
 import com.sluv.domain.user.entity.User;
 import com.sluv.domain.user.exception.UserNotMatchedException;
 import com.sluv.domain.user.service.UserDomainService;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @Slf4j
@@ -54,6 +55,7 @@ public class ClosetService {
     /**
      * 신규 유저 생성 시 기본 옷장 생성
      */
+    @Transactional
     public void postBasicCloset(User user) {
         closetDomainService.saveBasicCloset(user);
     }
@@ -72,6 +74,7 @@ public class ClosetService {
     /**
      * 옷장 정보 변경
      */
+    @Transactional
     public void patchCloset(Long userId, Long closetId, ClosetRequest dto) {
         log.info("옷장 변경 - 사용자: {} ", userId);
         Closet closet = closetDomainService.findById(closetId);
@@ -87,6 +90,7 @@ public class ClosetService {
     /**
      * 옷장 삭제
      */
+    @Transactional
     public void deleteCloset(Long userId, Long closetId) {
 //        User user = userDomainService.findById(userId);
         Closet closet = closetDomainService.findById(closetId);

@@ -22,7 +22,6 @@ import java.util.List;
 import static com.sluv.common.constant.ConstantData.ALARM_TITLE;
 
 @Service
-@Transactional
 @RequiredArgsConstructor
 public class ItemAlarmService {
 
@@ -33,6 +32,7 @@ public class ItemAlarmService {
 
     private final FcmNotificationService fcmNotificationService;
 
+    @Transactional
     @Async("alarmThreadPoolExecutor")
     public void sendAlarmAboutItemLike(Long userId, Long itemId) {
         User user = userDomainService.findById(userId);
@@ -41,6 +41,7 @@ public class ItemAlarmService {
         sendMessageTypeItem(user, item, message, user);
     }
 
+    @Transactional
     @Async("alarmThreadPoolExecutor")
     public void sendAlarmAboutItemEdit(Long itemId, Long itemEditReqId, User sender) {
         Item item = itemDomainService.findById(itemId);
@@ -48,6 +49,7 @@ public class ItemAlarmService {
         sendMessageTypeItemEdit(itemEditReqId, item, message, sender);
     }
 
+    @Transactional
     @Async("alarmThreadPoolExecutor")
     public void sendAlarmAboutFollowItem(Long userId, Long itemId) {
         User user = userDomainService.findById(userId);

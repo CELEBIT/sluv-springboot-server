@@ -26,6 +26,7 @@ public class UserAlarmService {
 
     private final FcmNotificationService fcmNotificationService;
 
+    @Transactional
     @Async("alarmThreadPoolExecutor")
     public void sendAlarmAboutFollow(Long userId, Long targetUserId) {
         User user = userDomainService.findById(userId);

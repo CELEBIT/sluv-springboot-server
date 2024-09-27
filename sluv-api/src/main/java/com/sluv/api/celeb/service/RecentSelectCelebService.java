@@ -11,6 +11,7 @@ import com.sluv.domain.user.entity.User;
 import com.sluv.domain.user.service.UserDomainService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -21,6 +22,7 @@ public class RecentSelectCelebService {
     private final NewCelebDomainService newCelebDomainService;
     private final RecentSelectCelebDomainService recentSelectCelebDomainService;
 
+    @Transactional
     public void postRecentSelectCeleb(Long userId, RecentSelectCelebRequest dto) {
         User user = userDomainService.findById(userId);
         Celeb celeb = celebDomainService.findByIdOrNull(dto.getCelebId());
@@ -30,10 +32,12 @@ public class RecentSelectCelebService {
 
     }
 
+    @Transactional
     public void deleteAllRecentSelectCeleb(Long userId) {
         recentSelectCelebDomainService.deleteAllByUserId(userId);
     }
 
+    @Transactional
     public void deleteRecentSelectCeleb(Long userId, Long celebId, String flag) {
         if (flag.equals("Y")) {
             recentSelectCelebDomainService.deleteByUserIdAndCelebId(userId, celebId);

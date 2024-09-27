@@ -19,7 +19,6 @@ import java.util.HashMap;
 import static com.sluv.common.constant.ConstantData.ALARM_TITLE;
 
 @Service
-@Transactional
 @RequiredArgsConstructor
 public class CommentAlarmService {
 
@@ -29,6 +28,7 @@ public class CommentAlarmService {
 
     private final FcmNotificationService fcmNotificationService;
 
+    @Transactional
     @Async("alarmThreadPoolExecutor")
     public void sendAlarmAboutCommentLike(Long userId, Long commentId) {
         User user = userDomainService.findById(userId);
@@ -37,6 +37,7 @@ public class CommentAlarmService {
         sendMessageTypeComment(comment.getUser().getId(), comment, message, user);
     }
 
+    @Transactional
     @Async("alarmThreadPoolExecutor")
     public void sendAlarmAboutComment(Long userId, Long commentId, User sender) {
         User user = userDomainService.findById(userId);
@@ -45,6 +46,7 @@ public class CommentAlarmService {
         sendMessageTypeComment(comment.getQuestion().getUser().getId(), comment, message, sender);
     }
 
+    @Transactional
     @Async("alarmThreadPoolExecutor")
     public void sendAlarmAboutSubComment(Long userId, Long commentId, User sender) {
         User user = userDomainService.findById(userId);
@@ -53,6 +55,7 @@ public class CommentAlarmService {
         sendMessageTypeComment(comment.getUser().getId(), comment, message, sender);
     }
 
+    @Transactional
     @Async("alarmThreadPoolExecutor")
     public void sendAlarmAboutReportByAI(Long commentId, User sender) {
         Comment comment = commentDomainService.findById(commentId);

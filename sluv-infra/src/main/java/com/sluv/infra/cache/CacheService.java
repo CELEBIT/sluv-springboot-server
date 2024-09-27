@@ -3,7 +3,7 @@ package com.sluv.infra.cache;
 import org.springframework.stereotype.Service;
 
 @Service
-public interface CacheService<T> {
+public interface CacheService {
     void visitMember(Long memberId);
 
     Long getVisitantCount();
@@ -11,9 +11,9 @@ public interface CacheService<T> {
     void clearVisitantCount();
 
     //
-    void saveItemDetailFixData(Long itemId, T itemDetailFixData);
+    void saveItemDetailFixData(Long itemId, Object itemDetailFixData);
 
-    T findItemDetailFixDataByItemId(Long itemId);
+    Object findItemDetailFixDataByItemId(Long itemId);
 //    void saveItemDetailFixData(Long itemId, T itemDetailFixData);
 //
 //    <T> findItemDetailFixDataByItemId(Long itemId);

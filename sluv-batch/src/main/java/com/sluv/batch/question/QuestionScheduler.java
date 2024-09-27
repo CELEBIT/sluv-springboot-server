@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Calendar;
 import java.util.List;
@@ -27,6 +28,7 @@ public class QuestionScheduler {
     /**
      * 일간 HOT Question
      */
+    @Transactional
     @Scheduled(cron = "0 0 0 * * *") // 초 분 시 일 월 요일
     public void updateDailyHotQuestion() {
         log.info("DailyHotQuestion Update Time: {}", Calendar.getInstance().getTime());
@@ -49,6 +51,7 @@ public class QuestionScheduler {
     /**
      * 투표 종료 확인
      */
+    @Transactional
     @Scheduled(fixedRate = VOTE_END_CHECK_PERIOD) // 초 분 시 일 월 요일
     public void checkQuestionVoteEnd() {
         log.info("QuestionVoteEnd Check Time: {}", Calendar.getInstance().getTime());

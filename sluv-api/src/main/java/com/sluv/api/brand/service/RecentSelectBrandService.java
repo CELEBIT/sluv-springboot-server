@@ -12,6 +12,7 @@ import com.sluv.domain.user.service.UserDomainService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Slf4j
@@ -23,7 +24,7 @@ public class RecentSelectBrandService {
     private final NewBrandDomainService newBrandDomainService;
     private final RecentSelectBrandDomainService recentSelectBrandDomainService;
 
-
+    @Transactional
     public void postRecentSelectBrand(Long userId, RecentSelectBrandRequest request) {
         User user = userDomainService.findById(userId);
         Brand brand = brandDomainService.findByIdOrNull(request.getBrandId());
@@ -32,10 +33,12 @@ public class RecentSelectBrandService {
         recentSelectBrandDomainService.saveRecentSelectBrand(RecentSelectBrand.toEntity(brand, newBrand, user));
     }
 
+    @Transactional(readOnly = true)
     public void deleteAllRecentSelectBrand(Long userId) {
         recentSelectBrandDomainService.deleteAllByUserId(userId);
     }
 
+    @Transactional
     public void deleteRecentSelectBrand(Long userId, Long brandId, String flag) {
         if (flag.equals("Y")) {
             recentSelectBrandDomainService.deleteByUserIdAndBrandId(userId, brandId);

@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@Transactional
 @RequiredArgsConstructor
 public class ItemReportService {
 
@@ -21,7 +20,7 @@ public class ItemReportService {
 
     private final UserDomainService userDomainService;
 
-
+    @Transactional
     public void postItemReport(Long userId, Long itemId, ItemReportReqDto dto) {
         User user = userDomainService.findById(userId);
 

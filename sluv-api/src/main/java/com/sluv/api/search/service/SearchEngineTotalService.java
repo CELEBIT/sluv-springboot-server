@@ -6,15 +6,17 @@ import com.sluv.domain.item.dto.ItemSimpleDto;
 import com.sluv.domain.question.dto.QuestionSimpleResDto;
 import com.sluv.domain.search.dto.SearchFilterReqDto;
 import com.sluv.domain.user.dto.UserSearchInfoDto;
-import java.util.List;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.stream.Stream;
 
 @Service
 @Slf4j
@@ -26,6 +28,7 @@ public class SearchEngineTotalService {
     /**
      * 토탈 검색 with ElasticSearch
      */
+    @Transactional
     public SearchTotalResDto getSearchTotal(Long userId, String keyword)
             throws ExecutionException, InterruptedException {
         final int itemSize = 9;

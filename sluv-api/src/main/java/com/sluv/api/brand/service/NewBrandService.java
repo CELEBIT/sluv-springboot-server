@@ -7,6 +7,7 @@ import com.sluv.domain.brand.service.NewBrandDomainService;
 import com.sluv.infra.discord.WebHookService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -15,6 +16,7 @@ public class NewBrandService {
     private final NewBrandDomainService newBrandDomainService;
     private final WebHookService webHookService;
 
+    @Transactional
     public NewBrandPostResponse postNewBrand(NewBrandPostRequest request) {
         NewBrand newBrand = newBrandDomainService.findByBrandName(request.getNewBrandName());
 

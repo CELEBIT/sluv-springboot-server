@@ -1,9 +1,6 @@
 package com.sluv.infra.cache;
 
 
-import java.util.Calendar;
-import java.util.Date;
-import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.SetOperations;
@@ -11,12 +8,16 @@ import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import java.util.Calendar;
+import java.util.Date;
+import java.util.concurrent.TimeUnit;
+
 @Service
 @RequiredArgsConstructor
-public class RedisService<T> implements CacheService<T> {
+public class RedisService implements CacheService {
 
     private final RedisTemplate<String, Long> redisStringLongTemplate;
-    private final RedisTemplate<String, T> redisStringItemDetailFixDataTemplate;
+    private final RedisTemplate<String, Object> redisStringItemDetailFixDataTemplate;
     private final String VISITANT_KEY = "visitant";
 
     @Async(value = "redisThreadPoolExecutor")
@@ -39,21 +40,21 @@ public class RedisService<T> implements CacheService<T> {
 
     @Async(value = "redisThreadPoolExecutor")
     @Override
-    public void saveItemDetailFixData(Long itemId, T itemDetailFixData) {
-        ValueOperations<String, T> itemDetailFixDataCache = redisStringItemDetailFixDataTemplate.opsForValue();
+    public void saveItemDetailFixData(Long itemId, Object itemDetailFixData) {
+        ValueOperations<String, Object> itemDetailFixDataCache = redisStringItemDetailFixDataTemplate.opsForValue();
         itemDetailFixDataCache.set("item:" + itemId, itemDetailFixData, 1, TimeUnit.HOURS);
     }
 
     @Override
-    public T findItemDetailFixDataByItemId(Long itemId) {
-        ValueOperations<String, T> itemDetailFixDataCache = redisStringItemDetailFixDataTemplate.opsForValue();
+    public Object findItemDetailFixDataByItemId(Long itemId) {
+        ValueOperations<String, Object> itemDetailFixDataCache = redisStringItemDetailFixDataTemplate.opsForValue();
         return itemDetailFixDataCache.get("item:" + itemId);
     }
 
     @Async(value = "redisThreadPoolExecutor")
     @Override
     public void deleteItemDetailFixDataByItemId(Long itemId) {
-        ValueOperations<String, T> itemDetailFixDataCache = redisStringItemDetailFixDataTemplate.opsForValue();
+        ValueOperations<String, Object> itemDetailFixDataCache = redisStringItemDetailFixDataTemplate.opsForValue();
         itemDetailFixDataCache.getAndDelete("item:" + itemId);
     }
 

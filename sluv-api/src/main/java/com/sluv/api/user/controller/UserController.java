@@ -7,12 +7,7 @@ import com.sluv.api.common.response.PaginationCountResponse;
 import com.sluv.api.common.response.PaginationResponse;
 import com.sluv.api.common.response.SuccessDataResponse;
 import com.sluv.api.common.response.SuccessResponse;
-import com.sluv.api.user.dto.UserMypageResDto;
-import com.sluv.api.user.dto.UserProfileImgReqDto;
-import com.sluv.api.user.dto.UserProfileReqDto;
-import com.sluv.api.user.dto.UserSocialDto;
-import com.sluv.api.user.dto.UserTermsResDto;
-import com.sluv.api.user.dto.UserWithdrawReqDto;
+import com.sluv.api.user.dto.*;
 import com.sluv.api.user.service.UserService;
 import com.sluv.common.annotation.CurrentUserId;
 import com.sluv.domain.item.dto.ItemSimpleDto;
@@ -20,24 +15,15 @@ import com.sluv.domain.question.dto.QuestionSimpleResDto;
 import com.sluv.domain.user.dto.UserSearchInfoDto;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.annotation.Nullable;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@Slf4j
 @RequestMapping("/app/user")
 public class UserController {
     private final UserService userService;
@@ -148,7 +134,6 @@ public class UserController {
     @GetMapping("/hotSluver")
     public ResponseEntity<SuccessDataResponse<List<UserSearchInfoDto>>> getHotSluver(@CurrentUserId Long userId,
                                                                                      @Nullable @RequestParam("celebId") Long celebId) {
-        log.info("이번주 인기 스러버 조회");
         List<UserSearchInfoDto> response = userService.getHotSluver(userId, celebId);
         return ResponseEntity.ok().body(SuccessDataResponse.create(response));
     }

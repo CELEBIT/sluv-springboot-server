@@ -9,14 +9,12 @@ import com.sluv.api.user.service.UserCelebService;
 import com.sluv.common.annotation.CurrentUserId;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@Slf4j
 @RequestMapping("/app/user")
 @RequiredArgsConstructor
 public class UserCelebController {

@@ -13,7 +13,6 @@ import com.sluv.domain.item.exception.StandardNotFoundException;
 import com.sluv.domain.search.dto.SearchFilterReqDto;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,7 +22,6 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/app/item")
-@Slf4j
 public class ItemController {
 
     private final ItemService itemService;
@@ -121,7 +119,6 @@ public class ItemController {
     @GetMapping("/recommend")
     public ResponseEntity<SuccessDataResponse<PaginationResponse<ItemSimpleDto>>> getRecommendItem(
             @CurrentUserId Long userId, Pageable pageable) {
-        log.info("유저별 추천 인기 아이템 조회");
         PaginationResponse<ItemSimpleDto> response = itemService.getRecommendItem(userId, pageable);
         return ResponseEntity.ok().body(SuccessDataResponse.create(response));
     }
@@ -133,7 +130,6 @@ public class ItemController {
             @CurrentUserId Long userId,
             Pageable pageable,
             SearchFilterReqDto dto) {
-        log.info("핫한 셀럽들이 선택한 여름나기 아이템 조회");
         PaginationResponse<ItemSimpleDto> response = itemService.getSummerItem(userId, pageable, dto);
         return ResponseEntity.ok().body(SuccessDataResponse.create(response));
     }
@@ -145,7 +141,6 @@ public class ItemController {
             @CurrentUserId Long userId,
             Pageable pageable,
             SearchFilterReqDto dto) {
-        log.info("지금 당장 구매가능한 아이템 조회");
         PaginationResponse<ItemSimpleDto> response = itemService.getNowBuyItem(userId, pageable, dto);
         return ResponseEntity.ok().body(SuccessDataResponse.create(response));
     }
@@ -155,7 +150,6 @@ public class ItemController {
     public ResponseEntity<SuccessDataResponse<PaginationResponse<ItemSimpleDto>>> getNewItem(
             @CurrentUserId Long userId,
             Pageable pageable) {
-        log.info("최신 등록 아이템 조회");
         PaginationResponse<ItemSimpleDto> response = itemService.getNewItem(userId, pageable);
         return ResponseEntity.ok().body(SuccessDataResponse.create(response));
     }
@@ -166,7 +160,6 @@ public class ItemController {
             @CurrentUserId Long userId,
             Pageable pageable,
             SearchFilterReqDto dto) {
-        log.info("주목해야할 럭셔리 무드 아이템 조회");
         PaginationResponse<ItemSimpleDto> response = itemService.getLuxuryItem(userId, pageable, dto);
         return ResponseEntity.ok().body(SuccessDataResponse.create(response));
     }
@@ -186,7 +179,6 @@ public class ItemController {
     @GetMapping("/hotItem")
     public ResponseEntity<SuccessDataResponse<List<ItemSimpleDto>>> getHotItem(@CurrentUserId Long userId,
                                                                                @RequestParam("standard") String standard) {
-        log.info("일간 주간 핫 아이템 조회: {}", standard);
         List<ItemSimpleDto> result;
         if (standard.equals("주간")) {
             result = itemService.getWeekHotItem(userId);
@@ -207,7 +199,6 @@ public class ItemController {
     @GetMapping("/hotCeleb")
     public ResponseEntity<SuccessDataResponse<PaginationResponse<ItemSimpleDto>>> getHotCelebItem(
             @CurrentUserId Long userId, Pageable pageable, SearchFilterReqDto dto) {
-        log.info("요즘 핫셀럽 아이템 조회");
         PaginationResponse<ItemSimpleDto> response = itemService.getHotCelebItem(userId, pageable, dto);
         return ResponseEntity.ok().body(SuccessDataResponse.create(response));
     }
@@ -220,7 +211,6 @@ public class ItemController {
     @GetMapping("/curation")
     public ResponseEntity<SuccessDataResponse<List<ItemSimpleDto>>> getCurationItem(
             @CurrentUserId Long userId) {
-        log.info("큐레이션 아이템 조회");
         List<ItemSimpleDto> response = itemService.getCurationItem(userId);
         return ResponseEntity.ok().body(SuccessDataResponse.create(response));
     }
@@ -232,7 +222,6 @@ public class ItemController {
     @GetMapping("/howabout")
     public ResponseEntity<SuccessDataResponse<List<ItemSimpleDto>>> getHowAboutItem(
             @CurrentUserId Long userId) {
-        log.info("이 아이템은 어때요 아이템 조회");
         List<ItemSimpleDto> response = itemService.getHowAboutItem(userId);
         return ResponseEntity.ok().body(SuccessDataResponse.create(response));
     }

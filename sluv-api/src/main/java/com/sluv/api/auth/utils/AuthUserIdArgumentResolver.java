@@ -2,6 +2,7 @@ package com.sluv.api.auth.utils;
 
 import com.sluv.common.annotation.CurrentUserId;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.MethodParameter;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -12,6 +13,7 @@ import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
 @Component
+@Slf4j
 @RequiredArgsConstructor
 public class AuthUserIdArgumentResolver implements HandlerMethodArgumentResolver {
 
@@ -28,7 +30,9 @@ public class AuthUserIdArgumentResolver implements HandlerMethodArgumentResolver
                                   WebDataBinderFactory binderFactory) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && !authentication.getName().equals("anonymousUser")) {
-            return Long.parseLong(authentication.getName());
+            long userId = Long.parseLong(authentication.getName());
+            log.info("== User Id : {} ==", userId);
+            return userId;
         }
         return null;
     }

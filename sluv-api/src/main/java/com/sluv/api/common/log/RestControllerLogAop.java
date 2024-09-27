@@ -1,5 +1,6 @@
 package com.sluv.api.common.log;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
@@ -8,8 +9,8 @@ import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.stereotype.Component;
-
-import java.lang.reflect.Method;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 @Slf4j
 @Aspect
@@ -23,33 +24,54 @@ public class RestControllerLogAop {
     // Pointcut에 의해 필터링된 경로로 들어오는 경우 메서드 호출 전에 적용
     @Before("cut()")
     public void beforeParameterLog(JoinPoint joinPoint) {
-        // 메서드 정보 받아오기
-        Method method = getMethod(joinPoint);
-        log.info("======= Method name = {} =======", method.getName());
+
+        // Request URI
+        ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        if (requestAttributes != null) {
+            HttpServletRequest request = requestAttributes.getRequest();
+            // Log the requested URL
+            log.info("====== Requested URL: {} ======", request.getRequestURI());
+        }
+
+        if (requestAttributes == null) {
+            log.info("====== Requested URL: Unknown ======");
+        }
 
         // 파라미터 받아오기
+        MethodSignature signature = (MethodSignature) joinPoint.getSignature();
+        String[] parameterNames = signature.getParameterNames();
         Object[] args = joinPoint.getArgs();
-        if (args.length <= 0) log.info("No parameter");
-        for (Object arg : args) {
-            log.info("Parameter type = {}", arg.getClass().getSimpleName());
-            log.info("Parameter value = {}", arg);
+
+
+        if (args.length <= 0) {
+            log.info("Request Data: null");
+        } else {
+            for (int i = 0; i < parameterNames.length; i++) {
+                String paramName = parameterNames[i];
+                String paramType = args[i] != null ? args[i].getClass().getSimpleName() : "null";
+                Object paramValue = args[i];
+                log.info("Request Data [name: {}, type: {}, value: {}]", paramName, paramType, paramValue);
+            }
         }
+
     }
 
     // Poincut에 의해 필터링된 경로로 들어오는 경우 메서드 리턴 후에 적용
     @AfterReturning(value = "cut()", returning = "returnObj")
     public void afterReturnLog(JoinPoint joinPoint, Object returnObj) {
-        // 메서드 정보 받아오기
-        Method method = getMethod(joinPoint);
-        log.info("======= Method name = {} =======", method.getName());
 
-        log.info("Return type = {}", returnObj.getClass().getSimpleName());
-        log.info("Return value = {}", returnObj.toString());
+        // Request URI
+        ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        if (requestAttributes != null) {
+            HttpServletRequest request = requestAttributes.getRequest();
+            // Log the requested URL
+            log.info("Requested URL: {}", request.getRequestURI());
+        }
+        if (requestAttributes == null) {
+            log.info("====== Requested URL: Unknown ======");
+        }
+
+        log.info("Return: type = {}, Value = {}", returnObj.getClass().getSimpleName(), returnObj);
     }
 
-    // JoinPoint로 메서드 정보 가져오기
-    private Method getMethod(JoinPoint joinPoint) {
-        MethodSignature signature = (MethodSignature) joinPoint.getSignature();
-        return signature.getMethod();
-    }
 }

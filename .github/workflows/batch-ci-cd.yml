@@ -59,8 +59,9 @@ jobs:
           username: ${{ secrets.LOCAL_SERVER_USER }}
           password: ${{ secrets.LOCAL_SERVER_SSH_PASSWORD }}
           script: |
-            echo ${{ secrets.LOCAL_SERVER_SUDO_PASSWORD }} | sudo -S chmod +x /home/sluv/dev-server/dev-deploy-script.sh
-            echo ${{ secrets.LOCAL_SERVER_SUDO_PASSWORD }} | sudo -S /home/sluv/dev-server/dev-deploy-script.sh
+            branchName=${{ github.ref_name }}
+            echo ${{ secrets.LOCAL_SERVER_SUDO_PASSWORD }} | sudo -S chmod +x /home/sluv/${branchName}-server/${branchName}-deploy-script.sh
+            echo ${{ secrets.LOCAL_SERVER_SUDO_PASSWORD }} | sudo -S /home/sluv/${branchName}-server/${branchName}-deploy-script.sh
 
   current-time:
     needs: batch-ci-cd

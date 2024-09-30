@@ -1,5 +1,21 @@
 package com.sluv.domain.user.repository.impl;
 
+import com.querydsl.jpa.impl.JPAQuery;
+import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.sluv.domain.auth.enums.SnsType;
+import com.sluv.domain.item.enums.ItemStatus;
+import com.sluv.domain.user.entity.Follow;
+import com.sluv.domain.user.entity.QUser;
+import com.sluv.domain.user.entity.User;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.support.PageableExecutionUtils;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+
 import static com.sluv.domain.celeb.entity.QInterestedCeleb.interestedCeleb;
 import static com.sluv.domain.item.entity.QItem.item;
 import static com.sluv.domain.item.entity.QItemLike.itemLike;
@@ -7,18 +23,6 @@ import static com.sluv.domain.user.entity.QFollow.follow;
 import static com.sluv.domain.user.entity.QUser.user;
 import static com.sluv.domain.user.enums.UserStatus.ACTIVE;
 import static com.sluv.domain.user.enums.UserStatus.DELETED;
-
-import com.querydsl.jpa.impl.JPAQuery;
-import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.sluv.domain.item.enums.ItemStatus;
-import com.sluv.domain.user.entity.Follow;
-import com.sluv.domain.user.entity.User;
-import java.time.LocalDateTime;
-import java.util.List;
-import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.support.PageableExecutionUtils;
 
 @RequiredArgsConstructor
 public class UserRepositoryImpl implements UserRepositoryCustom {
@@ -163,5 +167,13 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
                 .where(user.userStatus.eq(DELETED)
                         .and(user.updatedAt.before(LocalDateTime.now().minusDays(7)))
                 ).fetch();
+    }
+
+    @Override
+    public Optional<User> findBySnsWithEmailOrNull(String email, SnsType snsType) {
+        User user = jpaQueryFactory.selectFrom(QUser.user)
+                .where(QUser.user.snsType.eq(snsType).and(QUser.user.email.eq(email)))
+                .fetchOne();
+        return Optional.ofNullable(user);
     }
 }

@@ -28,7 +28,7 @@ public class AuthService {
 
     @Transactional
     public User getOrCreateUser(SocialUserInfoDto userInfoDto, SnsType snsType, String fcm) {
-        User user = userDomainService.findByEmailOrNull(userInfoDto.getEmail());
+        User user = userDomainService.findBySnsWithEmailOrNull(userInfoDto.getEmail(), snsType);
 
         if (user == null) {
             user = userDomainService.createUser(User.toEntity(userInfoDto, snsType, fcm));

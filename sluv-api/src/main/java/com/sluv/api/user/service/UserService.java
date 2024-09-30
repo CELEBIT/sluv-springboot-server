@@ -246,7 +246,7 @@ public class UserService {
         userWithdrawDataService.withdrawUserByUserId(user.getId());
 
         userWithdrawDomainService.saveUserWithdraw(user, dto.getReason(), dto.getContent());
-        webHookService.sendWithdrawMessage(user);
+        webHookService.sendWithdrawMessage(user, dto.getReason(), dto.getContent());
 
     }
 

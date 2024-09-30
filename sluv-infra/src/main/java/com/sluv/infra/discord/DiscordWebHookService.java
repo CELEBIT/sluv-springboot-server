@@ -4,17 +4,19 @@ import com.sluv.domain.brand.entity.NewBrand;
 import com.sluv.domain.celeb.entity.NewCeleb;
 import com.sluv.domain.user.entity.User;
 import com.sluv.domain.user.enums.UserStatus;
+import com.sluv.domain.user.enums.UserWithdrawReason;
 import com.sluv.domain.user.repository.UserRepository;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.temporal.ChronoUnit;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.temporal.ChronoUnit;
 
 @Service
 @Slf4j
@@ -61,7 +63,7 @@ public class DiscordWebHookService implements WebHookService {
     @Override
     @Async("asyncThreadPoolExecutor")
     @Transactional
-    public void sendWithdrawMessage(User user) {
+    public void sendWithdrawMessage(User user, UserWithdrawReason reason, String content) {
         long userCount = userRepository.getNotDeleteUserCount() - 1;
         long activeUser = userRepository.countByUserStatus(UserStatus.ACTIVE);
         LocalDateTime now = LocalDateTime.now();
@@ -74,6 +76,7 @@ public class DiscordWebHookService implements WebHookService {
                 .append("- 연령대: ").append(user.getAgeRange()).append("\n")
                 .append("- 성별: ").append(user.getGender()).append("\n")
                 .append("- 탈퇴 시간: ").append(date).append(" ").append(localTime).append("\n")
+                .append("- 탈퇴 사유: ").append(reason).append(" -> ").append(content).append("\n")
                 .append("### 현재 __**").append(activeUser).append("명**__의 **활성화** 유저").append("\n")
                 .append("### 현재 __**").append(userCount).append("명**__의 유저")
                 .toString();

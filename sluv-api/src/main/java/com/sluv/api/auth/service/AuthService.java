@@ -52,7 +52,6 @@ public class AuthService {
     public void changeFcm(Long userId, String fcmToken) {
         User user = userDomainService.findById(userId);
         user.changeFcmToken(fcmToken);
-        userDomainService.saveUser(user);
     }
 
     @Transactional(readOnly = true)

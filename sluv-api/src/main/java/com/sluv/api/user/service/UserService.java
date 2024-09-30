@@ -262,4 +262,12 @@ public class UserService {
         return UserTermsResDto.of(user);
     }
 
+    @Transactional
+    public UserAlarmStatusResponse changeAlarmStatus(Long userId) {
+        User user = userDomainService.findById(userId);
+        Boolean alarmStatus = user.getAlarmStatus();
+        user.changeAlarmStatus(!alarmStatus);
+        return UserAlarmStatusResponse.from(user);
+    }
+
 }

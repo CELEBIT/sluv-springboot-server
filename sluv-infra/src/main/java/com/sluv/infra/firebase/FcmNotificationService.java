@@ -60,8 +60,8 @@ public class FcmNotificationService {
         }
     }
 
-    private static Message getMessage(String title, String body, User user, AlarmType alarmType,
-                                      HashMap<String, Long> ids) {
+    private Message getMessage(String title, String body, User user, AlarmType alarmType,
+                               HashMap<String, Long> ids) {
 
         Notification notification = Notification.builder()
                 .setTitle(title)

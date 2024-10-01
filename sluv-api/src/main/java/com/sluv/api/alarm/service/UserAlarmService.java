@@ -17,7 +17,6 @@ import java.util.HashMap;
 import static com.sluv.common.constant.ConstantData.ALARM_TITLE;
 
 @Service
-@Transactional
 @RequiredArgsConstructor
 public class UserAlarmService {
 

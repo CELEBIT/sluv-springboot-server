@@ -159,4 +159,12 @@ public class UserController {
         userService.withdrawUser(userId, dto);
         return ResponseEntity.ok().body(SuccessResponse.create());
     }
+
+    @Operation(summary = "사용자 알람 수신 여부 수정", description = "기본값 false, 호출 시 현재 상태의 반대로 수정")
+    @PatchMapping("/alarm-status")
+    public ResponseEntity<SuccessDataResponse<UserAlarmStatusResponse>> changeUserAlarmStatus(@CurrentUserId Long userId) {
+        UserAlarmStatusResponse response = userService.changeAlarmStatus(userId);
+        return ResponseEntity.ok().body(SuccessDataResponse.create(response));
+    }
+
 }

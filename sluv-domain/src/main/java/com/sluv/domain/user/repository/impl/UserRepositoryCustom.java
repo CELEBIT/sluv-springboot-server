@@ -1,9 +1,12 @@
 package com.sluv.domain.user.repository.impl;
 
+import com.sluv.domain.auth.enums.SnsType;
 import com.sluv.domain.user.entity.User;
-import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+
+import java.util.List;
+import java.util.Optional;
 
 public interface UserRepositoryCustom {
     Page<User> getSearchUser(List<Long> userIdList, Pageable pageable);
@@ -19,4 +22,6 @@ public interface UserRepositoryCustom {
     long getNotDeleteUserCount();
 
     List<User> getDeletedUsersAfter7Days();
+
+    Optional<User> findBySnsWithEmailOrNull(String email, SnsType snsType);
 }

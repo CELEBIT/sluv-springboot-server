@@ -246,7 +246,7 @@ public class UserService {
         userWithdrawDataService.withdrawUserByUserId(user.getId());
 
         userWithdrawDomainService.saveUserWithdraw(user, dto.getReason(), dto.getContent());
-        webHookService.sendWithdrawMessage(user);
+        webHookService.sendWithdrawMessage(user, dto.getReason(), dto.getContent());
 
     }
 
@@ -260,6 +260,14 @@ public class UserService {
     public UserTermsResDto findUserTermsStatus(Long userId) {
         User user = userDomainService.findById(userId);
         return UserTermsResDto.of(user);
+    }
+
+    @Transactional
+    public UserAlarmStatusResponse changeAlarmStatus(Long userId) {
+        User user = userDomainService.findById(userId);
+        Boolean alarmStatus = user.getAlarmStatus();
+        user.changeAlarmStatus(!alarmStatus);
+        return UserAlarmStatusResponse.from(user);
     }
 
 }

@@ -1,5 +1,6 @@
 package com.sluv.domain.user.service;
 
+import com.sluv.domain.auth.enums.SnsType;
 import com.sluv.domain.user.entity.User;
 import com.sluv.domain.user.exception.UserNotFoundException;
 import com.sluv.domain.user.repository.UserRepository;
@@ -55,7 +56,7 @@ public class UserDomainService {
         return userRepository.getSearchUser(searchUserIds, pageable);
     }
 
-    public User findByEmailOrNull(String email) {
-        return userRepository.findByEmail(email).orElse(null);
+    public User findBySnsWithEmailOrNull(String email, SnsType snsType) {
+        return userRepository.findBySnsWithEmailOrNull(email, snsType).orElse(null);
     }
 }

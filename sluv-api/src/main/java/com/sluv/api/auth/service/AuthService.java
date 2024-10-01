@@ -28,7 +28,7 @@ public class AuthService {
 
     @Transactional
     public User getOrCreateUser(SocialUserInfoDto userInfoDto, SnsType snsType, String fcm) {
-        User user = userDomainService.findByEmailOrNull(userInfoDto.getEmail());
+        User user = userDomainService.findBySnsWithEmailOrNull(userInfoDto.getEmail(), snsType);
 
         if (user == null) {
             user = userDomainService.createUser(User.toEntity(userInfoDto, snsType, fcm));
@@ -52,7 +52,6 @@ public class AuthService {
     public void changeFcm(Long userId, String fcmToken) {
         User user = userDomainService.findById(userId);
         user.changeFcmToken(fcmToken);
-        userDomainService.saveUser(user);
     }
 
     @Transactional(readOnly = true)

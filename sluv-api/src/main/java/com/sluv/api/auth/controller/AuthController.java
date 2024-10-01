@@ -17,6 +17,7 @@ import com.sluv.infra.cache.CacheService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -51,10 +52,25 @@ public class AuthController {
         return ResponseEntity.ok().body(SuccessDataResponse.create(response));
     }
 
+    @Deprecated
     @Operation(summary = "*자동 로그인", description = "토큰 만료 시 error code : 4002")
     @GetMapping("/auto-login")
     public ResponseEntity<SuccessDataResponse<AutoLoginResponse>> autoLogin(@CurrentUserId Long userId) {
         cacheService.visitMember(userId);
+        User user = authService.findLogInUser(userId);
+//        authService.checkFcm(user);
+        AutoLoginResponse response = AutoLoginResponse.of(user);
+        return ResponseEntity.ok().body(SuccessDataResponse.create(response));
+    }
+
+    @Operation(summary = "*자동 로그인", description = "토큰 만료 시 error code : 4002")
+    @PostMapping("/auto-login")
+    public ResponseEntity<SuccessDataResponse<AutoLoginResponse>> autoLoginWithFcm(@CurrentUserId Long userId,
+                                                                                   @Nullable @RequestBody AutoLoginRequest request) {
+        cacheService.visitMember(userId);
+        if (request != null) {
+            authService.changeFcm(userId, request.getFcm());
+        }
         User user = authService.findLogInUser(userId);
 //        authService.checkFcm(user);
         AutoLoginResponse response = AutoLoginResponse.of(user);

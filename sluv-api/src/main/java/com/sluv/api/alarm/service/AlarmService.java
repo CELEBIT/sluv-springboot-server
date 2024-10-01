@@ -37,7 +37,6 @@ public class AlarmService {
         return PaginationResponse.create(alarmPage, content);
     }
 
-    @Transactional(readOnly = true)
     private AlarmImages getAlarmImages(Alarm alarm) {
         List<QuestionImgSimpleDto> images = new ArrayList<>();
         String useImageUrl = null;

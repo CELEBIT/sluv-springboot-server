@@ -9,6 +9,9 @@ on:
       - 'sluv-common/**'
       - 'sluv-infra/**'
 
+concurrency:
+  group: ${{ github.ref_name }}
+
 jobs:
   admin-ci-cd:
     runs-on: ubuntu-latest

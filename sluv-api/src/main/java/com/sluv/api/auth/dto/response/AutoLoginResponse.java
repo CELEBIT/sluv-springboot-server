@@ -17,9 +17,13 @@ public class AutoLoginResponse {
     @Schema(description = "유저 Status")
     private UserStatus userStatus;
 
+    @Schema(description = "유저 FCM")
+    private String fcm;
+
     public static AutoLoginResponse of(User user) {
         return AutoLoginResponse.builder()
                 .userStatus(user.getUserStatus())
+                .fcm(user.getFcmToken())
                 .build();
     }
 }

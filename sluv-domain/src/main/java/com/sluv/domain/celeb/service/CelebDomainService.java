@@ -27,6 +27,9 @@ public class CelebDomainService {
     }
 
     public Celeb findByIdOrNull(Long celebId) {
+        if (celebId == null) {
+            return null;
+        }
         return celebRepository.findById(celebId).orElse(null);
     }
 

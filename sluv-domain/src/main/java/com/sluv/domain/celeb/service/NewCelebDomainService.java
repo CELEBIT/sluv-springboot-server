@@ -21,6 +21,9 @@ public class NewCelebDomainService {
     }
 
     public NewCeleb findByNewCelebIdOrNull(Long newCelebId) {
+        if (newCelebId == null) {
+            return null;
+        }
         return newCelebRepository.findById(newCelebId).orElseThrow(null);
     }
 

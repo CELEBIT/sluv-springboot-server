@@ -18,6 +18,9 @@ public class UserDomainService {
     private final UserRepository userRepository;
 
     public User findById(Long userId) {
+        if (userId == null) {
+            return null;
+        }
         return userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
     }
 

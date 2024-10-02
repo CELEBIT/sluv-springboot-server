@@ -61,13 +61,13 @@ public class ItemAlarmService {
     public void sendAlarmAboutFollowItem(Long followeeId, Long itemId) {
         User followee = userDomainService.findById(followeeId);
         Item item = itemDomainService.findById(itemId);
-        List<User> follower = followDomainService.getAllFollower(followeeId)
+        List<User> followers = followDomainService.getAllFollower(followeeId)
                 .stream()
                 .map(Follow::getFollower)
                 .toList();
 
         String message = AlarmMessage.getMessageWithUserName(followee.getNickname(), AlarmMessage.USER_FOLLOW_ITEM);
-        sendMulticastMessageTypeItem(follower, item, message, followee);
+        sendMulticastMessageTypeItem(followers, item, message, followee);
     }
 
     private void sendMessageTypeItem(User receiver, Item item, String message, User sender) {
@@ -78,15 +78,15 @@ public class ItemAlarmService {
         );
     }
 
-    private void sendMulticastMessageTypeItem(List<User> follower, Item item, String message, User followee) {
+    private void sendMulticastMessageTypeItem(List<User> followers, Item item, String message, User followee) {
 
-        List<Long> followerIds = follower
+        List<Long> followerIds = followers
                 .stream()
                 .map(User::getId)
                 .toList();
 
         AlarmElement alarmElement = AlarmElement.of(item, null, null, followee);
-        alarmDomainService.saveAllAlarm(follower, ALARM_TITLE, message, AlarmType.ITEM, alarmElement);
+        alarmDomainService.saveAllAlarm(followers, ALARM_TITLE, message, AlarmType.ITEM, alarmElement);
         fcmNotificationService.sendFCMNotificationMulticast(
                 followerIds, ALARM_TITLE, message, AlarmType.ITEM, getIdAboutItem(item.getId())
         );

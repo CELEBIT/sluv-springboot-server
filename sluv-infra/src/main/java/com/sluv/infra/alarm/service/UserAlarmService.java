@@ -1,4 +1,4 @@
-package com.sluv.api.alarm.service;
+package com.sluv.infra.alarm.service;
 
 import com.sluv.domain.alarm.dto.AlarmElement;
 import com.sluv.domain.alarm.enums.AlarmMessage;
@@ -6,7 +6,7 @@ import com.sluv.domain.alarm.enums.AlarmType;
 import com.sluv.domain.alarm.service.AlarmDomainService;
 import com.sluv.domain.user.entity.User;
 import com.sluv.domain.user.service.UserDomainService;
-import com.sluv.infra.firebase.FcmNotificationService;
+import com.sluv.infra.alarm.firebase.FcmNotificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -27,11 +27,11 @@ public class UserAlarmService {
 
     @Transactional
     @Async("alarmThreadPoolExecutor")
-    public void sendAlarmAboutFollow(Long userId, Long targetUserId) {
-        User user = userDomainService.findById(userId);
+    public void sendAlarmAboutFollow(Long senderId, Long targetUserId) {
         User targetUser = userDomainService.findById(targetUserId);
-        String message = AlarmMessage.getMessageWithUserName(user.getNickname(), AlarmMessage.USER_FOLLOW);
-        sendMessageTypeUser(user, targetUser, message);
+        User sender = userDomainService.findById(senderId);
+        String message = AlarmMessage.getMessageWithUserName(sender.getNickname(), AlarmMessage.USER_FOLLOW);
+        sendMessageTypeUser(sender, targetUser, message);
 
     }
 

@@ -5,6 +5,7 @@ import com.sluv.domain.question.entity.Question;
 import com.sluv.domain.question.entity.QuestionBuy;
 import com.sluv.domain.question.repository.DailyHotQuestionRepository;
 import com.sluv.domain.question.repository.QuestionRepository;
+import com.sluv.infra.alarm.service.QuestionAlarmService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -21,7 +22,7 @@ public class QuestionScheduler {
 
     private final DailyHotQuestionRepository dailyHotQuestionRepository;
     private final QuestionRepository questionRepository;
-//    private final QuestionAlarmService questionAlarmService;
+    private final QuestionAlarmService questionAlarmService;
 
     private static final int VOTE_END_CHECK_PERIOD = 60000; // 1분
 
@@ -57,7 +58,7 @@ public class QuestionScheduler {
         log.info("QuestionVoteEnd Check Time: {}", Calendar.getInstance().getTime());
         List<QuestionBuy> endTimeBetweenNow = questionRepository.getEndTimeBetweenNow(VOTE_END_CHECK_PERIOD);
         endTimeBetweenNow.forEach(questionBuy -> System.out.println("dd: " + questionBuy.getId()));
-//        endTimeBetweenNow.forEach(questionBuy -> questionAlarmService.sendAlarmAboutQuestionVote(questionBuy.getId()));
+        endTimeBetweenNow.forEach(questionBuy -> questionAlarmService.sendAlarmAboutQuestionVote(questionBuy.getId()));
 
     }
 

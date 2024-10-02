@@ -1,4 +1,4 @@
-package com.sluv.api.alarm.service;
+package com.sluv.infra.alarm.service;
 
 import com.sluv.domain.alarm.dto.AlarmElement;
 import com.sluv.domain.alarm.enums.AlarmMessage;
@@ -8,7 +8,7 @@ import com.sluv.domain.question.entity.Question;
 import com.sluv.domain.question.service.QuestionDomainService;
 import com.sluv.domain.user.entity.User;
 import com.sluv.domain.user.service.UserDomainService;
-import com.sluv.infra.firebase.FcmNotificationService;
+import com.sluv.infra.alarm.firebase.FcmNotificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -30,18 +30,20 @@ public class QuestionAlarmService {
 
     @Transactional
     @Async("alarmThreadPoolExecutor")
-    public void sendAlarmAboutQuestionLike(Long userId, Long questionId) {
-        User user = userDomainService.findById(userId);
+    public void sendAlarmAboutQuestionLike(Long senderId, Long questionId) {
         Question question = questionDomainService.findById(questionId);
-        String message = AlarmMessage.getMessageWithUserName(user.getNickname(), AlarmMessage.QUESTION_LIKE);
-        sendMessageTypeQuestion(user, question, message, user, AlarmType.QUESTION);
+        if (!senderId.equals(question.getUser().getId())) {
+            User sender = userDomainService.findById(senderId);
+            String message = AlarmMessage.getMessageWithUserName(sender.getNickname(), AlarmMessage.QUESTION_LIKE);
+            sendMessageTypeQuestion(question.getUser(), question, message, sender, AlarmType.QUESTION);
+        }
     }
 
-    private void sendMessageTypeQuestion(User user, Question question, String message, User sender, AlarmType type) {
+    private void sendMessageTypeQuestion(User receiver, Question question, String message, User sender, AlarmType type) {
         AlarmElement alarmElement = AlarmElement.of(null, question, null, sender);
-        alarmDomainService.saveAlarm(user, ALARM_TITLE, message, type, alarmElement);
+        alarmDomainService.saveAlarm(receiver, ALARM_TITLE, message, type, alarmElement);
         fcmNotificationService.sendFCMNotification(
-                question.getUser().getId(), ALARM_TITLE, message, type,
+                receiver.getId(), ALARM_TITLE, message, type,
                 getIdAboutQuestion(question.getId())
         );
     }

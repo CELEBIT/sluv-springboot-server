@@ -1,6 +1,5 @@
 package com.sluv.api.comment.service;
 
-import com.sluv.api.alarm.service.CommentAlarmService;
 import com.sluv.api.comment.dto.reponse.CommentResponse;
 import com.sluv.api.comment.dto.reponse.SubCommentPageResponse;
 import com.sluv.api.comment.dto.request.CommentPostRequest;
@@ -17,13 +16,15 @@ import com.sluv.domain.user.entity.User;
 import com.sluv.domain.user.exception.UserNotMatchedException;
 import com.sluv.domain.user.service.UserDomainService;
 import com.sluv.infra.ai.AiModelService;
-import java.util.List;
+import com.sluv.infra.alarm.service.CommentAlarmService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @Slf4j
@@ -113,7 +114,7 @@ public class CommentService {
         commentImgHelper.saveCommentImg(request, comment);
 
         aiModelService.censorComment(comment);
-        commentAlarmService.sendAlarmAboutComment(user.getId(), comment.getId(), user);
+        commentAlarmService.sendAlarmAboutComment(user.getId(), comment.getId());
 
     }
 
@@ -137,8 +138,8 @@ public class CommentService {
         commentImgHelper.saveCommentImg(request, comment);
 
         aiModelService.censorComment(comment);
-        commentAlarmService.sendAlarmAboutComment(user.getId(), comment.getId(), user);
-        commentAlarmService.sendAlarmAboutSubComment(user.getId(), comment.getId(), user);
+        commentAlarmService.sendAlarmAboutComment(user.getId(), comment.getId());
+        commentAlarmService.sendAlarmAboutSubComment(user.getId(), comment.getId());
     }
 
     /**

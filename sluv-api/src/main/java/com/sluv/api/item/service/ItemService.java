@@ -1,7 +1,6 @@
 package com.sluv.api.item.service;
 
 
-import com.sluv.api.alarm.service.ItemAlarmService;
 import com.sluv.api.brand.dto.response.BrandSearchResponse;
 import com.sluv.api.celeb.dto.response.CelebSearchResponse;
 import com.sluv.api.common.response.PaginationResponse;
@@ -34,6 +33,7 @@ import com.sluv.domain.user.entity.User;
 import com.sluv.domain.user.service.FollowDomainService;
 import com.sluv.domain.user.service.UserDomainService;
 import com.sluv.infra.ai.AiModelService;
+import com.sluv.infra.alarm.service.ItemAlarmService;
 import com.sluv.infra.cache.CacheService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -301,7 +301,7 @@ public class ItemService {
         boolean likeExist = itemLikeDomainService.existsByUserIdAndItemId(user.getId(), itemId);
         if (!likeExist) {
             itemLikeDomainService.saveItemLike(item, user);
-            itemAlarmService.sendAlarmAboutItemLike(user.getId(), itemId);
+            itemAlarmService.sendAlarmAboutItemLike(user.getId(), item.getId());
         } else {
             itemLikeDomainService.deleteByUserIdAndItemId(user.getId(), itemId);
         }

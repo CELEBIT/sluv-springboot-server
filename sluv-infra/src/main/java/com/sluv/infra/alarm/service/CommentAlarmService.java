@@ -1,4 +1,4 @@
-package com.sluv.api.alarm.service;
+package com.sluv.infra.alarm.service;
 
 import com.sluv.domain.alarm.dto.AlarmElement;
 import com.sluv.domain.alarm.enums.AlarmMessage;
@@ -8,7 +8,7 @@ import com.sluv.domain.comment.entity.Comment;
 import com.sluv.domain.comment.service.CommentDomainService;
 import com.sluv.domain.user.entity.User;
 import com.sluv.domain.user.service.UserDomainService;
-import com.sluv.infra.firebase.FcmNotificationService;
+import com.sluv.infra.alarm.firebase.FcmNotificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -30,29 +30,38 @@ public class CommentAlarmService {
 
     @Transactional
     @Async("alarmThreadPoolExecutor")
-    public void sendAlarmAboutCommentLike(Long userId, Long commentId) {
-        User user = userDomainService.findById(userId);
+    public void sendAlarmAboutCommentLike(Long senderId, Long commentId) {
         Comment comment = commentDomainService.findById(commentId);
-        String message = AlarmMessage.getMessageWithUserName(user.getNickname(), AlarmMessage.COMMENT_LIKE);
-        sendMessageTypeComment(comment.getUser().getId(), comment, message, user);
+
+        if (!senderId.equals(comment.getUser().getId())) {
+            User sender = userDomainService.findById(senderId);
+            String message = AlarmMessage.getMessageWithUserName(sender.getNickname(), AlarmMessage.COMMENT_LIKE);
+            sendMessageTypeComment(comment.getUser(), comment, message, sender);
+        }
     }
 
     @Transactional
     @Async("alarmThreadPoolExecutor")
-    public void sendAlarmAboutComment(Long userId, Long commentId, User sender) {
-        User user = userDomainService.findById(userId);
+    public void sendAlarmAboutComment(Long senderId, Long commentId) {
         Comment comment = commentDomainService.findById(commentId);
-        String message = AlarmMessage.getMessageWithUserName(user.getNickname(), AlarmMessage.QUESTION_COMMENT);
-        sendMessageTypeComment(comment.getQuestion().getUser().getId(), comment, message, sender);
+
+        if (!senderId.equals(comment.getUser().getId())) {
+            User sender = userDomainService.findById(senderId);
+            String message = AlarmMessage.getMessageWithUserName(sender.getNickname(), AlarmMessage.QUESTION_COMMENT);
+            sendMessageTypeComment(comment.getQuestion().getUser(), comment, message, sender);
+        }
     }
 
     @Transactional
     @Async("alarmThreadPoolExecutor")
-    public void sendAlarmAboutSubComment(Long userId, Long commentId, User sender) {
-        User user = userDomainService.findById(userId);
+    public void sendAlarmAboutSubComment(Long senderId, Long commentId) {
         Comment comment = commentDomainService.findById(commentId);
-        String message = AlarmMessage.getMessageWithUserName(user.getNickname(), AlarmMessage.COMMENT_SUB);
-        sendMessageTypeComment(comment.getUser().getId(), comment, message, sender);
+
+        if (!senderId.equals(comment.getUser().getId())) {
+            User sender = userDomainService.findById(senderId);
+            String message = AlarmMessage.getMessageWithUserName(sender.getNickname(), AlarmMessage.COMMENT_SUB);
+            sendMessageTypeComment(comment.getUser(), comment, message, sender);
+        }
     }
 
     @Transactional
@@ -60,14 +69,14 @@ public class CommentAlarmService {
     public void sendAlarmAboutReportByAI(Long commentId, User sender) {
         Comment comment = commentDomainService.findById(commentId);
         String message = AlarmMessage.COMMENT_REPORT_BY_AI.getMessage();
-        sendMessageTypeComment(comment.getUser().getId(), comment, message, sender);
+        sendMessageTypeComment(comment.getUser(), comment, message, sender);
     }
 
-    private void sendMessageTypeComment(Long receiverId, Comment comment, String message, User sender) {
+    private void sendMessageTypeComment(User receiver, Comment comment, String message, User sender) {
         AlarmElement alarmElement = AlarmElement.of(null, comment.getQuestion(), comment, sender);
-        alarmDomainService.saveAlarm(comment.getUser(), ALARM_TITLE, message, AlarmType.COMMENT, alarmElement);
+        alarmDomainService.saveAlarm(receiver, ALARM_TITLE, message, AlarmType.COMMENT, alarmElement);
         fcmNotificationService.sendFCMNotification(
-                receiverId, ALARM_TITLE, message, AlarmType.COMMENT, getIdsAboutComment(comment)
+                receiver.getId(), ALARM_TITLE, message, AlarmType.COMMENT, getIdsAboutComment(comment)
         );
     }
 

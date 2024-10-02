@@ -27,19 +27,19 @@ public class UserAlarmService {
 
     @Transactional
     @Async("alarmThreadPoolExecutor")
-    public void sendAlarmAboutFollow(Long senderId, Long targetUserId) {
-        User targetUser = userDomainService.findById(targetUserId);
+    public void sendAlarmAboutFollow(Long senderId, Long followeeId) {
+        User followee = userDomainService.findById(followeeId);
         User sender = userDomainService.findById(senderId);
         String message = AlarmMessage.getMessageWithUserName(sender.getNickname(), AlarmMessage.USER_FOLLOW);
-        sendMessageTypeUser(sender, targetUser, message);
+        sendMessageTypeUser(followee, sender, message);
 
     }
 
-    private void sendMessageTypeUser(User sender, User targetUser, String message) {
+    private void sendMessageTypeUser(User receiver, User sender, String message) {
         AlarmElement alarmElement = AlarmElement.of(null, null, null, sender);
-        alarmDomainService.saveAlarm(targetUser, ALARM_TITLE, message, AlarmType.QUESTION, alarmElement);
+        alarmDomainService.saveAlarm(receiver, ALARM_TITLE, message, AlarmType.QUESTION, alarmElement);
         fcmNotificationService.sendFCMNotification(
-                targetUser.getId(), ALARM_TITLE, message, AlarmType.USER, getIdAboutUser(sender.getId())
+                receiver.getId(), ALARM_TITLE, message, AlarmType.USER, getIdAboutUser(sender.getId())
         );
     }
 

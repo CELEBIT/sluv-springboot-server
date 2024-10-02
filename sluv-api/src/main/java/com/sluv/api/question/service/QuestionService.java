@@ -1,6 +1,5 @@
 package com.sluv.api.question.service;
 
-import com.sluv.api.alarm.service.QuestionAlarmService;
 import com.sluv.api.celeb.dto.response.CelebChipResponse;
 import com.sluv.api.common.response.PaginationResponse;
 import com.sluv.api.question.dto.*;
@@ -26,6 +25,7 @@ import com.sluv.domain.question.exception.QuestionTypeNotFoundException;
 import com.sluv.domain.question.service.*;
 import com.sluv.domain.user.entity.User;
 import com.sluv.domain.user.service.UserDomainService;
+import com.sluv.infra.alarm.service.QuestionAlarmService;
 import com.sluv.infra.cache.CacheService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

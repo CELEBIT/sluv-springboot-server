@@ -1,12 +1,12 @@
 package com.sluv.api.user.service;
 
-import com.sluv.api.alarm.service.UserAlarmService;
 import com.sluv.api.common.response.PaginationResponse;
 import com.sluv.domain.user.dto.UserSearchInfoDto;
 import com.sluv.domain.user.entity.Follow;
 import com.sluv.domain.user.entity.User;
 import com.sluv.domain.user.service.FollowDomainService;
 import com.sluv.domain.user.service.UserDomainService;
+import com.sluv.infra.alarm.service.UserAlarmService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

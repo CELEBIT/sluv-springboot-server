@@ -1,4 +1,4 @@
-package com.sluv.api.alarm.service;
+package com.sluv.infra.alarm.service;
 
 import com.sluv.domain.alarm.dto.AlarmElement;
 import com.sluv.domain.alarm.enums.AlarmMessage;
@@ -6,7 +6,7 @@ import com.sluv.domain.alarm.enums.AlarmType;
 import com.sluv.domain.alarm.service.AlarmDomainService;
 import com.sluv.domain.user.entity.User;
 import com.sluv.domain.user.service.UserDomainService;
-import com.sluv.infra.firebase.FcmNotificationService;
+import com.sluv.infra.alarm.firebase.FcmNotificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -27,19 +27,19 @@ public class UserAlarmService {
 
     @Transactional
     @Async("alarmThreadPoolExecutor")
-    public void sendAlarmAboutFollow(Long userId, Long targetUserId) {
-        User user = userDomainService.findById(userId);
-        User targetUser = userDomainService.findById(targetUserId);
-        String message = AlarmMessage.getMessageWithUserName(user.getNickname(), AlarmMessage.USER_FOLLOW);
-        sendMessageTypeUser(user, targetUser, message);
+    public void sendAlarmAboutFollow(Long senderId, Long followeeId) {
+        User followee = userDomainService.findById(followeeId);
+        User sender = userDomainService.findById(senderId);
+        String message = AlarmMessage.getMessageWithUserName(sender.getNickname(), AlarmMessage.USER_FOLLOW);
+        sendMessageTypeUser(followee, sender, message);
 
     }
 
-    private void sendMessageTypeUser(User sender, User targetUser, String message) {
+    private void sendMessageTypeUser(User receiver, User sender, String message) {
         AlarmElement alarmElement = AlarmElement.of(null, null, null, sender);
-        alarmDomainService.saveAlarm(targetUser, ALARM_TITLE, message, AlarmType.QUESTION, alarmElement);
+        alarmDomainService.saveAlarm(receiver, ALARM_TITLE, message, AlarmType.QUESTION, alarmElement);
         fcmNotificationService.sendFCMNotification(
-                targetUser.getId(), ALARM_TITLE, message, AlarmType.USER, getIdAboutUser(sender.getId())
+                receiver.getId(), ALARM_TITLE, message, AlarmType.USER, getIdAboutUser(sender.getId())
         );
     }
 

@@ -30,7 +30,7 @@ public class RestControllerLogAop {
         if (requestAttributes != null) {
             HttpServletRequest request = requestAttributes.getRequest();
             // Log the requested URL
-            log.info("====== Requested URL: {} ======", request.getRequestURI());
+            log.info("====== Requested URL: {} - {} ======", request.getMethod(), request.getRequestURI());
         }
 
         if (requestAttributes == null) {
@@ -65,7 +65,7 @@ public class RestControllerLogAop {
         if (requestAttributes != null) {
             HttpServletRequest request = requestAttributes.getRequest();
             // Log the requested URL
-            log.info("Requested URL: {}", request.getRequestURI());
+            log.info("Requested URL: {} - {}", request.getMethod(), request.getRequestURI());
         }
         if (requestAttributes == null) {
             log.info("====== Requested URL: Unknown ======");

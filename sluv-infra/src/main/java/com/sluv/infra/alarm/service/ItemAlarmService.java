@@ -1,4 +1,4 @@
-package com.sluv.api.alarm.service;
+package com.sluv.infra.alarm.service;
 
 import com.sluv.domain.alarm.dto.AlarmElement;
 import com.sluv.domain.alarm.enums.AlarmMessage;
@@ -10,7 +10,7 @@ import com.sluv.domain.user.entity.Follow;
 import com.sluv.domain.user.entity.User;
 import com.sluv.domain.user.service.FollowDomainService;
 import com.sluv.domain.user.service.UserDomainService;
-import com.sluv.infra.firebase.FcmNotificationService;
+import com.sluv.infra.alarm.firebase.FcmNotificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -34,52 +34,59 @@ public class ItemAlarmService {
 
     @Transactional
     @Async("alarmThreadPoolExecutor")
-    public void sendAlarmAboutItemLike(Long userId, Long itemId) {
-        User user = userDomainService.findById(userId);
+    public void sendAlarmAboutItemLike(Long senderId, Long itemId) {
         Item item = itemDomainService.findById(itemId);
-        String message = AlarmMessage.getMessageWithUserName(user.getNickname(), AlarmMessage.ITEM_LIKE);
-        sendMessageTypeItem(user, item, message, user);
+
+        if (!senderId.equals(item.getUser().getId())) {
+            User sender = userDomainService.findById(senderId);
+            String message = AlarmMessage.getMessageWithUserName(sender.getNickname(), AlarmMessage.ITEM_LIKE);
+            sendMessageTypeItem(item.getUser(), item, message, sender);
+        }
     }
 
     @Transactional
     @Async("alarmThreadPoolExecutor")
-    public void sendAlarmAboutItemEdit(Long itemId, Long itemEditReqId, User sender) {
+    public void sendAlarmAboutItemEdit(Long senderId, Long itemId, Long itemEditReqId) {
         Item item = itemDomainService.findById(itemId);
-        String message = AlarmMessage.ITEM_EDIT.getMessage();
-        sendMessageTypeItemEdit(itemEditReqId, item, message, sender);
+
+        if (!senderId.equals(item.getUser().getId())) {
+            User sender = userDomainService.findById(senderId);
+            String message = AlarmMessage.ITEM_EDIT.getMessage();
+            sendMessageTypeItemEdit(itemEditReqId, item, message, sender);
+        }
     }
 
     @Transactional
     @Async("alarmThreadPoolExecutor")
-    public void sendAlarmAboutFollowItem(Long userId, Long itemId) {
-        User user = userDomainService.findById(userId);
+    public void sendAlarmAboutFollowItem(Long followeeId, Long itemId) {
+        User followee = userDomainService.findById(followeeId);
         Item item = itemDomainService.findById(itemId);
-        List<User> follower = followDomainService.getAllFollower(userId)
+        List<User> followers = followDomainService.getAllFollower(followeeId)
                 .stream()
                 .map(Follow::getFollower)
                 .toList();
 
-        String message = AlarmMessage.getMessageWithUserName(user.getNickname(), AlarmMessage.USER_FOLLOW_ITEM);
-        sendMulticastMessageTypeItem(follower, item, message, user);
+        String message = AlarmMessage.getMessageWithUserName(followee.getNickname(), AlarmMessage.USER_FOLLOW_ITEM);
+        sendMulticastMessageTypeItem(followers, item, message, followee);
     }
 
-    private void sendMessageTypeItem(User user, Item item, String message, User sender) {
+    private void sendMessageTypeItem(User receiver, Item item, String message, User sender) {
         AlarmElement alarmElement = AlarmElement.of(item, null, null, sender);
-        alarmDomainService.saveAlarm(user, ALARM_TITLE, message, AlarmType.ITEM, alarmElement);
+        alarmDomainService.saveAlarm(receiver, ALARM_TITLE, message, AlarmType.ITEM, alarmElement);
         fcmNotificationService.sendFCMNotification(
-                item.getUser().getId(), ALARM_TITLE, message, AlarmType.ITEM, getIdAboutItem(item.getId())
+                receiver.getId(), ALARM_TITLE, message, AlarmType.ITEM, getIdAboutItem(item.getId())
         );
     }
 
-    private void sendMulticastMessageTypeItem(List<User> follower, Item item, String message, User sender) {
+    private void sendMulticastMessageTypeItem(List<User> followers, Item item, String message, User followee) {
 
-        List<Long> followerIds = follower
+        List<Long> followerIds = followers
                 .stream()
                 .map(User::getId)
                 .toList();
 
-        AlarmElement alarmElement = AlarmElement.of(item, null, null, sender);
-        alarmDomainService.saveAllAlarm(follower, ALARM_TITLE, message, AlarmType.ITEM, alarmElement);
+        AlarmElement alarmElement = AlarmElement.of(item, null, null, followee);
+        alarmDomainService.saveAllAlarm(followers, ALARM_TITLE, message, AlarmType.ITEM, alarmElement);
         fcmNotificationService.sendFCMNotificationMulticast(
                 followerIds, ALARM_TITLE, message, AlarmType.ITEM, getIdAboutItem(item.getId())
         );

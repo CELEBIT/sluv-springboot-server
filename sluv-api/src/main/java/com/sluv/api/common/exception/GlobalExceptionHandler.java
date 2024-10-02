@@ -16,8 +16,8 @@ import static com.sluv.common.exception.ErrorCode.*;
 @Slf4j
 public class GlobalExceptionHandler {
 
-    private static final String LOG_FORMAT = "Error: {}, Class : {}, Message : {}";
-    private static final String LOG_CODE_FORMAT = "Error: {}, Class : {}, Code : {}, Message : {}";
+    private static final String LOG_FORMAT = "Error: {}, Class : {}, Message : {}, Stack : {}";
+    private static final String LOG_CODE_FORMAT = "Error: {}, Class : {}, Code : {}, Message : {}, Stack : {}";
 
     /**
      * == Application Exception ==
@@ -32,7 +32,8 @@ public class GlobalExceptionHandler {
                 "ApplicationException",
                 exception.getClass().getSimpleName(),
                 exception.getErrorCode(),
-                exception.getMessage()
+                exception.getMessage(),
+                exception.getStackTrace()
         );
         HttpStatus httpStatus = HttpStatus.valueOf(exception.getHttpStatusCode().getCode());
 
@@ -51,7 +52,8 @@ public class GlobalExceptionHandler {
                 LOG_FORMAT,
                 "HttpMessageNotReadableException",
                 exception.getClass().getSimpleName(),
-                exception.getMessage()
+                exception.getMessage(),
+                exception.getStackTrace()
         );
 
         return ResponseEntity.badRequest()
@@ -75,7 +77,8 @@ public class GlobalExceptionHandler {
                 LOG_FORMAT,
                 "RuntimeException",
                 exception.getClass().getSimpleName(),
-                exception.getMessage()
+                exception.getMessage(),
+                exception.getStackTrace()
         );
 
         return ResponseEntity.internalServerError()
@@ -98,7 +101,8 @@ public class GlobalExceptionHandler {
                 LOG_FORMAT,
                 "DataAccessException",
                 exception.getClass().getSimpleName(),
-                exception.getMessage()
+                exception.getMessage(),
+                exception.getStackTrace()
         );
 
         return ResponseEntity.badRequest()
@@ -121,7 +125,8 @@ public class GlobalExceptionHandler {
                 LOG_FORMAT,
                 "Exception",
                 exception.getClass().getSimpleName(),
-                exception.getMessage()
+                exception.getMessage(),
+                exception.getStackTrace()
         );
         return ResponseEntity.internalServerError()
                 .body(ErrorResponse.customBuilder()

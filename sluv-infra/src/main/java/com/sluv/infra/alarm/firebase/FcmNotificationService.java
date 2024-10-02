@@ -1,4 +1,4 @@
-package com.sluv.infra.firebase;
+package com.sluv.infra.alarm.firebase;
 
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.FirebaseMessagingException;
@@ -9,7 +9,7 @@ import com.sluv.domain.alarm.enums.AlarmType;
 import com.sluv.domain.user.entity.User;
 import com.sluv.domain.user.exception.UserNotFoundException;
 import com.sluv.domain.user.repository.UserRepository;
-import com.sluv.infra.firebase.exception.FcmConnectException;
+import com.sluv.infra.alarm.firebase.exception.FcmConnectException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

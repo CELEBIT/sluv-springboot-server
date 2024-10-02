@@ -29,7 +29,7 @@ public class FcmNotificationService {
                                     HashMap<String, Long> ids) {
         User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
 
-        if (user.getAlarmStatus()) { // 알람 허용 시
+        if (user.getAlarmStatus() && user.getFcmToken() != null) { // 알람 허용 시
             Message message = getMessage(title, body, user, alarmType, ids);
 
             try {
@@ -46,7 +46,7 @@ public class FcmNotificationService {
         List<User> users = userRepository.findAllById(userIds);
 
         for (User user : users) {
-            if (user.getAlarmStatus()) { // 알람 허용 시
+            if (user.getAlarmStatus() && user.getFcmToken() != null) { // 알람 허용 시
 
                 Message message = getMessage(title, body, user, alarmType, ids);
 

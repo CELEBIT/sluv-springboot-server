@@ -9,25 +9,25 @@
 
 |김준기|김보인|
 |---|---|
-| Backend <br>  [GitHub](https://github.com/KJBig)| DevOps <br>  [GitHub](https://github.com/Boin-Kau)|
+| Backend, DevOps <br>   <div align="center">[GitHub](https://github.com/KJBig)</div>| DevOps <br>  <div align="center">[GitHub](https://github.com/Boin-Kau)</div>|
 
 </div>
 <br/><br/>
 
 ## Detailed Roles
 [김준기](https://github.com/KJBig)
-- Backend
+- Backend, Devlops
 - 전체적인 API 서버 구조 구축
 - 유저, 셀럽, 브랜드, 옷장, 아이템, 질문, 댓글, 공지, 검색 구현
 - DB 설계
 - JPA Entity 설계 및 구축
 - Swagger 문서화
+- 멀티모듈 전환
 
 [김보인](https://github.com/Boin-Kau)
 - DevOps
 - DB 설계
 - 전체적인 AWS 환경 구축
-- Jenkins CI/CD 구축
 
 <br/><br/>
 
@@ -53,11 +53,10 @@
 <br/><br/>
 
 ## Directory construction
-### 도메인형 디렉토리 구조 채택
-<img width="256" alt="Sluv 디렉토리 구조" src="https://github.com/CELEBIT/sluv-springboot-server/assets/101792740/755f64d8-a017-4280-8c43-d8f779528424">
+### 도메인형 디렉토리 구조 기반의 멀티모듈
+<img width="256" alt="Sluv 디렉토리 구조" src="https://github.com/user-attachments/assets/bb338412-cc75-4efb-accc-7c5111fa83dc">
 
-- 11개의 Domain과 약 50개의 Entity. 
-- 다량의 Entity를 기준으로 구분하기 쉬운 도메인형 디렉토리 구조를 채택.
+- Admin, Api, Batch 기능을 하나의 프로젝트에서 통합으로 관리할 수 있으며, 각각 다른 Docker 컨테이너에 독립 적으로 배포가 가능한 구조.
 
 <br/><br/>
 
@@ -70,7 +69,6 @@
 - [Architecture](#architecture)
 - [결과물](#result)
 - [이 기술을 쓰는 이유](#why)
-- [ERD](#erd)
 
 
 <br>
@@ -127,7 +125,7 @@
 <details>
    <summary> 본문 확인 (👈 Click)</summary>
 <br />
-<img width="700" alt="arch" src="https://github.com/CELEBIT/sluv-springboot-server/assets/101792740/f59b81e8-5557-4da0-9200-585e66d93000">
+<img width="700" alt="arch" src="https://github.com/user-attachments/assets/a7a8652b-3b88-467b-ba72-c407a95ac55b">
 
 </details>
 
@@ -409,19 +407,3 @@
 - 문자가 아닌 코드로 쿼리를 작성하여 문법 오류를 쉽게 확인할 수 있습니다.
 - 객체를 사용하는 방식과 동일한 작성법을 이용하기 때문에 가독성이 높습니다.
 - IDE의 도움을 받을 수 있습니다.
-
-</details>
-<br>
-
-# :card_file_box: ERD <a name = "erd"></a>
-
-<details>
-   <summary> 본문 확인 (👈 Click)</summary>
-<br />
-
-<div align="center">
-<img width="912" alt="rds" src="https://github.com/CELEBIT/sluv-springboot-server/assets/101792740/bb324c0c-c057-4e4e-9661-84b9099ae6e2">
-</div>
-<br><br/>
-
-</details>

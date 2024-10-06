@@ -1,23 +1,18 @@
 package com.sluv.domain.user.entity;
 
 import com.sluv.domain.common.entity.BaseEntity;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
+@Builder
 @NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "user_report_stack")
 public class UserReportStack extends BaseEntity {
 
@@ -32,9 +27,9 @@ public class UserReportStack extends BaseEntity {
     private User reported;
 
 
-    @Builder
-    public UserReportStack(Long id, User reported) {
-        this.id = id;
-        this.reported = reported;
+    public static UserReportStack toEntity(User reported) {
+        return UserReportStack.builder()
+                .reported(reported)
+                .build();
     }
 }

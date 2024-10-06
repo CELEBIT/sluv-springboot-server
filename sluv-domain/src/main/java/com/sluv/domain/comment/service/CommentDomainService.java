@@ -11,6 +11,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class CommentDomainService {
@@ -61,6 +63,10 @@ public class CommentDomainService {
 
     public void deleteAllByParentId(Long parentId) {
         commentRepository.deleteAllByParentId(parentId);
+    }
+
+    public List<Comment> getAllBlockComment() {
+        return commentRepository.getAllBlockComment();
     }
 
 }

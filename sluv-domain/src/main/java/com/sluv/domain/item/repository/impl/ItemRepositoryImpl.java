@@ -9,6 +9,7 @@ import com.sluv.domain.celeb.entity.Celeb;
 import com.sluv.domain.celeb.entity.QCeleb;
 import com.sluv.domain.closet.entity.Closet;
 import com.sluv.domain.item.dto.ItemSimpleDto;
+import com.sluv.domain.item.dto.ItemWithCountDto;
 import com.sluv.domain.item.entity.Item;
 import com.sluv.domain.item.entity.QItemCategory;
 import com.sluv.domain.item.entity.RecentItem;
@@ -34,6 +35,7 @@ import java.util.stream.Stream;
 import static com.sluv.domain.brand.entity.QBrand.brand;
 import static com.sluv.domain.brand.entity.QNewBrand.newBrand;
 import static com.sluv.domain.celeb.entity.QCeleb.celeb;
+import static com.sluv.domain.celeb.entity.QCelebCategory.celebCategory;
 import static com.sluv.domain.celeb.entity.QInterestedCeleb.interestedCeleb;
 import static com.sluv.domain.celeb.entity.QNewCeleb.newCeleb;
 import static com.sluv.domain.closet.entity.QCloset.closet;
@@ -917,6 +919,37 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
                 );
 
         return PageableExecutionUtils.getPage(content, pageable, () -> countQuery.fetch().size());
+    }
+
+    @Override
+    public List<Item> getAllItemWithCelebCategory() {
+        return jpaQueryFactory.selectFrom(item)
+                .join(item.celeb, celeb).fetchJoin()
+                .join(item.celeb.celebCategory, celebCategory).fetchJoin()
+                .fetch();
+    }
+
+    @Override
+    public List<ItemWithCountDto> getTop3HotItem() {
+        List<Tuple> fetch = jpaQueryFactory.select(item, itemImg, itemLike.count(), itemScrap.count())
+                .from(item)
+                .leftJoin(itemImg).on(itemImg.item.eq(item)).fetchJoin()
+                .leftJoin(itemLike).on(itemLike.item.eq(item)).fetchJoin()
+                .leftJoin(itemScrap).on(itemScrap.item.eq(item)).fetchJoin()
+                .where(itemImg.representFlag.eq(true))
+                .groupBy(item, itemLike, itemScrap)
+                .orderBy(item.viewNum.add(itemLike.count()).add(itemScrap.count()).desc(),
+                        item.viewNum.desc(),
+                        itemLike.count().desc(),
+                        itemScrap.count().desc()
+                )
+                .limit(3)
+                .fetch();
+
+        return fetch.stream()
+                .map(tuple -> ItemWithCountDto.of(tuple.get(item), tuple.get(itemImg).getItemImgUrl(),
+                        tuple.get(itemLike.count()), tuple.get(itemScrap.count())))
+                .toList();
     }
 
 }

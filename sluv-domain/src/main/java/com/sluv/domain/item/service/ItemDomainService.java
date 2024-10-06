@@ -3,6 +3,7 @@ package com.sluv.domain.item.service;
 import com.sluv.domain.celeb.entity.Celeb;
 import com.sluv.domain.closet.entity.Closet;
 import com.sluv.domain.item.dto.ItemSimpleDto;
+import com.sluv.domain.item.dto.ItemWithCountDto;
 import com.sluv.domain.item.entity.Item;
 import com.sluv.domain.item.enums.ItemStatus;
 import com.sluv.domain.item.exception.ItemNotFoundException;
@@ -166,4 +167,11 @@ public class ItemDomainService {
         return itemRepository.getTrendItems(pageable);
     }
 
+    public List<Item> getAllItemWithCelebCategory() {
+        return itemRepository.getAllItemWithCelebCategory();
+    }
+
+    public List<ItemWithCountDto> getTop3HotItem() {
+        return itemRepository.getTop3HotItem();
+    }
 }

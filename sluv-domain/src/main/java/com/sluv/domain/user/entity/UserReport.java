@@ -3,17 +3,7 @@ package com.sluv.domain.user.entity;
 import com.sluv.domain.common.entity.BaseEntity;
 import com.sluv.domain.common.enums.ReportStatus;
 import com.sluv.domain.user.enums.UserReportReason;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -64,4 +54,9 @@ public class UserReport extends BaseEntity {
                 .reportStatus(ReportStatus.WAITING)
                 .build();
     }
+
+    public void changeUserReportStatus(ReportStatus reportStatus) {
+        this.reportStatus = reportStatus;
+    }
+
 }

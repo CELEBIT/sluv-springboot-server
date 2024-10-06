@@ -1,5 +1,6 @@
 package com.sluv.domain.brand.service;
 
+import com.sluv.domain.brand.dto.BrandCountDto;
 import com.sluv.domain.brand.entity.Brand;
 import com.sluv.domain.brand.exception.BrandNotFoundException;
 import com.sluv.domain.brand.repository.BrandRepository;
@@ -38,5 +39,10 @@ public class BrandDomainService {
     public List<Brand> getBrandContainKeyword(String keyword) {
         return brandRepository.getBrandContainKeyword(keyword);
     }
+
+    public List<BrandCountDto> getTopHotBrandWithLimit(int limitCount) {
+        return brandRepository.getTopHotBrandWithLimit(limitCount);
+    }
+
 }
 

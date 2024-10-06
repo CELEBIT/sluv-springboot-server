@@ -278,7 +278,7 @@ public class ItemService {
                 .map(ItemImgDto::of).toList();
 
         // 6. Item 링크들 조회
-        List<ItemLinkDto> linkList = itemLinkDomainService.findByItemId(itemId)
+        List<ItemLinkDto> linkList = itemLinkDomainService.findAllByItemId(itemId)
                 .stream()
                 .map(ItemLinkDto::of).toList();
 

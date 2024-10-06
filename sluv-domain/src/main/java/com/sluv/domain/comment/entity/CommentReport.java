@@ -4,17 +4,7 @@ import com.sluv.domain.comment.enums.CommentReportReason;
 import com.sluv.domain.common.entity.BaseEntity;
 import com.sluv.domain.common.enums.ReportStatus;
 import com.sluv.domain.user.entity.User;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -66,4 +56,9 @@ public class CommentReport extends BaseEntity {
                 .reportStatus(ReportStatus.WAITING)
                 .build();
     }
+
+    public void changeCommentReportStatus(ReportStatus reportStatus) {
+        this.reportStatus = reportStatus;
+    }
+
 }

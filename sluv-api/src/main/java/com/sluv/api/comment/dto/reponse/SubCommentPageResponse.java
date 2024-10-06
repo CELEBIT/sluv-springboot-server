@@ -2,11 +2,12 @@ package com.sluv.api.comment.dto.reponse;
 
 import com.sluv.api.common.response.PaginationResponse;
 import com.sluv.domain.comment.entity.Comment;
-import java.util.List;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import org.springframework.data.domain.Page;
+
+import java.util.List;
 
 @NoArgsConstructor
 @Getter

@@ -3,6 +3,7 @@ package com.sluv.domain.item.repository.impl;
 import com.sluv.domain.celeb.entity.Celeb;
 import com.sluv.domain.closet.entity.Closet;
 import com.sluv.domain.item.dto.ItemSimpleDto;
+import com.sluv.domain.item.dto.ItemWithCountDto;
 import com.sluv.domain.item.entity.Item;
 import com.sluv.domain.search.dto.SearchFilterReqDto;
 import com.sluv.domain.user.entity.User;
@@ -77,4 +78,8 @@ public interface ItemRepositoryCustom {
     List<Item> getItemContainKeyword(String keyword);
 
     Page<Item> getTrendItems(Pageable pageable);
+
+    List<Item> getAllItemWithCelebCategory();
+
+    List<ItemWithCountDto> getTop3HotItem();
 }

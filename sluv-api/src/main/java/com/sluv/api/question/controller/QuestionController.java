@@ -3,34 +3,19 @@ package com.sluv.api.question.controller;
 import com.sluv.api.common.response.PaginationResponse;
 import com.sluv.api.common.response.SuccessDataResponse;
 import com.sluv.api.common.response.SuccessResponse;
-import com.sluv.api.question.dto.QuestionBuyPostReqDto;
-import com.sluv.api.question.dto.QuestionBuySimpleResDto;
-import com.sluv.api.question.dto.QuestionFindPostReqDto;
-import com.sluv.api.question.dto.QuestionGetDetailResDto;
-import com.sluv.api.question.dto.QuestionHomeResDto;
-import com.sluv.api.question.dto.QuestionHowaboutPostReqDto;
-import com.sluv.api.question.dto.QuestionPostResDto;
-import com.sluv.api.question.dto.QuestionRecommendPostReqDto;
-import com.sluv.api.question.dto.QuestionReportReqDto;
-import com.sluv.api.question.dto.QuestionVoteReqDto;
+import com.sluv.api.question.dto.*;
 import com.sluv.api.question.service.QuestionService;
 import com.sluv.common.annotation.CurrentUserId;
 import com.sluv.domain.question.dto.QuestionSimpleResDto;
 import com.sluv.domain.question.exception.QuestionTypeNotFoundException;
 import io.swagger.v3.oas.annotations.Operation;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.Nullable;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor

@@ -1,9 +1,15 @@
 package com.sluv.domain.user.repository.impl;
 
+import com.querydsl.core.Tuple;
+import com.querydsl.core.types.Projections;
+import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sluv.domain.auth.enums.SnsType;
+import com.sluv.domain.common.enums.ReportStatus;
 import com.sluv.domain.item.enums.ItemStatus;
+import com.sluv.domain.user.dto.UserReportStackDto;
+import com.sluv.domain.user.dto.UserWithFollowerCountDto;
 import com.sluv.domain.user.entity.Follow;
 import com.sluv.domain.user.entity.QUser;
 import com.sluv.domain.user.entity.User;
@@ -21,6 +27,8 @@ import static com.sluv.domain.item.entity.QItem.item;
 import static com.sluv.domain.item.entity.QItemLike.itemLike;
 import static com.sluv.domain.user.entity.QFollow.follow;
 import static com.sluv.domain.user.entity.QUser.user;
+import static com.sluv.domain.user.entity.QUserReport.userReport;
+import static com.sluv.domain.user.entity.QUserReportStack.userReportStack;
 import static com.sluv.domain.user.enums.UserStatus.ACTIVE;
 import static com.sluv.domain.user.enums.UserStatus.DELETED;
 
@@ -176,4 +184,45 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
                 .fetchOne();
         return Optional.ofNullable(user);
     }
+
+    @Override
+    public Page<UserReportStackDto> getAllUserInfo(Pageable pageable) {
+
+        List<UserReportStackDto> content = jpaQueryFactory
+                .select(Projections.constructor(UserReportStackDto.class,
+                        user.nickname,
+                        user.profileImgUrl,
+                        user.userStatus,
+                        JPAExpressions.select(userReport.reported.id.count())
+                                .from(userReport)
+                                .where(userReport.reported.id.eq(user.id)
+                                        .and(userReport.reportStatus.stringValue().eq(ReportStatus.WAITING.name()))),
+                        JPAExpressions.select(userReportStack.reported.id.count())
+                                .from(userReportStack)
+                                .where(userReportStack.reported.id.eq(user.id))
+                ))
+                .from(user)
+                .orderBy(user.createdAt.desc())
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        return PageableExecutionUtils.getPage(content, pageable, () -> jpaQueryFactory.from(user).fetch().size());
+    }
+
+    @Override
+    public List<UserWithFollowerCountDto> getTop3HotUser() {
+        List<Tuple> fetch = jpaQueryFactory.select(user, follow.count())
+                .from(user)
+                .leftJoin(follow).on(follow.followee.eq(user)).fetchJoin()
+                .groupBy(user)
+                .orderBy(follow.count().desc())
+                .limit(3)
+                .fetch();
+
+        return fetch.stream()
+                .map(tuple -> UserWithFollowerCountDto.of(tuple.get(user), tuple.get(follow.count())))
+                .toList();
+    }
+
 }

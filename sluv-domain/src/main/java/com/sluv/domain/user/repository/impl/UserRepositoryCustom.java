@@ -1,6 +1,8 @@
 package com.sluv.domain.user.repository.impl;
 
 import com.sluv.domain.auth.enums.SnsType;
+import com.sluv.domain.user.dto.UserReportStackDto;
+import com.sluv.domain.user.dto.UserWithFollowerCountDto;
 import com.sluv.domain.user.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -24,4 +26,8 @@ public interface UserRepositoryCustom {
     List<User> getDeletedUsersAfter7Days();
 
     Optional<User> findBySnsWithEmailOrNull(String email, SnsType snsType);
+
+    Page<UserReportStackDto> getAllUserInfo(Pageable pageable);
+
+    List<UserWithFollowerCountDto> getTop3HotUser();
 }

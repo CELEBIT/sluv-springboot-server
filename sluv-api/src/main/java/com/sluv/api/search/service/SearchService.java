@@ -17,7 +17,6 @@ import com.sluv.domain.search.service.SearchDataDomainService;
 import com.sluv.domain.search.service.SearchRankDomainService;
 import com.sluv.domain.user.entity.User;
 import com.sluv.domain.user.service.UserDomainService;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -25,6 +24,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Slf4j
 @Service

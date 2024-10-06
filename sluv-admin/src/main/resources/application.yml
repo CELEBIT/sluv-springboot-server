@@ -8,10 +8,10 @@ spring:
       - infra
     active: dev
 
-#  security:
-#    user:
-#      name: user
-#      password: 1234
+  security:
+    user:
+      name: user
+      password: 1234
 ---
 spring:
   config:

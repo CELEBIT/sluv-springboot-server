@@ -1,16 +1,20 @@
 package com.sluv.domain.brand.repository.impl;
 
-import static com.sluv.domain.brand.entity.QBrand.brand;
-import static com.sluv.domain.brand.entity.QRecentSelectBrand.recentSelectBrand;
-
+import com.querydsl.core.Tuple;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.sluv.domain.brand.dto.BrandCountDto;
 import com.sluv.domain.brand.entity.Brand;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
+
+import java.util.List;
+
+import static com.sluv.domain.brand.entity.QBrand.brand;
+import static com.sluv.domain.brand.entity.QRecentSelectBrand.recentSelectBrand;
+import static com.sluv.domain.item.entity.QItem.item;
 
 @RequiredArgsConstructor
 public class BrandRepositoryImpl implements BrandRepositoryCustom {
@@ -54,5 +58,19 @@ public class BrandRepositoryImpl implements BrandRepositoryCustom {
                 )
                 .limit(5)
                 .fetch();
+    }
+
+    @Override
+    public List<BrandCountDto> getTopHotBrandWithLimit(int limitCount) {
+        List<Tuple> fetch = jpaQueryFactory.select(brand, item.brand.count())
+                .from(item)
+                .groupBy(item.brand)
+                .orderBy(item.brand.count().desc())
+                .limit(limitCount)
+                .fetch();
+
+        return fetch.stream()
+                .map(tuple -> BrandCountDto.of(tuple.get(brand), tuple.get(item.brand.count())))
+                .toList();
     }
 }

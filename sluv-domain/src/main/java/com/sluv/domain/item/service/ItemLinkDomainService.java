@@ -19,8 +19,8 @@ public class ItemLinkDomainService {
         itemLinkRepository.deleteAllByItemId(itemId);
     }
 
-    public List<ItemLink> findByItemId(Long itemId) {
-        return itemLinkRepository.findByItemId(itemId);
+    public List<ItemLink> findAllByItemId(Long itemId) {
+        return itemLinkRepository.findAllByItemId(itemId);
     }
 
     public void saveItemLink(Item newItem, ItemLinkDto dto) {

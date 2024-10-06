@@ -1,6 +1,8 @@
 package com.sluv.domain.user.service;
 
 import com.sluv.domain.auth.enums.SnsType;
+import com.sluv.domain.user.dto.UserReportStackDto;
+import com.sluv.domain.user.dto.UserWithFollowerCountDto;
 import com.sluv.domain.user.entity.User;
 import com.sluv.domain.user.exception.UserNotFoundException;
 import com.sluv.domain.user.repository.UserRepository;
@@ -61,5 +63,17 @@ public class UserDomainService {
 
     public User findBySnsWithEmailOrNull(String email, SnsType snsType) {
         return userRepository.findBySnsWithEmailOrNull(email, snsType).orElse(null);
+    }
+
+    public Page<UserReportStackDto> getAllUserInfo(Pageable pageable) {
+        return userRepository.getAllUserInfo(pageable);
+    }
+
+    public List<User> findAll() {
+        return userRepository.findAll();
+    }
+
+    public List<UserWithFollowerCountDto> getTop3HotUser() {
+        return userRepository.getTop3HotUser();
     }
 }

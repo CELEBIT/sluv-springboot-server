@@ -1,11 +1,12 @@
 package com.sluv.domain.item.repository;
 
 import com.sluv.domain.item.entity.ItemLink;
-import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.List;
+
 public interface ItemLinkRepository extends JpaRepository<ItemLink, Long> {
-    List<ItemLink> findByItemId(Long itemId);
+    List<ItemLink> findAllByItemId(Long itemId);
 
     void deleteAllByItemId(Long itemId);
 

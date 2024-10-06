@@ -16,15 +16,16 @@ import com.sluv.domain.user.dto.UserSearchInfoDto;
 import com.sluv.domain.user.entity.User;
 import com.sluv.domain.user.service.FollowDomainService;
 import com.sluv.domain.user.service.UserDomainService;
-import java.util.List;
-import java.util.Objects;
-import java.util.concurrent.CompletableFuture;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
 
 @Service
 @RequiredArgsConstructor

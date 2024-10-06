@@ -1,19 +1,20 @@
 package com.sluv.domain.comment.repository.impl;
 
-import static com.sluv.domain.comment.entity.QComment.comment;
-import static com.sluv.domain.comment.entity.QCommentLike.commentLike;
-
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sluv.domain.comment.entity.Comment;
 import com.sluv.domain.comment.enums.CommentStatus;
 import com.sluv.domain.question.enums.QuestionStatus;
 import com.sluv.domain.user.entity.User;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
+
+import java.util.List;
+
+import static com.sluv.domain.comment.entity.QComment.comment;
+import static com.sluv.domain.comment.entity.QCommentLike.commentLike;
 
 @RequiredArgsConstructor
 public class CommentRepositoryImpl implements CommentRepositoryCustom {
@@ -125,4 +126,12 @@ public class CommentRepositoryImpl implements CommentRepositoryCustom {
 
         return comments.stream().count();
     }
+
+    @Override
+    public List<Comment> getAllBlockComment() {
+        return jpaQueryFactory.selectFrom(comment)
+                .where(comment.commentStatus.eq(CommentStatus.BLOCKED))
+                .fetch();
+    }
+
 }

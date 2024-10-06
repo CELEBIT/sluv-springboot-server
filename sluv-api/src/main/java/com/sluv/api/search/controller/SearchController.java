@@ -3,11 +3,7 @@ package com.sluv.api.search.controller;
 import com.sluv.api.common.response.PaginationResponse;
 import com.sluv.api.common.response.SuccessDataResponse;
 import com.sluv.api.common.response.SuccessResponse;
-import com.sluv.api.search.dto.RecentSearchChipResDto;
-import com.sluv.api.search.dto.SearchItemCountResDto;
-import com.sluv.api.search.dto.SearchKeywordResDto;
-import com.sluv.api.search.dto.SearchKeywordTotalResDto;
-import com.sluv.api.search.dto.SearchTotalResDto;
+import com.sluv.api.search.dto.*;
 import com.sluv.api.search.service.SearchEngineService;
 import com.sluv.api.search.service.SearchEngineTotalService;
 import com.sluv.api.search.service.SearchService;
@@ -17,17 +13,14 @@ import com.sluv.domain.question.dto.QuestionSimpleResDto;
 import com.sluv.domain.search.dto.SearchFilterReqDto;
 import com.sluv.domain.user.dto.UserSearchInfoDto;
 import io.swagger.v3.oas.annotations.Operation;
-import java.util.List;
-import java.util.concurrent.ExecutionException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.Nullable;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 @RestController
 @RequestMapping("/app/search")

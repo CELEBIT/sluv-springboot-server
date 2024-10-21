@@ -7,6 +7,7 @@ import com.sluv.domain.item.entity.Item;
 import com.sluv.domain.item.entity.ItemImg;
 import com.sluv.domain.item.repository.ItemImgRepository;
 import com.sluv.domain.item.repository.ItemRepository;
+import com.sluv.infra.alarm.service.CommentAlarmService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
@@ -21,6 +22,7 @@ public class AiModelService {
     private final CommentRepository commentRepository;
     private final ItemRepository itemRepository;
     private final ItemImgRepository itemImgRepository;
+    private final CommentAlarmService commentAlarmService;
 
 
     @Transactional
@@ -31,7 +33,7 @@ public class AiModelService {
         if (isMalicious) {
             comment.changeStatus(CommentStatus.BLOCKED);
             commentRepository.save(comment);
-//            commentAlarmService.sendAlarmAboutReportByAI(comment.getId(), null);
+            commentAlarmService.sendAlarmAboutReportByAI(comment.getId(), null);
         }
     }
 

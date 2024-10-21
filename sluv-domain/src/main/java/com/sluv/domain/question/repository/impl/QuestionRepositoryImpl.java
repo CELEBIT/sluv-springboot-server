@@ -1,5 +1,31 @@
 package com.sluv.domain.question.repository.impl;
 
+import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.ConstantImpl;
+import com.querydsl.core.types.Order;
+import com.querydsl.core.types.OrderSpecifier;
+import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.EntityPathBase;
+import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.core.types.dsl.StringTemplate;
+import com.querydsl.jpa.impl.JPAQuery;
+import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.sluv.domain.celeb.entity.Celeb;
+import com.sluv.domain.celeb.entity.QCeleb;
+import com.sluv.domain.question.entity.*;
+import com.sluv.domain.question.enums.QuestionStatus;
+import com.sluv.domain.user.entity.User;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.support.PageableExecutionUtils;
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
 import static com.sluv.domain.celeb.entity.QCeleb.celeb;
 import static com.sluv.domain.celeb.entity.QNewCeleb.newCeleb;
 import static com.sluv.domain.comment.entity.QComment.comment;
@@ -11,32 +37,6 @@ import static com.sluv.domain.question.entity.QQuestionHowabout.questionHowabout
 import static com.sluv.domain.question.entity.QQuestionLike.questionLike;
 import static com.sluv.domain.question.entity.QQuestionRecommend.questionRecommend;
 import static com.sluv.domain.question.entity.QQuestionRecommendCategory.questionRecommendCategory;
-
-import com.querydsl.core.BooleanBuilder;
-import com.querydsl.core.types.Order;
-import com.querydsl.core.types.OrderSpecifier;
-import com.querydsl.core.types.dsl.BooleanExpression;
-import com.querydsl.core.types.dsl.EntityPathBase;
-import com.querydsl.core.types.dsl.Expressions;
-import com.querydsl.jpa.impl.JPAQuery;
-import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.sluv.domain.celeb.entity.Celeb;
-import com.sluv.domain.celeb.entity.QCeleb;
-import com.sluv.domain.question.entity.Question;
-import com.sluv.domain.question.entity.QuestionBuy;
-import com.sluv.domain.question.entity.QuestionFind;
-import com.sluv.domain.question.entity.QuestionHowabout;
-import com.sluv.domain.question.entity.QuestionRecommend;
-import com.sluv.domain.question.enums.QuestionStatus;
-import com.sluv.domain.user.entity.User;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.support.PageableExecutionUtils;
 
 
 @RequiredArgsConstructor
@@ -538,11 +538,13 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
     @Override
     public List<QuestionBuy> getEndTimeBetweenNow(int voteEndCheckPeriod) {
         int periodToMinutes = voteEndCheckPeriod / 1000 / 60;
-        LocalDateTime now = LocalDateTime.now();
+        String dateFormat = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+        String start = LocalDateTime.now().minusMinutes(periodToMinutes).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+        StringTemplate formattedDate = Expressions.stringTemplate("DATE_FORMAT({0}, {1})", questionBuy.voteEndTime, ConstantImpl.create("%Y-%m-%d %H:%i:%s"));
 
         return jpaQueryFactory.selectFrom(questionBuy)
                 .where(questionBuy.questionStatus.eq(QuestionStatus.ACTIVE)
-                        .and(questionBuy.voteEndTime.between(now.minusMinutes(periodToMinutes), now))
+                        .and(formattedDate.between(start, dateFormat))
                 )
                 .fetch();
 

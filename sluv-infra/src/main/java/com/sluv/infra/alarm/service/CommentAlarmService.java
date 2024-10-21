@@ -44,8 +44,7 @@ public class CommentAlarmService {
     @Async("alarmThreadPoolExecutor")
     public void sendAlarmAboutComment(Long senderId, Long commentId) {
         Comment comment = commentDomainService.findById(commentId);
-
-        if (!senderId.equals(comment.getUser().getId())) {
+        if (!senderId.equals(comment.getQuestion().getUser().getId())) {
             User sender = userDomainService.findById(senderId);
             String message = AlarmMessage.getMessageWithUserName(sender.getNickname(), AlarmMessage.QUESTION_COMMENT);
             sendMessageTypeComment(comment.getQuestion().getUser(), comment, message, sender);
@@ -57,10 +56,10 @@ public class CommentAlarmService {
     public void sendAlarmAboutSubComment(Long senderId, Long commentId) {
         Comment comment = commentDomainService.findById(commentId);
 
-        if (!senderId.equals(comment.getUser().getId())) {
+        if (!senderId.equals(comment.getParent().getUser().getId()) && !senderId.equals(comment.getQuestion().getUser().getId())) {
             User sender = userDomainService.findById(senderId);
             String message = AlarmMessage.getMessageWithUserName(sender.getNickname(), AlarmMessage.COMMENT_SUB);
-            sendMessageTypeComment(comment.getUser(), comment, message, sender);
+            sendMessageTypeComment(comment.getParent().getUser(), comment, message, sender);
         }
     }
 

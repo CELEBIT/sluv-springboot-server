@@ -44,5 +44,8 @@ public class BrandDomainService {
         return brandRepository.getTopHotBrandWithLimit(limitCount);
     }
 
+    public Brand saveBrand(Brand brand) {
+        return brandRepository.save(brand);
+    }
 }
 

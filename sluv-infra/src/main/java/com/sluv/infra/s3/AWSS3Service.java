@@ -5,13 +5,14 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.Headers;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
-import java.net.URL;
-import java.util.Date;
-import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+
+import java.net.URL;
+import java.util.Date;
+import java.util.UUID;
 
 
 @Service
@@ -23,6 +24,9 @@ public class AWSS3Service {
 
     @Value("${aws.s3.bucketName}")
     private String BUCKET_NAME;
+
+    @Value("${aws.s3.brandBucketName}")
+    private String BRAND_BUCKET_NAME;
 
     @Value("${aws.s3.baseUrl}")
     private String BASE_URL = "";
@@ -98,6 +102,22 @@ public class AWSS3Service {
                 .build();
     }
 
+    /**
+     * 브랜드 이미지
+     */
+    public PreSingedUrlResDto forBrandImage(String fileName, ImgExtension imgExtension) {
+        String fixedExtension = imgExtension.getUploadExtension();
+        String filePathName = getForBrandImageFileName(fileName, fixedExtension);
+        log.info(filePathName);
+        URL url =
+                amazonS3.generatePresignedUrl(
+                        getGeneratePreSignedUrlRequest(BRAND_BUCKET_NAME, filePathName, fixedExtension));
+        return PreSingedUrlResDto.builder()
+                .preSignedUrl(url.toString())
+                .key(filePathName)
+                .build();
+    }
+
     // 유저 프로필
     private String getForUserProfileFileName(String imgExtension) {
         return BASE_URL + "/user/profile/" + UUID.randomUUID() + "." + imgExtension;
@@ -121,6 +141,11 @@ public class AWSS3Service {
     //클로젯 커버
     private String getForClosetFileName(String imgExtension) {
         return BASE_URL + "/closet/" + UUID.randomUUID() + "." + imgExtension;
+    }
+
+    // 브랜드 이미지
+    private String getForBrandImageFileName(String fileName, String imgExtension) {
+        return "brand_img/" + fileName + "." + imgExtension;
     }
 
     private GeneratePresignedUrlRequest getGeneratePreSignedUrlRequest(String bucket, String fileName,

@@ -1,5 +1,6 @@
 package com.sluv.domain.item.service;
 
+import com.sluv.domain.brand.entity.Brand;
 import com.sluv.domain.item.entity.TempItem;
 import com.sluv.domain.item.repository.TempItemRepository;
 import com.sluv.domain.user.entity.User;
@@ -40,4 +41,7 @@ public class TempItemDomainService {
         return tempItemRepository.save(postTempItem);
     }
 
+    public void changeAllBrandByNewBrandId(Brand brand, Long newBrandId) {
+        tempItemRepository.changeAllBrandByNewBrandId(brand, newBrandId);
+    }
 }

@@ -1,14 +1,17 @@
 package com.sluv.domain.brand.repository.impl;
 
+import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.sluv.domain.brand.entity.Brand;
+import com.sluv.domain.brand.entity.NewBrand;
+import com.sluv.domain.brand.entity.RecentSelectBrand;
+import com.sluv.domain.user.entity.User;
+import lombok.RequiredArgsConstructor;
+
+import java.util.List;
+
 import static com.sluv.domain.brand.entity.QBrand.brand;
 import static com.sluv.domain.brand.entity.QNewBrand.newBrand;
 import static com.sluv.domain.brand.entity.QRecentSelectBrand.recentSelectBrand;
-
-import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.sluv.domain.brand.entity.RecentSelectBrand;
-import com.sluv.domain.user.entity.User;
-import java.util.List;
-import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 public class RecentSelectBrandRepositoryImpl implements RecentSelectBrandRepositoryCustom {
@@ -27,5 +30,14 @@ public class RecentSelectBrandRepositoryImpl implements RecentSelectBrandReposit
                 .fetch();
 
 //        return null;
+    }
+
+    @Override
+    public void changeAllBrandByNewBrandId(Brand brand, Long newBrandId) {
+        jpaQueryFactory.update(recentSelectBrand)
+                .where(recentSelectBrand.newBrand.id.eq(newBrandId))
+                .set(recentSelectBrand.brand, brand)
+                .set(recentSelectBrand.newBrand, (NewBrand) null)
+                .execute();
     }
 }

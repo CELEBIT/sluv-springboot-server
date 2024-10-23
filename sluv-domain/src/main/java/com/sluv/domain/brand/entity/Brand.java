@@ -1,12 +1,7 @@
 package com.sluv.domain.brand.entity;
 
 import com.sluv.domain.common.entity.BaseEntity;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -38,5 +33,13 @@ public class Brand extends BaseEntity {
 
     @Column(columnDefinition = "TEXT")
     private String brandImgUrl;
+
+    public static Brand of(String krName, String enName, String imageUrl) {
+        return Brand.builder()
+                .brandKr(krName)
+                .brandEn(enName)
+                .brandImgUrl(imageUrl)
+                .build();
+    }
 
 }

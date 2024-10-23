@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>랭킹-[HOMSS-SF]</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            background-color: #f0f0f0;
+            border-bottom: 1px solid #ddd;
+        }
+
+        header a {
+            text-decoration: none;
+            color: #333;
+            font-size: 18px;
+            margin: 0 15px; /* 좌우 여백을 추가하여 균형 잡기 */
+        }
+
+        header .center {
+            flex: 1; /* 각 center 항목이 동일한 비율로 자라도록 설정 */
+            text-align: center;
+        }
+
+        header .left,
+        header .right {
+            flex: 1;
+            text-align: center;
+        }
+
+        main {
+            padding: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #f8f8f8;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+<header>
+    <div class="left"><a href="/admin/new-celebs">New Celeb</a></div>
+    <div class="right"><a href="/admin/new-brands">New Brand</a></div>
+</header>
+<main>
+    <table>
+        <thead>
+        <tr>
+            <th>뉴브랜드</th>
+            <th>등록일</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="newbrand : ${newBrands}">
+            <td th:text="${newbrand.name}">뉴브랜드</td>
+            <td th:text="${newbrand.createdAt}">생성일</td>
+            <td>
+                <button th:onclick="|location.href='@{brand-register(brandId=${newbrand.brandId})}'|">등록하기</button>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</main>
+</body>
+</html>

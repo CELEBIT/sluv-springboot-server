@@ -15,4 +15,6 @@ public interface BrandRepositoryCustom {
     List<Brand> getBrandContainKeyword(String keyword);
 
     List<BrandCountDto> getTopHotBrandWithLimit(int limitCount);
+
+    Page<Brand> findAllWithPageable(Pageable pageable);
 }

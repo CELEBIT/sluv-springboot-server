@@ -12,16 +12,16 @@ import java.time.format.DateTimeFormatter;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class NewBrandRegisterDto {
+public class NewBrandResponse {
 
-    private Long brandId;
+    private Long newBrandId;
     private String name;
     private String createdAt;
 
-    public static NewBrandRegisterDto from(NewBrand newBrand) {
+    public static NewBrandResponse from(NewBrand newBrand) {
         String dateTimeFormat = newBrand.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:MM"));
-        return NewBrandRegisterDto.builder()
-                .brandId(newBrand.getId())
+        return NewBrandResponse.builder()
+                .newBrandId(newBrand.getId())
                 .name(newBrand.getBrandName())
                 .createdAt(dateTimeFormat)
                 .build();

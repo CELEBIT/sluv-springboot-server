@@ -1,8 +1,8 @@
 package com.sluv.admin.brand.service;
 
 import com.sluv.admin.brand.dto.NewBrandChangeRequest;
-import com.sluv.admin.brand.dto.NewBrandRegisterDto;
 import com.sluv.admin.brand.dto.NewBrandRegisterRequest;
+import com.sluv.admin.brand.dto.NewBrandResponse;
 import com.sluv.domain.brand.entity.Brand;
 import com.sluv.domain.brand.entity.NewBrand;
 import com.sluv.domain.brand.service.BrandDomainService;
@@ -27,16 +27,16 @@ public class NewBrandService {
     private final RecentSelectBrandDomainService recentSelectBrandDomainService;
 
     @Transactional(readOnly = true)
-    public List<NewBrandRegisterDto> findAllNewBrandRegisterDto() {
+    public List<NewBrandResponse> findAllNewBrandRegisterDto() {
         return newBrandDomainService.findAll().stream()
-                .map(NewBrandRegisterDto::from)
+                .map(NewBrandResponse::from)
                 .toList();
     }
 
     @Transactional(readOnly = true)
-    public NewBrandRegisterDto findByNewBrandId(Long brandId) {
+    public NewBrandResponse findByNewBrandId(Long brandId) {
         NewBrand newBrand = newBrandDomainService.findById(brandId);
-        return NewBrandRegisterDto.from(newBrand);
+        return NewBrandResponse.from(newBrand);
     }
 
     @Transactional

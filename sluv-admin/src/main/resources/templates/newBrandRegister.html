@@ -171,6 +171,140 @@
             text-align: center;
         }
     </style>
+    <script>
+        document.getElementById('image').addEventListener('change', function (event) {
+            const imagePreview = document.getElementById('imagePreview');
+            imagePreview.innerHTML = ''; // Reset previous preview
+
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+
+                reader.onload = function (e) {
+                    const imgElement = document.createElement('img');
+                    imgElement.src = e.target.result;
+                    imgElement.style.maxWidth = '100%';
+                    imgElement.style.maxHeight = '300px';
+                    imagePreview.appendChild(imgElement);
+                };
+
+                reader.readAsDataURL(file);
+            }
+        });
+    </script>
+
+    <script>
+        document.getElementById('self-register').addEventListener('submit', function (event) {
+            event.preventDefault(); // Prevents the default form submission
+
+            // Get the value of the brandId input field
+            const krName = document.getElementById('kr-name').value;
+            const enName = document.getElementById('en-name').value;
+
+            // 이미지
+            const imageInput = document.getElementById('image');
+            const file = imageInput.files[0];
+            if (file == null) {
+                alert("이미지가 없습니다.");
+                return;
+            }
+            const fileName = file.name;
+            fileName.replace(' ', '');
+            const fileExtension = fileName.substring(fileName.lastIndexOf('.') + 1).toUpperCase();
+            const nameWithoutExtension = fileName.substring(0, fileName.lastIndexOf('.'));
+            const name = nameWithoutExtension.split(' ').join('');
+            let key;
+            // preSigned URL 발급
+
+            // Example usage
+            fetch('/admin/s3/pre-signed-url/brand?name=' + name + '&imgExtension=' + fileExtension, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'image/png'
+                }
+            })
+                .then(response => response.json())
+                .then(data => {
+                    key = data.result.key;
+                    fetch(data.result.preSignedUrl, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'image/png'
+                        },
+                        body: file
+                    })
+                        .then(() => {
+                            console.log('ok')
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                        });
+
+                    // 이미지 등록
+                    const host = "https://sluv-brands.s3.ap-northeast-2.amazonaws.com/"
+
+                    // Create the request payload
+                    const body = {
+                        newBrandId: [[${newBrandId}]],
+                        krName: krName,
+                        enName: enName,
+                        imageUrl: host + key
+                    }
+
+                    fetch('/admin/new-brand/self', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(body)
+                    })
+                        .then(() => {
+                            alert('brand 등록 성공');
+                            window.location.href = `/admin/new-brands`;
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            alert('등록 실패: ' + error.message);
+                        });
+                })
+                .catch(error => {
+                    console.error('Error:', error)
+                })
+        });
+
+    </script>
+
+    <script>
+        document.getElementById('registerById').addEventListener('submit', function (event) {
+            event.preventDefault(); // Prevents the default form submission
+
+            // Get the value of the brandId input field
+            const brandId = document.getElementById('brandId').value;
+
+            // Create the request payload
+            const data = {
+                brandId: brandId,
+                newBrandId: [[${newBrandId}]]
+            }
+
+            fetch('/admin/new-brand/change', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            })
+                .then(() => {
+                    alert('brand 등록 성공');
+                    window.location.href = `/admin/new-brands`;
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('등록 실패: ' + error.message);
+                });
+        });
+
+    </script>
 </head>
 <body>
 <!-- 최상단 헤더 -->
@@ -183,17 +317,30 @@
     <div></div>
 </header>
 
-<!-- 메뉴바와 본문을 감싸는 컨테이너 -->
 <div class="content">
-    <!-- 왼쪽 메뉴바 -->
     <div class="sidebar">
         <a th:href="@{/admin/brands}">브랜드 목록</a>
         <div class="divider"></div>
-        <a th:href="@{/admin/brand-register}" class="active">신규등록</a>
+        <a th:href="@{/admin/brand-register}">신규등록</a>
         <div class="divider"></div>
-        <a th:href="@{/admin/new-brands}">뉴브랜드 목록</a>
+        <a th:href="@{/admin/new-brands}" class="active">뉴브랜드 목록</a>
     </div>
     <main>
+        <table>
+            <thead>
+            <tr>
+                <th>뉴셀럽</th>
+                <th>등록일</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td th:text="${name}">뉴셀럽</td>
+                <td th:text="${createdAt}">생성일</td>
+            </tr>
+            </tbody>
+        </table>
+
         <div class="register-section"> <!-- Use a div with class "postsection" -->
             <form id="self-register">
                 <label for="kr-name">한글 이름</label>
@@ -211,112 +358,16 @@
 
                 <button type="submit" id="new-register">등록하기</button>
             </form>
+
+            <form id="registerById">
+                <label for="brandId">브랜드 아이디</label>
+                <input type="text" id="brandId" name="brandId" required>
+
+                <button type="submit" id="again-register">등록하기</button>
+            </form>
         </div>
     </main>
 </div>
-
-<script>
-    document.getElementById('image').addEventListener('change', function (event) {
-        const imagePreview = document.getElementById('imagePreview');
-        imagePreview.innerHTML = ''; // Reset previous preview
-
-        const file = event.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-
-            reader.onload = function (e) {
-                const imgElement = document.createElement('img');
-                imgElement.src = e.target.result;
-                imgElement.style.maxWidth = '100%';
-                imgElement.style.maxHeight = '300px';
-                imagePreview.appendChild(imgElement);
-            };
-
-            reader.readAsDataURL(file);
-        }
-    });
-</script>
-
-<script>
-    document.getElementById('self-register').addEventListener('submit', function (event) {
-        event.preventDefault(); // Prevents the default form submission
-
-        // Get the value of the brandId input field
-        const krName = document.getElementById('kr-name').value;
-        const enName = document.getElementById('en-name').value;
-
-        // 이미지
-        const imageInput = document.getElementById('image');
-        const file = imageInput.files[0];
-        if (file == null) {
-            alert("이미지가 없습니다.");
-            return;
-        }
-        const fileName = file.name;
-        fileName.replace(' ', '');
-        const fileExtension = fileName.substring(fileName.lastIndexOf('.') + 1).toUpperCase();
-        const nameWithoutExtension = fileName.substring(0, fileName.lastIndexOf('.'));
-        const name = nameWithoutExtension.split(' ').join('');
-        let key;
-        // preSigned URL 발급
-
-        // Example usage
-        fetch('/admin/s3/pre-signed-url/brand?name=' + name + '&imgExtension=' + fileExtension, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'image/png'
-            }
-        })
-            .then(response => response.json())
-            .then(data => {
-                key = data.result.key;
-                fetch(data.result.preSignedUrl, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'image/png'
-                    },
-                    body: file
-                })
-                    .then(() => {
-                        console.log('ok')
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                    });
-
-                // 이미지 등록
-                const host = "https://sluv-brands.s3.ap-northeast-2.amazonaws.com/"
-
-                // Create the request payload
-                const body = {
-                    newBrandId: [[${brandId}]],
-                    krName: krName,
-                    enName: enName,
-                    imageUrl: host + key
-                }
-
-                fetch('/admin/new-brand/self', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(body)
-                })
-                    .then(() => {
-                        alert('brand 등록 성공');
-                        window.location.href = `/admin/new-brands`;
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        alert('등록 실패: ' + error.message);
-                    });
-            })
-            .catch(error => {
-                console.error('Error:', error)
-            })
-    });
-
-</script>
 
 </body>
 </html>

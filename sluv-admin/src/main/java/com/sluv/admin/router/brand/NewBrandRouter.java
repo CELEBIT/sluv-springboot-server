@@ -1,6 +1,6 @@
-package com.sluv.admin.temproute;
+package com.sluv.admin.router.brand;
 
-import com.sluv.admin.brand.dto.NewBrandRegisterDto;
+import com.sluv.admin.brand.dto.NewBrandResponse;
 import com.sluv.admin.brand.service.NewBrandService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -14,23 +14,23 @@ import java.util.List;
 @Controller
 @RequestMapping("/admin")
 @RequiredArgsConstructor
-public class NewBrandRouteController {
+public class NewBrandRouter {
 
     private final NewBrandService newBrandService;
 
     @GetMapping("/new-brands")
-    public String testMap(Model model) {
-        List<NewBrandRegisterDto> newBrands = newBrandService.findAllNewBrandRegisterDto();
+    public String getNewBrandListPage(Model model) {
+        List<NewBrandResponse> newBrands = newBrandService.findAllNewBrandRegisterDto();
         model.addAttribute("newBrands", newBrands);
         return "newBrands";
     }
 
-    @GetMapping("/brand-register")
-    public String celebPostPage(Model model, @RequestParam("brandId") Long brandId) {
-        NewBrandRegisterDto newBrand = newBrandService.findByNewBrandId(brandId);
-        model.addAttribute("brandId", newBrand.getBrandId());
+    @GetMapping("/new-brand-register")
+    public String getNewBrandRegisterPage(Model model, @RequestParam("newBrandId") Long newBrandId) {
+        NewBrandResponse newBrand = newBrandService.findByNewBrandId(newBrandId);
+        model.addAttribute("newBrandId", newBrand.getNewBrandId());
         model.addAttribute("name", newBrand.getName());
         model.addAttribute("createdAt", newBrand.getCreatedAt());
-        return "brandRegister";
+        return "newBrandRegister";
     }
 }

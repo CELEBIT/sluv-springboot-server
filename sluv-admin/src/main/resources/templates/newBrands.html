@@ -9,35 +9,110 @@
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
         }
 
+        /* 상단 헤더 고정 스타일 */
         header {
+            width: 100%;
+            background-color: #333;
+            color: white;
+            padding: 10px 20px;
+            box-sizing: border-box;
             display: flex;
+            justify-content: space-between; /* 양 끝에 요소 배치 */
             align-items: center;
-            padding: 20px;
-            background-color: #f0f0f0;
-            border-bottom: 1px solid #ddd;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000; /* 사이드바보다 앞에 나오도록 설정 */
+        }
+
+        .header-center {
+            flex-grow: 1;
+            display: flex;
+            justify-content: left; /* 가운데 정렬 */
+            margin-left: 170px;
+        }
+
+        /* 가운데 정렬을 위한 컨테이너 */
+        .header-center a {
+            text-decoration: none;
+            color: #ddd;
+            font-size: 18px;
+            font-weight: bold;
+            margin: 0 5px; /* 메뉴 사이 간격 */
+            padding: 8px 16px;
+            background-color: transparent;
+            border-radius: 3px;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        /* 활성화된 메뉴 스타일 */
+        .header-center a.active {
+            background-color: #ddd; /* 눌린 느낌을 위한 회색 배경 */
+            color: #000; /* 글자색 어둡게 */
+            font-weight: bold;
+            border-bottom: 3px solid #333; /* 눌린 느낌을 위한 하단 강조선 */
+        }
+
+        /* 메뉴 호버 효과 */
+        .header-center a:hover {
+            background-color: #555; /* 어두운 회색 배경 */
+            color: #fff; /* 글자색을 흰색으로 변경 */
         }
 
         header a {
             text-decoration: none;
+            color: white;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        /* 본문과 사이드바를 헤더 아래로 밀기 위한 상단 패딩 추가 */
+        .content {
+            display: flex;
+            flex: 1;
+            margin-top: 60px; /* 헤더의 높이만큼 본문 아래로 밀기 */
+        }
+
+        /* 왼쪽 메뉴바 스타일 */
+        .sidebar {
+            width: 200px;
+            background-color: #f0f0f0;
+            padding: 20px;
+            box-sizing: border-box;
+            border-right: 1px solid #ddd;
+        }
+
+        .sidebar a {
+            display: block;
+            text-decoration: none;
             color: #333;
             font-size: 18px;
-            margin: 0 15px; /* 좌우 여백을 추가하여 균형 잡기 */
+            padding: 10px;
+            text-align: left;
         }
 
-        header .center {
-            flex: 1; /* 각 center 항목이 동일한 비율로 자라도록 설정 */
-            text-align: center;
+        /* 눌린 느낌을 주는 active 클래스 */
+        .sidebar a.active {
+            background-color: #ddd; /* 눌린 느낌을 위해 회색 배경 추가 */
+            font-weight: bold; /* 글자 굵게 */
+            color: #000; /* 글자색 어둡게 */
+            border-left: 4px solid #333; /* 왼쪽에 강조선 추가 */
         }
 
-        header .left,
-        header .right {
-            flex: 1;
-            text-align: center;
+        /* 버튼 사이에 구분선을 추가 */
+        .divider {
+            border-top: 1px solid #ddd; /* 구분선 */
+            margin: 15px 0; /* 버튼과 버튼 사이 간격 추가 */
         }
 
+        /* 메인 콘텐츠 영역 스타일 */
         main {
+            flex: 1;
             padding: 20px;
         }
 
@@ -66,28 +141,48 @@
     </style>
 </head>
 <body>
+
+<!-- 최상단 헤더 -->
 <header>
-    <div class="left"><a href="/admin/new-celebs">New Celeb</a></div>
-    <div class="right"><a href="/admin/new-brands">New Brand</a></div>
+    <a th:href="@{/admin/home}">Sluv Back-Office</a>
+    <div class="header-center">
+        <a th:href="@{/admin/celebs}">Celeb</a>
+        <a th:href="@{/admin/brands}" class="active">Brand</a>
+    </div>
+    <div></div>
 </header>
-<main>
-    <table>
-        <thead>
-        <tr>
-            <th>뉴브랜드</th>
-            <th>등록일</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="newbrand : ${newBrands}">
-            <td th:text="${newbrand.name}">뉴브랜드</td>
-            <td th:text="${newbrand.createdAt}">생성일</td>
-            <td>
-                <button th:onclick="|location.href='@{brand-register(brandId=${newbrand.brandId})}'|">등록하기</button>
-            </td>
-        </tr>
-        </tbody>
-    </table>
-</main>
+
+<div class="content">
+    <div class="sidebar">
+        <a th:href="@{/admin/brands}">브랜드 목록</a>
+        <div class="divider"></div>
+        <a th:href="@{/admin/brand-register}">신규등록</a>
+        <div class="divider"></div>
+        <a th:href="@{/admin/new-brands}" class="active">뉴브랜드 목록</a>
+    </div>
+
+    <!-- 메인 콘텐츠 영역 -->
+    <main>
+        <table>
+            <thead>
+            <tr>
+                <th>뉴브랜드</th>
+                <th>등록일</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="newbrand : ${newBrands}">
+                <td th:text="${newbrand.name}">뉴브랜드</td>
+                <td th:text="${newbrand.createdAt}">등록일</td>
+                <td>
+                    <button th:onclick="|location.href='@{new-brand-register(newBrandId=${newbrand.newBrandId})}'|">등록하기
+                    </button>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </main>
+</div>
+
 </body>
 </html>

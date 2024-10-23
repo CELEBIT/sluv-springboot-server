@@ -73,4 +73,17 @@ public class BrandRepositoryImpl implements BrandRepositoryCustom {
                 .map(tuple -> BrandCountDto.of(tuple.get(brand), tuple.get(item.brand.count())))
                 .toList();
     }
+
+    @Override
+    public Page<Brand> findAllWithPageable(Pageable pageable) {
+        List<Brand> content = jpaQueryFactory.selectFrom(brand)
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        //CountQuery
+        JPAQuery<Brand> countQuery = jpaQueryFactory.selectFrom(brand);
+
+        return PageableExecutionUtils.getPage(content, pageable, () -> countQuery.fetch().size());
+    }
 }

@@ -22,7 +22,7 @@ public class NewBrandRouter {
     public String getNewBrandListPage(Model model) {
         List<NewBrandResponse> newBrands = newBrandService.findAllNewBrandRegisterDto();
         model.addAttribute("newBrands", newBrands);
-        return "newBrands";
+        return "brand/newBrands";
     }
 
     @GetMapping("/new-brand-register")
@@ -31,6 +31,6 @@ public class NewBrandRouter {
         model.addAttribute("newBrandId", newBrand.getNewBrandId());
         model.addAttribute("name", newBrand.getName());
         model.addAttribute("createdAt", newBrand.getCreatedAt());
-        return "newBrandRegister";
+        return "brand/newBrandRegister";
     }
 }

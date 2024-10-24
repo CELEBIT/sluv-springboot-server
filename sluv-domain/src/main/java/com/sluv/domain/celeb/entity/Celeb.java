@@ -3,25 +3,15 @@ package com.sluv.domain.celeb.entity;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.sluv.domain.celeb.enums.CelebStatus;
 import com.sluv.domain.common.entity.BaseEntity;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import java.util.ArrayList;
-import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -69,5 +59,15 @@ public class Celeb extends BaseEntity {
         this.celebNameKr = celebNameKr;
         this.celebNameEn = celebNameEn;
         this.celebStatus = celebStatus;
+    }
+
+    public static Celeb of(String celebNameKr, String celebNameEn, CelebCategory celebCategory, Celeb parent) {
+        return Celeb.builder()
+                .celebNameKr(celebNameKr)
+                .celebNameEn(celebNameEn)
+                .celebCategory(celebCategory)
+                .parent(parent)
+                .celebStatus(CelebStatus.ACTIVE)
+                .build();
     }
 }

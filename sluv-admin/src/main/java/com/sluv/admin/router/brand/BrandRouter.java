@@ -20,18 +20,18 @@ public class BrandRouter {
     @GetMapping("/brands")
     public String getBrandListPage(Model model, @Nullable @RequestParam("keyword") String keyword,
                                    @Nullable @RequestParam("page") Integer page) {
-        System.out.println("size: " + page);
-        BrandPageResponse newBrands = brandService.findAllNewBrandRegisterDto(keyword, page);
-        model.addAttribute("brands", newBrands.getContent());
-        model.addAttribute("pageNumber", newBrands.getPageNumber());
-        model.addAttribute("totalPageSize", newBrands.getTotalPageSize());
+        BrandPageResponse brandPage = brandService.findAllBrandResponsePage(keyword, page);
+
+        model.addAttribute("brands", brandPage.getContent());
+        model.addAttribute("pageNumber", brandPage.getPageNumber());
+        model.addAttribute("totalPageSize", brandPage.getTotalPageSize());
         model.addAttribute("keyword", keyword);
-        return "brands";
+        return "brand/brands";
     }
 
     @GetMapping("/brand-register")
     public String getBrandRegisterPage(Model model) {
-        return "brandRegister";
+        return "brand/brandRegister";
     }
 
 }

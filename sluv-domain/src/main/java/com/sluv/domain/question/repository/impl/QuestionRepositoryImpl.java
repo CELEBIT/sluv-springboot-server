@@ -11,6 +11,7 @@ import com.querydsl.core.types.dsl.StringTemplate;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sluv.domain.celeb.entity.Celeb;
+import com.sluv.domain.celeb.entity.NewCeleb;
 import com.sluv.domain.celeb.entity.QCeleb;
 import com.sluv.domain.question.entity.*;
 import com.sluv.domain.question.enums.QuestionStatus;
@@ -548,5 +549,14 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
                 )
                 .fetch();
 
+    }
+
+    @Override
+    public void changeAllNewCelebToCeleb(Celeb celeb, Long newCelebId) {
+        jpaQueryFactory.update(questionFind)
+                .where(questionFind.newCeleb.id.eq(newCelebId))
+                .set(questionFind.celeb, celeb)
+                .set(questionFind.newCeleb, (NewCeleb) null)
+                .execute();
     }
 }

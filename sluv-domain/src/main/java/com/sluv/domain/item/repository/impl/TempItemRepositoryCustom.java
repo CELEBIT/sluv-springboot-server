@@ -1,6 +1,7 @@
 package com.sluv.domain.item.repository.impl;
 
 import com.sluv.domain.brand.entity.Brand;
+import com.sluv.domain.celeb.entity.Celeb;
 import com.sluv.domain.item.entity.TempItem;
 import com.sluv.domain.user.entity.User;
 import org.springframework.data.domain.Page;
@@ -14,5 +15,7 @@ public interface TempItemRepositoryCustom {
 
     List<TempItem> findAllExceptLast(Long userId);
 
-    void changeAllBrandByNewBrandId(Brand brand, Long newBrandId);
+    void changeAllNewBrandToBrand(Brand brand, Long newBrandId);
+
+    void changeAllNewCelebToCeleb(Celeb celeb, Long newCelebId);
 }

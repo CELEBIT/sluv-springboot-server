@@ -53,7 +53,15 @@ public class CelebDomainService {
         return celebRepository.findById(celebId).orElseThrow(CelebNotFoundException::new);
     }
 
-    public List<Celeb> getCelebByContainKeyword(String keyword) {
-        return celebRepository.getCelebByContainKeyword(keyword);
+    public Page<Celeb> getCelebByContainKeyword(String keyword, Pageable pageable) {
+        return celebRepository.getCelebByContainKeyword(keyword, pageable);
+    }
+
+    public Page<Celeb> findAllWithPageable(Pageable pageable) {
+        return celebRepository.findAllWithPageable(pageable);
+    }
+
+    public Celeb saveCeleb(Celeb celeb) {
+        return celebRepository.save(celeb);
     }
 }

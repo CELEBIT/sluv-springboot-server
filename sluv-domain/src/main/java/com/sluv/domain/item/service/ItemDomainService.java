@@ -176,7 +176,11 @@ public class ItemDomainService {
         return itemRepository.getTop3HotItem();
     }
 
-    public void changeAllBrandByNewBrandId(Brand brand, Long newBrandId) {
-        itemRepository.changeAllBrandByNewBrandId(brand, newBrandId);
+    public void changeAllNewBrandToBrand(Brand brand, Long newBrandId) {
+        itemRepository.changeAllNewBrandToBrand(brand, newBrandId);
+    }
+
+    public void changeAllNewCelebToCeleb(Celeb celeb, Long newCelebId) {
+        itemRepository.changeAllNewCelebToCeleb(celeb, newCelebId);
     }
 }

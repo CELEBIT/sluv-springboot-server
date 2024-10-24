@@ -4,6 +4,8 @@ import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sluv.domain.brand.entity.Brand;
 import com.sluv.domain.brand.entity.NewBrand;
+import com.sluv.domain.celeb.entity.Celeb;
+import com.sluv.domain.celeb.entity.NewCeleb;
 import com.sluv.domain.celeb.entity.QCeleb;
 import com.sluv.domain.celeb.entity.QCelebCategory;
 import com.sluv.domain.item.entity.QItemCategory;
@@ -58,11 +60,20 @@ public class TempItemRepositoryImpl implements TempItemRepositoryCustom {
     }
 
     @Override
-    public void changeAllBrandByNewBrandId(Brand brand, Long newBrandId) {
+    public void changeAllNewBrandToBrand(Brand brand, Long newBrandId) {
         jpaQueryFactory.update(tempItem)
                 .where(tempItem.newBrand.id.eq(newBrandId))
                 .set(tempItem.brand, brand)
                 .set(tempItem.newBrand, (NewBrand) null)
+                .execute();
+    }
+
+    @Override
+    public void changeAllNewCelebToCeleb(Celeb celeb, Long newCelebId) {
+        jpaQueryFactory.update(tempItem)
+                .where(tempItem.newCeleb.id.eq(newCelebId))
+                .set(tempItem.celeb, celeb)
+                .set(tempItem.newCeleb, (NewCeleb) null)
                 .execute();
     }
 }

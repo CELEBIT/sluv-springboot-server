@@ -44,9 +44,9 @@ public class NewBrandService {
         Brand brand = brandDomainService.findById(request.getBrandId());
 
         // 뉴브랜드를 브랜드로 변경
-        itemDomainService.changeAllBrandByNewBrandId(brand, request.getNewBrandId());
-        tempItemDomainService.changeAllBrandByNewBrandId(brand, request.getNewBrandId());
-        recentSelectBrandDomainService.changeAllBrandByNewBrandId(brand, request.getNewBrandId());
+        itemDomainService.changeAllNewBrandToBrand(brand, request.getNewBrandId());
+        tempItemDomainService.changeAllNewBrandToBrand(brand, request.getNewBrandId());
+        recentSelectBrandDomainService.changeAllNewBrandToBrand(brand, request.getNewBrandId());
         newBrandDomainService.deleteById(request.getNewBrandId());
     }
 
@@ -59,9 +59,9 @@ public class NewBrandService {
         );
 
         // 뉴브랜드를 브랜드로 변경
-        itemDomainService.changeAllBrandByNewBrandId(brand, request.getNewBrandId());
-        tempItemDomainService.changeAllBrandByNewBrandId(brand, request.getNewBrandId());
-        recentSelectBrandDomainService.changeAllBrandByNewBrandId(brand, request.getNewBrandId());
+        itemDomainService.changeAllNewBrandToBrand(brand, request.getNewBrandId());
+        tempItemDomainService.changeAllNewBrandToBrand(brand, request.getNewBrandId());
+        recentSelectBrandDomainService.changeAllNewBrandToBrand(brand, request.getNewBrandId());
         newBrandDomainService.deleteById(request.getNewBrandId());
     }
 }

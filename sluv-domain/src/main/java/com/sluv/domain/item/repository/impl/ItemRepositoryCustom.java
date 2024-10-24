@@ -84,5 +84,7 @@ public interface ItemRepositoryCustom {
 
     List<ItemWithCountDto> getTop3HotItem();
 
-    void changeAllBrandByNewBrandId(Brand brand, Long newBrandId);
+    void changeAllNewBrandToBrand(Brand brand, Long newBrandId);
+
+    void changeAllNewCelebToCeleb(Celeb celeb, Long newCelebId);
 }

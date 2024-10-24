@@ -9,5 +9,5 @@ import java.util.List;
 public interface RecentSelectBrandRepositoryCustom {
     List<RecentSelectBrand> getRecentSelectBrandTop20(User user);
 
-    void changeAllBrandByNewBrandId(Brand brand, Long newBrandId);
+    void changeAllNewBrandToBrand(Brand brand, Long newBrandId);
 }

@@ -1,26 +1,22 @@
 package com.sluv.domain.celeb.repository.Impl;
 
-import static com.sluv.domain.celeb.entity.QCeleb.celeb;
-import static com.sluv.domain.celeb.entity.QCelebCategory.celebCategory;
-import static com.sluv.domain.celeb.entity.QInterestedCeleb.interestedCeleb;
-import static com.sluv.domain.celeb.entity.QRecentSelectCeleb.recentSelectCeleb;
-
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.sluv.domain.celeb.entity.Celeb;
-import com.sluv.domain.celeb.entity.CelebCategory;
-import com.sluv.domain.celeb.entity.InterestedCeleb;
-import com.sluv.domain.celeb.entity.QCeleb;
-import com.sluv.domain.celeb.entity.QCelebCategory;
-import com.sluv.domain.celeb.entity.RecentSelectCeleb;
+import com.sluv.domain.celeb.entity.*;
 import com.sluv.domain.user.entity.User;
-import java.util.ArrayList;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static com.sluv.domain.celeb.entity.QCeleb.celeb;
+import static com.sluv.domain.celeb.entity.QCelebCategory.celebCategory;
+import static com.sluv.domain.celeb.entity.QInterestedCeleb.interestedCeleb;
+import static com.sluv.domain.celeb.entity.QRecentSelectCeleb.recentSelectCeleb;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -221,16 +217,41 @@ public class CelebRepositoryImpl implements CelebRepositoryCustom {
     }
 
     @Override
-    public List<Celeb> getCelebByContainKeyword(String keyword) {
+    public Page<Celeb> getCelebByContainKeyword(String keyword, Pageable pageable) {
         QCeleb parent = new QCeleb("parent");
-        return jpaQueryFactory.selectFrom(celeb)
+        List<Celeb> content = jpaQueryFactory.selectFrom(celeb)
                 .leftJoin(celeb.parent, parent).fetchJoin()
                 .where(celeb.celebNameKr.like("%" + keyword + "%")
                         .or(celeb.celebNameEn.like("%" + keyword + "%"))
                         .or(celeb.parent.celebNameKr.like("%" + keyword + "%"))
                         .or(celeb.parent.celebNameEn.like("%" + keyword + "%"))
                 )
-                .limit(5)
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())//5
                 .fetch();
+
+        //Count Query
+        JPAQuery<Celeb> countQuery = jpaQueryFactory.selectFrom(celeb)
+                .leftJoin(celeb.parent, parent).fetchJoin()
+                .where(celeb.celebNameKr.like("%" + keyword + "%")
+                        .or(celeb.celebNameEn.like("%" + keyword + "%"))
+                        .or(celeb.parent.celebNameKr.like("%" + keyword + "%"))
+                        .or(celeb.parent.celebNameEn.like("%" + keyword + "%"))
+                );
+
+        return PageableExecutionUtils.getPage(content, pageable, () -> countQuery.fetch().size());
+    }
+
+    @Override
+    public Page<Celeb> findAllWithPageable(Pageable pageable) {
+        List<Celeb> content = jpaQueryFactory.selectFrom(celeb)
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        //Count Query
+        JPAQuery<Celeb> countQuery = jpaQueryFactory.selectFrom(celeb);
+
+        return PageableExecutionUtils.getPage(content, pageable, () -> countQuery.fetch().size());
     }
 }

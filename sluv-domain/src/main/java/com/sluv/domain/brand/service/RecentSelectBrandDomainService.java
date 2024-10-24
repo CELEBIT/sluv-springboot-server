@@ -35,7 +35,7 @@ public class RecentSelectBrandDomainService {
         return recentSelectBrandRepository.getRecentSelectBrandTop20(user);
     }
 
-    public void changeAllBrandByNewBrandId(Brand brand, Long newBrandId) {
-        recentSelectBrandRepository.changeAllBrandByNewBrandId(brand, newBrandId);
+    public void changeAllNewBrandToBrand(Brand brand, Long newBrandId) {
+        recentSelectBrandRepository.changeAllNewBrandToBrand(brand, newBrandId);
     }
 }

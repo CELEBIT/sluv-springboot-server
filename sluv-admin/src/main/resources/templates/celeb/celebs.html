@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>랭킹-[HOMSS-SF]</title>
+    <title>Sluv Back-Office</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -233,44 +233,52 @@
 
     </style>
 
-    <script>
-        function redirectToPage() {
-            let selectedPage = document.getElementById('page-select').value;
-            let searchKeyword = document.getElementById('search-keyword').value;
-            let url = '/admin/brands?page=' + selectedPage;
-            if (searchKeyword !== '') {
-                console.log("keyword: " + searchKeyword);
-                url = url + '&keyword=' + searchKeyword;
-            }
-            window.location.href = url;
+    <style>
+        .text-button {
+            background: none;
+            border: none;
+            color: inherit;
+            font: inherit;
+            cursor: pointer;
+            padding: 0;
+            text-decoration: underline; /* 원한다면 밑줄을 추가할 수 있음 */
         }
-    </script>
 
-    <script>
-        function redirectToPageWithKeyword() {
-            let searchKeyword = document.getElementById('search-keyword').value;
-            window.location.href = '/admin/brands?keyword=' + searchKeyword;
+        .text-button:hover {
+            text-decoration: none; /* 호버 시 밑줄을 제거할 수도 있음 */
         }
-    </script>
+    </style>
+
+    <style>
+        .text-link {
+            color: inherit; /* 부모 요소의 텍스트 색상을 상속받아 텍스트처럼 보이도록 함 */
+            text-decoration: none; /* 밑줄 제거 */
+            cursor: pointer; /* 클릭 가능함을 표시 */
+        }
+
+        .text-link:hover {
+            text-decoration: underline; /* 호버 시 밑줄 추가 */
+        }
+    </style>
 </head>
 <body>
 
 <header>
     <a th:href="@{/admin/home}">Sluv Back-Office</a>
     <div class="header-center">
-        <a th:href="@{/admin/celebs}">Celeb</a>
-        <a th:href="@{/admin/brands}" class="active">Brand</a>
+        <a th:href="@{/admin/celebs}" class="active">Celeb</a>
+        <a th:href="@{/admin/brands}">Brand</a>
     </div>
     <div></div>
 </header>
 
 <div class="content">
     <div class="sidebar">
-        <a th:href="@{/admin/brands}" class="active">브랜드 목록</a>
+        <a th:href="@{/admin/celebs}" class="active">셀럽 목록</a>
         <div class="divider"></div>
-        <a th:href="@{/admin/brand-register}">신규등록</a>
+        <a th:href="@{/admin/celeb-register}">신규등록</a>
         <div class="divider"></div>
-        <a th:href="@{/admin/new-brands}">뉴브랜드 목록</a>
+        <a th:href="@{/admin/new-celebs}">뉴셀럽 목록</a>
     </div>
 
     <main>
@@ -299,23 +307,54 @@
         <table>
             <thead>
             <tr>
-                <th>브랜드 아이디</th>
-                <th>로고</th>
+                <th>셀럽 아이디</th>
+                <th>그룹명</th>
                 <th>한글이름</th>
                 <th>영어이름</th>
+                <th>카테고리(대)</th>
+                <th>카테고리(소)</th>
             </tr>
             </thead>
             <tbody>
-            <tr th:each="brand : ${brands}">
-                <td th:text="${brand.brandId}">아이디</td>
-                <td><img th:src="@{${brand.imageUrl}}" alt="로고"/></td>
-                <td th:text="${brand.krName}">한글이름</td>
-                <td th:text="${brand.enName}">영어이름</td>
+            <tr th:each="celeb : ${celebs}">
+                <td th:text="${celeb.celebId}">셀럽 아이디</td>
+                <td>
+                    <button type="button" onclick="location.href='/admin/celebs?keyword=' + [[${celeb.parentName}]]"
+                            class="text-button">
+                        <!--                        <span th:text="${celeb.parentName}"></span>-->
+                    </button>
+                    <a th:href="@{/admin/celebs(keyword=${celeb.parentName})}" class="text-link"
+                       th:text="${celeb.parentName}"></a>
+                </td>
+                <td th:text="${celeb.krName}">한글이름</td>
+                <td th:text="${celeb.enName}">영어이름</td>
+                <td th:text="${celeb.parentCategory}">카테고리(대)</td>
+                <td th:text="${celeb.category}">카테고리(소)</td>
             </tr>
             </tbody>
         </table>
     </main>
 </div>
+
+<script>
+    function redirectToPage() {
+        let selectedPage = document.getElementById('page-select').value;
+        let searchKeyword = document.getElementById('search-keyword').value;
+        let url = '/admin/celebs?page=' + selectedPage;
+        if (searchKeyword !== '') {
+            console.log("keyword: " + searchKeyword);
+            url = url + '&keyword=' + searchKeyword;
+        }
+        window.location.href = url;
+    }
+</script>
+
+<script>
+    function redirectToPageWithKeyword() {
+        let searchKeyword = document.getElementById('search-keyword').value;
+        window.location.href = '/admin/celebs?keyword=' + searchKeyword;
+    }
+</script>
 
 </body>
 </html>

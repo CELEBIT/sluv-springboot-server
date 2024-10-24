@@ -1,15 +1,12 @@
 package com.sluv.domain.question.repository.impl;
 
 import com.sluv.domain.celeb.entity.Celeb;
-import com.sluv.domain.question.entity.Question;
-import com.sluv.domain.question.entity.QuestionBuy;
-import com.sluv.domain.question.entity.QuestionFind;
-import com.sluv.domain.question.entity.QuestionHowabout;
-import com.sluv.domain.question.entity.QuestionRecommend;
+import com.sluv.domain.question.entity.*;
 import com.sluv.domain.user.entity.User;
-import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+
+import java.util.List;
 
 public interface QuestionRepositoryCustom {
     Page<QuestionBuy> getSearchQuestionBuy(List<Long> questionIdList, Pageable pageable);
@@ -53,4 +50,6 @@ public interface QuestionRepositoryCustom {
     List<Question> getSearchQuestionIds(String word);
 
     List<QuestionBuy> getEndTimeBetweenNow(int voteEndCheckPeriod);
+
+    void changeAllNewCelebToCeleb(Celeb celeb, Long newCelebId);
 }

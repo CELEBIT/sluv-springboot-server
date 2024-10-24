@@ -33,7 +33,7 @@ public class RecentSelectBrandRepositoryImpl implements RecentSelectBrandReposit
     }
 
     @Override
-    public void changeAllBrandByNewBrandId(Brand brand, Long newBrandId) {
+    public void changeAllNewBrandToBrand(Brand brand, Long newBrandId) {
         jpaQueryFactory.update(recentSelectBrand)
                 .where(recentSelectBrand.newBrand.id.eq(newBrandId))
                 .set(recentSelectBrand.brand, brand)

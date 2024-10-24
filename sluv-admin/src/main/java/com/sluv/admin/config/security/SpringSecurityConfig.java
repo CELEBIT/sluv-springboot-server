@@ -6,7 +6,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
 /*
@@ -23,16 +24,32 @@ public class SpringSecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests((request) -> request // 허용 범위 설정
-                        .anyRequest().permitAll()
+                        .requestMatchers("/admin/login").permitAll()
+                        .anyRequest().authenticated()
                 )
                 .csrf().disable()
                 .cors()
                 .and()
-                .formLogin().disable()
-                .httpBasic().disable()
-                .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+                .formLogin(formLogin -> {
+                    formLogin.loginPage("/admin/login")
+                            .defaultSuccessUrl("/admin/home", true)
+                            .failureUrl("/login?error=true")
+                            .usernameParameter("email")
+                            .passwordParameter("password")
+                            .loginProcessingUrl("/admin/login-process");
+                })
+                .logout(logout -> {
+                    logout.logoutUrl("/admin/logout-process");
+                })
+                .httpBasic().disable();
+//                .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
         return http.build();
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder(); // 비밀번호 암호화 방식
     }
 
 

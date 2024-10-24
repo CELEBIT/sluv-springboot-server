@@ -71,6 +71,10 @@
             font-weight: bold;
         }
 
+        .header-right {
+            margin-left: auto;
+        }
+
         /* 본문과 사이드바를 헤더 아래로 밀기 위한 상단 패딩 추가 */
         .content {
             display: flex;
@@ -146,10 +150,12 @@
 <header>
     <a th:href="@{/admin/home}">Sluv Back-Office</a>
     <div class="header-center">
-        <a th:href="@{/admin/celebs}" class="active">Celeb</a>
+        <a th:href="@{/admin/celebs}">Celeb</a>
         <a th:href="@{/admin/brands}">Brand</a>
     </div>
-    <div></div>
+    <div class="header-right">
+        <a th:href="@{/admin/logout-process}" class="logout-btn">로그아웃</a>
+    </div>
 </header>
 
 <div class="content">

@@ -29,13 +29,6 @@
             z-index: 1000; /* 사이드바보다 앞에 나오도록 설정 */
         }
 
-        .header-center {
-            flex-grow: 1;
-            display: flex;
-            justify-content: left;
-            margin-left: 170px;
-        }
-
         .header-center a {
             text-decoration: none;
             color: #ddd;
@@ -48,7 +41,7 @@
             transition: background-color 0.3s ease, color 0.3s ease;
         }
 
-        .header-center a.active {
+        .header-center a {
             background-color: #ddd;
             color: #000;
             font-weight: bold;
@@ -67,33 +60,12 @@
             font-weight: bold;
         }
 
-        .header-right {
-            margin-left: auto;
-        }
-
-        .logout-btn {
-            text-decoration: none;
-            color: #ddd;
-            font-size: 18px;
-            font-weight: bold;
-            margin-left: 20px;
-            padding: 8px 16px;
-            background-color: transparent;
-            border-radius: 3px;
-            transition: background-color 0.3s ease, color 0.3s ease;
-        }
-
-        .logout-btn:hover {
-            background-color: #555;
-            color: #fff;
-        }
-
         .content {
             display: flex;
             flex: 1;
             margin-top: 60px;
-            justify-content: center; /* 수평 가운데 정렬 */
-            align-items: center; /* 수직 가운데 정렬 */
+            justify-content: center;
+            align-items: center;
         }
 
         main {
@@ -105,51 +77,90 @@
         }
 
         .center-box {
-            width: 1000px;
-            height: 600px;
+            width: 400px;
+            padding: 20px;
             background-color: #f4f4f4;
             border: 2px solid #ddd;
             border-radius: 10px;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-top: -200px; /* 상단으로 20px 이동 */
         }
 
-        .center-box p {
-            font-size: 20px;
+        .center-box h2 {
+            margin-bottom: 10px;
+            font-size: 24px;
             color: #333;
-            text-align: center;
-            margin: 0;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+            width: 100%;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 16px;
+            color: #333;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 10px;
+            background-color: #333;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .login-btn:hover {
+            background-color: #555;
         }
     </style>
 </head>
 <body>
 
 <header>
-    <a th:href="@{/admin/home}">Sluv Back-Office</a>
-    <div class="header-center">
-        <a th:href="@{/admin/celebs}">Celeb</a>
-        <a th:href="@{/admin/brands}">Brand</a>
-    </div>
-    <div class="header-right">
-        <a th:href="@{/admin/logout-process}" class="logout-btn">로그아웃</a>
-    </div>
+    <a>Sluv Back-Office</a>
 </header>
 
 <div class="content">
     <main>
         <div class="center-box">
-            <p>
-                24.10.24
-                <br><br>
-                New Celeb과 New Brand를 관리하기 위해 임시로 만든 관리자 페이지 입니다.
-                <br><br>
-                -준커-
-            </p>
+            <h2>로그인</h2>
+            <form th:action="@{/admin/login-process}" method="post">
+                <div class="form-group">
+                    <label for="email">아이디</label>
+                    <input type="text" id="email" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">비밀번호</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+                <button type="submit" class="login-btn">로그인</button>
+            </form>
         </div>
     </main>
 </div>
 
 </body>
 </html>
+
+

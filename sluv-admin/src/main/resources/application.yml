@@ -16,10 +16,12 @@ spring:
   thymeleaf:
     prefix: classpath:/templates/
     suffix: .html
-    
+
 server:
   tomcat:
-    use-relative-redirects: true
+    remoteip:
+      protocol-header: x-forwarded-proto
+
 ---
 spring:
   config:

@@ -33,7 +33,7 @@ public class SpringSecurityConfig {
                 .formLogin(formLogin -> {
                     formLogin.loginPage("/admin/login")
                             .defaultSuccessUrl("/admin/home", true)
-                            .failureUrl("/login?error=true")
+                            .failureUrl("/admin/login?error=true")
                             .usernameParameter("email")
                             .passwordParameter("password")
                             .loginProcessingUrl("/admin/login-process");

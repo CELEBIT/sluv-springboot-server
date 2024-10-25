@@ -3,9 +3,10 @@ package com.sluv.domain.celeb.repository.Impl;
 import com.sluv.domain.celeb.entity.Celeb;
 import com.sluv.domain.celeb.entity.CelebCategory;
 import com.sluv.domain.user.entity.User;
-import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+
+import java.util.List;
 
 public interface CelebRepositoryCustom {
     List<Celeb> findInterestedCeleb(User user);
@@ -22,5 +23,7 @@ public interface CelebRepositoryCustom {
 
     List<Celeb> searchInterestedCelebByChild(String celebName);
 
-    List<Celeb> getCelebByContainKeyword(String keyword);
+    Page<Celeb> getCelebByContainKeyword(String keyword, Pageable p);
+
+    Page<Celeb> findAllWithPageable(Pageable pageable);
 }

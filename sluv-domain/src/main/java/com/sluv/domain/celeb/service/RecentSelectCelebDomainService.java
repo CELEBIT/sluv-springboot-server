@@ -1,5 +1,6 @@
 package com.sluv.domain.celeb.service;
 
+import com.sluv.domain.celeb.entity.Celeb;
 import com.sluv.domain.celeb.entity.RecentSelectCeleb;
 import com.sluv.domain.celeb.repository.RecentSelectCelebRepository;
 import com.sluv.domain.user.entity.User;
@@ -34,4 +35,7 @@ public class RecentSelectCelebDomainService {
         recentSelectCelebRepository.deleteByUserIdAndNewCelebId(userId, celebId);
     }
 
+    public void changeAllNewCelebToCeleb(Celeb celeb, Long newCelebId) {
+        recentSelectCelebRepository.changeAllNewCelebToCeleb(celeb, newCelebId);
+    }
 }

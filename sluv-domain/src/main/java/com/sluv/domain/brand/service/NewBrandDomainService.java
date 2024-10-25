@@ -6,6 +6,8 @@ import com.sluv.domain.brand.repository.NewBrandRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class NewBrandDomainService {
@@ -31,4 +33,11 @@ public class NewBrandDomainService {
         return newBrandRepository.findById(newBrandId).orElseThrow(NewBrandNotFoundException::new);
     }
 
+    public List<NewBrand> findAll() {
+        return newBrandRepository.findAllByOrderByCreatedAtDesc();
+    }
+
+    public void deleteById(Long newBrandId) {
+        newBrandRepository.deleteById(newBrandId);
+    }
 }

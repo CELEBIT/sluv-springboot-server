@@ -12,6 +12,10 @@ spring:
     user:
       name: user
       password: 1234
+
+  thymeleaf:
+    prefix: classpath:/templates/
+    suffix: .html
 ---
 spring:
   config:

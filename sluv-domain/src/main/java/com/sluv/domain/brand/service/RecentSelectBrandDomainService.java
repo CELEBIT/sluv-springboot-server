@@ -1,5 +1,6 @@
 package com.sluv.domain.brand.service;
 
+import com.sluv.domain.brand.entity.Brand;
 import com.sluv.domain.brand.entity.RecentSelectBrand;
 import com.sluv.domain.brand.repository.RecentSelectBrandRepository;
 import com.sluv.domain.user.entity.User;
@@ -34,4 +35,7 @@ public class RecentSelectBrandDomainService {
         return recentSelectBrandRepository.getRecentSelectBrandTop20(user);
     }
 
+    public void changeAllNewBrandToBrand(Brand brand, Long newBrandId) {
+        recentSelectBrandRepository.changeAllNewBrandToBrand(brand, newBrandId);
+    }
 }

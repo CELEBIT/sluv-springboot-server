@@ -20,6 +20,7 @@ import com.sluv.domain.user.service.UserDomainService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -107,8 +108,9 @@ public class SearchService {
 
     @Transactional(readOnly = true)
     public SearchKeywordTotalResDto getAllDateByKeyword(Long userId, String keyword) {
+        PageRequest pageable = PageRequest.of(0, 5);
         // 1. 셀럽 2. 브랜드 3. 아이템
-        List<CelebSearchResponse> celebByContainKeyword = celebDomainService.getCelebByContainKeyword(keyword).stream()
+        List<CelebSearchResponse> celebByContainKeyword = celebDomainService.getCelebByContainKeyword(keyword, pageable).stream()
                 .map(CelebSearchResponse::of)
                 .toList();
 

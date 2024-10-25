@@ -1,5 +1,6 @@
 package com.sluv.domain.item.service;
 
+import com.sluv.domain.brand.entity.Brand;
 import com.sluv.domain.celeb.entity.Celeb;
 import com.sluv.domain.closet.entity.Closet;
 import com.sluv.domain.item.dto.ItemSimpleDto;
@@ -173,5 +174,13 @@ public class ItemDomainService {
 
     public List<ItemWithCountDto> getTop3HotItem() {
         return itemRepository.getTop3HotItem();
+    }
+
+    public void changeAllNewBrandToBrand(Brand brand, Long newBrandId) {
+        itemRepository.changeAllNewBrandToBrand(brand, newBrandId);
+    }
+
+    public void changeAllNewCelebToCeleb(Celeb celeb, Long newCelebId) {
+        itemRepository.changeAllNewCelebToCeleb(celeb, newCelebId);
     }
 }

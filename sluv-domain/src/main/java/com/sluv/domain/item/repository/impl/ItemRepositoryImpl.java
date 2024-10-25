@@ -5,7 +5,10 @@ import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.sluv.domain.brand.entity.Brand;
+import com.sluv.domain.brand.entity.NewBrand;
 import com.sluv.domain.celeb.entity.Celeb;
+import com.sluv.domain.celeb.entity.NewCeleb;
 import com.sluv.domain.celeb.entity.QCeleb;
 import com.sluv.domain.closet.entity.Closet;
 import com.sluv.domain.item.dto.ItemSimpleDto;
@@ -952,4 +955,21 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
                 .toList();
     }
 
+    @Override
+    public void changeAllNewBrandToBrand(Brand brand, Long newBrandId) {
+        jpaQueryFactory.update(item)
+                .where(item.newBrand.id.eq(newBrandId))
+                .set(item.brand, brand)
+                .set(item.newBrand, (NewBrand) null)
+                .execute();
+    }
+
+    @Override
+    public void changeAllNewCelebToCeleb(Celeb celeb, Long newCelebId) {
+        jpaQueryFactory.update(item)
+                .where(item.newCeleb.id.eq(newCelebId))
+                .set(item.celeb, celeb)
+                .set(item.newCeleb, (NewCeleb) null)
+                .execute();
+    }
 }

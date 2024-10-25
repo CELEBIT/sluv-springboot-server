@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sluv Back-Office</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        header {
+            width: 100%;
+            background-color: #333;
+            color: white;
+            padding: 10px 20px;
+            box-sizing: border-box;
+            display: flex;
+            justify-content: space-between; /* 양 끝에 요소 배치 */
+            align-items: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000; /* 사이드바보다 앞에 나오도록 설정 */
+        }
+
+        .header-center {
+            flex-grow: 1;
+            display: flex;
+            justify-content: left;
+            margin-left: 170px;
+        }
+
+        .header-center a {
+            text-decoration: none;
+            color: #ddd;
+            font-size: 18px;
+            font-weight: bold;
+            margin: 0 5px;
+            padding: 8px 16px;
+            background-color: transparent;
+            border-radius: 3px;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .header-center a.active {
+            background-color: #ddd;
+            color: #000;
+            font-weight: bold;
+            border-bottom: 3px solid #333;
+        }
+
+        .header-center a:hover {
+            background-color: #555;
+            color: #fff;
+        }
+
+        header a {
+            text-decoration: none;
+            color: white;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .header-right {
+            margin-left: auto;
+        }
+
+        .logout-btn {
+            text-decoration: none;
+            color: #ddd;
+            font-size: 18px;
+            font-weight: bold;
+            margin-left: 20px;
+            padding: 8px 16px;
+            background-color: transparent;
+            border-radius: 3px;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background-color: #555;
+            color: #fff;
+        }
+
+        .content {
+            display: flex;
+            flex: 1;
+            margin-top: 60px;
+            justify-content: center; /* 수평 가운데 정렬 */
+            align-items: center; /* 수직 가운데 정렬 */
+        }
+
+        main {
+            flex: 1;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .center-box {
+            width: 1000px;
+            height: 600px;
+            background-color: #f4f4f4;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .center-box p {
+            font-size: 20px;
+            color: #333;
+            text-align: center;
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <a th:href="@{/admin/home}">Sluv Back-Office</a>
+    <div class="header-center">
+        <a th:href="@{/admin/celebs}">Celeb</a>
+        <a th:href="@{/admin/brands}">Brand</a>
+    </div>
+    <div class="header-right">
+        <a th:href="@{/admin/logout-process}" class="logout-btn">로그아웃</a>
+    </div>
+</header>
+
+<div class="content">
+    <main>
+        <div class="center-box">
+            <p>
+                24.10.24
+                <br><br>
+                New Celeb과 New Brand를 관리하기 위해 임시로 만든 관리자 페이지 입니다.
+                <br><br>
+                -준커-
+            </p>
+        </div>
+    </main>
+</div>
+
+</body>
+</html>

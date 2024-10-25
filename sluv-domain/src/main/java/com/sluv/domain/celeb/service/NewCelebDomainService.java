@@ -6,6 +6,8 @@ import com.sluv.domain.celeb.repository.NewCelebRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class NewCelebDomainService {
@@ -29,5 +31,14 @@ public class NewCelebDomainService {
 
     public NewCeleb findById(Long newCelebId) {
         return newCelebRepository.findById(newCelebId).orElseThrow(NewCelebNotFoundException::new);
+    }
+
+    public List<NewCeleb> findAll() {
+        return newCelebRepository.findAllByOrderByCreatedAtDesc();
+    }
+
+
+    public void deleteById(Long newCelebId) {
+        newCelebRepository.deleteById(newCelebId);
     }
 }

@@ -35,4 +35,7 @@ public class AdminDomainService {
         return null;
     }
 
+    public Admin findByEmail(String email) {
+        return adminRepository.findByEmail(email).orElseThrow(AdminNotFoundException::new);
+    }
 }

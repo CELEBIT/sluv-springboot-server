@@ -1,5 +1,23 @@
 package com.sluv.domain.item.repository.impl;
 
+import com.querydsl.jpa.impl.JPAQuery;
+import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.sluv.domain.brand.entity.Brand;
+import com.sluv.domain.brand.entity.NewBrand;
+import com.sluv.domain.celeb.entity.Celeb;
+import com.sluv.domain.celeb.entity.NewCeleb;
+import com.sluv.domain.celeb.entity.QCeleb;
+import com.sluv.domain.celeb.entity.QCelebCategory;
+import com.sluv.domain.item.entity.QItemCategory;
+import com.sluv.domain.item.entity.TempItem;
+import com.sluv.domain.user.entity.User;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.support.PageableExecutionUtils;
+
+import java.util.List;
+
 import static com.sluv.domain.brand.entity.QBrand.brand;
 import static com.sluv.domain.brand.entity.QNewBrand.newBrand;
 import static com.sluv.domain.celeb.entity.QCeleb.celeb;
@@ -7,19 +25,6 @@ import static com.sluv.domain.celeb.entity.QCelebCategory.celebCategory;
 import static com.sluv.domain.celeb.entity.QNewCeleb.newCeleb;
 import static com.sluv.domain.item.entity.QItemCategory.itemCategory;
 import static com.sluv.domain.item.entity.QTempItem.tempItem;
-
-import com.querydsl.jpa.impl.JPAQuery;
-import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.sluv.domain.celeb.entity.QCeleb;
-import com.sluv.domain.celeb.entity.QCelebCategory;
-import com.sluv.domain.item.entity.QItemCategory;
-import com.sluv.domain.item.entity.TempItem;
-import com.sluv.domain.user.entity.User;
-import java.util.List;
-import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.support.PageableExecutionUtils;
 
 @RequiredArgsConstructor
 public class TempItemRepositoryImpl implements TempItemRepositoryCustom {
@@ -52,6 +57,24 @@ public class TempItemRepositoryImpl implements TempItemRepositoryCustom {
                 .where(tempItem.user.id.eq(userId))
                 .orderBy(tempItem.updatedAt.desc())
                 .offset(1).fetch();
+    }
+
+    @Override
+    public void changeAllNewBrandToBrand(Brand brand, Long newBrandId) {
+        jpaQueryFactory.update(tempItem)
+                .where(tempItem.newBrand.id.eq(newBrandId))
+                .set(tempItem.brand, brand)
+                .set(tempItem.newBrand, (NewBrand) null)
+                .execute();
+    }
+
+    @Override
+    public void changeAllNewCelebToCeleb(Celeb celeb, Long newCelebId) {
+        jpaQueryFactory.update(tempItem)
+                .where(tempItem.newCeleb.id.eq(newCelebId))
+                .set(tempItem.celeb, celeb)
+                .set(tempItem.newCeleb, (NewCeleb) null)
+                .execute();
     }
 }
 

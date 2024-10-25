@@ -102,4 +102,8 @@ public class QuestionDomainService {
     public Page<Question> getWeeklyHotQuestion(Pageable pageable) {
         return questionRepository.getWeeklyHotQuestion(pageable);
     }
+
+    public void changeAllNewCelebToCeleb(Celeb celeb, Long newCelebId) {
+        questionRepository.changeAllNewCelebToCeleb(celeb, newCelebId);
+    }
 }

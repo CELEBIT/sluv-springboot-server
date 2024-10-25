@@ -16,6 +16,10 @@ spring:
   thymeleaf:
     prefix: classpath:/templates/
     suffix: .html
+    
+server:
+  tomcat:
+    use-relative-redirects: true
 ---
 spring:
   config:

@@ -12,6 +12,14 @@ spring:
     user:
       name: user
       password: 1234
+    require-ssl: true
+    
+server:
+  ssl:
+    enabled: true
+  forward-headers-strategy: native
+
+
 ---
 spring:
   config:

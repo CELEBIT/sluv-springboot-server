@@ -16,7 +16,7 @@ public class CorsConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.addAllowedOrigin("http://localhost:3000");
+        configuration.addAllowedOrigin("https://admin-temp.sluv-server.co.kr");
         configuration.addAllowedHeader("Authorization");
         configuration.addAllowedHeader("Content-Type");
         configuration.addAllowedMethod("*");

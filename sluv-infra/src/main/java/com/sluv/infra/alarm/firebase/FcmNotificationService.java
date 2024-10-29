@@ -7,6 +7,7 @@ import com.google.firebase.messaging.Message.Builder;
 import com.google.firebase.messaging.Notification;
 import com.sluv.domain.alarm.enums.AlarmType;
 import com.sluv.domain.user.entity.User;
+import com.sluv.domain.user.exception.UserNotFoundException;
 import com.sluv.domain.user.repository.UserRepository;
 import com.sluv.infra.alarm.firebase.exception.FcmConnectException;
 import lombok.RequiredArgsConstructor;
@@ -26,18 +27,18 @@ public class FcmNotificationService {
 
     public void sendFCMNotification(Long userId, String title, String body, AlarmType alarmType,
                                     HashMap<String, Long> ids) {
-//        User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
-//
-//        if (user.getAlarmStatus() && user.getFcmToken() != null) { // 알람 허용 시
-//            Message message = getMessage(title, body, user, alarmType, ids);
-//
-//            try {
-//                firebaseMessaging.send(message);
-//            } catch (FirebaseMessagingException e) {
-//                log.error(e.getMessage());
-//                throw new FcmConnectException();
-//            }
-//        }
+        User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+
+        if (user.getAlarmStatus() && user.getFcmToken() != null) { // 알람 허용 시
+            Message message = getMessage(title, body, user, alarmType, ids);
+
+            try {
+                firebaseMessaging.send(message);
+            } catch (FirebaseMessagingException e) {
+                log.error(e.getMessage());
+                throw new FcmConnectException();
+            }
+        }
     }
 
     public void sendFCMNotificationMulticast(List<Long> userIds, String title, String body, AlarmType alarmType,

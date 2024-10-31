@@ -18,9 +18,6 @@ public class UserScheduler {
 
     private final UserRepository userRepository;
 
-    /**
-     * SearchRank 업데이트
-     */
     @Transactional
     @Scheduled(cron = "0 0 0 * * *") // 초 분 시 일 월 요일
     public void replaceDeletedUserData() {

@@ -44,9 +44,7 @@ public class CommentAlarmService {
 
     @Transactional
     @Async("alarmThreadPoolExecutor")
-    public void sendAlarmAboutComment(Long senderId, Long commentId) {
-        log.warn("In the FCM Method : {}", commentId);
-        Comment comment = commentDomainService.findById(commentId);
+    public void sendAlarmAboutComment(Long senderId, Comment comment) {
         Long questionUserId = comment.getQuestion().getUser().getId();
         Long parentCommentUserId = null;
 
@@ -63,9 +61,7 @@ public class CommentAlarmService {
 
     @Transactional
     @Async("alarmThreadPoolExecutor")
-    public void sendAlarmAboutSubComment(Long senderId, Long commentId) {
-        Comment comment = commentDomainService.findById(commentId);
-
+    public void sendAlarmAboutSubComment(Long senderId, Comment comment) {
         if (!senderId.equals(comment.getParent().getUser().getId()) && !senderId.equals(comment.getQuestion().getUser().getId())) {
             User sender = userDomainService.findById(senderId);
             String message = AlarmMessage.getMessageWithUserName(sender.getNickname(), AlarmMessage.COMMENT_SUB);

@@ -30,7 +30,6 @@ public class AuthController {
     private final AppleUserService appleUserService;
     private final AuthService authService;
     private final CacheService cacheService;
-    ;
 
 
     @Operation(summary = "소셜 로그인", description = "KAKAO:[AccessToken], GOOGLE, APPLE: [IdToken]")
@@ -82,6 +81,13 @@ public class AuthController {
     public ResponseEntity<SuccessResponse> changeFcm(@CurrentUserId Long userId,
                                                      @RequestBody AutoLoginRequest dto) {
         authService.changeFcm(userId, dto.getFcm());
+        return ResponseEntity.ok().body(SuccessResponse.create());
+    }
+
+    @Operation(summary = "*로그아웃", description = "사용자의 FCM 토큰 삭제")
+    @PostMapping("/logout")
+    public ResponseEntity<SuccessResponse> logout(@CurrentUserId Long userId) {
+        authService.logout(userId);
         return ResponseEntity.ok().body(SuccessResponse.create());
     }
 

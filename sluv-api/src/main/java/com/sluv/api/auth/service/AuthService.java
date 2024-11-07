@@ -59,4 +59,9 @@ public class AuthService {
         return userDomainService.findById(userId);
     }
 
+    @Transactional
+    public void logout(Long userId) {
+        User user = userDomainService.findById(userId);
+        user.changeFcmToken(null);
+    }
 }

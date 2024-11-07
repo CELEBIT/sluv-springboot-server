@@ -10,6 +10,7 @@ import com.sluv.domain.user.entity.User;
 import com.sluv.domain.user.service.UserDomainService;
 import com.sluv.infra.alarm.firebase.FcmNotificationService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,6 +20,7 @@ import java.util.HashMap;
 import static com.sluv.common.constant.ConstantData.ALARM_TITLE;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class CommentAlarmService {
 
@@ -43,6 +45,7 @@ public class CommentAlarmService {
     @Transactional
     @Async("alarmThreadPoolExecutor")
     public void sendAlarmAboutComment(Long senderId, Long commentId) {
+        log.warn("In the FCM Method : {}", commentId);
         Comment comment = commentDomainService.findById(commentId);
         Long questionUserId = comment.getQuestion().getUser().getId();
         Long parentCommentUserId = null;

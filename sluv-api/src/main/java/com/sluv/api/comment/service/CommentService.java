@@ -112,8 +112,9 @@ public class CommentService {
         Comment comment = commentDomainService.saveComment(user, question, request.getContent());
         commentItemHelper.saveCommentItem(request, comment);
         commentImgHelper.saveCommentImg(request, comment);
-
+        log.warn("Before AI : {}", comment.getId());
         aiModelService.censorComment(comment);
+        log.warn("After AI : {}", comment.getId());
         commentAlarmService.sendAlarmAboutComment(user.getId(), comment.getId());
 
     }

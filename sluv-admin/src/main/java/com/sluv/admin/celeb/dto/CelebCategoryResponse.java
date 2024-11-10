@@ -22,4 +22,12 @@ public class CelebCategoryResponse {
                 .celebCategoryName(celebCategoryName)
                 .build();
     }
+
+    public static CelebCategoryResponse of(Long celebCategoryId, String celebCategoryName) {
+        return CelebCategoryResponse.builder()
+                .celebCategoryId(celebCategoryId)
+                .celebCategoryName(celebCategoryName)
+                .build();
+    }
+
 }

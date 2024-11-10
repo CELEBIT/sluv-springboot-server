@@ -19,4 +19,7 @@ public class ItemEditReqDomainService {
         return itemEditReqRepository.save(itemEditReq);
     }
 
+    public ItemEditReq findItemEditReqByIdWithItem(Long editReqId) {
+        return itemEditReqRepository.findByIdWithItem(editReqId);
+    }
 }

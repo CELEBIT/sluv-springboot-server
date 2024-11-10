@@ -1,7 +1,9 @@
 package com.sluv.api.item.controller;
 
+import com.sluv.api.common.response.SuccessDataResponse;
 import com.sluv.api.common.response.SuccessResponse;
 import com.sluv.api.item.dto.ItemEditReqDto;
+import com.sluv.api.item.dto.ItemEditReqResponseDto;
 import com.sluv.api.item.service.ItemEditReqService;
 import com.sluv.common.annotation.CurrentUserId;
 import io.swagger.v3.oas.annotations.Operation;
@@ -22,5 +24,13 @@ public class ItemEditController {
                                                         @RequestBody ItemEditReqDto dto) {
         itemEditReqService.postItemEdit(userId, itemId, dto);
         return ResponseEntity.ok().body(SuccessResponse.create());
+    }
+
+    @Operation(summary = "*아이템 게시글 수정 요청", description = "User 토큰 필요")
+    @GetMapping("/edit-req/{editReqId}")
+    public ResponseEntity<SuccessDataResponse<ItemEditReqResponseDto>> getItemEdit(@CurrentUserId Long userId,
+                                                                                   @PathVariable(name = "editReqId") Long editReqId) {
+        ItemEditReqResponseDto response = itemEditReqService.getItemEdit(userId, editReqId);
+        return ResponseEntity.ok().body(SuccessDataResponse.create(response));
     }
 }

@@ -6,14 +6,7 @@ import com.sluv.domain.common.entity.BaseEntity;
 import com.sluv.domain.user.enums.UserAge;
 import com.sluv.domain.user.enums.UserGender;
 import com.sluv.domain.user.enums.UserStatus;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -82,7 +75,6 @@ public class User extends BaseEntity {
         return User.builder()
                 .id(user.getId())
                 .email(nicknameHashCode + "@" + nicknameHashCode + "-withdraw.sluv")
-                .nickname(nicknameHashCode)
                 .snsType(user.getSnsType())
                 .profileImgUrl(null)
                 .fcmToken(null)

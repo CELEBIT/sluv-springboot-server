@@ -875,6 +875,7 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
                 .leftJoin(item.category, itemCategory).fetchJoin()
                 .leftJoin(item.category.parent, parentCategory).fetchJoin()
                 .where(item.name.like("%" + word + "%")
+                        .or(item.whereDiscovery.like("%" + word + "%"))
                         .or(item.celeb.celebNameKr.like("%" + word + "%"))
                         .or(item.celeb.celebNameEn.like("%" + word + "%"))
                         .or(item.celeb.parent.celebNameKr.like("%" + word + "%"))

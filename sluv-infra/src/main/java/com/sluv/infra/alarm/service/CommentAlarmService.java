@@ -10,6 +10,7 @@ import com.sluv.domain.user.entity.User;
 import com.sluv.domain.user.service.UserDomainService;
 import com.sluv.infra.alarm.firebase.FcmNotificationService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,6 +20,7 @@ import java.util.HashMap;
 import static com.sluv.common.constant.ConstantData.ALARM_TITLE;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class CommentAlarmService {
 
@@ -42,9 +44,15 @@ public class CommentAlarmService {
 
     @Transactional
     @Async("alarmThreadPoolExecutor")
-    public void sendAlarmAboutComment(Long senderId, Long commentId) {
-        Comment comment = commentDomainService.findById(commentId);
-        if (!senderId.equals(comment.getQuestion().getUser().getId())) {
+    public void sendAlarmAboutComment(Long senderId, Comment comment) {
+        Long questionUserId = comment.getQuestion().getUser().getId();
+        Long parentCommentUserId = null;
+
+        if (comment.getParent() != null) {
+            parentCommentUserId = comment.getParent().getUser().getId();
+        }
+
+        if (!senderId.equals(questionUserId) && !questionUserId.equals(parentCommentUserId)) {
             User sender = userDomainService.findById(senderId);
             String message = AlarmMessage.getMessageWithUserName(sender.getNickname(), AlarmMessage.QUESTION_COMMENT);
             sendMessageTypeComment(comment.getQuestion().getUser(), comment, message, sender);
@@ -53,9 +61,7 @@ public class CommentAlarmService {
 
     @Transactional
     @Async("alarmThreadPoolExecutor")
-    public void sendAlarmAboutSubComment(Long senderId, Long commentId) {
-        Comment comment = commentDomainService.findById(commentId);
-
+    public void sendAlarmAboutSubComment(Long senderId, Comment comment) {
         if (!senderId.equals(comment.getParent().getUser().getId()) && !senderId.equals(comment.getQuestion().getUser().getId())) {
             User sender = userDomainService.findById(senderId);
             String message = AlarmMessage.getMessageWithUserName(sender.getNickname(), AlarmMessage.COMMENT_SUB);

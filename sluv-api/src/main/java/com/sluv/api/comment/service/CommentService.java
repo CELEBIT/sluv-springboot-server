@@ -112,9 +112,8 @@ public class CommentService {
         Comment comment = commentDomainService.saveComment(user, question, request.getContent());
         commentItemHelper.saveCommentItem(request, comment);
         commentImgHelper.saveCommentImg(request, comment);
-
         aiModelService.censorComment(comment);
-        commentAlarmService.sendAlarmAboutComment(user.getId(), comment.getId());
+        commentAlarmService.sendAlarmAboutComment(user.getId(), comment);
 
     }
 
@@ -138,8 +137,8 @@ public class CommentService {
         commentImgHelper.saveCommentImg(request, comment);
 
         aiModelService.censorComment(comment);
-        commentAlarmService.sendAlarmAboutComment(user.getId(), comment.getId());
-        commentAlarmService.sendAlarmAboutSubComment(user.getId(), comment.getId());
+        commentAlarmService.sendAlarmAboutComment(user.getId(), comment);
+        commentAlarmService.sendAlarmAboutSubComment(user.getId(), comment);
     }
 
     /**

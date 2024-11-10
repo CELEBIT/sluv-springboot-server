@@ -32,6 +32,8 @@ public class NewCelebRoute {
     public String celebPostPage(Model model, @RequestParam("newCelebId") Long newCelebId) {
         NewCelebPostDto newCeleb = newCelebService.findByNewCelebId(newCelebId);
         List<CelebCategoryResponse> celebCategories = celebCategoryService.findAllAvailableCategory();
+        celebCategories.add(0, CelebCategoryResponse.of(5L, "방송인"));
+        celebCategories.add(1, CelebCategoryResponse.of(6L, "인플루언서"));
         model.addAttribute("celebCategories", celebCategories);
         model.addAttribute("newCelebId", newCeleb.getNewCelebId());
         model.addAttribute("name", newCeleb.getName());

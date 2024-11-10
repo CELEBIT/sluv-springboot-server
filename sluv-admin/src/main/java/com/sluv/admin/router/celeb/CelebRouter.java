@@ -36,6 +36,8 @@ public class CelebRouter {
     @GetMapping("/celeb-register")
     public String getCelebRegisterPage(Model model) {
         List<CelebCategoryResponse> celebCategories = celebCategoryService.findAllAvailableCategory();
+        celebCategories.add(0, CelebCategoryResponse.of(5L, "방송인"));
+        celebCategories.add(1, CelebCategoryResponse.of(6L, "인플루언서"));
         model.addAttribute("celebCategories", celebCategories);
         model.addAttribute("celebCategorySize", celebCategories.size());
         return "celeb/celebRegister";

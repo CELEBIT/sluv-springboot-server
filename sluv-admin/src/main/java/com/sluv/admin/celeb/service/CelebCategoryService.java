@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -18,6 +19,6 @@ public class CelebCategoryService {
     public List<CelebCategoryResponse> findAllAvailableCategory() {
         return celebCategoryDomainService.findAllAvailableCategory().stream()
                 .map(CelebCategoryResponse::from)
-                .toList();
+                .collect(Collectors.toList());
     }
 }

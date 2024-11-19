@@ -50,7 +50,7 @@ public class QuestionAlarmService {
 
     private HashMap<String, Long> getIdAboutQuestion(Long questionId) {
         HashMap<String, Long> ids = new HashMap<>();
-        ids.put("questionId", questionId);
+        ids.put("communityId", questionId);
         return ids;
     }
 

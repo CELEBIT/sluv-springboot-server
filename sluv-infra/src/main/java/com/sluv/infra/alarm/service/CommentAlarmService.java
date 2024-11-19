@@ -87,7 +87,7 @@ public class CommentAlarmService {
 
     private HashMap<String, Long> getIdsAboutComment(Comment comment) {
         HashMap<String, Long> ids = new HashMap<>();
-        ids.put("questionId", comment.getQuestion().getId());
+        ids.put("communityId", comment.getQuestion().getId());
         ids.put("commentId", comment.getId());
         return ids;
     }

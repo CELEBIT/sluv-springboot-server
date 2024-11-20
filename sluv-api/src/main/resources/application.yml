@@ -20,12 +20,6 @@ spring:
     activate:
       on-profile: prod
 
----
-spring:
-  config:
-    activate:
-      on-profile: dev
-
 management:
   endpoints:
     web:
@@ -35,6 +29,12 @@ management:
     metrics:
       export:
         enabled: true
+
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
 
 
 ---

@@ -125,7 +125,8 @@
 <details>
    <summary> 본문 확인 (👈 Click)</summary>
 <br />
-<img width="700" alt="arch" src="https://github.com/user-attachments/assets/a7a8652b-3b88-467b-ba72-c407a95ac55b">
+
+<img width="700" alt="arch" src="https://github.com/user-attachments/assets/6435a6ff-3fa4-492d-a785-441af26d1074">
 
 </details>
 

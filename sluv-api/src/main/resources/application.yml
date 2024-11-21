@@ -12,6 +12,9 @@ spring:
     user:
       name: user
       password: 1234
+swagger:
+  user: ${SWAGGER_USER}
+  password: ${SWAGGER_PASSWORD}
 
 
 ---

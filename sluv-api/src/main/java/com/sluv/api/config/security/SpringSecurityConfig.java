@@ -4,15 +4,22 @@ import com.sluv.api.config.security.filter.CustomAuthenticationEntryPoint;
 import com.sluv.api.config.security.filter.ExceptionHandlerFilter;
 import com.sluv.api.config.security.filter.JwtAuthenticationFilter;
 import com.sluv.common.jwt.JwtProvider;
-import com.sluv.domain.user.service.UserDomainService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -23,8 +30,13 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @RequiredArgsConstructor
 public class SpringSecurityConfig {
 
+    @Value("${swagger.user}")
+    private String SWAGGER_USER;
+
+    @Value("${swagger.password}")
+    private String SWAGGER_PASSWORD;
+
     private final JwtProvider jwtProvider;
-    private final UserDomainService userDomainService;
     private final ExceptionHandlerFilter exceptionHandlerFilter = new ExceptionHandlerFilter();
     private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
 
@@ -54,6 +66,8 @@ public class SpringSecurityConfig {
 
     };
 
+    private static final String[] SWAGGER_URL = {"/swagger-ui/**", "/v3/api-docs/**"};
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
@@ -68,7 +82,6 @@ public class SpringSecurityConfig {
                 .and()
                 .formLogin().disable()
                 .httpBasic().disable()
-
                 .authorizeHttpRequests((request) -> request // 허용 범위 설정
                         .requestMatchers(HttpMethod.OPTIONS, "/**/*").permitAll()
                         .requestMatchers(HttpMethod.GET, "/app/*/*").permitAll()
@@ -79,12 +92,38 @@ public class SpringSecurityConfig {
                 )
                 .exceptionHandling().authenticationEntryPoint(customAuthenticationEntryPoint)
                 .and()
-//                .addFilterBefore(new JwtAuthenticationFilter(jwtProvider, userDomainService),
                 .addFilterBefore(new JwtAuthenticationFilter(jwtProvider),
                         UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(exceptionHandlerFilter, JwtAuthenticationFilter.class);
 
         return http.build();
+    }
+
+    @Bean
+    @Order(1)
+    public SecurityFilterChain swaggerFilterChain(HttpSecurity http) throws Exception {
+        http
+                .securityMatcher(SWAGGER_URL)
+                .csrf().disable()
+                .authorizeHttpRequests(auth -> auth.anyRequest().authenticated())
+                .httpBasic(Customizer.withDefaults());
+
+        return http.build();
+    }
+
+    @Bean
+    public InMemoryUserDetailsManager userDetailsService() {
+        UserDetails user =
+                User.withUsername(SWAGGER_USER)
+                        .password(passwordEncoder().encode(SWAGGER_PASSWORD))
+                        .roles("SWAGGER")
+                        .build();
+        return new InMemoryUserDetailsManager(user);
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder(8);
     }
 
 

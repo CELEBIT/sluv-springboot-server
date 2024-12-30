@@ -5,6 +5,7 @@
     <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sluv Back-Office</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -238,25 +239,6 @@
 
     </style>
 
-    <script>
-        function redirectToPage() {
-            let selectedPage = document.getElementById('page-select').value;
-            let searchKeyword = document.getElementById('search-keyword').value;
-            let url = '/admin/brands?page=' + selectedPage;
-            if (searchKeyword !== '') {
-                console.log("keyword: " + searchKeyword);
-                url = url + '&keyword=' + searchKeyword;
-            }
-            window.location.href = url;
-        }
-    </script>
-
-    <script>
-        function redirectToPageWithKeyword() {
-            let searchKeyword = document.getElementById('search-keyword').value;
-            window.location.href = '/admin/brands?keyword=' + searchKeyword;
-        }
-    </script>
 </head>
 <body>
 
@@ -274,56 +256,42 @@
 
 <div class="content">
     <div class="sidebar">
-        <a th:href="@{/admin/brands}" class="active">브랜드 목록</a>
-        <div class="divider"></div>
-        <a th:href="@{/admin/brand-register}">신규등록</a>
-        <div class="divider"></div>
-        <a th:href="@{/admin/new-brands}">뉴브랜드 목록</a>
+        <a th:href="@{/admin/dashboard/visit}" class="active">일일 방문자</a>
     </div>
+    <div id="main" style="width: 600px; height: 400px;"></div>
+    <script th:inline="javascript">
+        let categories = /*[[${day}]]*/ [];
+        let dailyVisitCount = /*[[${dailyVisitCount}]]*/ [];
 
-    <main>
-        <!-- 페이지 번호 선택 영역 -->
+        // ECharts 초기화
+        let chart = echarts.init(document.getElementById('main'));
 
-        <div class="page-selector-box">
-            <div class="page-selector">
-                <label for="page-select">Page</label>
-                <select id="page-select" onchange="redirectToPage()">
-                    <option th:each="i : ${#numbers.sequence(1, totalPageSize)}"
-                            th:value="${i}"
-                            th:text="${i}"
-                            th:selected="${i} == ${pageNumber}">1
-                    </option>
-                </select>
-                <span>&nbspof&nbsp<span th:text="${totalPageSize}"></span></span>
-            </div>
+        // 차트 옵션 설정
+        let option = {
+            title: {
+                text: '일일 접속자 수'
+            },
+            tooltip: {},
+            xAxis: {
+                type: 'category',
+                data: categories
+            },
+            yAxis: {
+                type: 'value'
+            },
+            series: [
+                {
+                    type: 'line',
+                    data: dailyVisitCount
+                },
+            ]
+        };
 
-            <div class="search-box">
-                <input type="text" id="search-keyword" placeholder="검색어 입력"
-                       th:value="${keyword != null} ? ${keyword} : null">
-                <button type="button" onclick="redirectToPageWithKeyword()">검색</button>
-            </div>
-        </div>
-
-        <table>
-            <thead>
-            <tr>
-                <th>브랜드 아이디</th>
-                <th>로고</th>
-                <th>한글이름</th>
-                <th>영어이름</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr th:each="brand : ${brands}">
-                <td th:text="${brand.brandId}">아이디</td>
-                <td><img th:src="@{${brand.imageUrl}}" alt="로고"/></td>
-                <td th:text="${brand.krName}">한글이름</td>
-                <td th:text="${brand.enName}">영어이름</td>
-            </tr>
-            </tbody>
-        </table>
-    </main>
+        // 차트에 옵션 적용
+        chart.setOption(option);
+    </script>
 </div>
+
 
 </body>
 </html>

@@ -8,8 +8,11 @@ import com.sluv.domain.visit.service.VisitHistoryDomainService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -27,7 +30,24 @@ public class VisitHistoryService {
         Long yesterdayCount = getDayCount(now.minusDays(1), allDailyVisit);
         List<Long> countGraph = getCountGraph(visitHistoryFor10Days, todayCount);
 
-        return VisitHistoryCountResDto.of(todayCount, yesterdayCount, countGraph);
+        List<String> dates = getDates();
+
+        return VisitHistoryCountResDto.of(todayCount, yesterdayCount, countGraph, dates);
+    }
+
+    private List<String> getDates() {
+        List<String> dates = new ArrayList<>();
+        LocalDate today = LocalDate.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+        for (int i = 0; i <= 10; i++) {
+            LocalDate date = today.minusDays(i); // i일 전의 날짜 계산
+            String formattedDate = date.format(formatter); // 포맷팅
+            dates.add(formattedDate);
+        }
+
+        Collections.reverse(dates);
+        return dates;
     }
 
     private Long getDayCount(LocalDateTime now, List<DailyVisit> allDailyVisit) {

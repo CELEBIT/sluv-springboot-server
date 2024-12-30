@@ -21,12 +21,15 @@ public class VisitHistoryCountResDto {
     private Long todayCount;
     @Schema(description = "오늘을 기준으로 10일간 일일 누적 접속자 수 그래프")
     private List<Long> countGraph;
+    @Schema(description = "오늘을 기준으로 10일간 날짜")
+    private List<String> dates;
 
-    public static VisitHistoryCountResDto of(Long todayCount, Long yesterdayCount, List<Long> countGraph) {
+    public static VisitHistoryCountResDto of(Long todayCount, Long yesterdayCount, List<Long> countGraph, List<String> dates) {
         return VisitHistoryCountResDto.builder()
                 .percent(getPercent(yesterdayCount, todayCount))
                 .todayCount(todayCount)
                 .countGraph(countGraph)
+                .dates(dates)
                 .build();
     }
 

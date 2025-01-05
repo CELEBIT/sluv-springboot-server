@@ -26,9 +26,11 @@ public class AlarmResponse {
     private Long questionId;
     private Long commentId;
     private Long followerId;
+    private Long itemEditReqId;
 
     private List<QuestionImgSimpleDto> images;
     private String userImageUrl;
+    private String itemEditType;
 
 
     private LocalDateTime cratedAt;
@@ -40,6 +42,8 @@ public class AlarmResponse {
         Long questionId = alarm.getQuestion() == null ? null : alarm.getQuestion().getId();
         Long commentId = alarm.getComment() == null ? null : alarm.getComment().getId();
         Long followerId = alarm.getSender() == null ? null : alarm.getSender().getId();
+        Long itemEditReqId = alarm.getItemEditReq() == null ? null : alarm.getItemEditReq().getId();
+        String itemEditType = alarm.getItemEditReq() == null ? null : alarm.getItemEditReq().getItemEditReqReason().toString();
 
         return AlarmResponse.builder()
                 .alarmId(alarm.getId())
@@ -50,8 +54,10 @@ public class AlarmResponse {
                 .questionId(questionId)
                 .commentId(commentId)
                 .followerId(followerId)
+                .itemEditReqId(itemEditReqId)
                 .images(alarmImages.getImages())
                 .userImageUrl(alarmImages.getUserImageUrl())
+                .itemEditType(itemEditType)
                 .cratedAt(alarm.getCreatedAt())
                 .alarmStatus(alarm.getAlarmStatus())
                 .build();

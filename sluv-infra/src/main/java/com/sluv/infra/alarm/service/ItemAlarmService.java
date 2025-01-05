@@ -5,7 +5,9 @@ import com.sluv.domain.alarm.enums.AlarmMessage;
 import com.sluv.domain.alarm.enums.AlarmType;
 import com.sluv.domain.alarm.service.AlarmDomainService;
 import com.sluv.domain.item.entity.Item;
+import com.sluv.domain.item.entity.ItemEditReq;
 import com.sluv.domain.item.service.ItemDomainService;
+import com.sluv.domain.item.service.ItemEditReqDomainService;
 import com.sluv.domain.user.entity.Follow;
 import com.sluv.domain.user.entity.User;
 import com.sluv.domain.user.service.FollowDomainService;
@@ -29,6 +31,7 @@ public class ItemAlarmService {
     private final UserDomainService userDomainService;
     private final ItemDomainService itemDomainService;
     private final FollowDomainService followDomainService;
+    private final ItemEditReqDomainService itemEditReqDomainService;
 
     private final FcmNotificationService fcmNotificationService;
 
@@ -51,8 +54,9 @@ public class ItemAlarmService {
 
         if (!senderId.equals(item.getUser().getId())) {
             User sender = userDomainService.findById(senderId);
+            ItemEditReq itemEditReq = itemEditReqDomainService.findItemEditReqByIdWithItem(itemEditReqId);
             String message = AlarmMessage.ITEM_EDIT.getMessage();
-            sendMessageTypeItemEdit(itemEditReqId, item, message, sender);
+            sendMessageTypeItemEdit(itemEditReq, item, message, sender);
         }
     }
 
@@ -71,7 +75,7 @@ public class ItemAlarmService {
     }
 
     private void sendMessageTypeItem(User receiver, Item item, String message, User sender) {
-        AlarmElement alarmElement = AlarmElement.of(item, null, null, sender);
+        AlarmElement alarmElement = AlarmElement.of(item, null, null, sender, null);
         alarmDomainService.saveAlarm(receiver, ALARM_TITLE, message, AlarmType.ITEM, alarmElement);
         fcmNotificationService.sendFCMNotification(
                 receiver.getId(), ALARM_TITLE, message, AlarmType.ITEM, getIdAboutItem(item.getId())
@@ -85,18 +89,18 @@ public class ItemAlarmService {
                 .map(User::getId)
                 .toList();
 
-        AlarmElement alarmElement = AlarmElement.of(item, null, null, followee);
+        AlarmElement alarmElement = AlarmElement.of(item, null, null, followee, null);
         alarmDomainService.saveAllAlarm(followers, ALARM_TITLE, message, AlarmType.ITEM, alarmElement);
         fcmNotificationService.sendFCMNotificationMulticast(
                 followerIds, ALARM_TITLE, message, AlarmType.ITEM, getIdAboutItem(item.getId())
         );
     }
 
-    private void sendMessageTypeItemEdit(Long itemEditReqId, Item item, String message, User sender) {
-        AlarmElement alarmElement = AlarmElement.of(item, null, null, sender);
+    private void sendMessageTypeItemEdit(ItemEditReq itemEditReq, Item item, String message, User sender) {
+        AlarmElement alarmElement = AlarmElement.of(item, null, null, sender, itemEditReq);
         alarmDomainService.saveAlarm(item.getUser(), ALARM_TITLE, message, AlarmType.EDIT, alarmElement);
         fcmNotificationService.sendFCMNotification(
-                item.getUser().getId(), ALARM_TITLE, message, AlarmType.EDIT, getIdAboutItemEdit(itemEditReqId)
+                item.getUser().getId(), ALARM_TITLE, message, AlarmType.EDIT, getIdAboutItemEdit(itemEditReq.getId())
         );
     }
 

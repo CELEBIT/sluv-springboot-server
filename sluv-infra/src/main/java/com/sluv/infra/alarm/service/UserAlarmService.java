@@ -36,7 +36,7 @@ public class UserAlarmService {
     }
 
     private void sendMessageTypeUser(User receiver, User sender, String message) {
-        AlarmElement alarmElement = AlarmElement.of(null, null, null, sender);
+        AlarmElement alarmElement = AlarmElement.of(null, null, null, sender, null);
         alarmDomainService.saveAlarm(receiver, ALARM_TITLE, message, AlarmType.USER, alarmElement);
         fcmNotificationService.sendFCMNotification(
                 receiver.getId(), ALARM_TITLE, message, AlarmType.USER, getIdAboutUser(sender.getId())

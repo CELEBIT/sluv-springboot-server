@@ -78,7 +78,7 @@ public class CommentAlarmService {
     }
 
     private void sendMessageTypeComment(User receiver, Comment comment, String message, User sender) {
-        AlarmElement alarmElement = AlarmElement.of(null, comment.getQuestion(), comment, sender);
+        AlarmElement alarmElement = AlarmElement.of(null, comment.getQuestion(), comment, sender, null);
         alarmDomainService.saveAlarm(receiver, ALARM_TITLE, message, AlarmType.COMMENT, alarmElement);
         fcmNotificationService.sendFCMNotification(
                 receiver.getId(), ALARM_TITLE, message, AlarmType.COMMENT, getIdsAboutComment(comment)

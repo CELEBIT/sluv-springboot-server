@@ -34,7 +34,7 @@ import com.sluv.domain.user.service.FollowDomainService;
 import com.sluv.domain.user.service.UserDomainService;
 import com.sluv.infra.ai.AiModelService;
 import com.sluv.infra.alarm.service.ItemAlarmService;
-import com.sluv.infra.cache.ItemCacheService;
+import com.sluv.infra.cache.CacheService;
 import com.sluv.infra.counter.view.ViewCounter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -74,17 +74,19 @@ public class ItemService {
     private final ItemScrapDomainService itemScrapDomainService;
 
     private final AiModelService aiModelService;
-    private final ItemCacheService<ItemDetailFixData> itemCacheService;
+    private final CacheService<ItemDetailFixData> cacheService;
     private final ViewCounter viewCounter;
     private final ItemAlarmService itemAlarmService;
     private final ItemHelper itemHelper;
+
+    private final String ITEM_KEY_PREFIX = "item:";
 
     @Transactional
     public ItemPostResDto postItem(Long userId, ItemPostReqDto reqDto) {
         User user = userDomainService.findById(userId);
 
         if (reqDto.getId() != null) {
-            itemCacheService.deleteById(reqDto.getId());
+            cacheService.deleteByKey(ITEM_KEY_PREFIX + reqDto.getId());
         }
 
         // 추가될 Celeb 확인
@@ -186,10 +188,10 @@ public class ItemService {
         }
 
         // 2. Item Detail 고정 데이터 조회 -> Cache Aside
-        ItemDetailFixData fixData = itemCacheService.findById(itemId);
+        ItemDetailFixData fixData = cacheService.findByKey(ITEM_KEY_PREFIX + itemId);
         if (fixData == null) {
             fixData = getItemDetailFixData(item);
-            itemCacheService.saveWithId(itemId, fixData);
+            cacheService.saveWithKey(ITEM_KEY_PREFIX + itemId, fixData);
         }
 
         // 3. 좋아요 수
@@ -315,7 +317,7 @@ public class ItemService {
 
         item.changeStatus(ItemStatus.DELETED);
         itemDomainService.saveItem(item);
-        itemCacheService.deleteById(itemId);
+        cacheService.deleteByKey(ITEM_KEY_PREFIX + itemId);
     }
 
     @Transactional(readOnly = true)

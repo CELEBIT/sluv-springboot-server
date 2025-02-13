@@ -11,28 +11,28 @@ import java.util.concurrent.TimeUnit;
 
 @Service
 @RequiredArgsConstructor
-public class RedisItemCacheService<T> implements ItemCacheService<T> {
+public class RedisCacheService<T> implements CacheService<T> {
 
     private final RedisTemplate<String, T> redisStringDataTemplate;
 
     @Async(value = "redisThreadPoolExecutor")
     @Override
-    public void saveWithId(Long itemId, T itemData) {
+    public void saveWithKey(String key, T data) {
         ValueOperations<String, T> dataOperations = redisStringDataTemplate.opsForValue();
-        dataOperations.set("item:" + itemId, itemData, 1, TimeUnit.HOURS);
+        dataOperations.set(key, data, 1, TimeUnit.HOURS);
     }
 
     @Override
-    public T findById(Long itemId) {
+    public T findByKey(String key) {
         ValueOperations<String, T> dataOperations = redisStringDataTemplate.opsForValue();
-        return dataOperations.get("item:" + itemId);
+        return dataOperations.get(key);
     }
 
     @Async(value = "redisThreadPoolExecutor")
     @Override
-    public void deleteById(Long itemId) {
+    public void deleteByKey(String key) {
         ValueOperations<String, T> dataOperations = redisStringDataTemplate.opsForValue();
-        dataOperations.getAndDelete("item:" + itemId);
+        dataOperations.getAndDelete(key);
     }
 
 }

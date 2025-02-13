@@ -34,7 +34,8 @@ import com.sluv.domain.user.service.FollowDomainService;
 import com.sluv.domain.user.service.UserDomainService;
 import com.sluv.infra.ai.AiModelService;
 import com.sluv.infra.alarm.service.ItemAlarmService;
-import com.sluv.infra.cache.CacheService;
+import com.sluv.infra.cache.ItemCacheService;
+import com.sluv.infra.counter.view.ViewCounter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -73,7 +74,8 @@ public class ItemService {
     private final ItemScrapDomainService itemScrapDomainService;
 
     private final AiModelService aiModelService;
-    private final CacheService cacheService;
+    private final ItemCacheService<ItemDetailFixData> itemCacheService;
+    private final ViewCounter viewCounter;
     private final ItemAlarmService itemAlarmService;
     private final ItemHelper itemHelper;
 
@@ -82,7 +84,7 @@ public class ItemService {
         User user = userDomainService.findById(userId);
 
         if (reqDto.getId() != null) {
-            cacheService.deleteItemDetailFixDataByItemId(reqDto.getId());
+            itemCacheService.deleteById(reqDto.getId());
         }
 
         // 추가될 Celeb 확인
@@ -184,10 +186,10 @@ public class ItemService {
         }
 
         // 2. Item Detail 고정 데이터 조회 -> Cache Aside
-        ItemDetailFixData fixData = (ItemDetailFixData) cacheService.findItemDetailFixDataByItemId(itemId);
+        ItemDetailFixData fixData = itemCacheService.findById(itemId);
         if (fixData == null) {
             fixData = getItemDetailFixData(item);
-            cacheService.saveItemDetailFixData(itemId, fixData);
+            itemCacheService.saveWithId(itemId, fixData);
         }
 
         // 3. 좋아요 수
@@ -243,14 +245,13 @@ public class ItemService {
     }
 
     private void increaseViewNum(Long userId, Item item) {
-        boolean isExist = cacheService.existUserViewItemId(userId, item.getId());
+        boolean isExist = viewCounter.existUserViewItemId(userId, item.getId());
         if (!isExist) {
-            cacheService.saveUserViewItemId(userId, item.getId());
+            viewCounter.saveUserViewItemId(userId, item.getId());
             item.increaseViewNum();
         }
     }
 
-    //    @Cacheable(cacheNames = "item", key = "#itemId")
     @Transactional
     public ItemDetailFixData getItemDetailFixData(Item item) {
         Long itemId = item.getId();
@@ -314,7 +315,7 @@ public class ItemService {
 
         item.changeStatus(ItemStatus.DELETED);
         itemDomainService.saveItem(item);
-        cacheService.deleteItemDetailFixDataByItemId(itemId);
+        itemCacheService.deleteById(itemId);
     }
 
     @Transactional(readOnly = true)

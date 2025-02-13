@@ -1,8 +1,8 @@
 package com.sluv.api.item.service;
 
+import com.sluv.api.item.dto.ItemDetailFixData;
 import com.sluv.domain.item.entity.Item;
 import com.sluv.domain.item.service.ItemDomainService;
-import com.sluv.infra.cache.CacheService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -14,7 +14,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ItemCacheService {
     private final ItemDomainService itemDomainService;
-    private final CacheService cacheService;
+    private final com.sluv.infra.cache.ItemCacheService<ItemDetailFixData> itemCacheService;
 
     @Transactional
     @Async(value = "asyncThreadPoolExecutor")
@@ -24,7 +24,7 @@ public class ItemCacheService {
                 .map(Item::getId)
                 .toList();
 
-        userItemIds.forEach(cacheService::deleteItemDetailFixDataByItemId);
+        userItemIds.forEach(itemCacheService::deleteById);
     }
 
 }

@@ -126,7 +126,18 @@
    <summary> 본문 확인 (👈 Click)</summary>
 <br />
 
-<img width="700" alt="arch" src="https://github.com/user-attachments/assets/6435a6ff-3fa4-492d-a785-441af26d1074">
+### Service Architecture
+<br />
+<img width="700" alt="service-arch" src="https://github.com/user-attachments/assets/db2bf0c8-8c22-4439-9d6c-054fe638a159">
+
+<br />
+
+### CD Pipe-Line Architecture
+
+<br />
+<img width="700" alt="cd-arch" src="https://github.com/user-attachments/assets/a49b8077-9b1e-4cbe-a180-c39f67940561">
+
+
 
 </details>
 

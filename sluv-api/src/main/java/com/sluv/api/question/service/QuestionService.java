@@ -26,7 +26,7 @@ import com.sluv.domain.question.service.*;
 import com.sluv.domain.user.entity.User;
 import com.sluv.domain.user.service.UserDomainService;
 import com.sluv.infra.alarm.service.QuestionAlarmService;
-import com.sluv.infra.cache.CacheService;
+import com.sluv.infra.counter.view.ViewCounter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -58,7 +58,7 @@ public class QuestionService {
     private final QuestionVoteDomainService questionVoteDomainService;
     private final UserDomainService userDomainService;
 
-    private final CacheService cacheService;
+    private final ViewCounter viewCounter;
     private final QuestionAlarmService questionAlarmService;
 
 
@@ -405,9 +405,9 @@ public class QuestionService {
     }
 
     private void increaseQuestionViewNum(Long userId, Question question) {
-        boolean isExist = cacheService.existUserViewQuestionId(userId, question.getId());
+        boolean isExist = viewCounter.existUserViewQuestionId(userId, question.getId());
         if (!isExist) {
-            cacheService.saveUserViewQuestionId(userId, question.getId());
+            viewCounter.saveUserViewQuestionId(userId, question.getId());
             question.increaseSearchNum();
         }
     }

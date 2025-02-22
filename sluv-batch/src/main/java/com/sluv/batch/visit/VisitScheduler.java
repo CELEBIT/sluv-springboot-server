@@ -1,7 +1,7 @@
 package com.sluv.batch.visit;
 
 import com.sluv.domain.visit.service.VisitHistoryDomainService;
-import com.sluv.infra.cache.CacheService;
+import com.sluv.infra.counter.visit.VisitCounter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class VisitScheduler {
     private final VisitHistoryDomainService visitHistoryDomainService;
-    private final CacheService cacheService;
+    private final VisitCounter visitCounter;
 
     /**
      * 일일 접속 횟수 저장.
@@ -25,13 +25,13 @@ public class VisitScheduler {
     public void updateDailyVisitantCount() {
         LocalDateTime now = LocalDateTime.now();
         log.info("Daily Visitant Count Update Time: {}", LocalDateTime.now());
-        Long visitantCount = cacheService.getVisitantCount();
+        Long visitantCount = visitCounter.getVisitantCount();
 
         log.info("Save RecentDailyVisit. Time: {}", LocalDateTime.now());
 
         visitHistoryDomainService.saveVisitHistory(now.minusDays(1), visitantCount);
 
-        cacheService.clearVisitantCount();
+        visitCounter.clearVisitantCount();
     }
 
 }

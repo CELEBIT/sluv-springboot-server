@@ -13,7 +13,7 @@ import com.sluv.api.common.response.SuccessResponse;
 import com.sluv.common.annotation.CurrentUserId;
 import com.sluv.domain.auth.enums.SnsType;
 import com.sluv.domain.user.entity.User;
-import com.sluv.infra.cache.CacheService;
+import com.sluv.infra.counter.visit.VisitCounter;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -29,7 +29,7 @@ public class AuthController {
     private final GoogleUserService googleUserService;
     private final AppleUserService appleUserService;
     private final AuthService authService;
-    private final CacheService cacheService;
+    private final VisitCounter visitCounter;
 
 
     @Operation(summary = "소셜 로그인", description = "KAKAO:[AccessToken], GOOGLE, APPLE: [IdToken]")
@@ -45,7 +45,7 @@ public class AuthController {
             case APPLE -> loginUser = appleUserService.appleLogin(request);
         }
 
-        cacheService.visitMember(loginUser.getId());
+        visitCounter.countVisit(loginUser.getId());
 
         AuthResponse response = authService.getAuthResDto(loginUser);
         return ResponseEntity.ok().body(SuccessDataResponse.create(response));
@@ -55,7 +55,7 @@ public class AuthController {
     @Operation(summary = "*자동 로그인", description = "토큰 만료 시 error code : 4002")
     @GetMapping("/auto-login")
     public ResponseEntity<SuccessDataResponse<AutoLoginResponse>> autoLogin(@CurrentUserId Long userId) {
-        cacheService.visitMember(userId);
+        visitCounter.countVisit(userId);
         User user = authService.findLogInUser(userId);
 //        authService.checkFcm(user);
         AutoLoginResponse response = AutoLoginResponse.of(user);
@@ -66,7 +66,7 @@ public class AuthController {
     @PostMapping("/auto-login")
     public ResponseEntity<SuccessDataResponse<AutoLoginResponse>> autoLoginWithFcm(@CurrentUserId Long userId,
                                                                                    @Nullable @RequestBody AutoLoginRequest request) {
-        cacheService.visitMember(userId);
+        visitCounter.countVisit(userId);
         if (request != null) {
             authService.changeFcm(userId, request.getFcm());
         }

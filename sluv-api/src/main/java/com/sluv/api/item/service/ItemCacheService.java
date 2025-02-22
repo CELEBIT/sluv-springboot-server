@@ -1,5 +1,6 @@
 package com.sluv.api.item.service;
 
+import com.sluv.api.item.dto.ItemDetailFixData;
 import com.sluv.domain.item.entity.Item;
 import com.sluv.domain.item.service.ItemDomainService;
 import com.sluv.infra.cache.CacheService;
@@ -14,7 +15,9 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ItemCacheService {
     private final ItemDomainService itemDomainService;
-    private final CacheService cacheService;
+    private final CacheService<ItemDetailFixData> cacheService;
+
+    private final String ITEM_KEY_PREFIX = "item:";
 
     @Transactional
     @Async(value = "asyncThreadPoolExecutor")
@@ -24,7 +27,7 @@ public class ItemCacheService {
                 .map(Item::getId)
                 .toList();
 
-        userItemIds.forEach(cacheService::deleteItemDetailFixDataByItemId);
+        userItemIds.forEach((userItemId) -> cacheService.deleteByKey(ITEM_KEY_PREFIX + userItemId));
     }
 
 }

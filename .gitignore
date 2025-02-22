@@ -69,3 +69,5 @@ ansible/updater
 .idea
 
 ### END IAC
+
+.DS_Store

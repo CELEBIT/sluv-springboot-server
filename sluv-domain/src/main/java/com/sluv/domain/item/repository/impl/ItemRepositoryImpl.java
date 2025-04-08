@@ -730,14 +730,16 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
      * 큐레이션 아이템 조회
      */
     @Override
-    public List<Item> getCurationItem(User user, List<Celeb> interestedCeleb) {
+    public List<Item> getCurationItem(User nowUser, List<Celeb> interestedCeleb, List<Long> blockUserIds) {
         log.info("큐레이션 아이템 조회 Query");
         LocalDateTime now = LocalDateTime.now();
 
         List<Item> content = jpaQueryFactory.selectFrom(item)
+                .leftJoin(item.user, user).fetchJoin()
                 .leftJoin(itemLike).on(itemLike.item.eq(item))
                 .leftJoin(itemScrap).on(itemScrap.item.eq(item))
                 .where(item.itemStatus.eq(ACTIVE)
+                        .and(item.user.id.notIn(blockUserIds))
                         .and(item.celeb.in(interestedCeleb)
                                 .or(item.celeb.parent.in(interestedCeleb)))
                         .and(item.createdAt.year().eq(now.getYear()))

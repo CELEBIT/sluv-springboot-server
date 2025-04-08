@@ -88,8 +88,8 @@ public class ItemDomainService {
         return itemRepository.getDayHotItem();
     }
 
-    public List<Item> getCurationItem(User user, List<Celeb> interestedCeleb) {
-        return itemRepository.getCurationItem(user, interestedCeleb);
+    public List<Item> getCurationItem(User user, List<Celeb> interestedCeleb, List<Long> blockUserIds) {
+        return itemRepository.getCurationItem(user, interestedCeleb, blockUserIds);
     }
 
     public List<Item> getAllByItemStatus(List<Long> blockUserIds, ItemStatus itemStatus) {

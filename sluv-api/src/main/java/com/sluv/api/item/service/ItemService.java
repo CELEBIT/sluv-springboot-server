@@ -439,13 +439,18 @@ public class ItemService {
     @Transactional(readOnly = true)
     public List<ItemSimpleDto> getCurationItem(Long userId) {
         User user = userDomainService.findByIdOrNull(userId);
+        List<Long> blockUserIds = new ArrayList<>();
+
         List<Celeb> interestedCeleb;
         if (user != null) {
             interestedCeleb = celebDomainService.findInterestedCeleb(user);
+            blockUserIds = userBlockDomainService.getAllBlockedUser(userId).stream()
+                    .map(userBlock -> userBlock.getBlockedUser().getId())
+                    .toList();
         } else {
             interestedCeleb = celebDomainService.findTop10Celeb();
         }
-        List<Item> itemList = itemDomainService.getCurationItem(user, interestedCeleb);
+        List<Item> itemList = itemDomainService.getCurationItem(user, interestedCeleb, blockUserIds);
 
         return itemDomainService.getItemSimpleDto(user, itemList);
     }

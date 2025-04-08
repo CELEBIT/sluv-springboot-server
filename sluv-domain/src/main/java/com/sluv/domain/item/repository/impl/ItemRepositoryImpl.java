@@ -401,10 +401,15 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
      * 유저가 좋아요 누른 Item 조회
      */
     @Override
-    public Page<Item> getAllByUserLikeItem(User user, Pageable pageable) {
+    public Page<Item> getAllByUserLikeItem(User user, List<Long> blockUserIds, Pageable pageable) {
         List<Item> content = jpaQueryFactory.select(item)
                 .from(itemLike)
-                .where(itemLike.user.eq(user).and(itemLike.item.itemStatus.eq(ACTIVE)))
+                .leftJoin(item).on(itemLike.item.eq(item))
+                .where(
+                        itemLike.user.eq(user)
+                                .and(itemLike.item.itemStatus.eq(ACTIVE))
+                                .and(item.user.id.notIn(blockUserIds))
+                )
                 .orderBy(itemLike.id.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -414,7 +419,11 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
         JPAQuery<Item> query = jpaQueryFactory.select(item)
                 .from(itemLike)
                 .leftJoin(item).on(itemLike.item.eq(item))
-                .where(itemLike.user.eq(user).and(itemLike.item.itemStatus.eq(ACTIVE)))
+                .where(
+                        itemLike.user.eq(user)
+                                .and(itemLike.item.itemStatus.eq(ACTIVE))
+                                .and(item.user.id.notIn(blockUserIds))
+                )
                 .orderBy(itemLike.id.desc());
 
         return PageableExecutionUtils.getPage(content, pageable, () -> query.fetch().size());

@@ -28,8 +28,8 @@ public class ItemDomainService {
         return itemRepository.findById(itemId).orElseThrow(ItemNotFoundException::new);
     }
 
-    public Page<Item> getAllByUserLikeItem(User user, Pageable pageable) {
-        return itemRepository.getAllByUserLikeItem(user, pageable);
+    public Page<Item> getAllByUserLikeItem(User user, List<Long> blockUserIds, Pageable pageable) {
+        return itemRepository.getAllByUserLikeItem(user, blockUserIds, pageable);
     }
 
     public List<ItemSimpleDto> getItemSimpleDto(User user, List<Item> content) {

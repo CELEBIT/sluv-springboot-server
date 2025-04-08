@@ -38,7 +38,7 @@ public interface ItemRepositoryCustom {
 
     Page<Item> getUserAllItem(Long userId, Pageable pageable);
 
-    Page<Item> getAllByUserLikeItem(User user, Pageable pageable);
+    Page<Item> getAllByUserLikeItem(User user, List<Long> blockUserIds, Pageable pageable);
 
     Page<Item> getCelebSummerItem(Pageable pageable, SearchFilterReqDto dto);
 

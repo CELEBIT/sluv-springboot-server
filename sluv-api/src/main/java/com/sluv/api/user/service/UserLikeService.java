@@ -36,10 +36,18 @@ public class UserLikeService {
 
     private final QuestionDtoMapper questionDtoMapper;
 
+
+    /**
+     * 유저가 좋아요한 Item 게시글 조회
+     */
     @Transactional(readOnly = true)
     public PaginationCountResponse<ItemSimpleDto> getUserLikeItem(Long userId, Pageable pageable) {
         User user = userDomainService.findById(userId);
-        Page<Item> itemPage = itemDomainService.getAllByUserLikeItem(user, pageable);
+        List<Long> blockUserIds = userBlockDomainService.getAllBlockedUser(userId).stream()
+                .map(userBlock -> userBlock.getBlockedUser().getId())
+                .toList();
+
+        Page<Item> itemPage = itemDomainService.getAllByUserLikeItem(user, blockUserIds, pageable);
 
         List<ItemSimpleDto> content = itemDomainService.getItemSimpleDto(user, itemPage.getContent());
 

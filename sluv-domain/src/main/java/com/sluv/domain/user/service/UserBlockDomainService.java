@@ -8,6 +8,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class UserBlockDomainService {
@@ -28,5 +30,9 @@ public class UserBlockDomainService {
 
     public Page<UserBlock> getUserBlockPage(Long userId, Pageable pageable) {
         return userBlockRepository.getUserBlockPage(userId, pageable);
+    }
+
+    public List<UserBlock> getAllBlockedUser(Long userId) {
+        return userBlockRepository.getAllBlockUser(userId);
     }
 }

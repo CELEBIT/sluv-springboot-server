@@ -5,10 +5,14 @@ import com.sluv.domain.user.entity.UserBlock;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
+
 public interface UserBlockRepositoryCustom {
     boolean getBlockStatus(User user, User targetUser);
 
     void deleteUserBlock(User user, User targetUser);
 
     Page<UserBlock> getUserBlockPage(Long userId, Pageable pageable);
+
+    List<UserBlock> getAllBlockUser(Long userId);
 }

@@ -11,6 +11,7 @@ import org.springframework.data.support.PageableExecutionUtils;
 
 import java.util.List;
 
+import static com.sluv.domain.user.entity.QUser.user;
 import static com.sluv.domain.user.entity.QUserBlock.userBlock;
 
 
@@ -47,5 +48,13 @@ public class UserBlockRepositoryImpl implements UserBlockRepositoryCustom {
                 .where(userBlock.user.id.eq(userId));
 
         return PageableExecutionUtils.getPage(content, pageable, () -> countQuery.fetch().size());
+    }
+
+    @Override
+    public List<UserBlock> getAllBlockUser(Long userId) {
+        return jpaQueryFactory.selectFrom(userBlock)
+                .leftJoin(userBlock.blockedUser, user).fetchJoin()
+                .where(userBlock.user.id.eq(userId))
+                .fetch();
     }
 }

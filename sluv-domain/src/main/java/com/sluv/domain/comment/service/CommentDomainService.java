@@ -23,8 +23,8 @@ public class CommentDomainService {
         return commentRepository.findById(commentId).orElseThrow(CommentNotFoundException::new);
     }
 
-    public Page<Comment> getUserAllLikeComment(User user, Pageable pageable) {
-        return commentRepository.getUserAllLikeComment(user, pageable);
+    public Page<Comment> getUserAllLikeComment(User user, List<Long> blockUserIds, Pageable pageable) {
+        return commentRepository.getUserAllLikeComment(user, blockUserIds, pageable);
     }
 
     public Long countByQuestionId(Long questionId) {

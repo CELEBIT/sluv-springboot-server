@@ -66,12 +66,13 @@ public class CommentRepositoryImpl implements CommentRepositoryCustom {
     }
 
     @Override
-    public Page<Comment> getUserAllLikeComment(User user, Pageable pageable) {
+    public Page<Comment> getUserAllLikeComment(User user, List<Long> blockUserIds, Pageable pageable) {
         List<Comment> content = jpaQueryFactory.select(comment)
                 .from(commentLike)
                 .where(commentLike.user.eq(user)
                         .and(comment.commentStatus.eq(CommentStatus.ACTIVE))
                         .and(comment.question.questionStatus.eq(QuestionStatus.ACTIVE))
+                        .and(comment.user.id.notIn(blockUserIds))
                 )
                 .orderBy(commentLike.createdAt.desc())
                 .offset(pageable.getOffset())
@@ -84,6 +85,7 @@ public class CommentRepositoryImpl implements CommentRepositoryCustom {
                 .where(commentLike.user.eq(user)
                         .and(comment.commentStatus.eq(CommentStatus.ACTIVE))
                         .and(comment.question.questionStatus.eq(QuestionStatus.ACTIVE))
+                        .and(comment.user.id.notIn(blockUserIds))
                 )
                 .orderBy(commentLike.createdAt.desc());
 

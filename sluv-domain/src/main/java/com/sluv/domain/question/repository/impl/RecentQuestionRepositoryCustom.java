@@ -5,6 +5,8 @@ import com.sluv.domain.user.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
+
 public interface RecentQuestionRepositoryCustom {
-    Page<Question> getUserAllRecentQuestion(User user, Pageable pageable);
+    Page<Question> getUserAllRecentQuestion(User user, List<Long> blockUserIds, Pageable pageable);
 }

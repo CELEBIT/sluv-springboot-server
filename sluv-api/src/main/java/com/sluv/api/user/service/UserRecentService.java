@@ -59,8 +59,11 @@ public class UserRecentService {
     @Transactional(readOnly = true)
     public PaginationCountResponse<QuestionSimpleResDto> getUserRecentQuestion(Long userId, Pageable pageable) {
         User user = userDomainService.findById(userId);
+        List<Long> blockUserIds = userBlockDomainService.getAllBlockedUser(userId).stream()
+                .map(userBlock -> userBlock.getBlockedUser().getId())
+                .toList();
 
-        Page<Question> recentQuestionPage = recentQuestionDomainService.getUserAllRecentQuestion(user, pageable);
+        Page<Question> recentQuestionPage = recentQuestionDomainService.getUserAllRecentQuestion(user, blockUserIds, pageable);
 
         List<QuestionSimpleResDto> content = recentQuestionPage.stream().map(question -> {
             List<QuestionImgSimpleDto> imgList = null;

@@ -92,8 +92,8 @@ public class ItemDomainService {
         return itemRepository.getCurationItem(user, interestedCeleb);
     }
 
-    public List<Item> findAllByItemStatus(ItemStatus itemStatus) {
-        return itemRepository.findAllByItemStatus(itemStatus);
+    public List<Item> getAllByItemStatus(List<Long> blockUserIds, ItemStatus itemStatus) {
+        return itemRepository.getAllByItemStatus(blockUserIds, itemStatus);
     }
 
     public Item getItemByIdWithCelebAndBrand(Long itemId) {
@@ -183,4 +183,5 @@ public class ItemDomainService {
     public void changeAllNewCelebToCeleb(Celeb celeb, Long newCelebId) {
         itemRepository.changeAllNewCelebToCeleb(celeb, newCelebId);
     }
+
 }

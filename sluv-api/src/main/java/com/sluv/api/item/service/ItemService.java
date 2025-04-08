@@ -453,7 +453,11 @@ public class ItemService {
     @Transactional(readOnly = true)
     public List<ItemSimpleDto> getHowAboutItem(Long userId) {
         User user = userDomainService.findByIdOrNull(userId);
-        List<Item> items = itemDomainService.findAllByItemStatus(ACTIVE);
+        List<Long> blockUserIds = userBlockDomainService.getAllBlockedUser(userId).stream()
+                .map(userBlock -> userBlock.getBlockedUser().getId())
+                .toList();
+
+        List<Item> items = itemDomainService.getAllByItemStatus(blockUserIds, ACTIVE);
         Collections.shuffle(items, new Random());
         return itemDomainService.getItemSimpleDto(user, items.subList(0, 4));
     }

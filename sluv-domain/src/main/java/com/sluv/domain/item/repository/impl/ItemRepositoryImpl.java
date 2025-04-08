@@ -17,6 +17,7 @@ import com.sluv.domain.item.entity.Item;
 import com.sluv.domain.item.entity.QItemCategory;
 import com.sluv.domain.item.entity.RecentItem;
 import com.sluv.domain.item.enums.ItemNumberConfig;
+import com.sluv.domain.item.enums.ItemStatus;
 import com.sluv.domain.search.dto.SearchFilterReqDto;
 import com.sluv.domain.user.entity.User;
 import com.sluv.domain.user.enums.UserStatus;
@@ -991,5 +992,14 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
                 .set(item.celeb, celeb)
                 .set(item.newCeleb, (NewCeleb) null)
                 .execute();
+    }
+
+    @Override
+    public List<Item> getAllByItemStatus(List<Long> blockUserIds, ItemStatus itemStatus) {
+        return jpaQueryFactory.selectFrom(item)
+                .where(item.itemStatus.eq(itemStatus)
+                        .and(item.user.id.notIn(blockUserIds))
+                )
+                .fetch();
     }
 }

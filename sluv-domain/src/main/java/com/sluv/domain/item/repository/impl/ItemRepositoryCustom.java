@@ -6,6 +6,7 @@ import com.sluv.domain.closet.entity.Closet;
 import com.sluv.domain.item.dto.ItemSimpleDto;
 import com.sluv.domain.item.dto.ItemWithCountDto;
 import com.sluv.domain.item.entity.Item;
+import com.sluv.domain.item.enums.ItemStatus;
 import com.sluv.domain.search.dto.SearchFilterReqDto;
 import com.sluv.domain.user.entity.User;
 import org.springframework.data.domain.Page;
@@ -87,4 +88,6 @@ public interface ItemRepositoryCustom {
     void changeAllNewBrandToBrand(Brand brand, Long newBrandId);
 
     void changeAllNewCelebToCeleb(Celeb celeb, Long newCelebId);
+
+    List<Item> getAllByItemStatus(List<Long> blockUserIds, ItemStatus itemStatus);
 }

@@ -27,7 +27,7 @@ public interface QuestionRepositoryCustom {
 
     List<QuestionFind> getWaitQuestionFind(User user, Long questionId, List<Celeb> interestedCeleb);
 
-    Page<Question> getUserLikeQuestion(User user, Pageable pageable);
+    Page<Question> getUserLikeQuestion(User user, List<Long> blockUserIds, Pageable pageable);
 
     Page<Question> getUserAllQuestion(User user, Pageable pageable);
 

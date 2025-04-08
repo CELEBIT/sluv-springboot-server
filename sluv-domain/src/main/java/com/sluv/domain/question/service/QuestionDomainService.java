@@ -23,8 +23,8 @@ public class QuestionDomainService {
         return questionRepository.findById(questionId).orElseThrow(QuestionNotFoundException::new);
     }
 
-    public Page<Question> getUserLikeQuestion(User user, Pageable pageable) {
-        return questionRepository.getUserLikeQuestion(user, pageable);
+    public Page<Question> getUserLikeQuestion(User user, List<Long> blockUserIds, Pageable pageable) {
+        return questionRepository.getUserLikeQuestion(user, blockUserIds, pageable);
     }
 
     public Long countByUserIdAndQuestionStatus(Long questionId, QuestionStatus questionStatus) {

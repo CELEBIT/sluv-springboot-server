@@ -53,7 +53,11 @@ public class UserLikeService {
     @Transactional(readOnly = true)
     public PaginationCountResponse<QuestionSimpleResDto> getUserLikeQuestion(Long userId, Pageable pageable) {
         User user = userDomainService.findById(userId);
-        Page<Question> questionPage = questionDomainService.getUserLikeQuestion(user, pageable);
+        List<Long> blockUserIds = userBlockDomainService.getAllBlockedUser(userId).stream()
+                .map(userBlock -> userBlock.getBlockedUser().getId())
+                .toList();
+
+        Page<Question> questionPage = questionDomainService.getUserLikeQuestion(user, blockUserIds, pageable);
 
         List<QuestionSimpleResDto> content = questionPage.stream()
                 .map(questionDtoMapper::dtoBuildByQuestionType).toList();

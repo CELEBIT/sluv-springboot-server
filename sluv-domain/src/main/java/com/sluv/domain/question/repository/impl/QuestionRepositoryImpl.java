@@ -210,12 +210,13 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
      * User Like Question
      */
     @Override
-    public Page<Question> getUserLikeQuestion(User user, Pageable pageable) {
+    public Page<Question> getUserLikeQuestion(User user, List<Long> blockUserIds, Pageable pageable) {
         List<Question> content = jpaQueryFactory.select(question)
                 .from(questionLike)
                 .leftJoin(questionLike.question, question)
                 .where(questionLike.user.eq(user)
                         .and(question.questionStatus.eq(QuestionStatus.ACTIVE))
+                        .and(question.user.id.notIn(blockUserIds))
                 )
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -227,6 +228,7 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
                 .leftJoin(questionLike.question, question)
                 .where(questionLike.user.eq(user)
                         .and(question.questionStatus.eq(QuestionStatus.ACTIVE))
+                        .and(question.user.id.notIn(blockUserIds))
                 )
                 .orderBy(questionLike.createdAt.desc());
 

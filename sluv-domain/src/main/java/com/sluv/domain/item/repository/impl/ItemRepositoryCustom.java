@@ -51,7 +51,7 @@ public interface ItemRepositoryCustom {
 
     List<Item> getItemByOverPrice(int price);
 
-    Page<Item> getEfficientItem(Pageable pageable, SearchFilterReqDto filterReqDto);
+    Page<Item> getEfficientItem(List<Long> blockUserIds, Pageable pageable, SearchFilterReqDto filterReqDto);
 
     List<Item> getItemByUnderPrice(int price);
 

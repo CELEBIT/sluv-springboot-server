@@ -583,14 +583,14 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
      * 가성비 선물 아이템 조회
      */
     @Override
-    public Page<Item> getEfficientItem(Pageable pageable, SearchFilterReqDto filterReqDto) {
+    public Page<Item> getEfficientItem(List<Long> blockUserIds, Pageable pageable, SearchFilterReqDto filterReqDto) {
         log.info("가성비 좋은 선물 아이템 조회 Query");
         JPAQuery<Item> query = jpaQueryFactory.select(item)
                 .from(efficientItem)
                 .leftJoin(item).on(efficientItem.item.eq(item))
                 .leftJoin(itemLike).on(itemLike.item.eq(item))
                 .leftJoin(itemScrap).on(itemScrap.item.eq(item))
-                .where(item.itemStatus.eq(ACTIVE))
+                .where(item.itemStatus.eq(ACTIVE).and(efficientItem.item.user.id.notIn(blockUserIds)))
                 .groupBy(item);
 
         addFilterWhere(query, filterReqDto);
@@ -606,7 +606,7 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
                 .leftJoin(item).on(efficientItem.item.eq(item))
                 .leftJoin(itemLike).on(itemLike.item.eq(item)).fetchJoin()
                 .leftJoin(itemScrap).on(itemScrap.item.eq(item)).fetchJoin()
-                .where(item.itemStatus.eq(ACTIVE))
+                .where(item.itemStatus.eq(ACTIVE).and(efficientItem.item.user.id.notIn(blockUserIds)))
                 .groupBy(item);
 
         addFilterWhere(countQuery, filterReqDto);

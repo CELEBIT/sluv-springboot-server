@@ -120,8 +120,8 @@ public class ItemDomainService {
         return itemRepository.getLuxuryItem(pageable, dto);
     }
 
-    public Page<Item> getEfficientItem(Pageable pageable, SearchFilterReqDto filterReqDto) {
-        return itemRepository.getEfficientItem(pageable, filterReqDto);
+    public Page<Item> getEfficientItem(List<Long> blockUserIds, Pageable pageable, SearchFilterReqDto filterReqDto) {
+        return itemRepository.getEfficientItem(blockUserIds, pageable, filterReqDto);
     }
 
     public Page<Item> getHotCelebItem(Long celebId, Pageable pageable, SearchFilterReqDto dto) {

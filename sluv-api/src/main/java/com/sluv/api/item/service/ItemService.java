@@ -402,7 +402,10 @@ public class ItemService {
     public PaginationResponse<ItemSimpleDto> getEfficientItem(Long userId, Pageable pageable,
                                                               SearchFilterReqDto filterReqDto) {
         User user = userDomainService.findByIdOrNull(userId);
-        Page<Item> itemPage = itemDomainService.getEfficientItem(pageable, filterReqDto);
+        List<Long> blockUserIds = userBlockDomainService.getAllBlockedUser(userId).stream()
+                .map(userBlock -> userBlock.getBlockedUser().getId())
+                .toList();
+        Page<Item> itemPage = itemDomainService.getEfficientItem(blockUserIds, pageable, filterReqDto);
         List<ItemSimpleDto> content = itemDomainService.getItemSimpleDto(user, itemPage.getContent());
         return PaginationResponse.create(itemPage, content);
     }

@@ -24,6 +24,7 @@ import com.sluv.domain.question.exception.QuestionReportDuplicateException;
 import com.sluv.domain.question.exception.QuestionTypeNotFoundException;
 import com.sluv.domain.question.service.*;
 import com.sluv.domain.user.entity.User;
+import com.sluv.domain.user.service.UserBlockDomainService;
 import com.sluv.domain.user.service.UserDomainService;
 import com.sluv.infra.alarm.service.QuestionAlarmService;
 import com.sluv.infra.counter.view.ViewCounter;
@@ -57,6 +58,7 @@ public class QuestionService {
     private final ClosetDomainService closetDomainService;
     private final QuestionVoteDomainService questionVoteDomainService;
     private final UserDomainService userDomainService;
+    private final UserBlockDomainService userBlockDomainService;
 
     private final ViewCounter viewCounter;
     private final QuestionAlarmService questionAlarmService;
@@ -470,17 +472,20 @@ public class QuestionService {
 
     /**
      * Question 상세보기 하단의 추천 게시글
-     * TODO 게시글과 같은 셀럽/같은 그룹 로직 추가해야함 (23.06.22)
      */
     @Transactional(readOnly = true)
     public List<QuestionSimpleResDto> getWaitQuestionBuy(Long userId, Long questionId) {
         User user = userDomainService.findById(userId);
+        List<Long> blockUserIds = userBlockDomainService.getAllBlockedUser(userId).stream()
+                .map(userBlock -> userBlock.getBlockedUser().getId())
+                .toList();
+
         List<Celeb> interestedCelebs = new ArrayList<>();
         if (user != null) {
             interestedCelebs = celebDomainService.findInterestedCeleb(user);
         }
 
-        return questionDomainService.getWaitQuestionBuy(user, questionId, interestedCelebs)
+        return questionDomainService.getWaitQuestionBuy(user, questionId, interestedCelebs, blockUserIds)
                 .stream()
                 .map(questionBuy -> getQuestionSimpleResDto(questionBuy, "Buy"))
                 .toList();
@@ -492,19 +497,28 @@ public class QuestionService {
     @Transactional(readOnly = true)
     public List<QuestionSimpleResDto> getWaitQuestionRecommend(Long userId, Long questionId) {
         User user = userDomainService.findById(userId);
-        return questionDomainService.getWaitQuestionRecommend(user, questionId)
+        List<Long> blockUserIds = userBlockDomainService.getAllBlockedUser(userId).stream()
+                .map(userBlock -> userBlock.getBlockedUser().getId())
+                .toList();
+
+        return questionDomainService.getWaitQuestionRecommend(user, questionId, blockUserIds)
                 .stream()
                 .map(questionRecommend -> getQuestionSimpleResDto(questionRecommend, "Recommend"))
                 .toList();
     }
 
     /**
+     * 가
      * Wait QuestionHowabout 조회
      */
     @Transactional(readOnly = true)
     public List<QuestionSimpleResDto> getWaitQuestionHowabout(Long userId, Long questionId) {
         User user = userDomainService.findById(userId);
-        return questionDomainService.getWaitQuestionHowabout(user, questionId)
+        List<Long> blockUserIds = userBlockDomainService.getAllBlockedUser(userId).stream()
+                .map(userBlock -> userBlock.getBlockedUser().getId())
+                .toList();
+
+        return questionDomainService.getWaitQuestionHowabout(user, questionId, blockUserIds)
                 .stream()
                 .map(questionHowabout -> getQuestionSimpleResDto(questionHowabout, "How"))
                 .toList();
@@ -516,13 +530,17 @@ public class QuestionService {
     @Transactional(readOnly = true)
     public List<QuestionSimpleResDto> getWaitQuestionFind(Long userId, Long questionId) {
         User user = userDomainService.findById(userId);
+        List<Long> blockUserIds = userBlockDomainService.getAllBlockedUser(userId).stream()
+                .map(userBlock -> userBlock.getBlockedUser().getId())
+                .toList();
+
         List<Celeb> interestedCelebs = new ArrayList<>();
 
         if (user != null) {
             interestedCelebs = celebDomainService.findInterestedCeleb(user);
         }
 
-        return questionDomainService.getWaitQuestionFind(user, questionId, interestedCelebs)
+        return questionDomainService.getWaitQuestionFind(user, questionId, interestedCelebs, blockUserIds)
                 .stream()
                 .map(questionFind -> getQuestionSimpleResDto(questionFind, "Find"))
                 .toList();

@@ -19,13 +19,13 @@ public interface QuestionRepositoryCustom {
 
     Page<Question> getSearchQuestion(List<Long> questionIdList, Pageable pageable);
 
-    List<QuestionBuy> getWaitQuestionBuy(User user, Long questionId, List<Celeb> interestedCeleb);
+    List<QuestionBuy> getWaitQuestionBuy(User user, Long questionId, List<Celeb> interestedCeleb, List<Long> blockUserIds);
 
-    List<QuestionRecommend> getWaitQuestionRecommend(User user, Long questionId);
+    List<QuestionRecommend> getWaitQuestionRecommend(User user, Long questionId, List<Long> blockUserIds);
 
-    List<QuestionHowabout> getWaitQuestionHowabout(User user, Long questionId);
+    List<QuestionHowabout> getWaitQuestionHowabout(User user, Long questionId, List<Long> blockUserIds);
 
-    List<QuestionFind> getWaitQuestionFind(User user, Long questionId, List<Celeb> interestedCeleb);
+    List<QuestionFind> getWaitQuestionFind(User user, Long questionId, List<Celeb> interestedCeleb, List<Long> blockUserIds);
 
     Page<Question> getUserLikeQuestion(User user, List<Long> blockUserIds, Pageable pageable);
 

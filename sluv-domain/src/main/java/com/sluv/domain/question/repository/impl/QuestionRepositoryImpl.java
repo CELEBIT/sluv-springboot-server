@@ -132,13 +132,14 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
      * Wait QuestionBuy 조회
      */
     @Override
-    public List<QuestionBuy> getWaitQuestionBuy(User user, Long questionId, List<Celeb> interestedCeleb) {
+    public List<QuestionBuy> getWaitQuestionBuy(User user, Long questionId, List<Celeb> interestedCeleb, List<Long> blockUserIds) {
         LocalDateTime nowTime = LocalDateTime.now();
         return jpaQueryFactory.selectFrom(questionBuy)
                 .where(questionBuy.id.ne(questionId)
                         .and(questionBuy.questionStatus.eq(QuestionStatus.ACTIVE))
                         .and(questionBuy.voteEndTime.gt(nowTime))
                         .and(getUserNeOrNullInQuestion(questionBuy, user))
+                        .and(questionBuy.user.id.notIn(blockUserIds))
                 )
                 .orderBy(questionBuy.voteEndTime.asc())
                 .limit(4)
@@ -149,13 +150,14 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
      * Wait QuestionRecommend 조회
      */
     @Override
-    public List<QuestionRecommend> getWaitQuestionRecommend(User user, Long questionId) {
+    public List<QuestionRecommend> getWaitQuestionRecommend(User user, Long questionId, List<Long> blockUserIds) {
         return jpaQueryFactory.select(questionRecommend)
                 .from(questionRecommend)
                 .where(questionRecommend.id.ne(questionId)
                         .and(questionRecommend.questionStatus.eq(QuestionStatus.ACTIVE))
                         .and(getUserNeOrNullInQuestion(questionRecommend, user))
                         .and(questionRecommend.commentList.size().eq(0))
+                        .and(questionRecommend.user.id.notIn(blockUserIds))
                 )
                 .orderBy(questionRecommend.createdAt.desc())
                 .limit(4)
@@ -166,13 +168,14 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
      * Wait QuestionHowabout 조회
      */
     @Override
-    public List<QuestionHowabout> getWaitQuestionHowabout(User user, Long questionId) {
+    public List<QuestionHowabout> getWaitQuestionHowabout(User user, Long questionId, List<Long> blockUserIds) {
         return jpaQueryFactory.select(questionHowabout)
                 .from(questionHowabout)
                 .where(questionHowabout.id.ne(questionId)
                         .and(questionHowabout.questionStatus.eq(QuestionStatus.ACTIVE))
                         .and(getUserNeOrNullInQuestion(questionHowabout, user))
                         .and(questionHowabout.commentList.size().eq(0))
+                        .and(questionHowabout.user.id.notIn(blockUserIds))
                 )
                 .orderBy(questionHowabout.createdAt.desc())
                 .limit(4)
@@ -181,10 +184,9 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
 
     /**
      * Wait QuestionFind 조회
-     * TODO: 게시글과 같은 셀럽/같은 그룹 로직 추가
      */
     @Override
-    public List<QuestionFind> getWaitQuestionFind(User user, Long questionId, List<Celeb> interestedCeleb) {
+    public List<QuestionFind> getWaitQuestionFind(User user, Long questionId, List<Celeb> interestedCeleb, List<Long> blockUserIds) {
 
         return jpaQueryFactory.select(questionFind)
                 .from(questionFind)
@@ -192,6 +194,7 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
                         .and(questionFind.questionStatus.eq(QuestionStatus.ACTIVE))
                         .and(getUserNeOrNullInQuestion(questionFind, user))
                         .and(questionFind.commentList.size().eq(0))
+                        .and(questionFind.user.id.notIn(blockUserIds))
                 )
                 .orderBy(questionFind.createdAt.desc())
                 .limit(4)

@@ -39,20 +39,20 @@ public class QuestionDomainService {
         return questionRepository.save(question);
     }
 
-    public List<QuestionBuy> getWaitQuestionBuy(User user, Long questionId, List<Celeb> interestedCelebs) {
-        return questionRepository.getWaitQuestionBuy(user, questionId, interestedCelebs);
+    public List<QuestionBuy> getWaitQuestionBuy(User user, Long questionId, List<Celeb> interestedCelebs, List<Long> blockUserIds) {
+        return questionRepository.getWaitQuestionBuy(user, questionId, interestedCelebs, blockUserIds);
     }
 
-    public List<QuestionRecommend> getWaitQuestionRecommend(User user, Long questionId) {
-        return questionRepository.getWaitQuestionRecommend(user, questionId);
+    public List<QuestionRecommend> getWaitQuestionRecommend(User user, Long questionId, List<Long> blockUserIds) {
+        return questionRepository.getWaitQuestionRecommend(user, questionId, blockUserIds);
     }
 
-    public List<QuestionHowabout> getWaitQuestionHowabout(User user, Long questionId) {
-        return questionRepository.getWaitQuestionHowabout(user, questionId);
+    public List<QuestionHowabout> getWaitQuestionHowabout(User user, Long questionId, List<Long> blockUserIds) {
+        return questionRepository.getWaitQuestionHowabout(user, questionId, blockUserIds);
     }
 
-    public List<QuestionFind> getWaitQuestionFind(User user, Long questionId, List<Celeb> interestedCelebs) {
-        return questionRepository.getWaitQuestionFind(user, questionId, interestedCelebs);
+    public List<QuestionFind> getWaitQuestionFind(User user, Long questionId, List<Celeb> interestedCelebs, List<Long> blockUserIds) {
+        return questionRepository.getWaitQuestionFind(user, questionId, interestedCelebs, blockUserIds);
     }
 
     public Page<Question> getTotalQuestionList(Pageable pageable) {

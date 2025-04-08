@@ -218,7 +218,11 @@ public class UserService {
     @Transactional(readOnly = true)
     public List<UserSearchInfoDto> getHotSluver(Long userId, Long celebId) {
         User user = userDomainService.findByIdOrNull(userId);
-        List<User> userList = userDomainService.getHotSluver(celebId);
+        List<Long> blockUserIds = userBlockDomainService.getAllBlockedUser(userId).stream()
+                .map(userBlock -> userBlock.getBlockedUser().getId())
+                .toList();
+
+        List<User> userList = userDomainService.getHotSluver(celebId, blockUserIds);
 
         return userList.stream()
                 .map(hotSluver -> {

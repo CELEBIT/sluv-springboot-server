@@ -105,7 +105,7 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
      * 전체 / 셀럽 별 인기 스러버 조회
      */
     @Override
-    public List<User> getHotSluver(Long celebId) {
+    public List<User> getHotSluver(Long celebId, List<Long> blockUserIds) {
         LocalDateTime now = LocalDateTime.now();
 
         JPAQuery<User> query = jpaQueryFactory.selectFrom(user)
@@ -117,6 +117,7 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
 //                .leftJoin(comment).on(comment.user.eq(user))
 //                .leftJoin(commentLike).on(commentLike.comment.eq(comment))
                 .where(user.userStatus.eq(ACTIVE)
+                                .and(user.id.notIn(blockUserIds))
                                 .or(follow.createdAt.goe(now.minusDays(31)))
                                 .or(item.itemStatus.eq(ItemStatus.ACTIVE)
                                         .and(item.createdAt.goe(now.minusDays(31)))

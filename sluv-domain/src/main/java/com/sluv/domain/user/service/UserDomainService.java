@@ -53,8 +53,8 @@ public class UserDomainService {
         return userRepository.existsByNickname(nickName);
     }
 
-    public List<User> getHotSluver(Long celebId) {
-        return userRepository.getHotSluver(celebId);
+    public List<User> getHotSluver(Long celebId, List<Long> blockUserIds) {
+        return userRepository.getHotSluver(celebId, blockUserIds);
     }
 
     public Page<User> getSearchUser(List<Long> searchUserIds, Pageable pageable) {

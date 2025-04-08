@@ -17,7 +17,7 @@ public interface UserRepositoryCustom {
 
     Page<User> getAllFollowing(Long userId, Pageable pageable);
 
-    List<User> getHotSluver(Long celebId);
+    List<User> getHotSluver(Long celebId, List<Long> blockUserIds);
 
     List<User> getSearchUserIds(String word);
 

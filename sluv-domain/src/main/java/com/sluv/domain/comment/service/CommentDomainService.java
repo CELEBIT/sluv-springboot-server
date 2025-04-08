@@ -39,12 +39,12 @@ public class CommentDomainService {
         return commentRepository.getUserAllComment(user, pageable);
     }
 
-    public Page<Comment> getAllQuestionComment(Long questionId, Pageable pageable) {
-        return commentRepository.getAllQuestionComment(questionId, pageable);
+    public Page<Comment> getAllQuestionComment(Long questionId, List<Long> blockUserIds, Pageable pageable) {
+        return commentRepository.getAllQuestionComment(questionId, blockUserIds, pageable);
     }
 
-    public Page<Comment> getAllSubComment(Long commentId, Pageable pageable) {
-        return commentRepository.getAllSubComment(commentId, pageable);
+    public Page<Comment> getAllSubComment(Long commentId, List<Long> blockUserIds, Pageable pageable) {
+        return commentRepository.getAllSubComment(commentId, blockUserIds, pageable);
     }
 
     public Comment saveComment(User user, Question question, String content) {

@@ -9,9 +9,9 @@ import org.springframework.data.domain.Pageable;
 import java.util.List;
 
 public interface CommentRepositoryCustom {
-    Page<Comment> getAllQuestionComment(Long questionId, Pageable pageable);
+    Page<Comment> getAllQuestionComment(Long questionId, List<Long> blockUserIds, Pageable pageable);
 
-    Page<Comment> getAllSubComment(Long commentId, Pageable pageable);
+    Page<Comment> getAllSubComment(Long commentId, List<Long> blockUserIds, Pageable pageable);
 
     Page<Comment> getUserAllLikeComment(User user, List<Long> blockUserIds, Pageable pageable);
 

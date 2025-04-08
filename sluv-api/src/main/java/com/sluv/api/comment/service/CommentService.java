@@ -14,6 +14,7 @@ import com.sluv.domain.question.entity.Question;
 import com.sluv.domain.question.service.QuestionDomainService;
 import com.sluv.domain.user.entity.User;
 import com.sluv.domain.user.exception.UserNotMatchedException;
+import com.sluv.domain.user.service.UserBlockDomainService;
 import com.sluv.domain.user.service.UserDomainService;
 import com.sluv.infra.ai.AiModelService;
 import com.sluv.infra.alarm.service.CommentAlarmService;
@@ -34,6 +35,7 @@ public class CommentService {
     private final CommentDomainService commentDomainService;
     private final CommentLikeDomainService commentLikeDomainService;
     private final UserDomainService userDomainService;
+    private final UserBlockDomainService userBlockDomainService;
 
     private final AiModelService aiModelService;
     private final CommentHelper commentHelper;
@@ -48,9 +50,12 @@ public class CommentService {
     @Transactional(readOnly = true)
     public PaginationResponse<CommentResponse> getComment(Long userId, Long questionId, Pageable pageable) {
         User user = userDomainService.findById(userId);
+        List<Long> blockUserIds = userBlockDomainService.getAllBlockedUser(userId).stream()
+                .map(userBlock -> userBlock.getBlockedUser().getId())
+                .toList();
 
         // 해당 페이지 검색
-        Page<Comment> commentPage = commentDomainService.getAllQuestionComment(questionId, pageable);
+        Page<Comment> commentPage = commentDomainService.getAllQuestionComment(questionId, blockUserIds, pageable);
 
         // Content 제작
         List<CommentResponse> content = commentHelper.getCommentResDtos(user, commentPage.getContent());
@@ -81,9 +86,12 @@ public class CommentService {
     @Transactional(readOnly = true)
     public SubCommentPageResponse<CommentResponse> getSubComment(Long userId, Long commentId, Pageable pageable) {
         User user = userDomainService.findById(userId);
+        List<Long> blockUserIds = userBlockDomainService.getAllBlockedUser(userId).stream()
+                .map(userBlock -> userBlock.getBlockedUser().getId())
+                .toList();
 
         // 대댓글 페이지 검색
-        Page<Comment> commentPage = commentDomainService.getAllSubComment(commentId, pageable);
+        Page<Comment> commentPage = commentDomainService.getAllSubComment(commentId, blockUserIds, pageable);
 
         // Content 제작
         List<CommentResponse> content = commentHelper.getCommentResDtos(user, commentPage.getContent());

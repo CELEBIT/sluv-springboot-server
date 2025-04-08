@@ -29,6 +29,7 @@ import com.sluv.domain.user.entity.User;
 import com.sluv.domain.user.enums.UserStatus;
 import com.sluv.domain.user.exception.UserNicknameDuplicatedException;
 import com.sluv.domain.user.service.FollowDomainService;
+import com.sluv.domain.user.service.UserBlockDomainService;
 import com.sluv.domain.user.service.UserDomainService;
 import com.sluv.domain.user.service.UserWithdrawDomainService;
 import com.sluv.infra.discord.WebHookService;
@@ -56,6 +57,7 @@ public class UserService {
     private final ItemScrapDomainService itemScrapDomainService;
     private final ClosetDomainService closetDomainService;
     private final UserWithdrawDomainService userWithdrawDomainService;
+    private final UserBlockDomainService userBlockDomainService;
 
     private final ItemHelper itemHelper;
     private final QuestionDtoMapper questionDtoMapper;
@@ -113,9 +115,10 @@ public class UserService {
         Boolean followStatus = followDomainService.getFollowStatus(user, targetUser.getId());
         Long followerCount = followDomainService.getFollowerCount(targetUser);
         Long followingCount = followDomainService.getFollowingCount(targetUser);
+        boolean blockStatus = userBlockDomainService.getBlockStatus(user, targetUser);
 
-        return UserMypageResDto.of(targetUser, followStatus, followerCount, followingCount, itemCount, imgList,
-                communityCount);
+        return UserMypageResDto.of(targetUser, followStatus, followerCount, followingCount, blockStatus,
+                itemCount, imgList, communityCount);
     }
 
     @Transactional(readOnly = true)

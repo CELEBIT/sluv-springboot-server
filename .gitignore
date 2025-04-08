@@ -70,4 +70,4 @@ ansible/updater
 
 ### END IAC
 
-.DS_Store
+**/.DS_Store

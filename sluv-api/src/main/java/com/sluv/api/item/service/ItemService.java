@@ -31,6 +31,7 @@ import com.sluv.domain.search.dto.SearchFilterReqDto;
 import com.sluv.domain.user.dto.UserInfoDto;
 import com.sluv.domain.user.entity.User;
 import com.sluv.domain.user.service.FollowDomainService;
+import com.sluv.domain.user.service.UserBlockDomainService;
 import com.sluv.domain.user.service.UserDomainService;
 import com.sluv.infra.ai.AiModelService;
 import com.sluv.infra.alarm.service.ItemAlarmService;
@@ -63,6 +64,7 @@ public class ItemService {
     private final ItemCategoryDomainService itemCategoryDomainService;
     private final BrandDomainService brandDomainService;
     private final UserDomainService userDomainService;
+    private final UserBlockDomainService userBlockDomainService;
     private final RecentItemDomainService recentItemDomainService;
 
     private final NewBrandDomainService newBrandDomainService;
@@ -496,7 +498,11 @@ public class ItemService {
     @Transactional(readOnly = true)
     public List<ItemSimpleDto> getTrendItems(Long userId, Pageable pageable) {
         User user = userDomainService.findById(userId);
-        Page<Item> itemPage = itemDomainService.getTrendItems(pageable);
+        List<Long> blockUserIds = userBlockDomainService.getAllBlockedUser(userId).stream()
+                .map(userBlock -> userBlock.getBlockedUser().getId())
+                .toList();
+
+        Page<Item> itemPage = itemDomainService.getTrendItems(blockUserIds, pageable);
         return itemDomainService.getItemSimpleDto(user, itemPage.getContent());
     }
 

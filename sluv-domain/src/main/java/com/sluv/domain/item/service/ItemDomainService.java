@@ -164,8 +164,8 @@ public class ItemDomainService {
         return itemRepository.getYesterdayHotItem();
     }
 
-    public Page<Item> getTrendItems(Pageable pageable) {
-        return itemRepository.getTrendItems(pageable);
+    public Page<Item> getTrendItems(List<Long> blockUserIds, Pageable pageable) {
+        return itemRepository.getTrendItems(blockUserIds, pageable);
     }
 
     public List<Item> getAllItemWithCelebCategory() {

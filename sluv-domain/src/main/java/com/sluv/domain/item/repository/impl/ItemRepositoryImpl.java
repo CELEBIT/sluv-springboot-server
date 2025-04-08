@@ -922,11 +922,12 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
     }
 
     @Override
-    public Page<Item> getTrendItems(Pageable pageable) {
+    public Page<Item> getTrendItems(List<Long> blockUserIds, Pageable pageable) {
         List<Long> trendCelebIds = List.of(133L, 865L);
         List<Item> content = jpaQueryFactory.selectFrom(item)
                 .where(item.itemStatus.eq(ACTIVE)
                         .and(item.celeb.id.in(trendCelebIds).or(item.celeb.parent.id.in(trendCelebIds)))
+                        .and(item.user.id.notIn(blockUserIds))
                 )
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -937,6 +938,7 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
         JPAQuery<Item> countQuery = jpaQueryFactory.selectFrom(item)
                 .where(item.itemStatus.eq(ACTIVE)
                         .and(item.celeb.id.in(trendCelebIds).or(item.celeb.parent.id.in(trendCelebIds)))
+                        .and(item.user.id.notIn(blockUserIds))
                 );
 
         return PageableExecutionUtils.getPage(content, pageable, () -> countQuery.fetch().size());

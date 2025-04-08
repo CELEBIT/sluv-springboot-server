@@ -78,7 +78,7 @@ public interface ItemRepositoryCustom {
 
     List<Item> getItemContainKeyword(String keyword);
 
-    Page<Item> getTrendItems(Pageable pageable);
+    Page<Item> getTrendItems(List<Long> blockUserIds, Pageable pageable);
 
     List<Item> getAllItemWithCelebCategory();
 

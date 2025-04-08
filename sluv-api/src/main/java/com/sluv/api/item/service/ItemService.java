@@ -393,7 +393,14 @@ public class ItemService {
     @Transactional(readOnly = true)
     public PaginationResponse<ItemSimpleDto> getLuxuryItem(Long userId, Pageable pageable, SearchFilterReqDto dto) {
         User user = userDomainService.findByIdOrNull(userId);
-        Page<Item> itemPage = itemDomainService.getLuxuryItem(pageable, dto);
+        List<Long> blockUserIds = new ArrayList<>();
+        if (userId != null) {
+            blockUserIds = userBlockDomainService.getAllBlockedUser(userId).stream()
+                    .map(userBlock -> userBlock.getBlockedUser().getId())
+                    .toList();
+        }
+
+        Page<Item> itemPage = itemDomainService.getLuxuryItem(blockUserIds, pageable, dto);
         List<ItemSimpleDto> content = itemDomainService.getItemSimpleDto(user, itemPage.getContent());
         return PaginationResponse.create(itemPage, content);
     }

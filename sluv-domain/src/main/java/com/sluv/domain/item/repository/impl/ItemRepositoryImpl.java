@@ -534,14 +534,14 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
      */
 
     @Override
-    public Page<Item> getLuxuryItem(Pageable pageable, SearchFilterReqDto dto) {
+    public Page<Item> getLuxuryItem(List<Long> blockUserIds, Pageable pageable, SearchFilterReqDto dto) {
         log.info("럭셔리 아이템 조회 Query");
         JPAQuery<Item> query = jpaQueryFactory.select(item)
                 .from(luxuryItem)
                 .leftJoin(item).on(luxuryItem.item.eq(item))
                 .leftJoin(itemLike).on(itemLike.item.eq(item))
                 .leftJoin(itemScrap).on(itemScrap.item.eq(item))
-                .where(item.itemStatus.eq(ACTIVE))
+                .where(item.itemStatus.eq(ACTIVE).and(luxuryItem.item.user.id.notIn(blockUserIds)))
                 .groupBy(item);
 
         addFilterWhere(query, dto);
@@ -558,7 +558,7 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
                 .leftJoin(item).on(luxuryItem.item.eq(item))
                 .leftJoin(itemLike).on(itemLike.item.eq(item))
                 .leftJoin(itemScrap).on(itemScrap.item.eq(item))
-                .where(item.itemStatus.eq(ACTIVE))
+                .where(item.itemStatus.eq(ACTIVE).and(luxuryItem.item.user.id.notIn(blockUserIds)))
                 .groupBy(item);
 
         addFilterWhere(countQuery, dto);

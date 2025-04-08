@@ -47,7 +47,7 @@ public interface ItemRepositoryCustom {
 
     Page<Item> getNewItem(Pageable pageable);
 
-    Page<Item> getLuxuryItem(Pageable pageable, SearchFilterReqDto dto);
+    Page<Item> getLuxuryItem(List<Long> blockUserIds, Pageable pageable, SearchFilterReqDto dto);
 
     List<Item> getItemByOverPrice(int price);
 

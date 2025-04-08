@@ -116,8 +116,8 @@ public class ItemDomainService {
         return itemRepository.save(postItem);
     }
 
-    public Page<Item> getLuxuryItem(Pageable pageable, SearchFilterReqDto dto) {
-        return itemRepository.getLuxuryItem(pageable, dto);
+    public Page<Item> getLuxuryItem(List<Long> blockUserIds, Pageable pageable, SearchFilterReqDto dto) {
+        return itemRepository.getLuxuryItem(blockUserIds, pageable, dto);
     }
 
     public Page<Item> getEfficientItem(List<Long> blockUserIds, Pageable pageable, SearchFilterReqDto filterReqDto) {

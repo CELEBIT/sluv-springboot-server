@@ -833,10 +833,14 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
     }
 
     @Override
-    public Page<Item> getUserAllRecentItem(User user, Pageable pageable) {
+    public Page<Item> getUserAllRecentItem(User user, List<Long> blockUserIds, Pageable pageable) {
         List<RecentItem> fetch = jpaQueryFactory.selectFrom(recentItem)
                 .leftJoin(recentItem.item, item).fetchJoin()
-                .where(recentItem.user.eq(user).and(recentItem.item.itemStatus.eq(ACTIVE)))
+                .where(
+                        recentItem.user.eq(user)
+                                .and(recentItem.item.itemStatus.eq(ACTIVE))
+                                .and(item.user.id.notIn(blockUserIds))
+                )
                 .orderBy(recentItem.createdAt.max().desc())
                 .groupBy(recentItem.item)
                 .offset(pageable.getOffset())
@@ -844,7 +848,11 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
                 .fetch();
 
         JPAQuery<RecentItem> query = jpaQueryFactory.selectFrom(recentItem)
-                .where(recentItem.user.eq(user).and(recentItem.item.itemStatus.eq(ACTIVE)))
+                .where(
+                        recentItem.user.eq(user)
+                                .and(recentItem.item.itemStatus.eq(ACTIVE))
+                                .and(item.user.id.notIn(blockUserIds))
+                )
                 .groupBy(recentItem.item)
                 .orderBy(recentItem.createdAt.max().desc());
 

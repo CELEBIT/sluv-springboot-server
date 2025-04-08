@@ -70,7 +70,7 @@ public interface ItemRepositoryCustom {
 
     List<ItemSimpleDto> getItemSimpleDto(User user, List<Item> items);
 
-    Page<Item> getUserAllRecentItem(User user, Pageable pageable);
+    Page<Item> getUserAllRecentItem(User user, List<Long> blockUserIds, Pageable pageable);
 
     Item getItemByIdWithCelebAndBrand(Long itemId);
 

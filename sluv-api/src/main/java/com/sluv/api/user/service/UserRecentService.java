@@ -13,6 +13,7 @@ import com.sluv.domain.question.entity.*;
 import com.sluv.domain.question.exception.QuestionTypeNotFoundException;
 import com.sluv.domain.question.service.*;
 import com.sluv.domain.user.entity.User;
+import com.sluv.domain.user.service.UserBlockDomainService;
 import com.sluv.domain.user.service.UserDomainService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,13 +38,17 @@ public class UserRecentService {
     private final QuestionRecommendCategoryDomainService questionRecommendCategoryDomainService;
     private final CommentDomainService commentDomainService;
     private final UserDomainService userDomainService;
+    private final UserBlockDomainService userBlockDomainService;
 
 
     @Transactional(readOnly = true)
     public PaginationCountResponse<ItemSimpleDto> getUserRecentItem(Long userId, Pageable pageable) {
         User user = userDomainService.findById(userId);
+        List<Long> blockUserIds = userBlockDomainService.getAllBlockedUser(userId).stream()
+                .map(userBlock -> userBlock.getBlockedUser().getId())
+                .toList();
 
-        Page<Item> recentItemPage = itemDomainService.getUserAllRecentItem(user, pageable);
+        Page<Item> recentItemPage = itemDomainService.getUserAllRecentItem(user, blockUserIds, pageable);
 
         List<ItemSimpleDto> content = itemDomainService.getItemSimpleDto(user, recentItemPage.getContent());
 

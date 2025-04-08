@@ -36,8 +36,8 @@ public class ItemDomainService {
         return itemRepository.getItemSimpleDto(user, content);
     }
 
-    public Page<Item> getUserAllRecentItem(User user, Pageable pageable) {
-        return itemRepository.getUserAllRecentItem(user, pageable);
+    public Page<Item> getUserAllRecentItem(User user, List<Long> blockUserIds, Pageable pageable) {
+        return itemRepository.getUserAllRecentItem(user, blockUserIds, pageable);
     }
 
     public List<Item> getRecentTop2Item(User targetUser) {

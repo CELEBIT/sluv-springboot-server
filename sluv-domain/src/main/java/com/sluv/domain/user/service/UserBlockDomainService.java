@@ -4,6 +4,8 @@ import com.sluv.domain.user.entity.User;
 import com.sluv.domain.user.entity.UserBlock;
 import com.sluv.domain.user.repository.UserBlockRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -22,5 +24,9 @@ public class UserBlockDomainService {
 
     public void postUserBlock(UserBlock userBlock) {
         userBlockRepository.save(userBlock);
+    }
+
+    public Page<UserBlock> getUserBlockPage(Long userId, Pageable pageable) {
+        return userBlockRepository.getUserBlockPage(userId, pageable);
     }
 }

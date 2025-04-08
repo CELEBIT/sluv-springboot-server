@@ -1,9 +1,13 @@
 package com.sluv.domain.user.repository.impl;
 
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sluv.domain.user.entity.User;
 import com.sluv.domain.user.entity.UserBlock;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.support.PageableExecutionUtils;
 
 import java.util.List;
 
@@ -29,5 +33,19 @@ public class UserBlockRepositoryImpl implements UserBlockRepositoryCustom {
         jpaQueryFactory.delete(userBlock)
                 .where(userBlock.user.eq(user).and(userBlock.blockedUser.eq(targetUser)))
                 .execute();
+    }
+
+    @Override
+    public Page<UserBlock> getUserBlockPage(Long userId, Pageable pageable) {
+        List<UserBlock> content = jpaQueryFactory.selectFrom(userBlock)
+                .where(userBlock.user.id.eq(userId))
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        JPAQuery<UserBlock> countQuery = jpaQueryFactory.selectFrom(userBlock)
+                .where(userBlock.user.id.eq(userId));
+
+        return PageableExecutionUtils.getPage(content, pageable, () -> countQuery.fetch().size());
     }
 }

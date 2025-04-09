@@ -19,7 +19,7 @@ public interface ItemRepositoryCustom {
 
     List<Item> findSameCelebItem(Long itemId, Long celebId, boolean celebJudge);
 
-    List<Item> findSameBrandItem(Long itemId, Long brandId, boolean brandJudge);
+    List<Item> findSameBrandItem(Long itemId, Long brandId, boolean brandJudge, List<Long> blockUserIds);
 
     Page<Item> getRecentItem(User user, Pageable pageable);
 

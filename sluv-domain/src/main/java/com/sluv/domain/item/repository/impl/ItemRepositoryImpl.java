@@ -92,10 +92,13 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
     }
 
     @Override
-    public List<Item> findSameBrandItem(Long itemId, Long brandId, boolean brandJudge) {
+    public List<Item> findSameBrandItem(Long itemId, Long brandId, boolean brandJudge, List<Long> blockUserIds) {
         return jpaQueryFactory.selectFrom(item)
-                .where(getSameBrandId(brandId, brandJudge).and(item.id.ne(itemId)).and(item.itemStatus.eq(
-                        ACTIVE)))
+                .where(getSameBrandId(brandId, brandJudge)
+                        .and(item.id.ne(itemId))
+                        .and(item.itemStatus.eq(ACTIVE))
+                        .and(item.user.id.notIn(blockUserIds))
+                )
                 .limit(10)
                 .orderBy(item.createdAt.desc())
                 .fetch();

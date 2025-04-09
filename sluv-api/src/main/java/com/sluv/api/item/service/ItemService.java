@@ -517,13 +517,21 @@ public class ItemService {
     @Transactional(readOnly = true)
     public List<ItemSimpleDto> getSameBrandItem(Long userId, Long itemId) {
         User user = userDomainService.findByIdOrNull(userId);
+        List<Long> blockUserIds = new ArrayList<>();
+        if (userId != null) {
+            blockUserIds = userBlockDomainService.getAllBlockedUser(userId).stream()
+                    .map(userBlock -> userBlock.getBlockedUser().getId())
+                    .toList();
+        }
+        // 1. Item 조회
         Item item = itemDomainService.getItemByIdWithCelebAndBrand(itemId);
         List<Item> sameBrandItems;
 
+        // 2. 브랜드 동일 Item 조회
         if (item.getBrand() != null) {
-            sameBrandItems = itemDomainService.findSameBrandItem(itemId, item.getBrand().getId(), true);
-        } else {
-            sameBrandItems = itemDomainService.findSameBrandItem(itemId, item.getNewBrand().getId(), false);
+            sameBrandItems = itemDomainService.findSameBrandItem(itemId, item.getBrand().getId(), true, blockUserIds);
+        } else { // 브랜드가 아닌 뉴브랜드일 경우
+            sameBrandItems = itemDomainService.findSameBrandItem(itemId, item.getNewBrand().getId(), false, blockUserIds);
         }
 
         return itemDomainService.getItemSimpleDto(user, sameBrandItems);

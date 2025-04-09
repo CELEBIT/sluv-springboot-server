@@ -31,7 +31,7 @@ public interface ItemRepositoryCustom {
 
     Page<Item> getSearchItem(List<Long> itemIdList, SearchFilterReqDto dto, Pageable pageable);
 
-    Page<Item> getRecommendItemPage(Pageable pageable);
+    Page<Item> getRecommendItemPage(List<Long> blockUserIds, Pageable pageable);
 
     Long getSearchItemCount(List<Long> itemIdList, SearchFilterReqDto dto);
 

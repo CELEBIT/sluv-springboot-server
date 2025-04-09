@@ -343,8 +343,15 @@ public class ItemService {
 
     @Transactional(readOnly = true)
     public PaginationResponse<ItemSimpleDto> getRecommendItem(Long userId, Pageable pageable) {
-        Page<Item> recommendItemPage = itemDomainService.getRecommendItemPage(pageable);
         User user = userDomainService.findByIdOrNull(userId);
+        List<Long> blockUserIds = new ArrayList<>();
+        if (userId != null) {
+            blockUserIds = userBlockDomainService.getAllBlockedUser(userId).stream()
+                    .map(userBlock -> userBlock.getBlockedUser().getId())
+                    .toList();
+        }
+
+        Page<Item> recommendItemPage = itemDomainService.getRecommendItemPage(blockUserIds, pageable);
 
         List<ItemSimpleDto> content =
                 itemDomainService.getItemSimpleDto(user, recommendItemPage.getContent());

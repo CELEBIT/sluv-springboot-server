@@ -250,7 +250,7 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
     }
 
     @Override
-    public Page<Item> getRecommendItemPage(Pageable pageable) {
+    public Page<Item> getRecommendItemPage(List<Long> blockUserIds, Pageable pageable) {
         List<Item> content = jpaQueryFactory.select(item)
                 .from(item)
                 .leftJoin(itemLike).on(itemLike.item.eq(item))
@@ -260,7 +260,7 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
                 .limit(pageable.getPageSize())
                 .orderBy(itemLike.count().add(itemScrap.count()).add(item.viewNum).desc())
                 .orderBy(item.whenDiscovery.desc())
-                .where(item.itemStatus.eq(ACTIVE))
+                .where(item.itemStatus.eq(ACTIVE).and(item.user.id.notIn(blockUserIds)))
                 .fetch();
 
         // Count Query
@@ -271,7 +271,7 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
                 .groupBy(item)
                 .orderBy(itemLike.count().add(itemScrap.count()).add(item.viewNum).desc())
                 .orderBy(item.whenDiscovery.desc())
-                .where(item.itemStatus.eq(ACTIVE));
+                .where(item.itemStatus.eq(ACTIVE).and(item.user.id.notIn(blockUserIds)));
 
         return PageableExecutionUtils.getPage(content, pageable, () -> countJPAQuery.fetch().size());
     }

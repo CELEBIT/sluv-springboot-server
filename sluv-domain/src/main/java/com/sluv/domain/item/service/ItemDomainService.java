@@ -72,8 +72,8 @@ public class ItemDomainService {
         return itemRepository.getAllScrapItem(user, pageable);
     }
 
-    public Page<Item> getRecommendItemPage(Pageable pageable) {
-        return itemRepository.getRecommendItemPage(pageable);
+    public Page<Item> getRecommendItemPage(List<Long> blockUserIds, Pageable pageable) {
+        return itemRepository.getRecommendItemPage(blockUserIds, pageable);
     }
 
     public Page<Item> getNewItem(List<Long> blockUserIds, Pageable pageable) {

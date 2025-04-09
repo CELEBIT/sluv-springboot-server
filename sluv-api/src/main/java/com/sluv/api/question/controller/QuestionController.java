@@ -136,8 +136,8 @@ public class QuestionController {
             description = "Pagination 적용. Ordering: 최신순으로 조회. Filtering: celebId.")
     @GetMapping("/find")
     public ResponseEntity<SuccessDataResponse<PaginationResponse<QuestionSimpleResDto>>> getQuestionFindList(
-            @Nullable @RequestParam("celebId") Long celebId, Pageable pageable) {
-        PaginationResponse<QuestionSimpleResDto> response = questionService.getQuestionFindList(celebId,
+            @CurrentUserId Long userId, @Nullable @RequestParam("celebId") Long celebId, Pageable pageable) {
+        PaginationResponse<QuestionSimpleResDto> response = questionService.getQuestionFindList(userId, celebId,
                 pageable);
         return ResponseEntity.ok().body(SuccessDataResponse.create(response));
     }

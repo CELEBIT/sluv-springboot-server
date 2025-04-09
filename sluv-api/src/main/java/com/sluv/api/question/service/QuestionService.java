@@ -701,9 +701,15 @@ public class QuestionService {
      * QuestionFind 커뮤니티 게시글 조회.
      */
     @Transactional(readOnly = true)
-    public PaginationResponse<QuestionSimpleResDto> getQuestionFindList(Long celebId, Pageable pageable) {
+    public PaginationResponse<QuestionSimpleResDto> getQuestionFindList(Long userId, Long celebId, Pageable pageable) {
+        List<Long> blockUserIds = new ArrayList<>();
+        if (userId != null) {
+            blockUserIds = userBlockDomainService.getAllBlockedUser(userId).stream()
+                    .map(userBlock -> userBlock.getBlockedUser().getId())
+                    .toList();
+        }
 
-        Page<QuestionFind> questionPage = questionDomainService.getQuestionFindList(celebId, pageable);
+        Page<QuestionFind> questionPage = questionDomainService.getQuestionFindList(celebId, blockUserIds, pageable);
 
         List<QuestionSimpleResDto> content = questionPage.stream().map(question ->
                 getQuestionSimpleResDto(question, "Find")
@@ -713,6 +719,7 @@ public class QuestionService {
     }
 
     @Transactional(readOnly = true)
+
     public PaginationResponse<QuestionSimpleResDto> getQuestionHowaboutList(Pageable pageable) {
         Page<QuestionHowabout> questionPage = questionDomainService.getQuestionHowaboutList(pageable);
         List<QuestionSimpleResDto> content = questionPage.stream().map(question ->

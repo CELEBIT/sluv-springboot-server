@@ -507,12 +507,13 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
      * 1시간 기준 최신 아이템 조회
      */
     @Override
-    public Page<Item> getNewItem(Pageable pageable) {
+    public Page<Item> getNewItem(List<Long> blockUserIds, Pageable pageable) {
         LocalDateTime nowTime = LocalDateTime.now();
 
         List<Item> content = jpaQueryFactory.selectFrom(item)
                 .where(item.itemStatus.eq(ACTIVE)
 //                        .and(item.createdAt.between(nowTime.minusHours(1L), nowTime))
+                                .and(item.user.id.notIn(blockUserIds))
                 )
                 .orderBy(item.whenDiscovery.desc())
                 .offset(pageable.getOffset())
@@ -523,6 +524,7 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
         JPAQuery<Item> countQuery = jpaQueryFactory.selectFrom(item)
                 .where(item.itemStatus.eq(ACTIVE)
 //                        .and(item.createdAt.between(nowTime.minusHours(1L), nowTime))
+                                .and(item.user.id.notIn(blockUserIds))
                 )
                 .orderBy(item.whenDiscovery.desc());
 

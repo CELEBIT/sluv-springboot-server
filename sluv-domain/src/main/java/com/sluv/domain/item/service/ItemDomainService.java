@@ -76,8 +76,8 @@ public class ItemDomainService {
         return itemRepository.getRecommendItemPage(pageable);
     }
 
-    public Page<Item> getNewItem(Pageable pageable) {
-        return itemRepository.getNewItem(pageable);
+    public Page<Item> getNewItem(List<Long> blockUserIds, Pageable pageable) {
+        return itemRepository.getNewItem(blockUserIds, pageable);
     }
 
     public List<Item> getWeekHotItem() {

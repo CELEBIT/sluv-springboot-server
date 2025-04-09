@@ -380,9 +380,15 @@ public class ItemService {
     @Transactional(readOnly = true)
     public PaginationResponse<ItemSimpleDto> getNewItem(Long userId, Pageable pageable) {
         User user = userDomainService.findByIdOrNull(userId);
+        List<Long> blockUserIds = new ArrayList<>();
+        if (userId != null) {
+            blockUserIds = userBlockDomainService.getAllBlockedUser(userId).stream()
+                    .map(userBlock -> userBlock.getBlockedUser().getId())
+                    .toList();
+        }
 
         // itemPage 조회
-        Page<Item> itemPage = itemDomainService.getNewItem(pageable);
+        Page<Item> itemPage = itemDomainService.getNewItem(blockUserIds, pageable);
 
         // Content 조립
         List<ItemSimpleDto> content = itemDomainService.getItemSimpleDto(user, itemPage.getContent());

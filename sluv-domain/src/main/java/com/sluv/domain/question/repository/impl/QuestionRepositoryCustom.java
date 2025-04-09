@@ -39,7 +39,7 @@ public interface QuestionRepositoryCustom {
 
     Page<QuestionHowabout> getQuestionHowaboutList(List<Long> blockUserIds, Pageable pageable);
 
-    Page<QuestionRecommend> getQuestionRecommendList(String hashtag, Pageable pageable);
+    Page<QuestionRecommend> getQuestionRecommendList(String hashtag, List<Long> blockUserIds, Pageable pageable);
 
     List<Question> updateDailyHotQuestion();
 

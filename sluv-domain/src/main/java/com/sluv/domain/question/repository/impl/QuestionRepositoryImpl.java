@@ -357,9 +357,9 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
      * QuestionRecommend만 조회. Ordering: createdAt Filtering : hashtag
      */
     @Override
-    public Page<QuestionRecommend> getQuestionRecommendList(String hashtag, Pageable pageable) {
+    public Page<QuestionRecommend> getQuestionRecommendList(String hashtag, List<Long> blockUserIds, Pageable pageable) {
         List<QuestionRecommend> content = getQuestionRecommendTable(hashtag)
-                .where(getQuestionRecommendFiltering(hashtag))
+                .where(getQuestionRecommendFiltering(hashtag).and(questionRecommend.user.id.notIn(blockUserIds)))
                 .orderBy(questionRecommend.createdAt.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -367,7 +367,7 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
 
         // Count Query
         JPAQuery<QuestionRecommend> query = getQuestionRecommendTable(hashtag)
-                .where(getQuestionRecommendFiltering(hashtag))
+                .where(getQuestionRecommendFiltering(hashtag).and(questionRecommend.user.id.notIn(blockUserIds)))
                 .orderBy(questionRecommend.createdAt.desc());
 
         return PageableExecutionUtils.getPage(content, pageable, () -> query.fetch().size());

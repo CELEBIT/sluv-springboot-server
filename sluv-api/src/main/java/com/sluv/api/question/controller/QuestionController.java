@@ -176,9 +176,9 @@ public class QuestionController {
             description = "Pagination 적용. Ordering 최신순. Filtering 전체, 특정해시태그")
     @GetMapping("/recommend")
     public ResponseEntity<SuccessDataResponse<PaginationResponse<QuestionSimpleResDto>>> getQuestionRecommendList(
-            @Nullable @RequestParam String hashtag, Pageable pageable) {
+            @CurrentUserId Long userId, @Nullable @RequestParam String hashtag, Pageable pageable) {
         PaginationResponse<QuestionSimpleResDto> response = questionService.getQuestionRecommendList(
-                hashtag, pageable);
+                userId, hashtag, pageable);
         return ResponseEntity.ok().body(SuccessDataResponse.create(response));
     }
 

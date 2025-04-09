@@ -736,6 +736,7 @@ public class QuestionService {
                     .map(userBlock -> userBlock.getBlockedUser().getId())
                     .toList();
         }
+
         Page<QuestionHowabout> questionPage = questionDomainService.getQuestionHowaboutList(blockUserIds, pageable);
         List<QuestionSimpleResDto> content = questionPage.stream().map(question ->
                 getQuestionSimpleResDto(question, "How")
@@ -745,8 +746,15 @@ public class QuestionService {
     }
 
     @Transactional(readOnly = true)
-    public PaginationResponse<QuestionSimpleResDto> getQuestionRecommendList(String hashtag, Pageable pageable) {
-        Page<QuestionRecommend> questionPage = questionDomainService.getQuestionRecommendList(hashtag, pageable);
+    public PaginationResponse<QuestionSimpleResDto> getQuestionRecommendList(Long userId, String hashtag, Pageable pageable) {
+        List<Long> blockUserIds = new ArrayList<>();
+        if (userId != null) {
+            blockUserIds = userBlockDomainService.getAllBlockedUser(userId).stream()
+                    .map(userBlock -> userBlock.getBlockedUser().getId())
+                    .toList();
+        }
+
+        Page<QuestionRecommend> questionPage = questionDomainService.getQuestionRecommendList(hashtag, blockUserIds, pageable);
         List<QuestionSimpleResDto> content = questionPage.stream().map(question ->
                 getQuestionSimpleResDto(question, "Recommend")
         ).toList();

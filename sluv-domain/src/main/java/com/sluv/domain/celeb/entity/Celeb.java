@@ -50,7 +50,7 @@ public class Celeb extends BaseEntity {
     @OneToMany(mappedBy = "parent")
     private List<Celeb> subCelebList = new ArrayList<>();
 
-    @Builder
+    @Builder(toBuilder = true)
     public Celeb(Long id, Celeb parent, CelebCategory celebCategory, String celebNameKr, String celebNameEn,
                  CelebStatus celebStatus) {
         this.id = id;

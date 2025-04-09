@@ -17,6 +17,7 @@ import com.sluv.domain.item.entity.Item;
 import com.sluv.domain.item.entity.QItemCategory;
 import com.sluv.domain.item.entity.RecentItem;
 import com.sluv.domain.item.enums.ItemNumberConfig;
+import com.sluv.domain.item.enums.ItemStatus;
 import com.sluv.domain.search.dto.SearchFilterReqDto;
 import com.sluv.domain.user.entity.User;
 import com.sluv.domain.user.enums.UserStatus;
@@ -73,10 +74,13 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
     }
 
     @Override
-    public List<Item> findSameCelebItem(Long itemId, Long celebId, boolean celebJudge) {
+    public List<Item> findSameCelebItem(Long itemId, Long celebId, boolean celebJudge, List<Long> blockUserIds) {
         return jpaQueryFactory.selectFrom(item)
-                .where(getSameCelebId(celebId, celebJudge).and(item.id.ne(itemId)).and(item.itemStatus.eq(
-                        ACTIVE)))
+                .where(getSameCelebId(celebId, celebJudge)
+                        .and(item.id.ne(itemId))
+                        .and(item.itemStatus.eq(ACTIVE))
+                        .and(item.user.id.notIn(blockUserIds))
+                )
                 .limit(10)
                 .orderBy(item.createdAt.desc())
                 .fetch();
@@ -91,10 +95,13 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
     }
 
     @Override
-    public List<Item> findSameBrandItem(Long itemId, Long brandId, boolean brandJudge) {
+    public List<Item> findSameBrandItem(Long itemId, Long brandId, boolean brandJudge, List<Long> blockUserIds) {
         return jpaQueryFactory.selectFrom(item)
-                .where(getSameBrandId(brandId, brandJudge).and(item.id.ne(itemId)).and(item.itemStatus.eq(
-                        ACTIVE)))
+                .where(getSameBrandId(brandId, brandJudge)
+                        .and(item.id.ne(itemId))
+                        .and(item.itemStatus.eq(ACTIVE))
+                        .and(item.user.id.notIn(blockUserIds))
+                )
                 .limit(10)
                 .orderBy(item.createdAt.desc())
                 .fetch();
@@ -203,12 +210,14 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
     }
 
     @Override
-    public List<Item> getSameClosetItems(Long itemId, List<Closet> closetList) {
+    public List<Item> getSameClosetItems(Long itemId, List<Closet> closetList, List<Long> blockUserIds) {
         return jpaQueryFactory.select(item)
                 .from(itemScrap)
                 .leftJoin(itemScrap.item, item)
                 .where(itemScrap.closet.in(closetList).and(item.id.ne(itemId))
-                        .and(item.itemStatus.eq(ACTIVE)))
+                        .and(item.itemStatus.eq(ACTIVE))
+                        .and(item.user.id.notIn(blockUserIds))
+                )
                 .groupBy(item)
                 .orderBy(itemScrap.createdAt.max().desc())
                 .limit(10)
@@ -249,7 +258,7 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
     }
 
     @Override
-    public Page<Item> getRecommendItemPage(Pageable pageable) {
+    public Page<Item> getRecommendItemPage(List<Long> blockUserIds, Pageable pageable) {
         List<Item> content = jpaQueryFactory.select(item)
                 .from(item)
                 .leftJoin(itemLike).on(itemLike.item.eq(item))
@@ -259,7 +268,7 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
                 .limit(pageable.getPageSize())
                 .orderBy(itemLike.count().add(itemScrap.count()).add(item.viewNum).desc())
                 .orderBy(item.whenDiscovery.desc())
-                .where(item.itemStatus.eq(ACTIVE))
+                .where(item.itemStatus.eq(ACTIVE).and(item.user.id.notIn(blockUserIds)))
                 .fetch();
 
         // Count Query
@@ -270,7 +279,7 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
                 .groupBy(item)
                 .orderBy(itemLike.count().add(itemScrap.count()).add(item.viewNum).desc())
                 .orderBy(item.whenDiscovery.desc())
-                .where(item.itemStatus.eq(ACTIVE));
+                .where(item.itemStatus.eq(ACTIVE).and(item.user.id.notIn(blockUserIds)));
 
         return PageableExecutionUtils.getPage(content, pageable, () -> countJPAQuery.fetch().size());
     }
@@ -401,10 +410,15 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
      * 유저가 좋아요 누른 Item 조회
      */
     @Override
-    public Page<Item> getAllByUserLikeItem(User user, Pageable pageable) {
+    public Page<Item> getAllByUserLikeItem(User user, List<Long> blockUserIds, Pageable pageable) {
         List<Item> content = jpaQueryFactory.select(item)
                 .from(itemLike)
-                .where(itemLike.user.eq(user).and(itemLike.item.itemStatus.eq(ACTIVE)))
+                .leftJoin(item).on(itemLike.item.eq(item))
+                .where(
+                        itemLike.user.eq(user)
+                                .and(itemLike.item.itemStatus.eq(ACTIVE))
+                                .and(item.user.id.notIn(blockUserIds))
+                )
                 .orderBy(itemLike.id.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -414,7 +428,11 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
         JPAQuery<Item> query = jpaQueryFactory.select(item)
                 .from(itemLike)
                 .leftJoin(item).on(itemLike.item.eq(item))
-                .where(itemLike.user.eq(user).and(itemLike.item.itemStatus.eq(ACTIVE)))
+                .where(
+                        itemLike.user.eq(user)
+                                .and(itemLike.item.itemStatus.eq(ACTIVE))
+                                .and(item.user.id.notIn(blockUserIds))
+                )
                 .orderBy(itemLike.id.desc());
 
         return PageableExecutionUtils.getPage(content, pageable, () -> query.fetch().size());
@@ -464,11 +482,15 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
      * 당장 구매할 수 있는 아이템.
      */
     @Override
-    public Page<Item> getNowBuyItem(Pageable pageable, SearchFilterReqDto dto) {
+    public Page<Item> getNowBuyItem(List<Long> blockUserIds, Pageable pageable, SearchFilterReqDto dto) {
         log.info("지금 당장 구매 가능한 아이템 조회 Query");
         JPAQuery<Item> query = jpaQueryFactory.selectFrom(item)
                 .leftJoin(itemLink).on(itemLink.item.eq(item))
-                .where(item.itemStatus.eq(ACTIVE).and(itemLink.item.isNotNull()))
+                .where(
+                        item.itemStatus.eq(ACTIVE)
+                                .and(itemLink.item.isNotNull())
+                                .and(item.user.id.notIn(blockUserIds))
+                )
                 .groupBy(item)
                 .orderBy(item.createdAt.desc());
         // Filter 추가
@@ -483,7 +505,11 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
         // Count Query
         JPAQuery<Item> countQuery = jpaQueryFactory.selectFrom(item)
                 .leftJoin(itemLink).on(itemLink.item.eq(item))
-                .where(item.itemStatus.eq(ACTIVE).and(itemLink.item.isNotNull()))
+                .where(
+                        item.itemStatus.eq(ACTIVE)
+                                .and(itemLink.item.isNotNull())
+                                .and(item.user.id.notIn(blockUserIds))
+                )
                 .groupBy(item)
                 .orderBy(item.createdAt.desc());
         // Filter 추가
@@ -497,12 +523,13 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
      * 1시간 기준 최신 아이템 조회
      */
     @Override
-    public Page<Item> getNewItem(Pageable pageable) {
+    public Page<Item> getNewItem(List<Long> blockUserIds, Pageable pageable) {
         LocalDateTime nowTime = LocalDateTime.now();
 
         List<Item> content = jpaQueryFactory.selectFrom(item)
                 .where(item.itemStatus.eq(ACTIVE)
 //                        .and(item.createdAt.between(nowTime.minusHours(1L), nowTime))
+                                .and(item.user.id.notIn(blockUserIds))
                 )
                 .orderBy(item.whenDiscovery.desc())
                 .offset(pageable.getOffset())
@@ -513,6 +540,7 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
         JPAQuery<Item> countQuery = jpaQueryFactory.selectFrom(item)
                 .where(item.itemStatus.eq(ACTIVE)
 //                        .and(item.createdAt.between(nowTime.minusHours(1L), nowTime))
+                                .and(item.user.id.notIn(blockUserIds))
                 )
                 .orderBy(item.whenDiscovery.desc());
 
@@ -524,14 +552,14 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
      */
 
     @Override
-    public Page<Item> getLuxuryItem(Pageable pageable, SearchFilterReqDto dto) {
+    public Page<Item> getLuxuryItem(List<Long> blockUserIds, Pageable pageable, SearchFilterReqDto dto) {
         log.info("럭셔리 아이템 조회 Query");
         JPAQuery<Item> query = jpaQueryFactory.select(item)
                 .from(luxuryItem)
                 .leftJoin(item).on(luxuryItem.item.eq(item))
                 .leftJoin(itemLike).on(itemLike.item.eq(item))
                 .leftJoin(itemScrap).on(itemScrap.item.eq(item))
-                .where(item.itemStatus.eq(ACTIVE))
+                .where(item.itemStatus.eq(ACTIVE).and(luxuryItem.item.user.id.notIn(blockUserIds)))
                 .groupBy(item);
 
         addFilterWhere(query, dto);
@@ -548,7 +576,7 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
                 .leftJoin(item).on(luxuryItem.item.eq(item))
                 .leftJoin(itemLike).on(itemLike.item.eq(item))
                 .leftJoin(itemScrap).on(itemScrap.item.eq(item))
-                .where(item.itemStatus.eq(ACTIVE))
+                .where(item.itemStatus.eq(ACTIVE).and(luxuryItem.item.user.id.notIn(blockUserIds)))
                 .groupBy(item);
 
         addFilterWhere(countQuery, dto);
@@ -573,14 +601,14 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
      * 가성비 선물 아이템 조회
      */
     @Override
-    public Page<Item> getEfficientItem(Pageable pageable, SearchFilterReqDto filterReqDto) {
+    public Page<Item> getEfficientItem(List<Long> blockUserIds, Pageable pageable, SearchFilterReqDto filterReqDto) {
         log.info("가성비 좋은 선물 아이템 조회 Query");
         JPAQuery<Item> query = jpaQueryFactory.select(item)
                 .from(efficientItem)
                 .leftJoin(item).on(efficientItem.item.eq(item))
                 .leftJoin(itemLike).on(itemLike.item.eq(item))
                 .leftJoin(itemScrap).on(itemScrap.item.eq(item))
-                .where(item.itemStatus.eq(ACTIVE))
+                .where(item.itemStatus.eq(ACTIVE).and(efficientItem.item.user.id.notIn(blockUserIds)))
                 .groupBy(item);
 
         addFilterWhere(query, filterReqDto);
@@ -596,7 +624,7 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
                 .leftJoin(item).on(efficientItem.item.eq(item))
                 .leftJoin(itemLike).on(itemLike.item.eq(item)).fetchJoin()
                 .leftJoin(itemScrap).on(itemScrap.item.eq(item)).fetchJoin()
-                .where(item.itemStatus.eq(ACTIVE))
+                .where(item.itemStatus.eq(ACTIVE).and(efficientItem.item.user.id.notIn(blockUserIds)))
                 .groupBy(item);
 
         addFilterWhere(countQuery, filterReqDto);
@@ -720,14 +748,16 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
      * 큐레이션 아이템 조회
      */
     @Override
-    public List<Item> getCurationItem(User user, List<Celeb> interestedCeleb) {
+    public List<Item> getCurationItem(User nowUser, List<Celeb> interestedCeleb, List<Long> blockUserIds) {
         log.info("큐레이션 아이템 조회 Query");
         LocalDateTime now = LocalDateTime.now();
 
         List<Item> content = jpaQueryFactory.selectFrom(item)
+                .leftJoin(item.user, user).fetchJoin()
                 .leftJoin(itemLike).on(itemLike.item.eq(item))
                 .leftJoin(itemScrap).on(itemScrap.item.eq(item))
                 .where(item.itemStatus.eq(ACTIVE)
+                        .and(item.user.id.notIn(blockUserIds))
                         .and(item.celeb.in(interestedCeleb)
                                 .or(item.celeb.parent.in(interestedCeleb)))
                         .and(item.createdAt.year().eq(now.getYear()))
@@ -824,10 +854,14 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
     }
 
     @Override
-    public Page<Item> getUserAllRecentItem(User user, Pageable pageable) {
+    public Page<Item> getUserAllRecentItem(User user, List<Long> blockUserIds, Pageable pageable) {
         List<RecentItem> fetch = jpaQueryFactory.selectFrom(recentItem)
                 .leftJoin(recentItem.item, item).fetchJoin()
-                .where(recentItem.user.eq(user).and(recentItem.item.itemStatus.eq(ACTIVE)))
+                .where(
+                        recentItem.user.eq(user)
+                                .and(recentItem.item.itemStatus.eq(ACTIVE))
+                                .and(item.user.id.notIn(blockUserIds))
+                )
                 .orderBy(recentItem.createdAt.max().desc())
                 .groupBy(recentItem.item)
                 .offset(pageable.getOffset())
@@ -835,7 +869,11 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
                 .fetch();
 
         JPAQuery<RecentItem> query = jpaQueryFactory.selectFrom(recentItem)
-                .where(recentItem.user.eq(user).and(recentItem.item.itemStatus.eq(ACTIVE)))
+                .where(
+                        recentItem.user.eq(user)
+                                .and(recentItem.item.itemStatus.eq(ACTIVE))
+                                .and(item.user.id.notIn(blockUserIds))
+                )
                 .groupBy(recentItem.item)
                 .orderBy(recentItem.createdAt.max().desc());
 
@@ -905,11 +943,12 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
     }
 
     @Override
-    public Page<Item> getTrendItems(Pageable pageable) {
+    public Page<Item> getTrendItems(List<Long> blockUserIds, Pageable pageable) {
         List<Long> trendCelebIds = List.of(133L, 865L);
         List<Item> content = jpaQueryFactory.selectFrom(item)
                 .where(item.itemStatus.eq(ACTIVE)
                         .and(item.celeb.id.in(trendCelebIds).or(item.celeb.parent.id.in(trendCelebIds)))
+                        .and(item.user.id.notIn(blockUserIds))
                 )
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -920,6 +959,7 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
         JPAQuery<Item> countQuery = jpaQueryFactory.selectFrom(item)
                 .where(item.itemStatus.eq(ACTIVE)
                         .and(item.celeb.id.in(trendCelebIds).or(item.celeb.parent.id.in(trendCelebIds)))
+                        .and(item.user.id.notIn(blockUserIds))
                 );
 
         return PageableExecutionUtils.getPage(content, pageable, () -> countQuery.fetch().size());
@@ -972,5 +1012,14 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
                 .set(item.celeb, celeb)
                 .set(item.newCeleb, (NewCeleb) null)
                 .execute();
+    }
+
+    @Override
+    public List<Item> getAllByItemStatus(List<Long> blockUserIds, ItemStatus itemStatus) {
+        return jpaQueryFactory.selectFrom(item)
+                .where(item.itemStatus.eq(itemStatus)
+                        .and(item.user.id.notIn(blockUserIds))
+                )
+                .fetch();
     }
 }

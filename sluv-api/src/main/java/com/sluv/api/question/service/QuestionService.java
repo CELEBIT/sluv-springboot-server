@@ -24,6 +24,7 @@ import com.sluv.domain.question.exception.QuestionReportDuplicateException;
 import com.sluv.domain.question.exception.QuestionTypeNotFoundException;
 import com.sluv.domain.question.service.*;
 import com.sluv.domain.user.entity.User;
+import com.sluv.domain.user.service.UserBlockDomainService;
 import com.sluv.domain.user.service.UserDomainService;
 import com.sluv.infra.alarm.service.QuestionAlarmService;
 import com.sluv.infra.counter.view.ViewCounter;
@@ -57,6 +58,7 @@ public class QuestionService {
     private final ClosetDomainService closetDomainService;
     private final QuestionVoteDomainService questionVoteDomainService;
     private final UserDomainService userDomainService;
+    private final UserBlockDomainService userBlockDomainService;
 
     private final ViewCounter viewCounter;
     private final QuestionAlarmService questionAlarmService;
@@ -470,17 +472,20 @@ public class QuestionService {
 
     /**
      * Question 상세보기 하단의 추천 게시글
-     * TODO 게시글과 같은 셀럽/같은 그룹 로직 추가해야함 (23.06.22)
      */
     @Transactional(readOnly = true)
     public List<QuestionSimpleResDto> getWaitQuestionBuy(Long userId, Long questionId) {
         User user = userDomainService.findById(userId);
+        List<Long> blockUserIds = userBlockDomainService.getAllBlockedUser(userId).stream()
+                .map(userBlock -> userBlock.getBlockedUser().getId())
+                .toList();
+
         List<Celeb> interestedCelebs = new ArrayList<>();
         if (user != null) {
             interestedCelebs = celebDomainService.findInterestedCeleb(user);
         }
 
-        return questionDomainService.getWaitQuestionBuy(user, questionId, interestedCelebs)
+        return questionDomainService.getWaitQuestionBuy(user, questionId, interestedCelebs, blockUserIds)
                 .stream()
                 .map(questionBuy -> getQuestionSimpleResDto(questionBuy, "Buy"))
                 .toList();
@@ -492,19 +497,28 @@ public class QuestionService {
     @Transactional(readOnly = true)
     public List<QuestionSimpleResDto> getWaitQuestionRecommend(Long userId, Long questionId) {
         User user = userDomainService.findById(userId);
-        return questionDomainService.getWaitQuestionRecommend(user, questionId)
+        List<Long> blockUserIds = userBlockDomainService.getAllBlockedUser(userId).stream()
+                .map(userBlock -> userBlock.getBlockedUser().getId())
+                .toList();
+
+        return questionDomainService.getWaitQuestionRecommend(user, questionId, blockUserIds)
                 .stream()
                 .map(questionRecommend -> getQuestionSimpleResDto(questionRecommend, "Recommend"))
                 .toList();
     }
 
     /**
+     * 가
      * Wait QuestionHowabout 조회
      */
     @Transactional(readOnly = true)
     public List<QuestionSimpleResDto> getWaitQuestionHowabout(Long userId, Long questionId) {
         User user = userDomainService.findById(userId);
-        return questionDomainService.getWaitQuestionHowabout(user, questionId)
+        List<Long> blockUserIds = userBlockDomainService.getAllBlockedUser(userId).stream()
+                .map(userBlock -> userBlock.getBlockedUser().getId())
+                .toList();
+
+        return questionDomainService.getWaitQuestionHowabout(user, questionId, blockUserIds)
                 .stream()
                 .map(questionHowabout -> getQuestionSimpleResDto(questionHowabout, "How"))
                 .toList();
@@ -516,13 +530,17 @@ public class QuestionService {
     @Transactional(readOnly = true)
     public List<QuestionSimpleResDto> getWaitQuestionFind(Long userId, Long questionId) {
         User user = userDomainService.findById(userId);
+        List<Long> blockUserIds = userBlockDomainService.getAllBlockedUser(userId).stream()
+                .map(userBlock -> userBlock.getBlockedUser().getId())
+                .toList();
+
         List<Celeb> interestedCelebs = new ArrayList<>();
 
         if (user != null) {
             interestedCelebs = celebDomainService.findInterestedCeleb(user);
         }
 
-        return questionDomainService.getWaitQuestionFind(user, questionId, interestedCelebs)
+        return questionDomainService.getWaitQuestionFind(user, questionId, interestedCelebs, blockUserIds)
                 .stream()
                 .map(questionFind -> getQuestionSimpleResDto(questionFind, "Find"))
                 .toList();
@@ -591,8 +609,15 @@ public class QuestionService {
      * Question 리스트를 최신순으로 조회
      */
     @Transactional(readOnly = true)
-    public PaginationResponse<QuestionSimpleResDto> getTotalQuestionList(Pageable pageable) {
-        Page<Question> questionPage = questionDomainService.getTotalQuestionList(pageable);
+    public PaginationResponse<QuestionSimpleResDto> getTotalQuestionList(Long userId, Pageable pageable) {
+        List<Long> blockUserIds = new ArrayList<>();
+        if (userId != null) {
+            blockUserIds = userBlockDomainService.getAllBlockedUser(userId).stream()
+                    .map(userBlock -> userBlock.getBlockedUser().getId())
+                    .toList();
+        }
+
+        Page<Question> questionPage = questionDomainService.getTotalQuestionList(blockUserIds, pageable);
         List<QuestionSimpleResDto> content = questionPage.stream().map(question -> {
             String qType;
             if (question instanceof QuestionBuy) {
@@ -616,7 +641,14 @@ public class QuestionService {
     public PaginationResponse<QuestionBuySimpleResDto> getQuestionBuyList(Long userId, String voteStatus,
                                                                           Pageable pageable) {
         User user = userDomainService.findById(userId);
-        Page<QuestionBuy> questionPage = questionDomainService.getQuestionBuyList(voteStatus, pageable);
+        List<Long> blockUserIds = new ArrayList<>();
+        if (userId != null) {
+            blockUserIds = userBlockDomainService.getAllBlockedUser(userId).stream()
+                    .map(userBlock -> userBlock.getBlockedUser().getId())
+                    .toList();
+        }
+
+        Page<QuestionBuy> questionPage = questionDomainService.getQuestionBuyList(voteStatus, blockUserIds, pageable);
 
         List<QuestionBuySimpleResDto> content = questionPage.stream().map(question -> {
 
@@ -645,8 +677,11 @@ public class QuestionService {
 
             Long voteCount = getTotalVoteCount(imgList, itemImgList);
 
-            QuestionVote questionVote = questionVoteDomainService.findByQuestionIdAndUserIdOrNull(question.getId(),
-                    user.getId());
+            QuestionVote questionVote = null;
+            if (user != null) {
+                questionVote = questionVoteDomainService.findByQuestionIdAndUserIdOrNull(question.getId(),
+                        user.getId());
+            }
 
             User writer = userDomainService.findByIdOrNull(question.getUser().getId());
 
@@ -676,9 +711,15 @@ public class QuestionService {
      * QuestionFind 커뮤니티 게시글 조회.
      */
     @Transactional(readOnly = true)
-    public PaginationResponse<QuestionSimpleResDto> getQuestionFindList(Long celebId, Pageable pageable) {
+    public PaginationResponse<QuestionSimpleResDto> getQuestionFindList(Long userId, Long celebId, Pageable pageable) {
+        List<Long> blockUserIds = new ArrayList<>();
+        if (userId != null) {
+            blockUserIds = userBlockDomainService.getAllBlockedUser(userId).stream()
+                    .map(userBlock -> userBlock.getBlockedUser().getId())
+                    .toList();
+        }
 
-        Page<QuestionFind> questionPage = questionDomainService.getQuestionFindList(celebId, pageable);
+        Page<QuestionFind> questionPage = questionDomainService.getQuestionFindList(celebId, blockUserIds, pageable);
 
         List<QuestionSimpleResDto> content = questionPage.stream().map(question ->
                 getQuestionSimpleResDto(question, "Find")
@@ -688,8 +729,15 @@ public class QuestionService {
     }
 
     @Transactional(readOnly = true)
-    public PaginationResponse<QuestionSimpleResDto> getQuestionHowaboutList(Pageable pageable) {
-        Page<QuestionHowabout> questionPage = questionDomainService.getQuestionHowaboutList(pageable);
+    public PaginationResponse<QuestionSimpleResDto> getQuestionHowaboutList(Long userId, Pageable pageable) {
+        List<Long> blockUserIds = new ArrayList<>();
+        if (userId != null) {
+            blockUserIds = userBlockDomainService.getAllBlockedUser(userId).stream()
+                    .map(userBlock -> userBlock.getBlockedUser().getId())
+                    .toList();
+        }
+
+        Page<QuestionHowabout> questionPage = questionDomainService.getQuestionHowaboutList(blockUserIds, pageable);
         List<QuestionSimpleResDto> content = questionPage.stream().map(question ->
                 getQuestionSimpleResDto(question, "How")
         ).toList();
@@ -698,8 +746,15 @@ public class QuestionService {
     }
 
     @Transactional(readOnly = true)
-    public PaginationResponse<QuestionSimpleResDto> getQuestionRecommendList(String hashtag, Pageable pageable) {
-        Page<QuestionRecommend> questionPage = questionDomainService.getQuestionRecommendList(hashtag, pageable);
+    public PaginationResponse<QuestionSimpleResDto> getQuestionRecommendList(Long userId, String hashtag, Pageable pageable) {
+        List<Long> blockUserIds = new ArrayList<>();
+        if (userId != null) {
+            blockUserIds = userBlockDomainService.getAllBlockedUser(userId).stream()
+                    .map(userBlock -> userBlock.getBlockedUser().getId())
+                    .toList();
+        }
+
+        Page<QuestionRecommend> questionPage = questionDomainService.getQuestionRecommendList(hashtag, blockUserIds, pageable);
         List<QuestionSimpleResDto> content = questionPage.stream().map(question ->
                 getQuestionSimpleResDto(question, "Recommend")
         ).toList();
@@ -719,8 +774,15 @@ public class QuestionService {
      * 일일 Hot Question 조회 기능.
      */
     @Transactional(readOnly = true)
-    public List<QuestionHomeResDto> getDailyHotQuestionList() {
-        List<Question> dailyHoyQuestionList = questionDomainService.getDailyHotQuestion();
+    public List<QuestionHomeResDto> getDailyHotQuestionList(Long userId) {
+        List<Long> blockUserIds = new ArrayList<>();
+        if (userId != null) {
+            blockUserIds = userBlockDomainService.getAllBlockedUser(userId).stream()
+                    .map(userBlock -> userBlock.getBlockedUser().getId())
+                    .toList();
+        }
+
+        List<Question> dailyHoyQuestionList = questionDomainService.getDailyHotQuestion(blockUserIds);
 
         List<QuestionHomeResDto> result = dailyHoyQuestionList.stream().map(question -> {
             List<QuestionImgSimpleDto> questionImgSimpleList = getQuestionImgSimpleList(question);
@@ -773,8 +835,15 @@ public class QuestionService {
      * 주간 Hot Question 조회 기능.
      */
     @Transactional(readOnly = true)
-    public PaginationResponse<QuestionSimpleResDto> getWeeklyHotQuestionList(Pageable pageable) {
-        Page<Question> page = questionDomainService.getWeeklyHotQuestion(pageable);
+    public PaginationResponse<QuestionSimpleResDto> getWeeklyHotQuestionList(Long userId, Pageable pageable) {
+        List<Long> blockUserIds = new ArrayList<>();
+        if (userId != null) {
+            blockUserIds = userBlockDomainService.getAllBlockedUser(userId).stream()
+                    .map(userBlock -> userBlock.getBlockedUser().getId())
+                    .toList();
+        }
+
+        Page<Question> page = questionDomainService.getWeeklyHotQuestion(blockUserIds, pageable);
 
         List<QuestionSimpleResDto> content = page.stream().map(question -> {
             List<String> categoryList = null;

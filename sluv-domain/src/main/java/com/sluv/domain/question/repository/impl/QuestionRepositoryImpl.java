@@ -132,13 +132,14 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
      * Wait QuestionBuy 조회
      */
     @Override
-    public List<QuestionBuy> getWaitQuestionBuy(User user, Long questionId, List<Celeb> interestedCeleb) {
+    public List<QuestionBuy> getWaitQuestionBuy(User user, Long questionId, List<Celeb> interestedCeleb, List<Long> blockUserIds) {
         LocalDateTime nowTime = LocalDateTime.now();
         return jpaQueryFactory.selectFrom(questionBuy)
                 .where(questionBuy.id.ne(questionId)
                         .and(questionBuy.questionStatus.eq(QuestionStatus.ACTIVE))
                         .and(questionBuy.voteEndTime.gt(nowTime))
                         .and(getUserNeOrNullInQuestion(questionBuy, user))
+                        .and(questionBuy.user.id.notIn(blockUserIds))
                 )
                 .orderBy(questionBuy.voteEndTime.asc())
                 .limit(4)
@@ -149,13 +150,14 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
      * Wait QuestionRecommend 조회
      */
     @Override
-    public List<QuestionRecommend> getWaitQuestionRecommend(User user, Long questionId) {
+    public List<QuestionRecommend> getWaitQuestionRecommend(User user, Long questionId, List<Long> blockUserIds) {
         return jpaQueryFactory.select(questionRecommend)
                 .from(questionRecommend)
                 .where(questionRecommend.id.ne(questionId)
                         .and(questionRecommend.questionStatus.eq(QuestionStatus.ACTIVE))
                         .and(getUserNeOrNullInQuestion(questionRecommend, user))
                         .and(questionRecommend.commentList.size().eq(0))
+                        .and(questionRecommend.user.id.notIn(blockUserIds))
                 )
                 .orderBy(questionRecommend.createdAt.desc())
                 .limit(4)
@@ -166,13 +168,14 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
      * Wait QuestionHowabout 조회
      */
     @Override
-    public List<QuestionHowabout> getWaitQuestionHowabout(User user, Long questionId) {
+    public List<QuestionHowabout> getWaitQuestionHowabout(User user, Long questionId, List<Long> blockUserIds) {
         return jpaQueryFactory.select(questionHowabout)
                 .from(questionHowabout)
                 .where(questionHowabout.id.ne(questionId)
                         .and(questionHowabout.questionStatus.eq(QuestionStatus.ACTIVE))
                         .and(getUserNeOrNullInQuestion(questionHowabout, user))
                         .and(questionHowabout.commentList.size().eq(0))
+                        .and(questionHowabout.user.id.notIn(blockUserIds))
                 )
                 .orderBy(questionHowabout.createdAt.desc())
                 .limit(4)
@@ -181,10 +184,9 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
 
     /**
      * Wait QuestionFind 조회
-     * TODO: 게시글과 같은 셀럽/같은 그룹 로직 추가
      */
     @Override
-    public List<QuestionFind> getWaitQuestionFind(User user, Long questionId, List<Celeb> interestedCeleb) {
+    public List<QuestionFind> getWaitQuestionFind(User user, Long questionId, List<Celeb> interestedCeleb, List<Long> blockUserIds) {
 
         return jpaQueryFactory.select(questionFind)
                 .from(questionFind)
@@ -192,6 +194,7 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
                         .and(questionFind.questionStatus.eq(QuestionStatus.ACTIVE))
                         .and(getUserNeOrNullInQuestion(questionFind, user))
                         .and(questionFind.commentList.size().eq(0))
+                        .and(questionFind.user.id.notIn(blockUserIds))
                 )
                 .orderBy(questionFind.createdAt.desc())
                 .limit(4)
@@ -210,12 +213,13 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
      * User Like Question
      */
     @Override
-    public Page<Question> getUserLikeQuestion(User user, Pageable pageable) {
+    public Page<Question> getUserLikeQuestion(User user, List<Long> blockUserIds, Pageable pageable) {
         List<Question> content = jpaQueryFactory.select(question)
                 .from(questionLike)
                 .leftJoin(questionLike.question, question)
                 .where(questionLike.user.eq(user)
                         .and(question.questionStatus.eq(QuestionStatus.ACTIVE))
+                        .and(question.user.id.notIn(blockUserIds))
                 )
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -227,6 +231,7 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
                 .leftJoin(questionLike.question, question)
                 .where(questionLike.user.eq(user)
                         .and(question.questionStatus.eq(QuestionStatus.ACTIVE))
+                        .and(question.user.id.notIn(blockUserIds))
                 )
                 .orderBy(questionLike.createdAt.desc());
 
@@ -258,9 +263,11 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
     }
 
     @Override
-    public Page<Question> getTotalQuestionList(Pageable pageable) {
+    public Page<Question> getTotalQuestionList(List<Long> blockUserIds, Pageable pageable) {
         List<Question> content = jpaQueryFactory.selectFrom(question)
-                .where(question.questionStatus.eq(QuestionStatus.ACTIVE))
+                .where(question.questionStatus.eq(QuestionStatus.ACTIVE)
+                        .and(question.user.id.notIn(blockUserIds))
+                )
                 .orderBy(question.createdAt.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -268,7 +275,9 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
 
         // Count Query
         JPAQuery<Question> query = jpaQueryFactory.selectFrom(question)
-                .where(question.questionStatus.eq(QuestionStatus.ACTIVE))
+                .where(question.questionStatus.eq(QuestionStatus.ACTIVE)
+                        .and(question.user.id.notIn(blockUserIds))
+                )
                 .orderBy(question.createdAt.desc());
 
         return PageableExecutionUtils.getPage(content, pageable, () -> query.fetch().size());
@@ -280,10 +289,10 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
      * voteStatus가 null이면 모든 voteStatus에 대해 조회.
      */
     @Override
-    public Page<QuestionBuy> getQuestionBuyList(String voteStatus, Pageable pageable) {
+    public Page<QuestionBuy> getQuestionBuyList(String voteStatus, List<Long> blockUserIds, Pageable pageable) {
 
         List<QuestionBuy> content = jpaQueryFactory.selectFrom(questionBuy)
-                .where(getQuestionBuyFiltering(voteStatus))
+                .where(getQuestionBuyFiltering(voteStatus).and(questionBuy.user.id.notIn(blockUserIds)))
                 .orderBy(getQuestionBuyOrderSpecifier(voteStatus))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -291,7 +300,7 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
 
         // Count Query
         JPAQuery<QuestionBuy> query = jpaQueryFactory.selectFrom(questionBuy)
-                .where(getQuestionBuyFiltering(voteStatus));
+                .where(getQuestionBuyFiltering(voteStatus).and(questionBuy.user.id.notIn(blockUserIds)));
 //                    .orderBy(getQuestionBuyOrderSpecifier());
 
         return PageableExecutionUtils.getPage(content, pageable, () -> query.fetch().size());
@@ -303,10 +312,10 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
      * CelebId가 null이면 모든 Celeb에 대해 조회.
      */
     @Override
-    public Page<QuestionFind> getQuestionFindList(Long celebId, Pageable pageable) {
+    public Page<QuestionFind> getQuestionFindList(Long celebId, List<Long> blockUserIds, Pageable pageable) {
 
         List<QuestionFind> content = jpaQueryFactory.selectFrom(questionFind)
-                .where(getQuestionFindFiltering(celebId))
+                .where(getQuestionFindFiltering(celebId).and(questionFind.user.id.notIn(blockUserIds)))
                 .orderBy(questionFind.createdAt.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -314,7 +323,7 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
 
         // Count Query
         JPAQuery<QuestionFind> query = jpaQueryFactory.selectFrom(questionFind)
-                .where(getQuestionFindFiltering(celebId))
+                .where(getQuestionFindFiltering(celebId).and(questionFind.user.id.notIn(blockUserIds)))
                 .orderBy(questionFind.createdAt.desc());
 
         return PageableExecutionUtils.getPage(content, pageable, () -> query.fetch().size());
@@ -324,9 +333,11 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
      * QuestionHowabout만 조회. Ordering: createdAt
      */
     @Override
-    public Page<QuestionHowabout> getQuestionHowaboutList(Pageable pageable) {
+    public Page<QuestionHowabout> getQuestionHowaboutList(List<Long> blockUserIds, Pageable pageable) {
         List<QuestionHowabout> content = jpaQueryFactory.selectFrom(questionHowabout)
-                .where(questionHowabout.questionStatus.eq(QuestionStatus.ACTIVE))
+                .where(questionHowabout.questionStatus.eq(QuestionStatus.ACTIVE)
+                        .and(questionHowabout.user.id.notIn(blockUserIds))
+                )
                 .orderBy(questionHowabout.createdAt.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -334,7 +345,9 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
 
         // Count Query
         JPAQuery<QuestionHowabout> query = jpaQueryFactory.selectFrom(questionHowabout)
-                .where(questionHowabout.questionStatus.eq(QuestionStatus.ACTIVE))
+                .where(questionHowabout.questionStatus.eq(QuestionStatus.ACTIVE)
+                        .and(questionHowabout.user.id.notIn(blockUserIds))
+                )
                 .orderBy(questionHowabout.createdAt.desc());
 
         return PageableExecutionUtils.getPage(content, pageable, () -> query.fetch().size());
@@ -344,9 +357,9 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
      * QuestionRecommend만 조회. Ordering: createdAt Filtering : hashtag
      */
     @Override
-    public Page<QuestionRecommend> getQuestionRecommendList(String hashtag, Pageable pageable) {
+    public Page<QuestionRecommend> getQuestionRecommendList(String hashtag, List<Long> blockUserIds, Pageable pageable) {
         List<QuestionRecommend> content = getQuestionRecommendTable(hashtag)
-                .where(getQuestionRecommendFiltering(hashtag))
+                .where(getQuestionRecommendFiltering(hashtag).and(questionRecommend.user.id.notIn(blockUserIds)))
                 .orderBy(questionRecommend.createdAt.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -354,7 +367,7 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
 
         // Count Query
         JPAQuery<QuestionRecommend> query = getQuestionRecommendTable(hashtag)
-                .where(getQuestionRecommendFiltering(hashtag))
+                .where(getQuestionRecommendFiltering(hashtag).and(questionRecommend.user.id.notIn(blockUserIds)))
                 .orderBy(questionRecommend.createdAt.desc());
 
         return PageableExecutionUtils.getPage(content, pageable, () -> query.fetch().size());
@@ -471,7 +484,7 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
      * 주간 Hot Question
      */
     @Override
-    public Page<Question> getWeeklyHotQuestion(Pageable pageable) {
+    public Page<Question> getWeeklyHotQuestion(List<Long> blockUserIds, Pageable pageable) {
         LocalDateTime now = LocalDateTime.now();
 
         List<Question> content = jpaQueryFactory.select(question)
@@ -482,6 +495,7 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
                         question.questionStatus.eq(QuestionStatus.ACTIVE)
                                 .and(question.createdAt.between(now.minusDays(7).toLocalDate().atStartOfDay(),
                                         now.toLocalDate().atStartOfDay()))
+                                .and(question.user.id.notIn(blockUserIds))
 
                 )
                 .groupBy(question)
@@ -499,6 +513,7 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
                         question.questionStatus.eq(QuestionStatus.ACTIVE)
                                 .and(question.createdAt.between(now.minusDays(7).toLocalDate().atStartOfDay(),
                                         now.toLocalDate().atStartOfDay()))
+                                .and(question.user.id.notIn(blockUserIds))
                 )
                 .groupBy(question);
 
@@ -506,11 +521,13 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
     }
 
     @Override
-    public List<Question> getDailyHotQuestion() {
+    public List<Question> getDailyHotQuestion(List<Long> blockUserIds) {
         return jpaQueryFactory.select(question)
                 .from(dailyHotQuestion)
-                .leftJoin(question).on(dailyHotQuestion.question.eq(question)).fetchJoin()
-                .where(question.questionStatus.eq(QuestionStatus.ACTIVE))
+                .leftJoin(question).on(dailyHotQuestion.question.eq(question))
+                .where(question.questionStatus.eq(QuestionStatus.ACTIVE)
+                        .and(question.user.id.notIn(blockUserIds))
+                )
                 .fetch();
     }
 

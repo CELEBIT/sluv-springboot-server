@@ -22,11 +22,12 @@ public class CommentRepositoryImpl implements CommentRepositoryCustom {
     private final JPAQueryFactory jpaQueryFactory;
 
     @Override
-    public Page<Comment> getAllQuestionComment(Long questionId, Pageable pageable) {
+    public Page<Comment> getAllQuestionComment(Long questionId, List<Long> blockUserIds, Pageable pageable) {
         List<Comment> content = jpaQueryFactory.selectFrom(comment)
                 .where(comment.question.id.eq(questionId)
                                 .and(comment.parent.isNull())
 //                        .and(comment.commentStatus.eq(CommentStatus.ACTIVE))
+                                .and(comment.user.id.notIn(blockUserIds))
                 )
                 .orderBy(comment.createdAt.asc())
                 .offset(pageable.getOffset())
@@ -38,6 +39,7 @@ public class CommentRepositoryImpl implements CommentRepositoryCustom {
                 .where(comment.question.id.eq(questionId)
                                 .and(comment.parent.isNull())
 //                        .and(comment.commentStatus.eq(CommentStatus.ACTIVE))
+                                .and(comment.user.id.notIn(blockUserIds))
                 )
                 .orderBy(comment.createdAt.asc());
 
@@ -45,10 +47,11 @@ public class CommentRepositoryImpl implements CommentRepositoryCustom {
     }
 
     @Override
-    public Page<Comment> getAllSubComment(Long commentId, Pageable pageable) {
+    public Page<Comment> getAllSubComment(Long commentId, List<Long> blockUserIds, Pageable pageable) {
         List<Comment> content = jpaQueryFactory.selectFrom(comment)
                 .where(comment.parent.id.eq(commentId)
 //                        .and(comment.commentStatus.eq(CommentStatus.ACTIVE))
+                                .and(comment.user.id.notIn(blockUserIds))
                 )
                 .orderBy(comment.createdAt.asc())
                 .offset(pageable.getOffset())
@@ -59,6 +62,7 @@ public class CommentRepositoryImpl implements CommentRepositoryCustom {
         JPAQuery<Comment> countQuery = jpaQueryFactory.selectFrom(comment)
                 .where(comment.parent.id.eq(commentId)
 //                        .and(comment.commentStatus.eq(CommentStatus.ACTIVE))
+                                .and(comment.user.id.notIn(blockUserIds))
                 )
                 .orderBy(comment.createdAt.asc());
 
@@ -66,12 +70,13 @@ public class CommentRepositoryImpl implements CommentRepositoryCustom {
     }
 
     @Override
-    public Page<Comment> getUserAllLikeComment(User user, Pageable pageable) {
+    public Page<Comment> getUserAllLikeComment(User user, List<Long> blockUserIds, Pageable pageable) {
         List<Comment> content = jpaQueryFactory.select(comment)
                 .from(commentLike)
                 .where(commentLike.user.eq(user)
                         .and(comment.commentStatus.eq(CommentStatus.ACTIVE))
                         .and(comment.question.questionStatus.eq(QuestionStatus.ACTIVE))
+                        .and(comment.user.id.notIn(blockUserIds))
                 )
                 .orderBy(commentLike.createdAt.desc())
                 .offset(pageable.getOffset())
@@ -84,6 +89,7 @@ public class CommentRepositoryImpl implements CommentRepositoryCustom {
                 .where(commentLike.user.eq(user)
                         .and(comment.commentStatus.eq(CommentStatus.ACTIVE))
                         .and(comment.question.questionStatus.eq(QuestionStatus.ACTIVE))
+                        .and(comment.user.id.notIn(blockUserIds))
                 )
                 .orderBy(commentLike.createdAt.desc());
 

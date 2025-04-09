@@ -9,14 +9,16 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class RecentQuestionDomainService {
 
     private final RecentQuestionRepository recentQuestionRepository;
 
-    public Page<Question> getUserAllRecentQuestion(User user, Pageable pageable) {
-        return recentQuestionRepository.getUserAllRecentQuestion(user, pageable);
+    public Page<Question> getUserAllRecentQuestion(User user, List<Long> blockUserIds, Pageable pageable) {
+        return recentQuestionRepository.getUserAllRecentQuestion(user, blockUserIds, pageable);
     }
 
     public void deleteAllByUserId(Long userId) {

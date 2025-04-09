@@ -23,8 +23,8 @@ public class QuestionDomainService {
         return questionRepository.findById(questionId).orElseThrow(QuestionNotFoundException::new);
     }
 
-    public Page<Question> getUserLikeQuestion(User user, Pageable pageable) {
-        return questionRepository.getUserLikeQuestion(user, pageable);
+    public Page<Question> getUserLikeQuestion(User user, List<Long> blockUserIds, Pageable pageable) {
+        return questionRepository.getUserLikeQuestion(user, blockUserIds, pageable);
     }
 
     public Long countByUserIdAndQuestionStatus(Long questionId, QuestionStatus questionStatus) {
@@ -39,44 +39,44 @@ public class QuestionDomainService {
         return questionRepository.save(question);
     }
 
-    public List<QuestionBuy> getWaitQuestionBuy(User user, Long questionId, List<Celeb> interestedCelebs) {
-        return questionRepository.getWaitQuestionBuy(user, questionId, interestedCelebs);
+    public List<QuestionBuy> getWaitQuestionBuy(User user, Long questionId, List<Celeb> interestedCelebs, List<Long> blockUserIds) {
+        return questionRepository.getWaitQuestionBuy(user, questionId, interestedCelebs, blockUserIds);
     }
 
-    public List<QuestionRecommend> getWaitQuestionRecommend(User user, Long questionId) {
-        return questionRepository.getWaitQuestionRecommend(user, questionId);
+    public List<QuestionRecommend> getWaitQuestionRecommend(User user, Long questionId, List<Long> blockUserIds) {
+        return questionRepository.getWaitQuestionRecommend(user, questionId, blockUserIds);
     }
 
-    public List<QuestionHowabout> getWaitQuestionHowabout(User user, Long questionId) {
-        return questionRepository.getWaitQuestionHowabout(user, questionId);
+    public List<QuestionHowabout> getWaitQuestionHowabout(User user, Long questionId, List<Long> blockUserIds) {
+        return questionRepository.getWaitQuestionHowabout(user, questionId, blockUserIds);
     }
 
-    public List<QuestionFind> getWaitQuestionFind(User user, Long questionId, List<Celeb> interestedCelebs) {
-        return questionRepository.getWaitQuestionFind(user, questionId, interestedCelebs);
+    public List<QuestionFind> getWaitQuestionFind(User user, Long questionId, List<Celeb> interestedCelebs, List<Long> blockUserIds) {
+        return questionRepository.getWaitQuestionFind(user, questionId, interestedCelebs, blockUserIds);
     }
 
-    public Page<Question> getTotalQuestionList(Pageable pageable) {
-        return questionRepository.getTotalQuestionList(pageable);
+    public Page<Question> getTotalQuestionList(List<Long> blockUserIds, Pageable pageable) {
+        return questionRepository.getTotalQuestionList(blockUserIds, pageable);
     }
 
-    public Page<QuestionBuy> getQuestionBuyList(String voteStatus, Pageable pageable) {
-        return questionRepository.getQuestionBuyList(voteStatus, pageable);
+    public Page<QuestionBuy> getQuestionBuyList(String voteStatus, List<Long> blockUserIds, Pageable pageable) {
+        return questionRepository.getQuestionBuyList(voteStatus, blockUserIds, pageable);
     }
 
-    public Page<QuestionFind> getQuestionFindList(Long celebId, Pageable pageable) {
-        return questionRepository.getQuestionFindList(celebId, pageable);
+    public Page<QuestionFind> getQuestionFindList(Long celebId, List<Long> blockUserIds, Pageable pageable) {
+        return questionRepository.getQuestionFindList(celebId, blockUserIds, pageable);
     }
 
-    public Page<QuestionHowabout> getQuestionHowaboutList(Pageable pageable) {
-        return questionRepository.getQuestionHowaboutList(pageable);
+    public Page<QuestionHowabout> getQuestionHowaboutList(List<Long> blockUserIds, Pageable pageable) {
+        return questionRepository.getQuestionHowaboutList(blockUserIds, pageable);
     }
 
-    public Page<QuestionRecommend> getQuestionRecommendList(String hashtag, Pageable pageable) {
-        return questionRepository.getQuestionRecommendList(hashtag, pageable);
+    public Page<QuestionRecommend> getQuestionRecommendList(String hashtag, List<Long> blockUserIds, Pageable pageable) {
+        return questionRepository.getQuestionRecommendList(hashtag, blockUserIds, pageable);
     }
 
-    public List<Question> getDailyHotQuestion() {
-        return questionRepository.getDailyHotQuestion();
+    public List<Question> getDailyHotQuestion(List<Long> blockUserIds) {
+        return questionRepository.getDailyHotQuestion(blockUserIds);
     }
 
     public Page<?> getSearchQuestion(List<Long> searchQuestionIds, Pageable pageable) {
@@ -99,8 +99,8 @@ public class QuestionDomainService {
         return questionRepository.getSearchQuestionRecommend(searchQuestionIds, pageable);
     }
 
-    public Page<Question> getWeeklyHotQuestion(Pageable pageable) {
-        return questionRepository.getWeeklyHotQuestion(pageable);
+    public Page<Question> getWeeklyHotQuestion(List<Long> blockUserIds, Pageable pageable) {
+        return questionRepository.getWeeklyHotQuestion(blockUserIds, pageable);
     }
 
     public void changeAllNewCelebToCeleb(Celeb celeb, Long newCelebId) {

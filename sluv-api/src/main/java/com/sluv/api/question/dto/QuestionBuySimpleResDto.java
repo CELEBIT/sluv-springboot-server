@@ -1,21 +1,17 @@
 package com.sluv.api.question.dto;
 
-import com.sluv.domain.question.entity.Question;
-import com.sluv.domain.question.entity.QuestionBuy;
-import com.sluv.domain.question.entity.QuestionFind;
-import com.sluv.domain.question.entity.QuestionHowabout;
-import com.sluv.domain.question.entity.QuestionRecommend;
-import com.sluv.domain.question.entity.QuestionVote;
+import com.sluv.domain.question.entity.*;
 import com.sluv.domain.user.dto.UserInfoDto;
 import com.sluv.domain.user.entity.User;
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Objects;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Objects;
 
 @Data
 @NoArgsConstructor
@@ -59,12 +55,17 @@ public class QuestionBuySimpleResDto {
 
         if (question instanceof QuestionBuy) {
             qType = "Buy";
-        } else if (question instanceof QuestionFind questionFind) {
+        } else if (question instanceof QuestionFind) {
             qType = "Find";
         } else if (question instanceof QuestionRecommend) {
             qType = "Recommend";
         } else if (question instanceof QuestionHowabout) {
             qType = "How";
+        }
+
+        boolean hasMine = false;
+        if (user != null) {
+            hasMine = Objects.equals(question.getUser().getId(), user.getId());
         }
 
         return QuestionBuySimpleResDto.builder()
@@ -79,7 +80,7 @@ public class QuestionBuySimpleResDto {
                 .voteEndTime(voteEndTime)
                 .voteStatus(questionVote != null)
                 .selectedVoteNum(questionVote != null ? questionVote.getVoteSortOrder() : null)
-                .hasMine(Objects.equals(question.getUser().getId(), user.getId()))
+                .hasMine(hasMine)
                 .build();
     }
 }

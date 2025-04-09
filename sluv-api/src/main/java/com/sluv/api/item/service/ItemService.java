@@ -31,6 +31,7 @@ import com.sluv.domain.search.dto.SearchFilterReqDto;
 import com.sluv.domain.user.dto.UserInfoDto;
 import com.sluv.domain.user.entity.User;
 import com.sluv.domain.user.service.FollowDomainService;
+import com.sluv.domain.user.service.UserBlockDomainService;
 import com.sluv.domain.user.service.UserDomainService;
 import com.sluv.infra.ai.AiModelService;
 import com.sluv.infra.alarm.service.ItemAlarmService;
@@ -63,6 +64,7 @@ public class ItemService {
     private final ItemCategoryDomainService itemCategoryDomainService;
     private final BrandDomainService brandDomainService;
     private final UserDomainService userDomainService;
+    private final UserBlockDomainService userBlockDomainService;
     private final RecentItemDomainService recentItemDomainService;
 
     private final NewBrandDomainService newBrandDomainService;
@@ -341,8 +343,15 @@ public class ItemService {
 
     @Transactional(readOnly = true)
     public PaginationResponse<ItemSimpleDto> getRecommendItem(Long userId, Pageable pageable) {
-        Page<Item> recommendItemPage = itemDomainService.getRecommendItemPage(pageable);
         User user = userDomainService.findByIdOrNull(userId);
+        List<Long> blockUserIds = new ArrayList<>();
+        if (userId != null) {
+            blockUserIds = userBlockDomainService.getAllBlockedUser(userId).stream()
+                    .map(userBlock -> userBlock.getBlockedUser().getId())
+                    .toList();
+        }
+
+        Page<Item> recommendItemPage = itemDomainService.getRecommendItemPage(blockUserIds, pageable);
 
         List<ItemSimpleDto> content =
                 itemDomainService.getItemSimpleDto(user, recommendItemPage.getContent());
@@ -370,7 +379,13 @@ public class ItemService {
     @Transactional(readOnly = true)
     public PaginationResponse<ItemSimpleDto> getNowBuyItem(Long userId, Pageable pageable, SearchFilterReqDto dto) {
         User user = userDomainService.findByIdOrNull(userId);
-        Page<Item> itemPage = itemDomainService.getNowBuyItem(pageable, dto);
+        List<Long> blockUserIds = new ArrayList<>();
+        if (userId != null) {
+            blockUserIds = userBlockDomainService.getAllBlockedUser(userId).stream()
+                    .map(userBlock -> userBlock.getBlockedUser().getId())
+                    .toList();
+        }
+        Page<Item> itemPage = itemDomainService.getNowBuyItem(blockUserIds, pageable, dto);
         List<ItemSimpleDto> content = itemDomainService.getItemSimpleDto(user, itemPage.getContent());
         return PaginationResponse.create(itemPage, content);
     }
@@ -378,9 +393,15 @@ public class ItemService {
     @Transactional(readOnly = true)
     public PaginationResponse<ItemSimpleDto> getNewItem(Long userId, Pageable pageable) {
         User user = userDomainService.findByIdOrNull(userId);
+        List<Long> blockUserIds = new ArrayList<>();
+        if (userId != null) {
+            blockUserIds = userBlockDomainService.getAllBlockedUser(userId).stream()
+                    .map(userBlock -> userBlock.getBlockedUser().getId())
+                    .toList();
+        }
 
         // itemPage 조회
-        Page<Item> itemPage = itemDomainService.getNewItem(pageable);
+        Page<Item> itemPage = itemDomainService.getNewItem(blockUserIds, pageable);
 
         // Content 조립
         List<ItemSimpleDto> content = itemDomainService.getItemSimpleDto(user, itemPage.getContent());
@@ -391,7 +412,14 @@ public class ItemService {
     @Transactional(readOnly = true)
     public PaginationResponse<ItemSimpleDto> getLuxuryItem(Long userId, Pageable pageable, SearchFilterReqDto dto) {
         User user = userDomainService.findByIdOrNull(userId);
-        Page<Item> itemPage = itemDomainService.getLuxuryItem(pageable, dto);
+        List<Long> blockUserIds = new ArrayList<>();
+        if (userId != null) {
+            blockUserIds = userBlockDomainService.getAllBlockedUser(userId).stream()
+                    .map(userBlock -> userBlock.getBlockedUser().getId())
+                    .toList();
+        }
+
+        Page<Item> itemPage = itemDomainService.getLuxuryItem(blockUserIds, pageable, dto);
         List<ItemSimpleDto> content = itemDomainService.getItemSimpleDto(user, itemPage.getContent());
         return PaginationResponse.create(itemPage, content);
     }
@@ -400,7 +428,14 @@ public class ItemService {
     public PaginationResponse<ItemSimpleDto> getEfficientItem(Long userId, Pageable pageable,
                                                               SearchFilterReqDto filterReqDto) {
         User user = userDomainService.findByIdOrNull(userId);
-        Page<Item> itemPage = itemDomainService.getEfficientItem(pageable, filterReqDto);
+        List<Long> blockUserIds = new ArrayList<>();
+        if (userId != null) {
+            blockUserIds = userBlockDomainService.getAllBlockedUser(userId).stream()
+                    .map(userBlock -> userBlock.getBlockedUser().getId())
+                    .toList();
+        }
+
+        Page<Item> itemPage = itemDomainService.getEfficientItem(blockUserIds, pageable, filterReqDto);
         List<ItemSimpleDto> content = itemDomainService.getItemSimpleDto(user, itemPage.getContent());
         return PaginationResponse.create(itemPage, content);
     }
@@ -437,13 +472,18 @@ public class ItemService {
     @Transactional(readOnly = true)
     public List<ItemSimpleDto> getCurationItem(Long userId) {
         User user = userDomainService.findByIdOrNull(userId);
+        List<Long> blockUserIds = new ArrayList<>();
+
         List<Celeb> interestedCeleb;
         if (user != null) {
             interestedCeleb = celebDomainService.findInterestedCeleb(user);
+            blockUserIds = userBlockDomainService.getAllBlockedUser(userId).stream()
+                    .map(userBlock -> userBlock.getBlockedUser().getId())
+                    .toList();
         } else {
             interestedCeleb = celebDomainService.findTop10Celeb();
         }
-        List<Item> itemList = itemDomainService.getCurationItem(user, interestedCeleb);
+        List<Item> itemList = itemDomainService.getCurationItem(user, interestedCeleb, blockUserIds);
 
         return itemDomainService.getItemSimpleDto(user, itemList);
     }
@@ -451,7 +491,11 @@ public class ItemService {
     @Transactional(readOnly = true)
     public List<ItemSimpleDto> getHowAboutItem(Long userId) {
         User user = userDomainService.findByIdOrNull(userId);
-        List<Item> items = itemDomainService.findAllByItemStatus(ACTIVE);
+        List<Long> blockUserIds = userBlockDomainService.getAllBlockedUser(userId).stream()
+                .map(userBlock -> userBlock.getBlockedUser().getId())
+                .toList();
+
+        List<Item> items = itemDomainService.getAllByItemStatus(blockUserIds, ACTIVE);
         Collections.shuffle(items, new Random());
         return itemDomainService.getItemSimpleDto(user, items.subList(0, 4));
     }
@@ -459,12 +503,22 @@ public class ItemService {
     @Transactional(readOnly = true)
     public List<ItemSimpleDto> getSameCelebItems(Long userId, Long itemId) {
         User user = userDomainService.findByIdOrNull(userId);
+        List<Long> blockUserIds = new ArrayList<>();
+        if (userId != null) {
+            blockUserIds = userBlockDomainService.getAllBlockedUser(userId).stream()
+                    .map(userBlock -> userBlock.getBlockedUser().getId())
+                    .toList();
+        }
+
+        // 1. Item 조회
         Item item = itemDomainService.getItemByIdWithCelebAndBrand(itemId);
+
+        // 2. 동일 셀럽 Item 조회
         List<Item> sameCelebItems;
         if (item.getCeleb() != null) {
-            sameCelebItems = itemDomainService.findSameCelebItem(itemId, item.getCeleb().getId(), true);
-        } else {
-            sameCelebItems = itemDomainService.findSameCelebItem(itemId, item.getNewCeleb().getId(), false);
+            sameCelebItems = itemDomainService.findSameCelebItem(itemId, item.getCeleb().getId(), true, blockUserIds);
+        } else { // 뉴셀럽일 경우
+            sameCelebItems = itemDomainService.findSameCelebItem(itemId, item.getNewCeleb().getId(), false, blockUserIds);
         }
 
         return itemDomainService.getItemSimpleDto(user, sameCelebItems);
@@ -473,13 +527,21 @@ public class ItemService {
     @Transactional(readOnly = true)
     public List<ItemSimpleDto> getSameBrandItem(Long userId, Long itemId) {
         User user = userDomainService.findByIdOrNull(userId);
+        List<Long> blockUserIds = new ArrayList<>();
+        if (userId != null) {
+            blockUserIds = userBlockDomainService.getAllBlockedUser(userId).stream()
+                    .map(userBlock -> userBlock.getBlockedUser().getId())
+                    .toList();
+        }
+        // 1. Item 조회
         Item item = itemDomainService.getItemByIdWithCelebAndBrand(itemId);
         List<Item> sameBrandItems;
 
+        // 2. 브랜드 동일 Item 조회
         if (item.getBrand() != null) {
-            sameBrandItems = itemDomainService.findSameBrandItem(itemId, item.getBrand().getId(), true);
-        } else {
-            sameBrandItems = itemDomainService.findSameBrandItem(itemId, item.getNewBrand().getId(), false);
+            sameBrandItems = itemDomainService.findSameBrandItem(itemId, item.getBrand().getId(), true, blockUserIds);
+        } else { // 브랜드가 아닌 뉴브랜드일 경우
+            sameBrandItems = itemDomainService.findSameBrandItem(itemId, item.getNewBrand().getId(), false, blockUserIds);
         }
 
         return itemDomainService.getItemSimpleDto(user, sameBrandItems);
@@ -488,15 +550,30 @@ public class ItemService {
     @Transactional(readOnly = true)
     public List<ItemSimpleDto> getTogetherScrapItem(Long userId, Long itemId) {
         User user = userDomainService.findByIdOrNull(userId);
+        List<Long> blockUserIds = new ArrayList<>();
+        if (userId != null) {
+            blockUserIds = userBlockDomainService.getAllBlockedUser(userId).stream()
+                    .map(userBlock -> userBlock.getBlockedUser().getId())
+                    .toList();
+        }
+
         List<Closet> recentAddClosets = closetDomainService.getRecentAddCloset(itemId);
-        List<Item> sameClosetItems = itemDomainService.getSameClosetItems(itemId, recentAddClosets);
+        List<Item> sameClosetItems = itemDomainService.getSameClosetItems(itemId, recentAddClosets, blockUserIds);
         return itemDomainService.getItemSimpleDto(user, sameClosetItems);
     }
 
     @Transactional(readOnly = true)
     public List<ItemSimpleDto> getTrendItems(Long userId, Pageable pageable) {
         User user = userDomainService.findById(userId);
-        Page<Item> itemPage = itemDomainService.getTrendItems(pageable);
+        List<Long> blockUserIds = new ArrayList<>();
+        if (userId != null) {
+            blockUserIds = userBlockDomainService.getAllBlockedUser(userId).stream()
+                    .map(userBlock -> userBlock.getBlockedUser().getId())
+                    .toList();
+        }
+
+
+        Page<Item> itemPage = itemDomainService.getTrendItems(blockUserIds, pageable);
         return itemDomainService.getItemSimpleDto(user, itemPage.getContent());
     }
 

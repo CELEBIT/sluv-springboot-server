@@ -28,16 +28,16 @@ public class ItemDomainService {
         return itemRepository.findById(itemId).orElseThrow(ItemNotFoundException::new);
     }
 
-    public Page<Item> getAllByUserLikeItem(User user, Pageable pageable) {
-        return itemRepository.getAllByUserLikeItem(user, pageable);
+    public Page<Item> getAllByUserLikeItem(User user, List<Long> blockUserIds, Pageable pageable) {
+        return itemRepository.getAllByUserLikeItem(user, blockUserIds, pageable);
     }
 
     public List<ItemSimpleDto> getItemSimpleDto(User user, List<Item> content) {
         return itemRepository.getItemSimpleDto(user, content);
     }
 
-    public Page<Item> getUserAllRecentItem(User user, Pageable pageable) {
-        return itemRepository.getUserAllRecentItem(user, pageable);
+    public Page<Item> getUserAllRecentItem(User user, List<Long> blockUserIds, Pageable pageable) {
+        return itemRepository.getUserAllRecentItem(user, blockUserIds, pageable);
     }
 
     public List<Item> getRecentTop2Item(User targetUser) {
@@ -72,12 +72,12 @@ public class ItemDomainService {
         return itemRepository.getAllScrapItem(user, pageable);
     }
 
-    public Page<Item> getRecommendItemPage(Pageable pageable) {
-        return itemRepository.getRecommendItemPage(pageable);
+    public Page<Item> getRecommendItemPage(List<Long> blockUserIds, Pageable pageable) {
+        return itemRepository.getRecommendItemPage(blockUserIds, pageable);
     }
 
-    public Page<Item> getNewItem(Pageable pageable) {
-        return itemRepository.getNewItem(pageable);
+    public Page<Item> getNewItem(List<Long> blockUserIds, Pageable pageable) {
+        return itemRepository.getNewItem(blockUserIds, pageable);
     }
 
     public List<Item> getWeekHotItem() {
@@ -88,48 +88,48 @@ public class ItemDomainService {
         return itemRepository.getDayHotItem();
     }
 
-    public List<Item> getCurationItem(User user, List<Celeb> interestedCeleb) {
-        return itemRepository.getCurationItem(user, interestedCeleb);
+    public List<Item> getCurationItem(User user, List<Celeb> interestedCeleb, List<Long> blockUserIds) {
+        return itemRepository.getCurationItem(user, interestedCeleb, blockUserIds);
     }
 
-    public List<Item> findAllByItemStatus(ItemStatus itemStatus) {
-        return itemRepository.findAllByItemStatus(itemStatus);
+    public List<Item> getAllByItemStatus(List<Long> blockUserIds, ItemStatus itemStatus) {
+        return itemRepository.getAllByItemStatus(blockUserIds, itemStatus);
     }
 
     public Item getItemByIdWithCelebAndBrand(Long itemId) {
         return itemRepository.getItemByIdWithCelebAndBrand(itemId);
     }
 
-    public List<Item> findSameCelebItem(Long itemId, Long celebId, boolean flag) {
-        return itemRepository.findSameCelebItem(itemId, celebId, flag);
+    public List<Item> findSameCelebItem(Long itemId, Long celebId, boolean flag, List<Long> blockUserIds) {
+        return itemRepository.findSameCelebItem(itemId, celebId, flag, blockUserIds);
     }
 
-    public List<Item> findSameBrandItem(Long itemId, Long brandId, boolean flag) {
-        return itemRepository.findSameBrandItem(itemId, brandId, flag);
+    public List<Item> findSameBrandItem(Long itemId, Long brandId, boolean flag, List<Long> blockUserIds) {
+        return itemRepository.findSameBrandItem(itemId, brandId, flag, blockUserIds);
     }
 
-    public List<Item> getSameClosetItems(Long itemId, List<Closet> recentAddClosets) {
-        return itemRepository.getSameClosetItems(itemId, recentAddClosets);
+    public List<Item> getSameClosetItems(Long itemId, List<Closet> recentAddClosets, List<Long> blockUserIds) {
+        return itemRepository.getSameClosetItems(itemId, recentAddClosets, blockUserIds);
     }
 
     public Item saveItem(Item postItem) {
         return itemRepository.save(postItem);
     }
 
-    public Page<Item> getLuxuryItem(Pageable pageable, SearchFilterReqDto dto) {
-        return itemRepository.getLuxuryItem(pageable, dto);
+    public Page<Item> getLuxuryItem(List<Long> blockUserIds, Pageable pageable, SearchFilterReqDto dto) {
+        return itemRepository.getLuxuryItem(blockUserIds, pageable, dto);
     }
 
-    public Page<Item> getEfficientItem(Pageable pageable, SearchFilterReqDto filterReqDto) {
-        return itemRepository.getEfficientItem(pageable, filterReqDto);
+    public Page<Item> getEfficientItem(List<Long> blockUserIds, Pageable pageable, SearchFilterReqDto filterReqDto) {
+        return itemRepository.getEfficientItem(blockUserIds, pageable, filterReqDto);
     }
 
     public Page<Item> getHotCelebItem(Long celebId, Pageable pageable, SearchFilterReqDto dto) {
         return itemRepository.getHotCelebItem(celebId, pageable, dto);
     }
 
-    public Page<Item> getNowBuyItem(Pageable pageable, SearchFilterReqDto dto) {
-        return itemRepository.getNowBuyItem(pageable, dto);
+    public Page<Item> getNowBuyItem(List<Long> blockUserIds, Pageable pageable, SearchFilterReqDto dto) {
+        return itemRepository.getNowBuyItem(blockUserIds, pageable, dto);
     }
 
     public Page<Item> getCelebSummerItem(Pageable pageable, SearchFilterReqDto dto) {
@@ -164,8 +164,8 @@ public class ItemDomainService {
         return itemRepository.getYesterdayHotItem();
     }
 
-    public Page<Item> getTrendItems(Pageable pageable) {
-        return itemRepository.getTrendItems(pageable);
+    public Page<Item> getTrendItems(List<Long> blockUserIds, Pageable pageable) {
+        return itemRepository.getTrendItems(blockUserIds, pageable);
     }
 
     public List<Item> getAllItemWithCelebCategory() {
@@ -183,4 +183,5 @@ public class ItemDomainService {
     public void changeAllNewCelebToCeleb(Celeb celeb, Long newCelebId) {
         itemRepository.changeAllNewCelebToCeleb(celeb, newCelebId);
     }
+
 }

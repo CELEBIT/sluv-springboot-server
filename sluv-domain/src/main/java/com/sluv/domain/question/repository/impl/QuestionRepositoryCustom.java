@@ -19,33 +19,33 @@ public interface QuestionRepositoryCustom {
 
     Page<Question> getSearchQuestion(List<Long> questionIdList, Pageable pageable);
 
-    List<QuestionBuy> getWaitQuestionBuy(User user, Long questionId, List<Celeb> interestedCeleb);
+    List<QuestionBuy> getWaitQuestionBuy(User user, Long questionId, List<Celeb> interestedCeleb, List<Long> blockUserIds);
 
-    List<QuestionRecommend> getWaitQuestionRecommend(User user, Long questionId);
+    List<QuestionRecommend> getWaitQuestionRecommend(User user, Long questionId, List<Long> blockUserIds);
 
-    List<QuestionHowabout> getWaitQuestionHowabout(User user, Long questionId);
+    List<QuestionHowabout> getWaitQuestionHowabout(User user, Long questionId, List<Long> blockUserIds);
 
-    List<QuestionFind> getWaitQuestionFind(User user, Long questionId, List<Celeb> interestedCeleb);
+    List<QuestionFind> getWaitQuestionFind(User user, Long questionId, List<Celeb> interestedCeleb, List<Long> blockUserIds);
 
-    Page<Question> getUserLikeQuestion(User user, Pageable pageable);
+    Page<Question> getUserLikeQuestion(User user, List<Long> blockUserIds, Pageable pageable);
 
     Page<Question> getUserAllQuestion(User user, Pageable pageable);
 
-    Page<Question> getTotalQuestionList(Pageable pageable);
+    Page<Question> getTotalQuestionList(List<Long> blockUserIds, Pageable pageable);
 
-    Page<QuestionBuy> getQuestionBuyList(String voteStatus, Pageable pageable);
+    Page<QuestionBuy> getQuestionBuyList(String voteStatus, List<Long> blockUserIds, Pageable pageable);
 
-    Page<QuestionFind> getQuestionFindList(Long celebId, Pageable pageable);
+    Page<QuestionFind> getQuestionFindList(Long celebId, List<Long> blockUserIds, Pageable pageable);
 
-    Page<QuestionHowabout> getQuestionHowaboutList(Pageable pageable);
+    Page<QuestionHowabout> getQuestionHowaboutList(List<Long> blockUserIds, Pageable pageable);
 
-    Page<QuestionRecommend> getQuestionRecommendList(String hashtag, Pageable pageable);
+    Page<QuestionRecommend> getQuestionRecommendList(String hashtag, List<Long> blockUserIds, Pageable pageable);
 
     List<Question> updateDailyHotQuestion();
 
-    Page<Question> getWeeklyHotQuestion(Pageable pageable);
+    Page<Question> getWeeklyHotQuestion(List<Long> blockUserIds, Pageable pageable);
 
-    List<Question> getDailyHotQuestion();
+    List<Question> getDailyHotQuestion(List<Long> blockUserIds);
 
     List<Question> getSearchQuestionIds(String word);
 

@@ -124,28 +124,11 @@ public class QuestionController {
         return ResponseEntity.ok().body(SuccessDataResponse.create(result));
     }
 
-    @Deprecated
-    @Operation(summary = "Question 커뮤니티 리스트 조회", description = "Pagination 적용")
-    @GetMapping("/list")
-    public ResponseEntity<SuccessDataResponse<PaginationResponse<QuestionSimpleResDto>>> getQuestionList(
-            @Nullable @RequestParam("qType") String qType, Pageable pageable) {
-        PaginationResponse<QuestionSimpleResDto> result = switch (qType) {
-            case "Total" -> questionService.getTotalQuestionList(pageable);
-//            case "Buy" -> questionService.getQuestionBuyList(null, pageable);
-            case "Find" -> questionService.getQuestionFindList(null, pageable);
-            case "How" -> questionService.getQuestionHowaboutList(pageable);
-            case "Recommend" -> questionService.getQuestionRecommendList(null, pageable);
-            default -> throw new QuestionTypeNotFoundException();
-        };
-
-        return ResponseEntity.ok().body(SuccessDataResponse.create(result));
-    }
-
     @Operation(summary = "Question 커뮤니티 게시글 종합 검색", description = "Pagination 적용. 최신순으로 조회")
     @GetMapping("/total")
     public ResponseEntity<SuccessDataResponse<PaginationResponse<QuestionSimpleResDto>>> getQuestionTotalList(
-            Pageable pageable) {
-        PaginationResponse<QuestionSimpleResDto> response = questionService.getTotalQuestionList(pageable);
+            @CurrentUserId Long userId, Pageable pageable) {
+        PaginationResponse<QuestionSimpleResDto> response = questionService.getTotalQuestionList(userId, pageable);
         return ResponseEntity.ok().body(SuccessDataResponse.create(response));
     }
 
@@ -153,8 +136,8 @@ public class QuestionController {
             description = "Pagination 적용. Ordering: 최신순으로 조회. Filtering: celebId.")
     @GetMapping("/find")
     public ResponseEntity<SuccessDataResponse<PaginationResponse<QuestionSimpleResDto>>> getQuestionFindList(
-            @Nullable @RequestParam("celebId") Long celebId, Pageable pageable) {
-        PaginationResponse<QuestionSimpleResDto> response = questionService.getQuestionFindList(celebId,
+            @CurrentUserId Long userId, @Nullable @RequestParam("celebId") Long celebId, Pageable pageable) {
+        PaginationResponse<QuestionSimpleResDto> response = questionService.getQuestionFindList(userId, celebId,
                 pageable);
         return ResponseEntity.ok().body(SuccessDataResponse.create(response));
     }
@@ -183,9 +166,9 @@ public class QuestionController {
     @Operation(summary = "QuestionHowabout 커뮤니티 게시글 검색", description = "Pagination 적용. Ordering 최신순")
     @GetMapping("/howabout")
     public ResponseEntity<SuccessDataResponse<PaginationResponse<QuestionSimpleResDto>>> getQuestionHowaboutList(
-            Pageable pageable) {
+            @CurrentUserId Long userId, Pageable pageable) {
         PaginationResponse<QuestionSimpleResDto> response = questionService.getQuestionHowaboutList(
-                pageable);
+                userId, pageable);
         return ResponseEntity.ok().body(SuccessDataResponse.create(response));
     }
 
@@ -193,17 +176,17 @@ public class QuestionController {
             description = "Pagination 적용. Ordering 최신순. Filtering 전체, 특정해시태그")
     @GetMapping("/recommend")
     public ResponseEntity<SuccessDataResponse<PaginationResponse<QuestionSimpleResDto>>> getQuestionRecommendList(
-            @Nullable @RequestParam String hashtag, Pageable pageable) {
+            @CurrentUserId Long userId, @Nullable @RequestParam String hashtag, Pageable pageable) {
         PaginationResponse<QuestionSimpleResDto> response = questionService.getQuestionRecommendList(
-                hashtag, pageable);
+                userId, hashtag, pageable);
         return ResponseEntity.ok().body(SuccessDataResponse.create(response));
     }
 
     @Operation(summary = "일간 핫 커뮤니티 게시글 검색",
             description = " 10개 조회. Ordering 인기순(조회수 + 좋아요 수 + 댓글 수). 매일 00시 00분 00초를 기준으로 업데이트")
     @GetMapping("/dailyhot")
-    public ResponseEntity<SuccessDataResponse<List<QuestionHomeResDto>>> getDailyHotQuestionList() {
-        List<QuestionHomeResDto> response = questionService.getDailyHotQuestionList();
+    public ResponseEntity<SuccessDataResponse<List<QuestionHomeResDto>>> getDailyHotQuestionList(@CurrentUserId Long userId) {
+        List<QuestionHomeResDto> response = questionService.getDailyHotQuestionList(userId);
         return ResponseEntity.ok().body(SuccessDataResponse.create(response));
     }
 
@@ -211,9 +194,9 @@ public class QuestionController {
             description = "Pagination 적용. Ordering 조회수 + 좋아요 수 + 댓글 수. Filtering 현재를 기점으로 일주일간 작성된 글")
     @GetMapping("/weeklyhot")
     public ResponseEntity<SuccessDataResponse<PaginationResponse<QuestionSimpleResDto>>> getWeeklyHotQuestionList(
-            Pageable pageable) {
+            @CurrentUserId Long userId, Pageable pageable) {
         PaginationResponse<QuestionSimpleResDto> response = questionService.getWeeklyHotQuestionList(
-                pageable);
+                userId, pageable);
         return ResponseEntity.ok().body(SuccessDataResponse.create(response));
     }
 }

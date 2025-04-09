@@ -12,6 +12,7 @@ import com.sluv.domain.question.dto.QuestionSimpleResDto;
 import com.sluv.domain.question.entity.Question;
 import com.sluv.domain.question.service.QuestionDomainService;
 import com.sluv.domain.user.entity.User;
+import com.sluv.domain.user.service.UserBlockDomainService;
 import com.sluv.domain.user.service.UserDomainService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,16 +29,25 @@ import java.util.List;
 public class UserLikeService {
 
     private final UserDomainService userDomainService;
+    private final UserBlockDomainService userBlockDomainService;
     private final ItemDomainService itemDomainService;
     private final QuestionDomainService questionDomainService;
     private final CommentDomainService commentDomainService;
 
     private final QuestionDtoMapper questionDtoMapper;
 
+
+    /**
+     * 유저가 좋아요한 Item 게시글 조회
+     */
     @Transactional(readOnly = true)
     public PaginationCountResponse<ItemSimpleDto> getUserLikeItem(Long userId, Pageable pageable) {
         User user = userDomainService.findById(userId);
-        Page<Item> itemPage = itemDomainService.getAllByUserLikeItem(user, pageable);
+        List<Long> blockUserIds = userBlockDomainService.getAllBlockedUser(userId).stream()
+                .map(userBlock -> userBlock.getBlockedUser().getId())
+                .toList();
+
+        Page<Item> itemPage = itemDomainService.getAllByUserLikeItem(user, blockUserIds, pageable);
 
         List<ItemSimpleDto> content = itemDomainService.getItemSimpleDto(user, itemPage.getContent());
 
@@ -51,7 +61,11 @@ public class UserLikeService {
     @Transactional(readOnly = true)
     public PaginationCountResponse<QuestionSimpleResDto> getUserLikeQuestion(Long userId, Pageable pageable) {
         User user = userDomainService.findById(userId);
-        Page<Question> questionPage = questionDomainService.getUserLikeQuestion(user, pageable);
+        List<Long> blockUserIds = userBlockDomainService.getAllBlockedUser(userId).stream()
+                .map(userBlock -> userBlock.getBlockedUser().getId())
+                .toList();
+
+        Page<Question> questionPage = questionDomainService.getUserLikeQuestion(user, blockUserIds, pageable);
 
         List<QuestionSimpleResDto> content = questionPage.stream()
                 .map(questionDtoMapper::dtoBuildByQuestionType).toList();
@@ -66,7 +80,11 @@ public class UserLikeService {
     @Transactional(readOnly = true)
     public PaginationCountResponse<CommentSimpleResponse> getUserLikeComment(Long userId, Pageable pageable) {
         User user = userDomainService.findById(userId);
-        Page<Comment> commentPage = commentDomainService.getUserAllLikeComment(user, pageable);
+        List<Long> blockUserIds = userBlockDomainService.getAllBlockedUser(userId).stream()
+                .map(userBlock -> userBlock.getBlockedUser().getId())
+                .toList();
+
+        Page<Comment> commentPage = commentDomainService.getUserAllLikeComment(user, blockUserIds, pageable);
 
         List<CommentSimpleResponse> content = commentPage.stream().map(CommentSimpleResponse::of).toList();
 

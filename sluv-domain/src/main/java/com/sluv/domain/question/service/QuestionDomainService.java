@@ -99,8 +99,8 @@ public class QuestionDomainService {
         return questionRepository.getSearchQuestionRecommend(searchQuestionIds, pageable);
     }
 
-    public Page<Question> getWeeklyHotQuestion(Pageable pageable) {
-        return questionRepository.getWeeklyHotQuestion(pageable);
+    public Page<Question> getWeeklyHotQuestion(List<Long> blockUserIds, Pageable pageable) {
+        return questionRepository.getWeeklyHotQuestion(blockUserIds, pageable);
     }
 
     public void changeAllNewCelebToCeleb(Celeb celeb, Long newCelebId) {

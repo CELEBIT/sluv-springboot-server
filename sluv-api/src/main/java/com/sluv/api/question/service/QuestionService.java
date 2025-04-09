@@ -835,8 +835,15 @@ public class QuestionService {
      * 주간 Hot Question 조회 기능.
      */
     @Transactional(readOnly = true)
-    public PaginationResponse<QuestionSimpleResDto> getWeeklyHotQuestionList(Pageable pageable) {
-        Page<Question> page = questionDomainService.getWeeklyHotQuestion(pageable);
+    public PaginationResponse<QuestionSimpleResDto> getWeeklyHotQuestionList(Long userId, Pageable pageable) {
+        List<Long> blockUserIds = new ArrayList<>();
+        if (userId != null) {
+            blockUserIds = userBlockDomainService.getAllBlockedUser(userId).stream()
+                    .map(userBlock -> userBlock.getBlockedUser().getId())
+                    .toList();
+        }
+
+        Page<Question> page = questionDomainService.getWeeklyHotQuestion(blockUserIds, pageable);
 
         List<QuestionSimpleResDto> content = page.stream().map(question -> {
             List<String> categoryList = null;

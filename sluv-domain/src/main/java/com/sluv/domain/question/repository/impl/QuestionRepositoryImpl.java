@@ -484,7 +484,7 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
      * 주간 Hot Question
      */
     @Override
-    public Page<Question> getWeeklyHotQuestion(Pageable pageable) {
+    public Page<Question> getWeeklyHotQuestion(List<Long> blockUserIds, Pageable pageable) {
         LocalDateTime now = LocalDateTime.now();
 
         List<Question> content = jpaQueryFactory.select(question)
@@ -495,6 +495,7 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
                         question.questionStatus.eq(QuestionStatus.ACTIVE)
                                 .and(question.createdAt.between(now.minusDays(7).toLocalDate().atStartOfDay(),
                                         now.toLocalDate().atStartOfDay()))
+                                .and(question.user.id.notIn(blockUserIds))
 
                 )
                 .groupBy(question)
@@ -512,6 +513,7 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
                         question.questionStatus.eq(QuestionStatus.ACTIVE)
                                 .and(question.createdAt.between(now.minusDays(7).toLocalDate().atStartOfDay(),
                                         now.toLocalDate().atStartOfDay()))
+                                .and(question.user.id.notIn(blockUserIds))
                 )
                 .groupBy(question);
 

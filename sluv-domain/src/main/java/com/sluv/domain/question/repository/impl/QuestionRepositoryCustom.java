@@ -43,7 +43,7 @@ public interface QuestionRepositoryCustom {
 
     List<Question> updateDailyHotQuestion();
 
-    Page<Question> getWeeklyHotQuestion(Pageable pageable);
+    Page<Question> getWeeklyHotQuestion(List<Long> blockUserIds, Pageable pageable);
 
     List<Question> getDailyHotQuestion(List<Long> blockUserIds);
 

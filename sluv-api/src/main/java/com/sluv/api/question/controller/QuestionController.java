@@ -194,9 +194,9 @@ public class QuestionController {
             description = "Pagination 적용. Ordering 조회수 + 좋아요 수 + 댓글 수. Filtering 현재를 기점으로 일주일간 작성된 글")
     @GetMapping("/weeklyhot")
     public ResponseEntity<SuccessDataResponse<PaginationResponse<QuestionSimpleResDto>>> getWeeklyHotQuestionList(
-            Pageable pageable) {
+            @CurrentUserId Long userId, Pageable pageable) {
         PaginationResponse<QuestionSimpleResDto> response = questionService.getWeeklyHotQuestionList(
-                pageable);
+                userId, pageable);
         return ResponseEntity.ok().body(SuccessDataResponse.create(response));
     }
 }

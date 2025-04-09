@@ -37,7 +37,7 @@ public interface QuestionRepositoryCustom {
 
     Page<QuestionFind> getQuestionFindList(Long celebId, List<Long> blockUserIds, Pageable pageable);
 
-    Page<QuestionHowabout> getQuestionHowaboutList(Pageable pageable);
+    Page<QuestionHowabout> getQuestionHowaboutList(List<Long> blockUserIds, Pageable pageable);
 
     Page<QuestionRecommend> getQuestionRecommendList(String hashtag, Pageable pageable);
 

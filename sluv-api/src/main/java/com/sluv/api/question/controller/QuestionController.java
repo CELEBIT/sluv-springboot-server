@@ -166,9 +166,9 @@ public class QuestionController {
     @Operation(summary = "QuestionHowabout 커뮤니티 게시글 검색", description = "Pagination 적용. Ordering 최신순")
     @GetMapping("/howabout")
     public ResponseEntity<SuccessDataResponse<PaginationResponse<QuestionSimpleResDto>>> getQuestionHowaboutList(
-            Pageable pageable) {
+            @CurrentUserId Long userId, Pageable pageable) {
         PaginationResponse<QuestionSimpleResDto> response = questionService.getQuestionHowaboutList(
-                pageable);
+                userId, pageable);
         return ResponseEntity.ok().body(SuccessDataResponse.create(response));
     }
 

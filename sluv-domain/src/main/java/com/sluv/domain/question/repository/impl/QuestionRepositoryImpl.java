@@ -333,9 +333,11 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
      * QuestionHowabout만 조회. Ordering: createdAt
      */
     @Override
-    public Page<QuestionHowabout> getQuestionHowaboutList(Pageable pageable) {
+    public Page<QuestionHowabout> getQuestionHowaboutList(List<Long> blockUserIds, Pageable pageable) {
         List<QuestionHowabout> content = jpaQueryFactory.selectFrom(questionHowabout)
-                .where(questionHowabout.questionStatus.eq(QuestionStatus.ACTIVE))
+                .where(questionHowabout.questionStatus.eq(QuestionStatus.ACTIVE)
+                        .and(questionHowabout.user.id.notIn(blockUserIds))
+                )
                 .orderBy(questionHowabout.createdAt.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -343,7 +345,9 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
 
         // Count Query
         JPAQuery<QuestionHowabout> query = jpaQueryFactory.selectFrom(questionHowabout)
-                .where(questionHowabout.questionStatus.eq(QuestionStatus.ACTIVE))
+                .where(questionHowabout.questionStatus.eq(QuestionStatus.ACTIVE)
+                        .and(questionHowabout.user.id.notIn(blockUserIds))
+                )
                 .orderBy(questionHowabout.createdAt.desc());
 
         return PageableExecutionUtils.getPage(content, pageable, () -> query.fetch().size());

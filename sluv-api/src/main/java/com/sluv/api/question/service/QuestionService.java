@@ -729,9 +729,14 @@ public class QuestionService {
     }
 
     @Transactional(readOnly = true)
-
-    public PaginationResponse<QuestionSimpleResDto> getQuestionHowaboutList(Pageable pageable) {
-        Page<QuestionHowabout> questionPage = questionDomainService.getQuestionHowaboutList(pageable);
+    public PaginationResponse<QuestionSimpleResDto> getQuestionHowaboutList(Long userId, Pageable pageable) {
+        List<Long> blockUserIds = new ArrayList<>();
+        if (userId != null) {
+            blockUserIds = userBlockDomainService.getAllBlockedUser(userId).stream()
+                    .map(userBlock -> userBlock.getBlockedUser().getId())
+                    .toList();
+        }
+        Page<QuestionHowabout> questionPage = questionDomainService.getQuestionHowaboutList(blockUserIds, pageable);
         List<QuestionSimpleResDto> content = questionPage.stream().map(question ->
                 getQuestionSimpleResDto(question, "How")
         ).toList();

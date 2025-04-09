@@ -59,8 +59,8 @@ public class QuestionDomainService {
         return questionRepository.getTotalQuestionList(blockUserIds, pageable);
     }
 
-    public Page<QuestionBuy> getQuestionBuyList(String voteStatus, Pageable pageable) {
-        return questionRepository.getQuestionBuyList(voteStatus, pageable);
+    public Page<QuestionBuy> getQuestionBuyList(String voteStatus, List<Long> blockUserIds, Pageable pageable) {
+        return questionRepository.getQuestionBuyList(voteStatus, blockUserIds, pageable);
     }
 
     public Page<QuestionFind> getQuestionFindList(Long celebId, List<Long> blockUserIds, Pageable pageable) {

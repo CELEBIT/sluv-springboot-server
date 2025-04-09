@@ -641,7 +641,14 @@ public class QuestionService {
     public PaginationResponse<QuestionBuySimpleResDto> getQuestionBuyList(Long userId, String voteStatus,
                                                                           Pageable pageable) {
         User user = userDomainService.findById(userId);
-        Page<QuestionBuy> questionPage = questionDomainService.getQuestionBuyList(voteStatus, pageable);
+        List<Long> blockUserIds = new ArrayList<>();
+        if (userId != null) {
+            blockUserIds = userBlockDomainService.getAllBlockedUser(userId).stream()
+                    .map(userBlock -> userBlock.getBlockedUser().getId())
+                    .toList();
+        }
+
+        Page<QuestionBuy> questionPage = questionDomainService.getQuestionBuyList(voteStatus, blockUserIds, pageable);
 
         List<QuestionBuySimpleResDto> content = questionPage.stream().map(question -> {
 
@@ -670,8 +677,11 @@ public class QuestionService {
 
             Long voteCount = getTotalVoteCount(imgList, itemImgList);
 
-            QuestionVote questionVote = questionVoteDomainService.findByQuestionIdAndUserIdOrNull(question.getId(),
-                    user.getId());
+            QuestionVote questionVote = null;
+            if (user != null) {
+                questionVote = questionVoteDomainService.findByQuestionIdAndUserIdOrNull(question.getId(),
+                        user.getId());
+            }
 
             User writer = userDomainService.findByIdOrNull(question.getUser().getId());
 

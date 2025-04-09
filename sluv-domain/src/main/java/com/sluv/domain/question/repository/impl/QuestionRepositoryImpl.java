@@ -289,10 +289,10 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
      * voteStatus가 null이면 모든 voteStatus에 대해 조회.
      */
     @Override
-    public Page<QuestionBuy> getQuestionBuyList(String voteStatus, Pageable pageable) {
+    public Page<QuestionBuy> getQuestionBuyList(String voteStatus, List<Long> blockUserIds, Pageable pageable) {
 
         List<QuestionBuy> content = jpaQueryFactory.selectFrom(questionBuy)
-                .where(getQuestionBuyFiltering(voteStatus))
+                .where(getQuestionBuyFiltering(voteStatus).and(questionBuy.user.id.notIn(blockUserIds)))
                 .orderBy(getQuestionBuyOrderSpecifier(voteStatus))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -300,7 +300,7 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
 
         // Count Query
         JPAQuery<QuestionBuy> query = jpaQueryFactory.selectFrom(questionBuy)
-                .where(getQuestionBuyFiltering(voteStatus));
+                .where(getQuestionBuyFiltering(voteStatus).and(questionBuy.user.id.notIn(blockUserIds)));
 //                    .orderBy(getQuestionBuyOrderSpecifier());
 
         return PageableExecutionUtils.getPage(content, pageable, () -> query.fetch().size());

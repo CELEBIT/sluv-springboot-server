@@ -33,7 +33,7 @@ public interface QuestionRepositoryCustom {
 
     Page<Question> getTotalQuestionList(List<Long> blockUserIds, Pageable pageable);
 
-    Page<QuestionBuy> getQuestionBuyList(String voteStatus, Pageable pageable);
+    Page<QuestionBuy> getQuestionBuyList(String voteStatus, List<Long> blockUserIds, Pageable pageable);
 
     Page<QuestionFind> getQuestionFindList(Long celebId, List<Long> blockUserIds, Pageable pageable);
 

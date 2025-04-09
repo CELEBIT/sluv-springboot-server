@@ -519,11 +519,13 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
     }
 
     @Override
-    public List<Question> getDailyHotQuestion() {
+    public List<Question> getDailyHotQuestion(List<Long> blockUserIds) {
         return jpaQueryFactory.select(question)
                 .from(dailyHotQuestion)
-                .leftJoin(question).on(dailyHotQuestion.question.eq(question)).fetchJoin()
-                .where(question.questionStatus.eq(QuestionStatus.ACTIVE))
+                .leftJoin(question).on(dailyHotQuestion.question.eq(question))
+                .where(question.questionStatus.eq(QuestionStatus.ACTIVE)
+                        .and(question.user.id.notIn(blockUserIds))
+                )
                 .fetch();
     }
 

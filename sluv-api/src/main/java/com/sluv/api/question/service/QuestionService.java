@@ -774,8 +774,15 @@ public class QuestionService {
      * 일일 Hot Question 조회 기능.
      */
     @Transactional(readOnly = true)
-    public List<QuestionHomeResDto> getDailyHotQuestionList() {
-        List<Question> dailyHoyQuestionList = questionDomainService.getDailyHotQuestion();
+    public List<QuestionHomeResDto> getDailyHotQuestionList(Long userId) {
+        List<Long> blockUserIds = new ArrayList<>();
+        if (userId != null) {
+            blockUserIds = userBlockDomainService.getAllBlockedUser(userId).stream()
+                    .map(userBlock -> userBlock.getBlockedUser().getId())
+                    .toList();
+        }
+
+        List<Question> dailyHoyQuestionList = questionDomainService.getDailyHotQuestion(blockUserIds);
 
         List<QuestionHomeResDto> result = dailyHoyQuestionList.stream().map(question -> {
             List<QuestionImgSimpleDto> questionImgSimpleList = getQuestionImgSimpleList(question);

@@ -45,7 +45,7 @@ public interface QuestionRepositoryCustom {
 
     Page<Question> getWeeklyHotQuestion(Pageable pageable);
 
-    List<Question> getDailyHotQuestion();
+    List<Question> getDailyHotQuestion(List<Long> blockUserIds);
 
     List<Question> getSearchQuestionIds(String word);
 

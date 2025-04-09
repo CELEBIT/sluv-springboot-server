@@ -185,8 +185,8 @@ public class QuestionController {
     @Operation(summary = "일간 핫 커뮤니티 게시글 검색",
             description = " 10개 조회. Ordering 인기순(조회수 + 좋아요 수 + 댓글 수). 매일 00시 00분 00초를 기준으로 업데이트")
     @GetMapping("/dailyhot")
-    public ResponseEntity<SuccessDataResponse<List<QuestionHomeResDto>>> getDailyHotQuestionList() {
-        List<QuestionHomeResDto> response = questionService.getDailyHotQuestionList();
+    public ResponseEntity<SuccessDataResponse<List<QuestionHomeResDto>>> getDailyHotQuestionList(@CurrentUserId Long userId) {
+        List<QuestionHomeResDto> response = questionService.getDailyHotQuestionList(userId);
         return ResponseEntity.ok().body(SuccessDataResponse.create(response));
     }
 

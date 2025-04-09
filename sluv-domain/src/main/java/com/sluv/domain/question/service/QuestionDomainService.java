@@ -75,8 +75,8 @@ public class QuestionDomainService {
         return questionRepository.getQuestionRecommendList(hashtag, blockUserIds, pageable);
     }
 
-    public List<Question> getDailyHotQuestion() {
-        return questionRepository.getDailyHotQuestion();
+    public List<Question> getDailyHotQuestion(List<Long> blockUserIds) {
+        return questionRepository.getDailyHotQuestion(blockUserIds);
     }
 
     public Page<?> getSearchQuestion(List<Long> searchQuestionIds, Pageable pageable) {

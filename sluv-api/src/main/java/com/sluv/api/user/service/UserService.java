@@ -40,6 +40,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -218,9 +219,12 @@ public class UserService {
     @Transactional(readOnly = true)
     public List<UserSearchInfoDto> getHotSluver(Long userId, Long celebId) {
         User user = userDomainService.findByIdOrNull(userId);
-        List<Long> blockUserIds = userBlockDomainService.getAllBlockedUser(userId).stream()
-                .map(userBlock -> userBlock.getBlockedUser().getId())
-                .toList();
+        List<Long> blockUserIds = new ArrayList<>();
+        if (userId != null) {
+            blockUserIds = userBlockDomainService.getAllBlockedUser(userId).stream()
+                    .map(userBlock -> userBlock.getBlockedUser().getId())
+                    .toList();
+        }
 
         List<User> userList = userDomainService.getHotSluver(celebId, blockUserIds);
 

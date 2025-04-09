@@ -540,9 +540,13 @@ public class ItemService {
     @Transactional(readOnly = true)
     public List<ItemSimpleDto> getTrendItems(Long userId, Pageable pageable) {
         User user = userDomainService.findById(userId);
-        List<Long> blockUserIds = userBlockDomainService.getAllBlockedUser(userId).stream()
-                .map(userBlock -> userBlock.getBlockedUser().getId())
-                .toList();
+        List<Long> blockUserIds = new ArrayList<>();
+        if (userId != null) {
+            blockUserIds = userBlockDomainService.getAllBlockedUser(userId).stream()
+                    .map(userBlock -> userBlock.getBlockedUser().getId())
+                    .toList();
+        }
+
 
         Page<Item> itemPage = itemDomainService.getTrendItems(blockUserIds, pageable);
         return itemDomainService.getItemSimpleDto(user, itemPage.getContent());

@@ -503,12 +503,22 @@ public class ItemService {
     @Transactional(readOnly = true)
     public List<ItemSimpleDto> getSameCelebItems(Long userId, Long itemId) {
         User user = userDomainService.findByIdOrNull(userId);
+        List<Long> blockUserIds = new ArrayList<>();
+        if (userId != null) {
+            blockUserIds = userBlockDomainService.getAllBlockedUser(userId).stream()
+                    .map(userBlock -> userBlock.getBlockedUser().getId())
+                    .toList();
+        }
+
+        // 1. Item 조회
         Item item = itemDomainService.getItemByIdWithCelebAndBrand(itemId);
+
+        // 2. 동일 셀럽 Item 조회
         List<Item> sameCelebItems;
         if (item.getCeleb() != null) {
-            sameCelebItems = itemDomainService.findSameCelebItem(itemId, item.getCeleb().getId(), true);
-        } else {
-            sameCelebItems = itemDomainService.findSameCelebItem(itemId, item.getNewCeleb().getId(), false);
+            sameCelebItems = itemDomainService.findSameCelebItem(itemId, item.getCeleb().getId(), true, blockUserIds);
+        } else { // 뉴셀럽일 경우
+            sameCelebItems = itemDomainService.findSameCelebItem(itemId, item.getNewCeleb().getId(), false, blockUserIds);
         }
 
         return itemDomainService.getItemSimpleDto(user, sameCelebItems);

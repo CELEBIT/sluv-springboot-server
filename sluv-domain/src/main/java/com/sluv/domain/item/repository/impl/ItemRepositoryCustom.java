@@ -17,7 +17,7 @@ import java.util.List;
 public interface ItemRepositoryCustom {
     List<String> findTopPlace();
 
-    List<Item> findSameCelebItem(Long itemId, Long celebId, boolean celebJudge);
+    List<Item> findSameCelebItem(Long itemId, Long celebId, boolean celebJudge, List<Long> blockUserIds);
 
     List<Item> findSameBrandItem(Long itemId, Long brandId, boolean brandJudge, List<Long> blockUserIds);
 

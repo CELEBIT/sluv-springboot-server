@@ -100,8 +100,8 @@ public class ItemDomainService {
         return itemRepository.getItemByIdWithCelebAndBrand(itemId);
     }
 
-    public List<Item> findSameCelebItem(Long itemId, Long celebId, boolean flag) {
-        return itemRepository.findSameCelebItem(itemId, celebId, flag);
+    public List<Item> findSameCelebItem(Long itemId, Long celebId, boolean flag, List<Long> blockUserIds) {
+        return itemRepository.findSameCelebItem(itemId, celebId, flag, blockUserIds);
     }
 
     public List<Item> findSameBrandItem(Long itemId, Long brandId, boolean flag, List<Long> blockUserIds) {

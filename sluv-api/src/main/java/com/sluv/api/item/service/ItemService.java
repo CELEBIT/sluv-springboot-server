@@ -532,8 +532,15 @@ public class ItemService {
     @Transactional(readOnly = true)
     public List<ItemSimpleDto> getTogetherScrapItem(Long userId, Long itemId) {
         User user = userDomainService.findByIdOrNull(userId);
+        List<Long> blockUserIds = new ArrayList<>();
+        if (userId != null) {
+            blockUserIds = userBlockDomainService.getAllBlockedUser(userId).stream()
+                    .map(userBlock -> userBlock.getBlockedUser().getId())
+                    .toList();
+        }
+
         List<Closet> recentAddClosets = closetDomainService.getRecentAddCloset(itemId);
-        List<Item> sameClosetItems = itemDomainService.getSameClosetItems(itemId, recentAddClosets);
+        List<Item> sameClosetItems = itemDomainService.getSameClosetItems(itemId, recentAddClosets, blockUserIds);
         return itemDomainService.getItemSimpleDto(user, sameClosetItems);
     }
 

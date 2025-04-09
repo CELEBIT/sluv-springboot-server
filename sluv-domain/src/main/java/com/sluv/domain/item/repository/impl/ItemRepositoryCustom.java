@@ -27,7 +27,7 @@ public interface ItemRepositoryCustom {
 
     Page<ItemSimpleDto> getClosetItems(Closet closet, Pageable pageable);
 
-    List<Item> getSameClosetItems(Long itemId, List<Closet> closetList);
+    List<Item> getSameClosetItems(Long itemId, List<Closet> closetList, List<Long> blockUserIds);
 
     Page<Item> getSearchItem(List<Long> itemIdList, SearchFilterReqDto dto, Pageable pageable);
 

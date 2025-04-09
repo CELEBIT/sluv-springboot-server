@@ -204,12 +204,14 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
     }
 
     @Override
-    public List<Item> getSameClosetItems(Long itemId, List<Closet> closetList) {
+    public List<Item> getSameClosetItems(Long itemId, List<Closet> closetList, List<Long> blockUserIds) {
         return jpaQueryFactory.select(item)
                 .from(itemScrap)
                 .leftJoin(itemScrap.item, item)
                 .where(itemScrap.closet.in(closetList).and(item.id.ne(itemId))
-                        .and(item.itemStatus.eq(ACTIVE)))
+                        .and(item.itemStatus.eq(ACTIVE))
+                        .and(item.user.id.notIn(blockUserIds))
+                )
                 .groupBy(item)
                 .orderBy(itemScrap.createdAt.max().desc())
                 .limit(10)

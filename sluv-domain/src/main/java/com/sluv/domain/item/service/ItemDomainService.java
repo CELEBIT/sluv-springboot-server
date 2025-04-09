@@ -108,8 +108,8 @@ public class ItemDomainService {
         return itemRepository.findSameBrandItem(itemId, brandId, flag);
     }
 
-    public List<Item> getSameClosetItems(Long itemId, List<Closet> recentAddClosets) {
-        return itemRepository.getSameClosetItems(itemId, recentAddClosets);
+    public List<Item> getSameClosetItems(Long itemId, List<Closet> recentAddClosets, List<Long> blockUserIds) {
+        return itemRepository.getSameClosetItems(itemId, recentAddClosets, blockUserIds);
     }
 
     public Item saveItem(Item postItem) {

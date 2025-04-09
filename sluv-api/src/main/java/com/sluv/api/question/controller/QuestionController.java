@@ -124,28 +124,11 @@ public class QuestionController {
         return ResponseEntity.ok().body(SuccessDataResponse.create(result));
     }
 
-    @Deprecated
-    @Operation(summary = "Question 커뮤니티 리스트 조회", description = "Pagination 적용")
-    @GetMapping("/list")
-    public ResponseEntity<SuccessDataResponse<PaginationResponse<QuestionSimpleResDto>>> getQuestionList(
-            @Nullable @RequestParam("qType") String qType, Pageable pageable) {
-        PaginationResponse<QuestionSimpleResDto> result = switch (qType) {
-            case "Total" -> questionService.getTotalQuestionList(pageable);
-//            case "Buy" -> questionService.getQuestionBuyList(null, pageable);
-            case "Find" -> questionService.getQuestionFindList(null, pageable);
-            case "How" -> questionService.getQuestionHowaboutList(pageable);
-            case "Recommend" -> questionService.getQuestionRecommendList(null, pageable);
-            default -> throw new QuestionTypeNotFoundException();
-        };
-
-        return ResponseEntity.ok().body(SuccessDataResponse.create(result));
-    }
-
     @Operation(summary = "Question 커뮤니티 게시글 종합 검색", description = "Pagination 적용. 최신순으로 조회")
     @GetMapping("/total")
     public ResponseEntity<SuccessDataResponse<PaginationResponse<QuestionSimpleResDto>>> getQuestionTotalList(
-            Pageable pageable) {
-        PaginationResponse<QuestionSimpleResDto> response = questionService.getTotalQuestionList(pageable);
+            @CurrentUserId Long userId, Pageable pageable) {
+        PaginationResponse<QuestionSimpleResDto> response = questionService.getTotalQuestionList(userId, pageable);
         return ResponseEntity.ok().body(SuccessDataResponse.create(response));
     }
 

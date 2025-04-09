@@ -263,9 +263,11 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
     }
 
     @Override
-    public Page<Question> getTotalQuestionList(Pageable pageable) {
+    public Page<Question> getTotalQuestionList(List<Long> blockUserIds, Pageable pageable) {
         List<Question> content = jpaQueryFactory.selectFrom(question)
-                .where(question.questionStatus.eq(QuestionStatus.ACTIVE))
+                .where(question.questionStatus.eq(QuestionStatus.ACTIVE)
+                        .and(question.user.id.notIn(blockUserIds))
+                )
                 .orderBy(question.createdAt.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -273,7 +275,9 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
 
         // Count Query
         JPAQuery<Question> query = jpaQueryFactory.selectFrom(question)
-                .where(question.questionStatus.eq(QuestionStatus.ACTIVE))
+                .where(question.questionStatus.eq(QuestionStatus.ACTIVE)
+                        .and(question.user.id.notIn(blockUserIds))
+                )
                 .orderBy(question.createdAt.desc());
 
         return PageableExecutionUtils.getPage(content, pageable, () -> query.fetch().size());

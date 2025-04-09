@@ -55,8 +55,8 @@ public class QuestionDomainService {
         return questionRepository.getWaitQuestionFind(user, questionId, interestedCelebs, blockUserIds);
     }
 
-    public Page<Question> getTotalQuestionList(Pageable pageable) {
-        return questionRepository.getTotalQuestionList(pageable);
+    public Page<Question> getTotalQuestionList(List<Long> blockUserIds, Pageable pageable) {
+        return questionRepository.getTotalQuestionList(blockUserIds, pageable);
     }
 
     public Page<QuestionBuy> getQuestionBuyList(String voteStatus, Pageable pageable) {

@@ -609,8 +609,15 @@ public class QuestionService {
      * Question 리스트를 최신순으로 조회
      */
     @Transactional(readOnly = true)
-    public PaginationResponse<QuestionSimpleResDto> getTotalQuestionList(Pageable pageable) {
-        Page<Question> questionPage = questionDomainService.getTotalQuestionList(pageable);
+    public PaginationResponse<QuestionSimpleResDto> getTotalQuestionList(Long userId, Pageable pageable) {
+        List<Long> blockUserIds = new ArrayList<>();
+        if (userId != null) {
+            blockUserIds = userBlockDomainService.getAllBlockedUser(userId).stream()
+                    .map(userBlock -> userBlock.getBlockedUser().getId())
+                    .toList();
+        }
+
+        Page<Question> questionPage = questionDomainService.getTotalQuestionList(blockUserIds, pageable);
         List<QuestionSimpleResDto> content = questionPage.stream().map(question -> {
             String qType;
             if (question instanceof QuestionBuy) {

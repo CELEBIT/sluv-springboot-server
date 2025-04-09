@@ -43,7 +43,7 @@ public interface ItemRepositoryCustom {
 
     Page<Item> getCelebSummerItem(Pageable pageable, SearchFilterReqDto dto);
 
-    Page<Item> getNowBuyItem(Pageable pageable, SearchFilterReqDto dto);
+    Page<Item> getNowBuyItem(List<Long> blockUserIds, Pageable pageable, SearchFilterReqDto dto);
 
     Page<Item> getNewItem(List<Long> blockUserIds, Pageable pageable);
 

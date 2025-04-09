@@ -128,8 +128,8 @@ public class ItemDomainService {
         return itemRepository.getHotCelebItem(celebId, pageable, dto);
     }
 
-    public Page<Item> getNowBuyItem(Pageable pageable, SearchFilterReqDto dto) {
-        return itemRepository.getNowBuyItem(pageable, dto);
+    public Page<Item> getNowBuyItem(List<Long> blockUserIds, Pageable pageable, SearchFilterReqDto dto) {
+        return itemRepository.getNowBuyItem(blockUserIds, pageable, dto);
     }
 
     public Page<Item> getCelebSummerItem(Pageable pageable, SearchFilterReqDto dto) {

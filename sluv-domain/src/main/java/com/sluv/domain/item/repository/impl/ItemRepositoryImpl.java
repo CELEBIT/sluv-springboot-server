@@ -474,11 +474,15 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
      * 당장 구매할 수 있는 아이템.
      */
     @Override
-    public Page<Item> getNowBuyItem(Pageable pageable, SearchFilterReqDto dto) {
+    public Page<Item> getNowBuyItem(List<Long> blockUserIds, Pageable pageable, SearchFilterReqDto dto) {
         log.info("지금 당장 구매 가능한 아이템 조회 Query");
         JPAQuery<Item> query = jpaQueryFactory.selectFrom(item)
                 .leftJoin(itemLink).on(itemLink.item.eq(item))
-                .where(item.itemStatus.eq(ACTIVE).and(itemLink.item.isNotNull()))
+                .where(
+                        item.itemStatus.eq(ACTIVE)
+                                .and(itemLink.item.isNotNull())
+                                .and(item.user.id.notIn(blockUserIds))
+                )
                 .groupBy(item)
                 .orderBy(item.createdAt.desc());
         // Filter 추가
@@ -493,7 +497,11 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
         // Count Query
         JPAQuery<Item> countQuery = jpaQueryFactory.selectFrom(item)
                 .leftJoin(itemLink).on(itemLink.item.eq(item))
-                .where(item.itemStatus.eq(ACTIVE).and(itemLink.item.isNotNull()))
+                .where(
+                        item.itemStatus.eq(ACTIVE)
+                                .and(itemLink.item.isNotNull())
+                                .and(item.user.id.notIn(blockUserIds))
+                )
                 .groupBy(item)
                 .orderBy(item.createdAt.desc());
         // Filter 추가

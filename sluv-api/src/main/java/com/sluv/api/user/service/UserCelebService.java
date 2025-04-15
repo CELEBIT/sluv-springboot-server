@@ -6,9 +6,11 @@ import com.sluv.api.celeb.dto.response.InterestedCelebParentResponse;
 import com.sluv.domain.celeb.entity.Celeb;
 import com.sluv.domain.celeb.entity.CelebCategory;
 import com.sluv.domain.celeb.entity.InterestedCeleb;
+import com.sluv.domain.celeb.entity.NewCeleb;
 import com.sluv.domain.celeb.service.CelebCategoryDomainService;
 import com.sluv.domain.celeb.service.CelebDomainService;
 import com.sluv.domain.celeb.service.InterestedCelebDomainService;
+import com.sluv.domain.celeb.service.NewCelebDomainService;
 import com.sluv.domain.user.entity.User;
 import com.sluv.domain.user.enums.UserStatus;
 import com.sluv.domain.user.service.UserDomainService;
@@ -18,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
@@ -29,6 +32,7 @@ public class UserCelebService {
 
     private final UserDomainService userDomainService;
     private final CelebDomainService celebDomainService;
+    private final NewCelebDomainService newCelebDomainService;
     private final CelebCategoryDomainService celebCategoryDomainService;
     private final InterestedCelebDomainService interestedCelebDomainService;
 
@@ -105,13 +109,28 @@ public class UserCelebService {
         if (user.getUserStatus().equals(UserStatus.ACTIVE)) {
             interestedCelebDomainService.deleteAllByUserId(user.getId());
         }
+        List<InterestedCeleb> selectedInterestedCelebs = new ArrayList<>();
+
 
         // 초기화 상태에서 다시 추가.
-        List<InterestedCeleb> interestedCelebList = dto.getCelebIdList().stream()
-                .map(celeb -> InterestedCeleb.toEntity(user,
-                        celebDomainService.findById(celeb))).toList();
+        // 관심 셀럽
+        if (dto.getCelebIdList() != null) {
+            List<InterestedCeleb> interestedCelebs = dto.getCelebIdList().stream()
+                    .map(celeb -> InterestedCeleb.toEntity(user, celebDomainService.findById(celeb), null)).toList();
+            selectedInterestedCelebs.addAll(interestedCelebs);
+        }
 
-        interestedCelebDomainService.saveAll(interestedCelebList);
+        // 관심 뉴셀럽
+        if (dto.getCelebIdList() != null) {
+            List<InterestedCeleb> interestedNewCelebs = dto.getCelebNameList().stream()
+                    .map(name -> {
+                        NewCeleb newCeleb = newCelebDomainService.saveNewCelebByName(NewCeleb.toEntity(name));
+                        return InterestedCeleb.toEntity(user, null, newCeleb);
+                    }).toList();
+            selectedInterestedCelebs.addAll(interestedNewCelebs);
+        }
+
+        interestedCelebDomainService.saveAll(selectedInterestedCelebs);
 
         if (user.getUserStatus().equals(UserStatus.PENDING_CELEB)) {
             user.changeUserStatus(UserStatus.ACTIVE);

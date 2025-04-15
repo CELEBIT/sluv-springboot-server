@@ -47,8 +47,11 @@ public class UserCelebService {
         User user = userDomainService.findByIdOrNull(userId);
         List<Celeb> interestedCelebList;
         List<NewCeleb> interestedNewCelebs = new ArrayList<>();
+
+        // 사용자 유무에 따라 처리 변경
         if (user != null) {
             List<InterestedCeleb> interestedCelebs = interestedCelebDomainService.findInterestedCelebByUser(user);
+
             interestedCelebList = interestedCelebs.stream()
                     .filter(interestedCeleb -> interestedCeleb.getCeleb() != null)
                     .map(InterestedCeleb::getCeleb)
@@ -62,9 +65,11 @@ public class UserCelebService {
             interestedCelebList = celebDomainService.findTop10Celeb();
         }
 
+        // 카테고리 셋팅
         List<CelebCategory> categoryList = celebCategoryDomainService.findAllByParentIdIsNull();
         changeCategoryOrder(categoryList);
 
+        // 셀럽 처리
         List<InterestedCelebCategoryResponse> responses = categoryList.stream()
                 .map(category -> { // 카테고리별 InterestedCelebCategoryResDto 생성
                     List<Celeb> categoryFilterCeleb = getCategoryFilterCeleb(interestedCelebList, category);
@@ -72,23 +77,11 @@ public class UserCelebService {
                             convertInterestedCelebParentResDto(categoryFilterCeleb));
                 }).collect(Collectors.toList());
 
+        // 뉴셀럽 처리
         InterestedCelebCategoryResponse newCelebs = InterestedCelebCategoryResponse.of("추가된 셀럽", convertInterestedNewCelebParentResDto(interestedNewCelebs));
         responses.add(newCelebs);
 
         return responses;
-    }
-
-    /**
-     * 특정 유저가 선택한 관심 Celeb을 조회 CelebCategory를 기준으로 그룹핑 유저가 등록한 순서대로 조회
-     */
-    @Transactional(readOnly = true)
-    public List<InterestedCelebParentResponse> getTargetUserInterestedCelebByPostTime(Long userId) {
-        User user = userDomainService.findById(userId);
-
-        return celebDomainService.findInterestedCeleb(user)
-                .stream()
-                .map(InterestedCelebParentResponse::of)
-                .toList();
     }
 
     /**
@@ -97,14 +90,20 @@ public class UserCelebService {
     @Transactional(readOnly = true)
     public List<InterestedCelebParentResponse> getInterestedCelebByPostTime(Long userId) {
         User user = userDomainService.findByIdOrNull(userId);
-        List<InterestedCelebParentResponse> dtos;
+        List<InterestedCelebParentResponse> responses;
         if (user != null) {
-            dtos = celebDomainService.findInterestedCeleb(user)
+            responses = interestedCelebDomainService.findInterestedCelebByUser(user)
                     .stream()
-                    .map(InterestedCelebParentResponse::of)
+                    .map(interestedCeleb -> {
+                        if (interestedCeleb.getCeleb() != null) {
+                            return InterestedCelebParentResponse.of(interestedCeleb.getCeleb());
+                        } else {
+                            return InterestedCelebParentResponse.of(interestedCeleb.getNewCeleb());
+                        }
+                    })
                     .toList();
         } else {
-            dtos = celebDomainService.findTop10Celeb()
+            responses = celebDomainService.findTop10Celeb()
                     .stream()
                     .map(celeb -> {
                         if (celeb.getParent() != null) {
@@ -115,7 +114,7 @@ public class UserCelebService {
                     .distinct()
                     .toList();
         }
-        return dtos;
+        return responses;
     }
 
     @Transactional

@@ -46,8 +46,7 @@ public class UserCelebController {
     @GetMapping("/{userId}/celeb")
     public ResponseEntity<SuccessDataResponse<List<InterestedCelebParentResponse>>> getTargetUserInterestedCelebByPostTime(
             @PathVariable("userId") Long userId) {
-        List<InterestedCelebParentResponse> response = userCelebService.getTargetUserInterestedCelebByPostTime(
-                userId);
+        List<InterestedCelebParentResponse> response = userCelebService.getInterestedCelebByPostTime(userId);
         return ResponseEntity.ok().body(SuccessDataResponse.create(response));
     }
 

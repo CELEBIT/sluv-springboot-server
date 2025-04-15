@@ -34,7 +34,7 @@ public class InterestedCeleb extends BaseEntity {
     private Celeb celeb;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "celeb_id")
+    @JoinColumn(name = "new_celeb_id")
     @Nullable
     private NewCeleb newCeleb;
 

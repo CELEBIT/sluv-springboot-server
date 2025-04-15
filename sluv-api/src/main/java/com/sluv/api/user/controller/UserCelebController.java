@@ -56,8 +56,7 @@ public class UserCelebController {
     @GetMapping("/{userId}/celeb/category")
     public ResponseEntity<SuccessDataResponse<List<InterestedCelebCategoryResponse>>> getTargetUserInterestedCelebByCategory(
             @PathVariable("userId") Long userId) {
-        List<InterestedCelebCategoryResponse> response = userCelebService.getTargetUserInterestedCelebByCategory(
-                userId);
+        List<InterestedCelebCategoryResponse> response = userCelebService.getInterestedCelebByCategory(userId);
         return ResponseEntity.ok().body(SuccessDataResponse.create(response));
     }
 

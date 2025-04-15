@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -45,8 +46,18 @@ public class UserCelebService {
     public List<InterestedCelebCategoryResponse> getInterestedCelebByCategory(Long userId) {
         User user = userDomainService.findByIdOrNull(userId);
         List<Celeb> interestedCelebList;
+        List<NewCeleb> interestedNewCelebs = new ArrayList<>();
         if (user != null) {
-            interestedCelebList = celebDomainService.findInterestedCeleb(user);
+            List<InterestedCeleb> interestedCelebs = interestedCelebDomainService.findInterestedCelebByUser(user);
+            interestedCelebList = interestedCelebs.stream()
+                    .filter(interestedCeleb -> interestedCeleb.getCeleb() != null)
+                    .map(InterestedCeleb::getCeleb)
+                    .toList();
+
+            interestedNewCelebs = interestedCelebs.stream()
+                    .filter(interestedCeleb -> interestedCeleb.getNewCeleb() != null)
+                    .map(InterestedCeleb::getNewCeleb)
+                    .toList();
         } else {
             interestedCelebList = celebDomainService.findTop10Celeb();
         }
@@ -54,12 +65,17 @@ public class UserCelebService {
         List<CelebCategory> categoryList = celebCategoryDomainService.findAllByParentIdIsNull();
         changeCategoryOrder(categoryList);
 
-        return categoryList.stream()
+        List<InterestedCelebCategoryResponse> responses = categoryList.stream()
                 .map(category -> { // 카테고리별 InterestedCelebCategoryResDto 생성
                     List<Celeb> categoryFilterCeleb = getCategoryFilterCeleb(interestedCelebList, category);
                     return InterestedCelebCategoryResponse.of(category,
                             convertInterestedCelebParentResDto(categoryFilterCeleb));
-                }).toList();
+                }).collect(Collectors.toList());
+
+        InterestedCelebCategoryResponse newCelebs = InterestedCelebCategoryResponse.of("추가된 셀럽", convertInterestedNewCelebParentResDto(interestedNewCelebs));
+        responses.add(newCelebs);
+
+        return responses;
     }
 
     /**
@@ -140,27 +156,6 @@ public class UserCelebService {
     }
 
     /**
-     * 특정 유저가 선택한 관심 Celeb을 조회 CelebCategory를 기준으로 그룹핑 카테고리를 기준으로 조회
-     */
-    @Transactional(readOnly = true)
-    public List<InterestedCelebCategoryResponse> getTargetUserInterestedCelebByCategory(Long userId) {
-        User user = userDomainService.findById(userId);
-        List<Celeb> interestedCelebList = celebDomainService.findInterestedCeleb(user);
-
-        List<CelebCategory> categoryList = celebCategoryDomainService.findAllByParentIdIsNull();
-        categoryList.sort(Comparator.comparing(CelebCategory::getName));
-        changeCategoryOrder(categoryList);
-
-        return categoryList.stream()
-                // 카테고리별 InterestedCelebCategoryResDto 생성
-                .map(category -> {
-                    List<Celeb> categoryFilterCeleb = getCategoryFilterCeleb(interestedCelebList, category);
-                    return InterestedCelebCategoryResponse.of(category,
-                            convertInterestedCelebParentResDto(categoryFilterCeleb));
-                }).toList();
-    }
-
-    /**
      * 가수 -> 배우 -> 방송인 -> 스포츠인 -> 인플루언서 순서로 변
      */
 
@@ -188,5 +183,12 @@ public class UserCelebService {
      */
     private List<InterestedCelebParentResponse> convertInterestedCelebParentResDto(List<Celeb> celebList) {
         return celebList.stream().map(InterestedCelebParentResponse::of).toList();
+    }
+
+    /**
+     * 관심셀럽 목록에서 category와 일치하는 NewCeleb을 분류
+     */
+    private List<InterestedCelebParentResponse> convertInterestedNewCelebParentResDto(List<NewCeleb> newCelebs) {
+        return newCelebs.stream().map(InterestedCelebParentResponse::of).toList();
     }
 }

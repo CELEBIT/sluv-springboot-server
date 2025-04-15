@@ -1,13 +1,11 @@
 package com.sluv.api.celeb.dto.response;
 
 import com.sluv.domain.celeb.entity.Celeb;
+import com.sluv.domain.celeb.entity.NewCeleb;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.*;
+
 import java.util.List;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 @Data
 @Getter
@@ -23,6 +21,11 @@ public class InterestedCelebParentResponse {
     private String celebCategory;
     @Schema(description = "하위 Celeb 리스트")
     private List<InterestedCelebChildResponse> subCelebList;
+
+    @Schema(description = "NewCeleb id")
+    private Long newCelebId;
+    @Schema(description = "NewCeleb 이름")
+    private String newCelebName;
 
     public static InterestedCelebParentResponse of(Celeb celeb) {
         List<InterestedCelebChildResponse> subDtoList = null;
@@ -40,6 +43,14 @@ public class InterestedCelebParentResponse {
                                 : celeb.getCelebCategory().getName()
                 )
                 .subCelebList(subDtoList)
+                .build();
+    }
+
+    public static InterestedCelebParentResponse of(NewCeleb newCeleb) {
+        return InterestedCelebParentResponse.builder()
+                .newCelebId(newCeleb.getId())
+                .newCelebName(newCeleb.getCelebName())
+                .celebCategory("추가된 셀럽")
                 .build();
     }
 

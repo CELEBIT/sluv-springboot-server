@@ -10,12 +10,14 @@ import com.sluv.domain.celeb.entity.QCeleb;
 import com.sluv.domain.celeb.entity.QCelebCategory;
 import com.sluv.domain.item.entity.QItemCategory;
 import com.sluv.domain.item.entity.TempItem;
+import com.sluv.domain.item.enums.ItemStatus;
 import com.sluv.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static com.sluv.domain.brand.entity.QBrand.brand;
@@ -74,6 +76,15 @@ public class TempItemRepositoryImpl implements TempItemRepositoryCustom {
                 .where(tempItem.newCeleb.id.eq(newCelebId))
                 .set(tempItem.celeb, celeb)
                 .set(tempItem.newCeleb, (NewCeleb) null)
+                .execute();
+    }
+
+    @Override
+    public void changeItemStatusToDeletedByExpiredDate(int date) {
+        LocalDateTime expiredDaysAgo = LocalDateTime.now().minusDays(date);
+        jpaQueryFactory.update(tempItem)
+                .set(tempItem.itemStatus, ItemStatus.DELETED)
+                .where(tempItem.updatedAt.lt(expiredDaysAgo))
                 .execute();
     }
 }

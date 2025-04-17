@@ -1,7 +1,9 @@
 package com.sluv.domain.celeb.repository.Impl;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.sluv.domain.celeb.entity.Celeb;
 import com.sluv.domain.celeb.entity.InterestedCeleb;
+import com.sluv.domain.celeb.entity.NewCeleb;
 import lombok.RequiredArgsConstructor;
 
 import java.util.List;
@@ -22,5 +24,14 @@ public class InterestedCelebRepositoryImpl implements InterestedCelebRepositoryC
                 .leftJoin(interestedCeleb.newCeleb, newCeleb).fetchJoin()
                 .where(interestedCeleb.user.id.eq(userId))
                 .fetch();
+    }
+
+    @Override
+    public void changeAllNewCelebToCeleb(Celeb celeb, Long newCelebId) {
+        jpaQueryFactory.update(interestedCeleb)
+                .set(interestedCeleb.newCeleb, (NewCeleb) null)
+                .set(interestedCeleb.celeb, celeb)
+                .where(interestedCeleb.newCeleb.id.eq(newCelebId))
+                .execute();
     }
 }

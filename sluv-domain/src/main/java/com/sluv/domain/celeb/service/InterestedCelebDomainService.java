@@ -1,5 +1,6 @@
 package com.sluv.domain.celeb.service;
 
+import com.sluv.domain.celeb.entity.Celeb;
 import com.sluv.domain.celeb.entity.InterestedCeleb;
 import com.sluv.domain.celeb.repository.InterestedCelebRepository;
 import com.sluv.domain.user.entity.User;
@@ -26,4 +27,7 @@ public class InterestedCelebDomainService {
         return interestedCelebRepository.findAllByUserId(user.getId());
     }
 
+    public void changeAllNewCelebToCeleb(Celeb celeb, Long newCelebId) {
+        interestedCelebRepository.changeAllNewCelebToCeleb(celeb, newCelebId);
+    }
 }

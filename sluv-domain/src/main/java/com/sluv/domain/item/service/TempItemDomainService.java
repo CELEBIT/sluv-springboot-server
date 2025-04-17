@@ -49,4 +49,8 @@ public class TempItemDomainService {
     public void changeAllNewCelebToCeleb(Celeb celeb, Long newCelebId) {
         tempItemRepository.changeAllNewCelebToCeleb(celeb, newCelebId);
     }
+
+    public void deleteAllByExpiredDate(int date) {
+        tempItemRepository.changeItemStatusToDeletedByExpiredDate(date);
+    }
 }

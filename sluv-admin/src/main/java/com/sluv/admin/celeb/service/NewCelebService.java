@@ -6,10 +6,7 @@ import com.sluv.admin.celeb.dto.NewCelebSelfPostRequest;
 import com.sluv.domain.celeb.entity.Celeb;
 import com.sluv.domain.celeb.entity.CelebCategory;
 import com.sluv.domain.celeb.entity.NewCeleb;
-import com.sluv.domain.celeb.service.CelebCategoryDomainService;
-import com.sluv.domain.celeb.service.CelebDomainService;
-import com.sluv.domain.celeb.service.NewCelebDomainService;
-import com.sluv.domain.celeb.service.RecentSelectCelebDomainService;
+import com.sluv.domain.celeb.service.*;
 import com.sluv.domain.item.service.ItemDomainService;
 import com.sluv.domain.item.service.TempItemDomainService;
 import com.sluv.domain.question.service.QuestionDomainService;
@@ -30,6 +27,7 @@ public class NewCelebService {
     private final RecentSelectCelebDomainService recentSelectCelebDomainService;
     private final QuestionDomainService questionDomainService;
     private final CelebCategoryDomainService celebCategoryDomainService;
+    private final InterestedCelebDomainService interestedCelebDomainService;
 
     @Transactional(readOnly = true)
     public List<NewCelebPostDto> findAllNewCelebPostDto() {
@@ -55,8 +53,11 @@ public class NewCelebService {
         recentSelectCelebDomainService.changeAllNewCelebToCeleb(celeb, request.getNewCelebId());
         //커뮤니티의 뉴셀럽 변경
         questionDomainService.changeAllNewCelebToCeleb(celeb, request.getNewCelebId());
+        //관심 뉴셀럽 변경
+        interestedCelebDomainService.changeAllNewCelebToCeleb(celeb, request.getNewCelebId());
         //뉴셀럽 삭제
         newCelebDomainService.deleteById(request.getNewCelebId());
+
     }
 
     @Transactional
@@ -77,6 +78,8 @@ public class NewCelebService {
         recentSelectCelebDomainService.changeAllNewCelebToCeleb(celeb, request.getNewCelebId());
         //커뮤니티의 뉴셀럽 변경
         questionDomainService.changeAllNewCelebToCeleb(celeb, request.getNewCelebId());
+        //관심 뉴셀럽 변경
+        interestedCelebDomainService.changeAllNewCelebToCeleb(celeb, request.getNewCelebId());
         //뉴셀럽 삭제
         newCelebDomainService.deleteById(request.getNewCelebId());
     }

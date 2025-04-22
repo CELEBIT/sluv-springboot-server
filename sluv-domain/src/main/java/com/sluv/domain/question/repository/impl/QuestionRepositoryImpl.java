@@ -312,10 +312,10 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
      * CelebId가 null이면 모든 Celeb에 대해 조회.
      */
     @Override
-    public Page<QuestionFind> getQuestionFindList(Long celebId, List<Long> blockUserIds, Pageable pageable) {
+    public Page<QuestionFind> getQuestionFindList(Long celebId, Boolean isNewCeleb, List<Long> blockUserIds, Pageable pageable) {
 
         List<QuestionFind> content = jpaQueryFactory.selectFrom(questionFind)
-                .where(getQuestionFindFiltering(celebId).and(questionFind.user.id.notIn(blockUserIds)))
+                .where(getQuestionFindFiltering(celebId, isNewCeleb).and(questionFind.user.id.notIn(blockUserIds)))
                 .orderBy(questionFind.createdAt.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -323,7 +323,7 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
 
         // Count Query
         JPAQuery<QuestionFind> query = jpaQueryFactory.selectFrom(questionFind)
-                .where(getQuestionFindFiltering(celebId).and(questionFind.user.id.notIn(blockUserIds)))
+                .where(getQuestionFindFiltering(celebId, isNewCeleb).and(questionFind.user.id.notIn(blockUserIds)))
                 .orderBy(questionFind.createdAt.desc());
 
         return PageableExecutionUtils.getPage(content, pageable, () -> query.fetch().size());
@@ -410,10 +410,14 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
         return predicate;
     }
 
-    private BooleanExpression getQuestionFindFiltering(Long celebId) {
+    private BooleanExpression getQuestionFindFiltering(Long celebId, Boolean isNewCeleb) {
         BooleanExpression predicate = questionFind.questionStatus.eq(QuestionStatus.ACTIVE);
         if (celebId == null) {
             return predicate;
+        } else if (isNewCeleb != null && isNewCeleb) {
+            predicate = predicate.and(
+                    questionFind.newCeleb.id.eq(celebId)
+            );
         } else {
             predicate = predicate.and(
                     questionFind.celeb.id.eq(celebId)

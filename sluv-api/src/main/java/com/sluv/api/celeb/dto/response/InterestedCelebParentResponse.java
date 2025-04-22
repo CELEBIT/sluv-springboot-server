@@ -19,13 +19,10 @@ public class InterestedCelebParentResponse {
     private String celebNameKr;
     @Schema(description = "Celeb 카테고리 이름")
     private String celebCategory;
+    @Schema(description = "NewCeleb 여부")
+    private Boolean isNewCeleb;
     @Schema(description = "하위 Celeb 리스트")
     private List<InterestedCelebChildResponse> subCelebList;
-
-    @Schema(description = "NewCeleb id")
-    private Long newCelebId;
-    @Schema(description = "NewCeleb 이름")
-    private String newCelebName;
 
     public static InterestedCelebParentResponse of(Celeb celeb) {
         List<InterestedCelebChildResponse> subDtoList = null;
@@ -37,6 +34,7 @@ public class InterestedCelebParentResponse {
         return InterestedCelebParentResponse.builder()
                 .id(celeb.getId())
                 .celebNameKr(celeb.getCelebNameKr())
+                .isNewCeleb(false)
                 .celebCategory(
                         celeb.getCelebCategory().getParent() != null
                                 ? celeb.getCelebCategory().getParent().getName()
@@ -48,9 +46,10 @@ public class InterestedCelebParentResponse {
 
     public static InterestedCelebParentResponse of(NewCeleb newCeleb) {
         return InterestedCelebParentResponse.builder()
-                .newCelebId(newCeleb.getId())
-                .newCelebName(newCeleb.getCelebName())
+                .id(newCeleb.getId())
+                .celebNameKr(newCeleb.getCelebName())
                 .celebCategory("추가된 셀럽")
+                .isNewCeleb(true)
                 .build();
     }
 

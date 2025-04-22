@@ -217,7 +217,7 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public List<UserSearchInfoDto> getHotSluver(Long userId, Long celebId) {
+    public List<UserSearchInfoDto> getHotSluver(Long userId, Long celebId, Boolean isNewCeleb) {
         User user = userDomainService.findByIdOrNull(userId);
         List<Long> blockUserIds = new ArrayList<>();
         if (userId != null) {
@@ -226,7 +226,12 @@ public class UserService {
                     .toList();
         }
 
-        List<User> userList = userDomainService.getHotSluver(celebId, blockUserIds);
+        List<User> userList;
+        if (isNewCeleb != null && isNewCeleb) {
+            userList = new ArrayList<>(List.of(user));
+        } else {
+            userList = userDomainService.getHotSluver(celebId, blockUserIds);
+        }
 
         return userList.stream()
                 .map(hotSluver -> {

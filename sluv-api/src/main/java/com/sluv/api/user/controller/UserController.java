@@ -130,11 +130,12 @@ public class UserController {
     /**
      * 1. 팔로워수 2. 아이템 업로드 수 3. item Like 받은 수 4. question Like 받은 수 5. comment Like 받은 수
      */
-    @Operation(summary = "*인기 스러버 조회", description = "User 토큰 필요. 정적으로 10개 검색")
+    @Operation(summary = "*인기 스러버 조회", description = "User 토큰 필요. 정적으로 10개 검색\n isNewCeleb이 null일 경우 정식 셀럽으로 간주")
     @GetMapping("/hotSluver")
     public ResponseEntity<SuccessDataResponse<List<UserSearchInfoDto>>> getHotSluver(@CurrentUserId Long userId,
-                                                                                     @Nullable @RequestParam("celebId") Long celebId) {
-        List<UserSearchInfoDto> response = userService.getHotSluver(userId, celebId);
+                                                                                     @Nullable @RequestParam("celebId") Long celebId,
+                                                                                     @Nullable @RequestParam("isNewCeleb") Boolean isNewCeleb) {
+        List<UserSearchInfoDto> response = userService.getHotSluver(userId, celebId, isNewCeleb);
         return ResponseEntity.ok().body(SuccessDataResponse.create(response));
     }
 

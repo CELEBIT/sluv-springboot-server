@@ -133,12 +133,14 @@ public class QuestionController {
     }
 
     @Operation(summary = "QuestionFind 커뮤니티 게시글 검색",
-            description = "Pagination 적용. Ordering: 최신순으로 조회. Filtering: celebId.")
+            description = "Pagination 적용. Ordering: 최신순으로 조회. Filtering: celebId.\n isNewCeleb이 null일 경우 정식 셀럽으로 간주")
     @GetMapping("/find")
     public ResponseEntity<SuccessDataResponse<PaginationResponse<QuestionSimpleResDto>>> getQuestionFindList(
-            @CurrentUserId Long userId, @Nullable @RequestParam("celebId") Long celebId, Pageable pageable) {
+            @CurrentUserId Long userId, @Nullable @RequestParam("celebId") Long celebId,
+            @Nullable @RequestParam("isNewCeleb") Boolean isNewCeleb, Pageable pageable) {
+
         PaginationResponse<QuestionSimpleResDto> response = questionService.getQuestionFindList(userId, celebId,
-                pageable);
+                isNewCeleb, pageable);
         return ResponseEntity.ok().body(SuccessDataResponse.create(response));
     }
 

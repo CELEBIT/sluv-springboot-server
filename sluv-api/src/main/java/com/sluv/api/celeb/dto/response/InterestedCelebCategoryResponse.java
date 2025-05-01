@@ -2,12 +2,9 @@ package com.sluv.api.celeb.dto.response;
 
 import com.sluv.domain.celeb.entity.CelebCategory;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.*;
+
 import java.util.List;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 @Data
 @Getter
@@ -24,6 +21,14 @@ public class InterestedCelebCategoryResponse {
                                                      List<InterestedCelebParentResponse> list) {
         return InterestedCelebCategoryResponse.builder()
                 .categoryName(celebCategory.getName())
+                .celebList(list)
+                .build();
+    }
+
+    public static InterestedCelebCategoryResponse of(String celebCategoryName,
+                                                     List<InterestedCelebParentResponse> list) {
+        return InterestedCelebCategoryResponse.builder()
+                .categoryName(celebCategoryName)
                 .celebList(list)
                 .build();
     }

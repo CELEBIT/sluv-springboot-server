@@ -18,4 +18,6 @@ public interface TempItemRepositoryCustom {
     void changeAllNewBrandToBrand(Brand brand, Long newBrandId);
 
     void changeAllNewCelebToCeleb(Celeb celeb, Long newCelebId);
+
+    void changeItemStatusToDeletedByExpiredDate(int date);
 }

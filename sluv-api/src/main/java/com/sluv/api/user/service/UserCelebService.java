@@ -6,9 +6,11 @@ import com.sluv.api.celeb.dto.response.InterestedCelebParentResponse;
 import com.sluv.domain.celeb.entity.Celeb;
 import com.sluv.domain.celeb.entity.CelebCategory;
 import com.sluv.domain.celeb.entity.InterestedCeleb;
+import com.sluv.domain.celeb.entity.NewCeleb;
 import com.sluv.domain.celeb.service.CelebCategoryDomainService;
 import com.sluv.domain.celeb.service.CelebDomainService;
 import com.sluv.domain.celeb.service.InterestedCelebDomainService;
+import com.sluv.domain.celeb.service.NewCelebDomainService;
 import com.sluv.domain.user.entity.User;
 import com.sluv.domain.user.enums.UserStatus;
 import com.sluv.domain.user.service.UserDomainService;
@@ -18,9 +20,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -29,6 +33,7 @@ public class UserCelebService {
 
     private final UserDomainService userDomainService;
     private final CelebDomainService celebDomainService;
+    private final NewCelebDomainService newCelebDomainService;
     private final CelebCategoryDomainService celebCategoryDomainService;
     private final InterestedCelebDomainService interestedCelebDomainService;
 
@@ -41,34 +46,42 @@ public class UserCelebService {
     public List<InterestedCelebCategoryResponse> getInterestedCelebByCategory(Long userId) {
         User user = userDomainService.findByIdOrNull(userId);
         List<Celeb> interestedCelebList;
+        List<NewCeleb> interestedNewCelebs = new ArrayList<>();
+
+        // 사용자 유무에 따라 처리 변경
         if (user != null) {
-            interestedCelebList = celebDomainService.findInterestedCeleb(user);
+            List<InterestedCeleb> interestedCelebs = interestedCelebDomainService.findInterestedCelebByUser(user);
+
+            interestedCelebList = interestedCelebs.stream()
+                    .filter(interestedCeleb -> interestedCeleb.getCeleb() != null)
+                    .map(InterestedCeleb::getCeleb)
+                    .toList();
+
+            interestedNewCelebs = interestedCelebs.stream()
+                    .filter(interestedCeleb -> interestedCeleb.getNewCeleb() != null)
+                    .map(InterestedCeleb::getNewCeleb)
+                    .toList();
         } else {
             interestedCelebList = celebDomainService.findTop10Celeb();
         }
 
+        // 카테고리 셋팅
         List<CelebCategory> categoryList = celebCategoryDomainService.findAllByParentIdIsNull();
         changeCategoryOrder(categoryList);
 
-        return categoryList.stream()
+        // 셀럽 처리
+        List<InterestedCelebCategoryResponse> responses = categoryList.stream()
                 .map(category -> { // 카테고리별 InterestedCelebCategoryResDto 생성
                     List<Celeb> categoryFilterCeleb = getCategoryFilterCeleb(interestedCelebList, category);
                     return InterestedCelebCategoryResponse.of(category,
                             convertInterestedCelebParentResDto(categoryFilterCeleb));
-                }).toList();
-    }
+                }).collect(Collectors.toList());
 
-    /**
-     * 특정 유저가 선택한 관심 Celeb을 조회 CelebCategory를 기준으로 그룹핑 유저가 등록한 순서대로 조회
-     */
-    @Transactional(readOnly = true)
-    public List<InterestedCelebParentResponse> getTargetUserInterestedCelebByPostTime(Long userId) {
-        User user = userDomainService.findById(userId);
+        // 뉴셀럽 처리
+        InterestedCelebCategoryResponse newCelebs = InterestedCelebCategoryResponse.of("추가된 셀럽", convertInterestedNewCelebParentResDto(interestedNewCelebs));
+        responses.add(newCelebs);
 
-        return celebDomainService.findInterestedCeleb(user)
-                .stream()
-                .map(InterestedCelebParentResponse::of)
-                .toList();
+        return responses;
     }
 
     /**
@@ -77,14 +90,20 @@ public class UserCelebService {
     @Transactional(readOnly = true)
     public List<InterestedCelebParentResponse> getInterestedCelebByPostTime(Long userId) {
         User user = userDomainService.findByIdOrNull(userId);
-        List<InterestedCelebParentResponse> dtos;
+        List<InterestedCelebParentResponse> responses;
         if (user != null) {
-            dtos = celebDomainService.findInterestedCeleb(user)
+            responses = interestedCelebDomainService.findInterestedCelebByUser(user)
                     .stream()
-                    .map(InterestedCelebParentResponse::of)
+                    .map(interestedCeleb -> {
+                        if (interestedCeleb.getCeleb() != null) {
+                            return InterestedCelebParentResponse.of(interestedCeleb.getCeleb());
+                        } else {
+                            return InterestedCelebParentResponse.of(interestedCeleb.getNewCeleb());
+                        }
+                    })
                     .toList();
         } else {
-            dtos = celebDomainService.findTop10Celeb()
+            responses = celebDomainService.findTop10Celeb()
                     .stream()
                     .map(celeb -> {
                         if (celeb.getParent() != null) {
@@ -95,7 +114,7 @@ public class UserCelebService {
                     .distinct()
                     .toList();
         }
-        return dtos;
+        return responses;
     }
 
     @Transactional
@@ -105,40 +124,34 @@ public class UserCelebService {
         if (user.getUserStatus().equals(UserStatus.ACTIVE)) {
             interestedCelebDomainService.deleteAllByUserId(user.getId());
         }
+        List<InterestedCeleb> selectedInterestedCelebs = new ArrayList<>();
+
 
         // 초기화 상태에서 다시 추가.
-        List<InterestedCeleb> interestedCelebList = dto.getCelebIdList().stream()
-                .map(celeb -> InterestedCeleb.toEntity(user,
-                        celebDomainService.findById(celeb))).toList();
+        // 관심 셀럽
+        if (dto.getCelebIdList() != null) {
+            List<InterestedCeleb> interestedCelebs = dto.getCelebIdList().stream()
+                    .map(celeb -> InterestedCeleb.toEntity(user, celebDomainService.findById(celeb), null)).toList();
+            selectedInterestedCelebs.addAll(interestedCelebs);
+        }
 
-        interestedCelebDomainService.saveAll(interestedCelebList);
+        // 관심 뉴셀럽
+        if (dto.getCelebIdList() != null) {
+            List<InterestedCeleb> interestedNewCelebs = dto.getCelebNameList().stream()
+                    .map(name -> {
+                        NewCeleb newCeleb = newCelebDomainService.saveNewCelebByName(NewCeleb.toEntity(name));
+                        return InterestedCeleb.toEntity(user, null, newCeleb);
+                    }).toList();
+            selectedInterestedCelebs.addAll(interestedNewCelebs);
+        }
+
+        interestedCelebDomainService.saveAll(selectedInterestedCelebs);
 
         if (user.getUserStatus().equals(UserStatus.PENDING_CELEB)) {
             user.changeUserStatus(UserStatus.ACTIVE);
             userDomainService.saveUser(user);
             webHookService.sendSingupMessage(user);
         }
-    }
-
-    /**
-     * 특정 유저가 선택한 관심 Celeb을 조회 CelebCategory를 기준으로 그룹핑 카테고리를 기준으로 조회
-     */
-    @Transactional(readOnly = true)
-    public List<InterestedCelebCategoryResponse> getTargetUserInterestedCelebByCategory(Long userId) {
-        User user = userDomainService.findById(userId);
-        List<Celeb> interestedCelebList = celebDomainService.findInterestedCeleb(user);
-
-        List<CelebCategory> categoryList = celebCategoryDomainService.findAllByParentIdIsNull();
-        categoryList.sort(Comparator.comparing(CelebCategory::getName));
-        changeCategoryOrder(categoryList);
-
-        return categoryList.stream()
-                // 카테고리별 InterestedCelebCategoryResDto 생성
-                .map(category -> {
-                    List<Celeb> categoryFilterCeleb = getCategoryFilterCeleb(interestedCelebList, category);
-                    return InterestedCelebCategoryResponse.of(category,
-                            convertInterestedCelebParentResDto(categoryFilterCeleb));
-                }).toList();
     }
 
     /**
@@ -169,5 +182,12 @@ public class UserCelebService {
      */
     private List<InterestedCelebParentResponse> convertInterestedCelebParentResDto(List<Celeb> celebList) {
         return celebList.stream().map(InterestedCelebParentResponse::of).toList();
+    }
+
+    /**
+     * 관심셀럽 목록에서 category와 일치하는 NewCeleb을 분류
+     */
+    private List<InterestedCelebParentResponse> convertInterestedNewCelebParentResDto(List<NewCeleb> newCelebs) {
+        return newCelebs.stream().map(InterestedCelebParentResponse::of).toList();
     }
 }

@@ -1,11 +1,9 @@
 package com.sluv.domain.celeb.repository;
 
 import com.sluv.domain.celeb.entity.InterestedCeleb;
-import java.util.List;
+import com.sluv.domain.celeb.repository.Impl.InterestedCelebRepositoryCustom;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface InterestedCelebRepository extends JpaRepository<InterestedCeleb, Long> {
+public interface InterestedCelebRepository extends JpaRepository<InterestedCeleb, Long>, InterestedCelebRepositoryCustom {
     void deleteAllByUserId(Long userId);
-
-    List<InterestedCeleb> findAllByUserId(Long user_id);
 }

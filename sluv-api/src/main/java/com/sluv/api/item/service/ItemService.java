@@ -11,8 +11,10 @@ import com.sluv.domain.brand.entity.NewBrand;
 import com.sluv.domain.brand.service.BrandDomainService;
 import com.sluv.domain.brand.service.NewBrandDomainService;
 import com.sluv.domain.celeb.entity.Celeb;
+import com.sluv.domain.celeb.entity.InterestedCeleb;
 import com.sluv.domain.celeb.entity.NewCeleb;
 import com.sluv.domain.celeb.service.CelebDomainService;
+import com.sluv.domain.celeb.service.InterestedCelebDomainService;
 import com.sluv.domain.celeb.service.NewCelebDomainService;
 import com.sluv.domain.closet.entity.Closet;
 import com.sluv.domain.closet.service.ClosetDomainService;
@@ -61,6 +63,7 @@ public class ItemService {
     private final ItemHashtagDomainService itemHashtagDomainService;
     private final HashtagDomainService hashtagDomainService;
     private final CelebDomainService celebDomainService;
+    private final InterestedCelebDomainService interestedCelebDomainService;
     private final ItemCategoryDomainService itemCategoryDomainService;
     private final BrandDomainService brandDomainService;
     private final UserDomainService userDomainService;
@@ -476,7 +479,10 @@ public class ItemService {
 
         List<Celeb> interestedCeleb;
         if (user != null) {
-            interestedCeleb = celebDomainService.findInterestedCeleb(user);
+            interestedCeleb = interestedCelebDomainService.findInterestedCelebByUser(user).stream()
+                    .filter(userInterestedCeleb -> userInterestedCeleb.getCeleb() != null)
+                    .map(InterestedCeleb::getCeleb).toList();
+
             blockUserIds = userBlockDomainService.getAllBlockedUser(userId).stream()
                     .map(userBlock -> userBlock.getBlockedUser().getId())
                     .toList();

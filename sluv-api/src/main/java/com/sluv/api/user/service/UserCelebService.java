@@ -3,6 +3,7 @@ package com.sluv.api.user.service;
 import com.sluv.api.celeb.dto.request.InterestedCelebPostRequest;
 import com.sluv.api.celeb.dto.response.InterestedCelebCategoryResponse;
 import com.sluv.api.celeb.dto.response.InterestedCelebParentResponse;
+import com.sluv.api.celeb.service.NewCelebService;
 import com.sluv.domain.celeb.entity.Celeb;
 import com.sluv.domain.celeb.entity.CelebCategory;
 import com.sluv.domain.celeb.entity.InterestedCeleb;
@@ -36,6 +37,7 @@ public class UserCelebService {
     private final NewCelebDomainService newCelebDomainService;
     private final CelebCategoryDomainService celebCategoryDomainService;
     private final InterestedCelebDomainService interestedCelebDomainService;
+    private final NewCelebService newCelebService;
 
     private final WebHookService webHookService;
 
@@ -139,7 +141,7 @@ public class UserCelebService {
         if (dto.getCelebIdList() != null) {
             List<InterestedCeleb> interestedNewCelebs = dto.getCelebNameList().stream()
                     .map(name -> {
-                        NewCeleb newCeleb = newCelebDomainService.saveNewCelebByName(NewCeleb.toEntity(name));
+                        NewCeleb newCeleb = newCelebService.postNewCelebByName(name);
                         return InterestedCeleb.toEntity(user, null, newCeleb);
                     }).toList();
             selectedInterestedCelebs.addAll(interestedNewCelebs);

@@ -28,4 +28,16 @@ public class NewCelebService {
         return NewCelebPostResponse.of(newCeleb);
     }
 
+    @Transactional
+    public NewCeleb postNewCelebByName(String newCelebName) {
+        NewCeleb newCeleb = newCelebDomainService.findByCelebNameOrNull(newCelebName);
+
+        if (newCeleb == null) {
+            newCeleb = newCelebDomainService.saveNewCelebByName(NewCeleb.toEntity(newCelebName));
+            webHookService.sendCreateNewCelebMessage(newCeleb);
+        }
+
+        return newCeleb;
+    }
+
 }

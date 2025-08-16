@@ -19,7 +19,7 @@ public class RedisCacheService<T> implements CacheService<T> {
     @Override
     public void saveWithKey(String key, T data) {
         ValueOperations<String, T> dataOperations = redisStringDataTemplate.opsForValue();
-        dataOperations.set(key, data, 1, TimeUnit.HOURS);
+        dataOperations.set(key, data, 1, TimeUnit.DAYS);
     }
 
     @Override

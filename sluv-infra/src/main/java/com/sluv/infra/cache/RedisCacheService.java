@@ -13,25 +13,25 @@ import java.util.concurrent.TimeUnit;
 @RequiredArgsConstructor
 public class RedisCacheService<T> implements CacheService<T> {
 
-    private final RedisTemplate<String, T> redisStringDataTemplate;
+    private final RedisTemplate<String, Object> redisStringDataTemplate;
 
     @Async(value = "redisThreadPoolExecutor")
     @Override
     public void saveWithKey(String key, T data) {
-        ValueOperations<String, T> dataOperations = redisStringDataTemplate.opsForValue();
+        ValueOperations<String, Object> dataOperations = redisStringDataTemplate.opsForValue();
         dataOperations.set(key, data, 1, TimeUnit.DAYS);
     }
 
     @Override
     public T findByKey(String key) {
-        ValueOperations<String, T> dataOperations = redisStringDataTemplate.opsForValue();
-        return dataOperations.get(key);
+        ValueOperations<String, Object> dataOperations = redisStringDataTemplate.opsForValue();
+        return (T) dataOperations.get(key);
     }
 
     @Async(value = "redisThreadPoolExecutor")
     @Override
     public void deleteByKey(String key) {
-        ValueOperations<String, T> dataOperations = redisStringDataTemplate.opsForValue();
+        ValueOperations<String, Object> dataOperations = redisStringDataTemplate.opsForValue();
         dataOperations.getAndDelete(key);
     }
 

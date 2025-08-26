@@ -8,6 +8,8 @@ on:
       - 'sluv-domain/**'
       - 'sluv-common/**'
       - 'sluv-infra/**'
+      - 'env/**'
+      - '.env'
 
 concurrency:
   group: ${{ github.ref_name }}

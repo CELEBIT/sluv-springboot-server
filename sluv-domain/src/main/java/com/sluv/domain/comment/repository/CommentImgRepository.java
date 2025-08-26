@@ -6,6 +6,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface CommentImgRepository extends JpaRepository<CommentImg, Long> {
     void deleteAllByCommentId(Long commentId);
-
     List<CommentImg> findAllByCommentId(Long id);
 }

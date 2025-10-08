@@ -252,11 +252,7 @@ public class ItemService {
     }
 
     private void increaseViewNum(Long userId, Item item) {
-        boolean isExist = viewCounter.existUserViewItemId(userId, item.getId());
-        if (!isExist) {
-            viewCounter.saveUserViewItemId(userId, item.getId());
-            item.increaseViewNum();
-        }
+        item.increaseViewNum();
     }
 
     @Transactional

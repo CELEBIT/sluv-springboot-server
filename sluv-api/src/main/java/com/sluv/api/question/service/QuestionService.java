@@ -407,11 +407,7 @@ public class QuestionService {
     }
 
     private void increaseQuestionViewNum(Long userId, Question question) {
-        boolean isExist = viewCounter.existUserViewQuestionId(userId, question.getId());
-        if (!isExist) {
-            viewCounter.saveUserViewQuestionId(userId, question.getId());
-            question.increaseSearchNum();
-        }
+        question.increaseSearchNum();
     }
 
     /**

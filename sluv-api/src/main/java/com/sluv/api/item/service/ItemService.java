@@ -190,12 +190,12 @@ public class ItemService {
         }
 
         // 2. Item Detail 고정 데이터 조회 -> Cache Aside
-        ItemDetailFixData fixData = cacheService.findByKey(ITEM_KEY_PREFIX + itemId);
-        if (fixData == null) {
-            fixData = getItemDetailFixData(item);
-            cacheService.saveWithKey(ITEM_KEY_PREFIX + itemId, fixData);
-        }
-
+//        ItemDetailFixData fixData = cacheService.findByKey(ITEM_KEY_PREFIX + itemId);
+//        if (fixData == null) {
+//            fixData = getItemDetailFixData(item);
+//            cacheService.saveWithKey(ITEM_KEY_PREFIX + itemId, fixData);
+//        }
+        ItemDetailFixData fixData = getItemDetailFixData(item);
         // 3. 좋아요 수 & 스크랩 수
         ItemCountDto itemCountDto = itemDomainService.getCountDataByItemId(itemId);
 
@@ -263,25 +263,26 @@ public class ItemService {
                 : null;
 
         // 4. 작성자 info
-        User writer = userDomainService.findByIdOrNull(item.getUser().getId());
-        UserInfoDto writerInfo = UserInfoDto.of(writer);
+        UserInfoDto writerInfo = UserInfoDto.of(item.getUser());
 
         // 5. Item 이미지들 조회
-        List<ItemImgDto> imgList = itemImgDomainService.findAllByItemId(itemId)
+//        List<ItemImgDto> imgList = itemImgDomainService.findAllByItemId(itemId)
+        List<ItemImgDto> imgList = item.getItemImgs()
                 .stream()
                 .map(ItemImgDto::of).toList();
 
         // 6. Item 링크들 조회
-        List<ItemLinkDto> linkList = itemLinkDomainService.findAllByItemId(itemId)
+//        List<ItemLinkDto> linkList = itemLinkDomainService.findAllByItemId(itemId)
+        List<ItemLinkDto> linkList = item.getItemLinks()
                 .stream()
                 .map(ItemLinkDto::of).toList();
 
         // 7. Hashtag
-        List<ItemHashtagResponseDto> itemHashtags = itemHashtagDomainService.findAllByItemId(itemId)
+//        List<ItemHashtagResponseDto> itemHashtags = itemHashtagDomainService.findAllByItemId(itemId)
+        List<ItemHashtagResponseDto> itemHashtags = item.getItemHashtags()
                 .stream()
-                .map(itemHashtag ->
-                        ItemHashtagResponseDto.of(itemHashtag.getHashtag())
-                ).toList();
+                .map(ItemHashtagResponseDto::from)
+                .toList();
 
         return ItemDetailFixData.of(item, celeb, item.getNewCeleb(), brand, item.getNewBrand(), category, writerInfo,
                 imgList, linkList, itemHashtags);

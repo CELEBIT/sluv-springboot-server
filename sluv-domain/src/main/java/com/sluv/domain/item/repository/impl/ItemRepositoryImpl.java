@@ -1059,6 +1059,8 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
 
     @Override
     public ItemStatusDto getStatusDataByItemId(Long itemId, User user, List<Long> searcherClosetIds) {
+        Long searcherId = user != null ? user.getId() : -1L;
+
         Tuple result = jpaQueryFactory
                 .select(
                         itemLike.id.isNotNull(),
@@ -1067,11 +1069,11 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
                 )
                 .from(item)
                 .leftJoin(itemLike).on(itemLike.item.id.eq(itemId)
-                        .and(itemLike.user.id.eq(user.getId())))
+                        .and(itemLike.user.id.eq(searcherId)))
                 .leftJoin(itemScrap).on(itemScrap.item.id.eq(itemId)
                         .and(itemScrap.closet.id.in(searcherClosetIds)))
                 .leftJoin(follow).on(follow.followee.eq(item.user)
-                        .and(follow.follower.id.eq(user.getId())))
+                        .and(follow.follower.id.eq(searcherId)))
                 .where(item.id.eq(itemId))
                 .fetchOne();
 

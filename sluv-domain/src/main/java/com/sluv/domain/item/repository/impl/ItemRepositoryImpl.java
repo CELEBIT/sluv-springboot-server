@@ -13,6 +13,7 @@ import com.sluv.domain.celeb.entity.QCeleb;
 import com.sluv.domain.closet.entity.Closet;
 import com.sluv.domain.item.dto.ItemCountDto;
 import com.sluv.domain.item.dto.ItemSimpleDto;
+import com.sluv.domain.item.dto.ItemStatusDto;
 import com.sluv.domain.item.dto.ItemWithCountDto;
 import com.sluv.domain.item.entity.Item;
 import com.sluv.domain.item.entity.QItemCategory;
@@ -57,6 +58,7 @@ import static com.sluv.domain.item.entity.QLuxuryItem.luxuryItem;
 import static com.sluv.domain.item.entity.QRecentItem.recentItem;
 import static com.sluv.domain.item.entity.QWeekHotItem.weekHotItem;
 import static com.sluv.domain.item.enums.ItemStatus.ACTIVE;
+import static com.sluv.domain.user.entity.QFollow.follow;
 import static com.sluv.domain.user.entity.QUser.user;
 
 @Slf4j
@@ -1052,6 +1054,31 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
         return new ItemCountDto(
                 result != null ? Objects.requireNonNull(result.get(0, Long.class)).intValue() : 0,
                 result != null ? Objects.requireNonNull(result.get(1, Long.class)).intValue() : 0
+        );
+    }
+
+    @Override
+    public ItemStatusDto getStatusDataByItemId(Long itemId, User user, List<Long> searcherClosetIds) {
+        Tuple result = jpaQueryFactory
+                .select(
+                        itemLike.id.isNotNull(),
+                        itemScrap.id.isNotNull(),
+                        follow.id.isNotNull()
+                )
+                .from(item)
+                .leftJoin(itemLike).on(itemLike.item.id.eq(itemId)
+                        .and(itemLike.user.id.eq(user.getId())))
+                .leftJoin(itemScrap).on(itemScrap.item.id.eq(itemId)
+                        .and(itemScrap.closet.id.in(searcherClosetIds)))
+                .leftJoin(follow).on(follow.followee.eq(item.user)
+                        .and(follow.follower.id.eq(user.getId())))
+                .where(item.id.eq(itemId))
+                .fetchOne();
+
+        return new ItemStatusDto(
+                Objects.requireNonNull(result).get(0, Boolean.class),
+                result.get(1, Boolean.class),
+                result.get(2, Boolean.class)
         );
     }
 }

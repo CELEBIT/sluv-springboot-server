@@ -199,26 +199,22 @@ public class ItemService {
         // 3. 좋아요 수 & 스크랩 수
         ItemCountDto itemCountDto = itemDomainService.getCountDataByItemId(itemId);
 
-        List<Closet> closetList = new ArrayList<>();
+        // 4. Status 데이터 조회 (스크랩 여부, 좋아요 여부, 팔로우 여부, 본인 글 여부)
+        List<Long> searcherClosetIds = new ArrayList<>();
 
         if (user != null) {
-            // 5. 최근 본 아이템 등록
             recentItemDomainService.saveRecentItem(item, user);
 
-            // 6. 조회수
-            increaseViewNum(user.getId(), item);
+            searcherClosetIds = closetDomainService.findAllByUserId(user.getId())
+                    .stream()
+                    .map(Closet::getId)
+                    .toList();
 
-            // 7. 스크랩 여부
-            closetList = closetDomainService.findAllByUserId(user.getId());
         }
 
-        boolean scrapStatus = itemScrapDomainService.getItemScrapStatus(item, closetList);
+        ItemStatusDto itemStatusDto = itemDomainService.getStatusDataByItemId(itemId, user, searcherClosetIds);
 
-        // 8. 좋아요 여부
-        boolean likeStatus = user != null && itemLikeDomainService.existsByUserIdAndItemId(user.getId(), itemId);
-
-        // 9. 팔로우 여부
-        boolean followStatus = followDomainService.getFollowStatus(user, fixData.getWriter().getId());
+        increaseViewNum(item);
 
         // 10. 본인의 게시글 여부
         boolean hasMine = user != null && item.getUser().getId().equals(user.getId());
@@ -232,12 +228,12 @@ public class ItemService {
                 fixData.getNewBrand(),
                 fixData.getCategory(),
                 itemCountDto.likeCount(),
-                likeStatus,
+                itemStatusDto.likeStatus(),
                 itemCountDto.scrapCount(),
-                scrapStatus,
+                itemStatusDto.scrapStatus(),
                 item.getViewNum(),
                 fixData.getWriter(),
-                followStatus,
+                itemStatusDto.followStatus(),
                 hasMine,
                 fixData.getImgList(),
                 fixData.getLinkList(),
@@ -245,7 +241,7 @@ public class ItemService {
         );
     }
 
-    private void increaseViewNum(Long userId, Item item) {
+    private void increaseViewNum(Item item) {
         item.increaseViewNum();
     }
 

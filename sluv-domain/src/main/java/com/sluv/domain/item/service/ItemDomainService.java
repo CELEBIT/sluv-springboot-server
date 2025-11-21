@@ -189,4 +189,8 @@ public class ItemDomainService {
         return itemRepository.findByIdForDetail(itemId);
     }
 
+    public ItemCountDto getCountDataByItemId(Long itemId) {
+        return itemRepository.getCountDataByItemId(itemId);
+    }
+
 }

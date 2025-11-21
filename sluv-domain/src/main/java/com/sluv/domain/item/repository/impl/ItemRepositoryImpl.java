@@ -11,6 +11,7 @@ import com.sluv.domain.celeb.entity.Celeb;
 import com.sluv.domain.celeb.entity.NewCeleb;
 import com.sluv.domain.celeb.entity.QCeleb;
 import com.sluv.domain.closet.entity.Closet;
+import com.sluv.domain.item.dto.ItemCountDto;
 import com.sluv.domain.item.dto.ItemSimpleDto;
 import com.sluv.domain.item.dto.ItemWithCountDto;
 import com.sluv.domain.item.entity.Item;

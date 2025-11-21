@@ -196,11 +196,8 @@ public class ItemService {
             cacheService.saveWithKey(ITEM_KEY_PREFIX + itemId, fixData);
         }
 
-        // 3. 좋아요 수
-        Integer likeNum = itemLikeDomainService.countByItemId(item.getId());
-
-        // 4. 스크랩 수
-        Integer scrapNum = itemScrapDomainService.countByItemId(item.getId());
+        // 3. 좋아요 수 & 스크랩 수
+        ItemCountDto itemCountDto = itemDomainService.getCountDataByItemId(itemId);
 
         List<Closet> closetList = new ArrayList<>();
 
@@ -234,9 +231,9 @@ public class ItemService {
                 fixData.getBrand(),
                 fixData.getNewBrand(),
                 fixData.getCategory(),
-                likeNum,
+                itemCountDto.likeCount(),
                 likeStatus,
-                scrapNum,
+                itemCountDto.scrapCount(),
                 scrapStatus,
                 item.getViewNum(),
                 fixData.getWriter(),

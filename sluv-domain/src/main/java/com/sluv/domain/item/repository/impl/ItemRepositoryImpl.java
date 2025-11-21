@@ -10,6 +10,7 @@ import com.sluv.domain.brand.entity.NewBrand;
 import com.sluv.domain.celeb.entity.Celeb;
 import com.sluv.domain.celeb.entity.NewCeleb;
 import com.sluv.domain.celeb.entity.QCeleb;
+import com.sluv.domain.celeb.entity.QCelebCategory;
 import com.sluv.domain.closet.entity.Closet;
 import com.sluv.domain.item.dto.ItemCountDto;
 import com.sluv.domain.item.dto.ItemSimpleDto;
@@ -1029,14 +1030,21 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
 
     @Override
     public Item findByIdForDetail(Long itemId) {
-        QCeleb parent = new QCeleb("parent");
+        QCeleb parentCeleb = new QCeleb("parentCeleb");
+        QItemCategory parentCategory = new QItemCategory("parentCategory");
+        QCelebCategory parentCelebCategory = new QCelebCategory("parentCelebCategory");
+
         return jpaQueryFactory.selectFrom(item)
                 .leftJoin(item.user, user).fetchJoin()
                 .leftJoin(item.category, itemCategory).fetchJoin()
+                .leftJoin(itemCategory.parent, parentCategory).fetchJoin()
                 .leftJoin(item.celeb, celeb).fetchJoin()
-                .leftJoin(item.celeb.parent, parent).fetchJoin()
-                .leftJoin(item.celeb.celebCategory, celebCategory).fetchJoin()
+                .leftJoin(celeb.parent, parentCeleb).fetchJoin()
+                .leftJoin(celeb.celebCategory, celebCategory).fetchJoin()
+                .leftJoin(celebCategory.parent, parentCelebCategory).fetchJoin()
                 .leftJoin(item.brand, brand).fetchJoin()
+                .leftJoin(item.newCeleb, newCeleb).fetchJoin()
+                .leftJoin(item.newBrand, newBrand).fetchJoin()
                 .where(item.id.eq(itemId))
                 .fetchOne();
     }

@@ -6,6 +6,7 @@ import com.sluv.domain.celeb.entity.Celeb;
 import com.sluv.domain.celeb.entity.NewCeleb;
 import com.sluv.domain.common.entity.BaseEntity;
 import com.sluv.domain.item.dto.ItemSaveDto;
+import com.sluv.domain.item.entity.hashtag.ItemHashtag;
 import com.sluv.domain.item.enums.ItemStatus;
 import com.sluv.domain.user.entity.User;
 import jakarta.persistence.*;
@@ -15,8 +16,11 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.BatchSize;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -85,6 +89,21 @@ public class Item extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Column(length = 45, columnDefinition = "varchar(45) default 'ACTIVE'")
     private ItemStatus itemStatus = ItemStatus.ACTIVE;
+
+    @OneToMany(mappedBy = "item", fetch = FetchType.LAZY)
+    @BatchSize(size = 100)
+    @Builder.Default
+    private List<ItemImg> itemImgs = new ArrayList<>();
+
+    @OneToMany(mappedBy = "item", fetch = FetchType.LAZY)
+    @BatchSize(size = 100)
+    @Builder.Default
+    private List<ItemLink> itemLinks = new ArrayList<>();
+
+    @OneToMany(mappedBy = "item", fetch = FetchType.LAZY)
+    @BatchSize(size = 100)
+    @Builder.Default
+    private List<ItemHashtag> itemHashtags = new ArrayList<>();
 
     /**
      * Item 생성

@@ -90,4 +90,8 @@ public interface ItemRepositoryCustom {
     void changeAllNewCelebToCeleb(Celeb celeb, Long newCelebId);
 
     List<Item> getAllByItemStatus(List<Long> blockUserIds, ItemStatus itemStatus);
+
+    Item findByIdForDetail(Long itemId);
+
+    ItemCountDto getCountDataByItemId(Long itemId);
 }

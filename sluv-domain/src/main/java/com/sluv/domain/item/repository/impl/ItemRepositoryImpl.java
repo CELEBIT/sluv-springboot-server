@@ -32,6 +32,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -1021,5 +1022,35 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
                         .and(item.user.id.notIn(blockUserIds))
                 )
                 .fetch();
+    }
+
+    @Override
+    public Item findByIdForDetail(Long itemId) {
+        QCeleb parent = new QCeleb("parent");
+        return jpaQueryFactory.selectFrom(item)
+                .leftJoin(item.user, user).fetchJoin()
+                .leftJoin(item.category, itemCategory).fetchJoin()
+                .leftJoin(item.celeb, celeb).fetchJoin()
+                .leftJoin(item.celeb.parent, parent).fetchJoin()
+                .leftJoin(item.celeb.celebCategory, celebCategory).fetchJoin()
+                .leftJoin(item.brand, brand).fetchJoin()
+                .where(item.id.eq(itemId))
+                .fetchOne();
+    }
+
+    @Override
+    public ItemCountDto getCountDataByItemId(Long itemId) {
+        Tuple result = jpaQueryFactory.select(itemLike.countDistinct(), itemScrap.countDistinct())
+                .from(item)
+                .leftJoin(itemLike).on(itemLike.item.eq(item))
+                .leftJoin(itemScrap).on(itemScrap.item.eq(item))
+                .where(item.id.eq(itemId))
+                .groupBy(item.id)
+                .fetchOne();
+
+        return new ItemCountDto(
+                result != null ? Objects.requireNonNull(result.get(0, Long.class)).intValue() : 0,
+                result != null ? Objects.requireNonNull(result.get(1, Long.class)).intValue() : 0
+        );
     }
 }

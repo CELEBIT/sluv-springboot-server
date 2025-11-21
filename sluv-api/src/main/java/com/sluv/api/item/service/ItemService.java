@@ -18,10 +18,7 @@ import com.sluv.domain.celeb.service.InterestedCelebDomainService;
 import com.sluv.domain.celeb.service.NewCelebDomainService;
 import com.sluv.domain.closet.entity.Closet;
 import com.sluv.domain.closet.service.ClosetDomainService;
-import com.sluv.domain.item.dto.ItemImgDto;
-import com.sluv.domain.item.dto.ItemLinkDto;
-import com.sluv.domain.item.dto.ItemSaveDto;
-import com.sluv.domain.item.dto.ItemSimpleDto;
+import com.sluv.domain.item.dto.*;
 import com.sluv.domain.item.entity.Item;
 import com.sluv.domain.item.entity.ItemCategory;
 import com.sluv.domain.item.entity.hashtag.Hashtag;
@@ -185,7 +182,7 @@ public class ItemService {
         User user = userDomainService.findByIdOrNull(userId);
 
         // 1. Item 조회
-        Item item = itemDomainService.findById(itemId);
+        Item item = itemDomainService.findByIdForDetail(itemId);
 
         if (item.getItemStatus() != ACTIVE) {
             log.error("ItemId: {}'s status: {}", itemId, item.getItemStatus());

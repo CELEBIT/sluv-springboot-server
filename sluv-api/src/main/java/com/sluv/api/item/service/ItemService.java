@@ -190,12 +190,12 @@ public class ItemService {
         }
 
         // 2. Item Detail 고정 데이터 조회 -> Cache Aside
-//        ItemDetailFixData fixData = cacheService.findByKey(ITEM_KEY_PREFIX + itemId);
-//        if (fixData == null) {
-//            fixData = getItemDetailFixData(item);
-//            cacheService.saveWithKey(ITEM_KEY_PREFIX + itemId, fixData);
-//        }
-        ItemDetailFixData fixData = getItemDetailFixData(item);
+        ItemDetailFixData fixData = cacheService.findByKey(ITEM_KEY_PREFIX + itemId);
+        if (fixData == null) {
+            fixData = getItemDetailFixData(item);
+            cacheService.saveWithKey(ITEM_KEY_PREFIX + itemId, fixData);
+        }
+
         // 3. 좋아요 수 & 스크랩 수
         ItemCountDto itemCountDto = itemDomainService.getCountDataByItemId(itemId);
 
@@ -245,8 +245,7 @@ public class ItemService {
         item.increaseViewNum();
     }
 
-    @Transactional
-    public ItemDetailFixData getItemDetailFixData(Item item) {
+    private ItemDetailFixData getItemDetailFixData(Item item) {
         Long itemId = item.getId();
 
         // 1. Item Category
@@ -265,21 +264,16 @@ public class ItemService {
         // 4. 작성자 info
         UserInfoDto writerInfo = UserInfoDto.of(item.getUser());
 
-        // 5. Item 이미지들 조회
-//        List<ItemImgDto> imgList = itemImgDomainService.findAllByItemId(itemId)
-        List<ItemImgDto> imgList = item.getItemImgs()
+        // 5. Item 관련 컬렉션
+        List<ItemImgDto> imgList = itemImgDomainService.findAllByItemId(itemId)
                 .stream()
                 .map(ItemImgDto::of).toList();
 
-        // 6. Item 링크들 조회
-//        List<ItemLinkDto> linkList = itemLinkDomainService.findAllByItemId(itemId)
-        List<ItemLinkDto> linkList = item.getItemLinks()
+        List<ItemLinkDto> linkList = itemLinkDomainService.findAllByItemId(itemId)
                 .stream()
                 .map(ItemLinkDto::of).toList();
 
-        // 7. Hashtag
-//        List<ItemHashtagResponseDto> itemHashtags = itemHashtagDomainService.findAllByItemId(itemId)
-        List<ItemHashtagResponseDto> itemHashtags = item.getItemHashtags()
+        List<ItemHashtagResponseDto> itemHashtags = itemHashtagDomainService.findAllByItemId(itemId)
                 .stream()
                 .map(ItemHashtagResponseDto::from)
                 .toList();

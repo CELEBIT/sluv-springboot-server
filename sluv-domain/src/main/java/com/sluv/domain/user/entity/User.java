@@ -22,7 +22,7 @@ import org.hibernate.annotations.DynamicInsert;
 @AllArgsConstructor
 @Builder(toBuilder = true)
 @DynamicInsert
-@Table(name = "user")
+@Table(name = "`user`")
 public class User extends BaseEntity {
 
     @Id

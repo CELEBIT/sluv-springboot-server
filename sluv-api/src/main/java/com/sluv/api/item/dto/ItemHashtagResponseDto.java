@@ -1,6 +1,7 @@
 package com.sluv.api.item.dto;
 
 import com.sluv.domain.item.entity.hashtag.Hashtag;
+import com.sluv.domain.item.entity.hashtag.ItemHashtag;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.io.Serializable;
 import lombok.AllArgsConstructor;
@@ -20,10 +21,17 @@ public class ItemHashtagResponseDto implements Serializable {
     @Schema(description = "해쉬태그 내용")
     private String hashtagContent;
 
-    public static ItemHashtagResponseDto of(Hashtag hashtag) {
+    public static ItemHashtagResponseDto from(Hashtag hashtag) {
         return ItemHashtagResponseDto.builder()
                 .hashtagId(hashtag.getId())
                 .hashtagContent(hashtag.getContent())
+                .build();
+    }
+
+    public static ItemHashtagResponseDto from(ItemHashtag itemHashtag) {
+        return ItemHashtagResponseDto.builder()
+                .hashtagId(itemHashtag.getHashtag().getId())
+                .hashtagContent(itemHashtag.getHashtag().getContent())
                 .build();
     }
 

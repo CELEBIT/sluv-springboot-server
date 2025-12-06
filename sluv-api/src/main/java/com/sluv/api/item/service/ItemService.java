@@ -18,10 +18,7 @@ import com.sluv.domain.celeb.service.InterestedCelebDomainService;
 import com.sluv.domain.celeb.service.NewCelebDomainService;
 import com.sluv.domain.closet.entity.Closet;
 import com.sluv.domain.closet.service.ClosetDomainService;
-import com.sluv.domain.item.dto.ItemImgDto;
-import com.sluv.domain.item.dto.ItemLinkDto;
-import com.sluv.domain.item.dto.ItemSaveDto;
-import com.sluv.domain.item.dto.ItemSimpleDto;
+import com.sluv.domain.item.dto.*;
 import com.sluv.domain.item.entity.Item;
 import com.sluv.domain.item.entity.ItemCategory;
 import com.sluv.domain.item.entity.hashtag.Hashtag;
@@ -185,7 +182,7 @@ public class ItemService {
         User user = userDomainService.findByIdOrNull(userId);
 
         // 1. Item 조회
-        Item item = itemDomainService.findById(itemId);
+        Item item = itemDomainService.findByIdForDetail(itemId);
 
         if (item.getItemStatus() != ACTIVE) {
             log.error("ItemId: {}'s status: {}", itemId, item.getItemStatus());
@@ -199,32 +196,25 @@ public class ItemService {
             cacheService.saveWithKey(ITEM_KEY_PREFIX + itemId, fixData);
         }
 
-        // 3. 좋아요 수
-        Integer likeNum = itemLikeDomainService.countByItemId(item.getId());
+        // 3. 좋아요 수 & 스크랩 수
+        ItemCountDto itemCountDto = itemDomainService.getCountDataByItemId(itemId);
 
-        // 4. 스크랩 수
-        Integer scrapNum = itemScrapDomainService.countByItemId(item.getId());
-
-        List<Closet> closetList = new ArrayList<>();
+        // 4. Status 데이터 조회 (스크랩 여부, 좋아요 여부, 팔로우 여부, 본인 글 여부)
+        List<Long> searcherClosetIds = new ArrayList<>();
 
         if (user != null) {
-            // 5. 최근 본 아이템 등록
             recentItemDomainService.saveRecentItem(item, user);
 
-            // 6. 조회수
-            increaseViewNum(user.getId(), item);
+            searcherClosetIds = closetDomainService.findAllByUserId(user.getId())
+                    .stream()
+                    .map(Closet::getId)
+                    .toList();
 
-            // 7. 스크랩 여부
-            closetList = closetDomainService.findAllByUserId(user.getId());
         }
 
-        boolean scrapStatus = itemScrapDomainService.getItemScrapStatus(item, closetList);
+        ItemStatusDto itemStatusDto = itemDomainService.getStatusDataByItemId(itemId, user, searcherClosetIds);
 
-        // 8. 좋아요 여부
-        boolean likeStatus = user != null && itemLikeDomainService.existsByUserIdAndItemId(user.getId(), itemId);
-
-        // 9. 팔로우 여부
-        boolean followStatus = followDomainService.getFollowStatus(user, fixData.getWriter().getId());
+        increaseViewNum(item);
 
         // 10. 본인의 게시글 여부
         boolean hasMine = user != null && item.getUser().getId().equals(user.getId());
@@ -237,13 +227,13 @@ public class ItemService {
                 fixData.getBrand(),
                 fixData.getNewBrand(),
                 fixData.getCategory(),
-                likeNum,
-                likeStatus,
-                scrapNum,
-                scrapStatus,
+                itemCountDto.likeCount(),
+                itemStatusDto.likeStatus(),
+                itemCountDto.scrapCount(),
+                itemStatusDto.scrapStatus(),
                 item.getViewNum(),
                 fixData.getWriter(),
-                followStatus,
+                itemStatusDto.followStatus(),
                 hasMine,
                 fixData.getImgList(),
                 fixData.getLinkList(),
@@ -251,12 +241,11 @@ public class ItemService {
         );
     }
 
-    private void increaseViewNum(Long userId, Item item) {
+    private void increaseViewNum(Item item) {
         item.increaseViewNum();
     }
 
-    @Transactional
-    public ItemDetailFixData getItemDetailFixData(Item item) {
+    private ItemDetailFixData getItemDetailFixData(Item item) {
         Long itemId = item.getId();
 
         // 1. Item Category
@@ -273,25 +262,21 @@ public class ItemService {
                 : null;
 
         // 4. 작성자 info
-        User writer = userDomainService.findByIdOrNull(item.getUser().getId());
-        UserInfoDto writerInfo = UserInfoDto.of(writer);
+        UserInfoDto writerInfo = UserInfoDto.of(item.getUser());
 
-        // 5. Item 이미지들 조회
+        // 5. Item 관련 컬렉션
         List<ItemImgDto> imgList = itemImgDomainService.findAllByItemId(itemId)
                 .stream()
                 .map(ItemImgDto::of).toList();
 
-        // 6. Item 링크들 조회
         List<ItemLinkDto> linkList = itemLinkDomainService.findAllByItemId(itemId)
                 .stream()
                 .map(ItemLinkDto::of).toList();
 
-        // 7. Hashtag
         List<ItemHashtagResponseDto> itemHashtags = itemHashtagDomainService.findAllByItemId(itemId)
                 .stream()
-                .map(itemHashtag ->
-                        ItemHashtagResponseDto.of(itemHashtag.getHashtag())
-                ).toList();
+                .map(ItemHashtagResponseDto::from)
+                .toList();
 
         return ItemDetailFixData.of(item, celeb, item.getNewCeleb(), brand, item.getNewBrand(), category, writerInfo,
                 imgList, linkList, itemHashtags);

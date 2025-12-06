@@ -3,7 +3,9 @@ package com.sluv.domain.item.service;
 import com.sluv.domain.brand.entity.Brand;
 import com.sluv.domain.celeb.entity.Celeb;
 import com.sluv.domain.closet.entity.Closet;
+import com.sluv.domain.item.dto.ItemCountDto;
 import com.sluv.domain.item.dto.ItemSimpleDto;
+import com.sluv.domain.item.dto.ItemStatusDto;
 import com.sluv.domain.item.dto.ItemWithCountDto;
 import com.sluv.domain.item.entity.Item;
 import com.sluv.domain.item.enums.ItemStatus;
@@ -184,4 +186,15 @@ public class ItemDomainService {
         itemRepository.changeAllNewCelebToCeleb(celeb, newCelebId);
     }
 
+    public Item findByIdForDetail(Long itemId) {
+        return itemRepository.findByIdForDetail(itemId);
+    }
+
+    public ItemCountDto getCountDataByItemId(Long itemId) {
+        return itemRepository.getCountDataByItemId(itemId);
+    }
+
+    public ItemStatusDto getStatusDataByItemId(Long itemId, User user, List<Long> searcherClosetIds) {
+        return itemRepository.getStatusDataByItemId(itemId, user, searcherClosetIds);
+    }
 }

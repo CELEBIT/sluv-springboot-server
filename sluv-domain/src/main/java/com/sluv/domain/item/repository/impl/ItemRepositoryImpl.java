@@ -10,8 +10,11 @@ import com.sluv.domain.brand.entity.NewBrand;
 import com.sluv.domain.celeb.entity.Celeb;
 import com.sluv.domain.celeb.entity.NewCeleb;
 import com.sluv.domain.celeb.entity.QCeleb;
+import com.sluv.domain.celeb.entity.QCelebCategory;
 import com.sluv.domain.closet.entity.Closet;
+import com.sluv.domain.item.dto.ItemCountDto;
 import com.sluv.domain.item.dto.ItemSimpleDto;
+import com.sluv.domain.item.dto.ItemStatusDto;
 import com.sluv.domain.item.dto.ItemWithCountDto;
 import com.sluv.domain.item.entity.Item;
 import com.sluv.domain.item.entity.QItemCategory;
@@ -32,6 +35,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -55,6 +59,7 @@ import static com.sluv.domain.item.entity.QLuxuryItem.luxuryItem;
 import static com.sluv.domain.item.entity.QRecentItem.recentItem;
 import static com.sluv.domain.item.entity.QWeekHotItem.weekHotItem;
 import static com.sluv.domain.item.enums.ItemStatus.ACTIVE;
+import static com.sluv.domain.user.entity.QFollow.follow;
 import static com.sluv.domain.user.entity.QUser.user;
 
 @Slf4j
@@ -1021,5 +1026,69 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
                         .and(item.user.id.notIn(blockUserIds))
                 )
                 .fetch();
+    }
+
+    @Override
+    public Item findByIdForDetail(Long itemId) {
+        QCeleb parentCeleb = new QCeleb("parentCeleb");
+        QItemCategory parentCategory = new QItemCategory("parentCategory");
+        QCelebCategory parentCelebCategory = new QCelebCategory("parentCelebCategory");
+
+        return jpaQueryFactory.selectFrom(item)
+                .leftJoin(item.user, user).fetchJoin()
+                .leftJoin(item.category, itemCategory).fetchJoin()
+                .leftJoin(itemCategory.parent, parentCategory).fetchJoin()
+                .leftJoin(item.celeb, celeb).fetchJoin()
+                .leftJoin(celeb.parent, parentCeleb).fetchJoin()
+                .leftJoin(celeb.celebCategory, celebCategory).fetchJoin()
+                .leftJoin(celebCategory.parent, parentCelebCategory).fetchJoin()
+                .leftJoin(item.brand, brand).fetchJoin()
+                .leftJoin(item.newCeleb, newCeleb).fetchJoin()
+                .leftJoin(item.newBrand, newBrand).fetchJoin()
+                .where(item.id.eq(itemId))
+                .fetchOne();
+    }
+
+    @Override
+    public ItemCountDto getCountDataByItemId(Long itemId) {
+        Tuple result = jpaQueryFactory.select(itemLike.countDistinct(), itemScrap.countDistinct())
+                .from(item)
+                .leftJoin(itemLike).on(itemLike.item.eq(item))
+                .leftJoin(itemScrap).on(itemScrap.item.eq(item))
+                .where(item.id.eq(itemId))
+                .groupBy(item.id)
+                .fetchOne();
+
+        return new ItemCountDto(
+                result != null ? Objects.requireNonNull(result.get(0, Long.class)).intValue() : 0,
+                result != null ? Objects.requireNonNull(result.get(1, Long.class)).intValue() : 0
+        );
+    }
+
+    @Override
+    public ItemStatusDto getStatusDataByItemId(Long itemId, User user, List<Long> searcherClosetIds) {
+        Long searcherId = user != null ? user.getId() : -1L;
+
+        Tuple result = jpaQueryFactory
+                .select(
+                        itemLike.id.isNotNull(),
+                        itemScrap.id.isNotNull(),
+                        follow.id.isNotNull()
+                )
+                .from(item)
+                .leftJoin(itemLike).on(itemLike.item.id.eq(itemId)
+                        .and(itemLike.user.id.eq(searcherId)))
+                .leftJoin(itemScrap).on(itemScrap.item.id.eq(itemId)
+                        .and(itemScrap.closet.id.in(searcherClosetIds)))
+                .leftJoin(follow).on(follow.followee.eq(item.user)
+                        .and(follow.follower.id.eq(searcherId)))
+                .where(item.id.eq(itemId))
+                .fetchOne();
+
+        return new ItemStatusDto(
+                Objects.requireNonNull(result).get(0, Boolean.class),
+                result.get(1, Boolean.class),
+                result.get(2, Boolean.class)
+        );
     }
 }

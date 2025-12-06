@@ -146,7 +146,7 @@ public class TempItemService {
             List<ItemHashtagResponseDto> hashtags = null;
             if (tempItemHashtagMap.get(ti.getId()) != null) {
                 hashtags = tempItemHashtagMap.get(ti.getId()).stream()
-                        .map(ItemHashtagResponseDto::of).toList();
+                        .map(ItemHashtagResponseDto::from).toList();
             }
             return TempItemResDto.of(ti, tempItemImgMap.get(ti.getId()), tempItemLinkMap.get(ti.getId()), hashtags);
         }).toList();

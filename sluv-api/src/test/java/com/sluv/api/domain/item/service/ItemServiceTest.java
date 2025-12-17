@@ -1,158 +1,195 @@
-//package com.sluv.server.domain.item.service;
-//
-//import static com.sluv.server.fixture.BrandFixture.브랜드_생성;
-//import static com.sluv.server.fixture.CelebFixture.셀럽_생성;
-//import static com.sluv.server.fixture.CelebFixture.셀럽_카테고리_생성;
-//import static com.sluv.server.fixture.ItemFixture.기본_아이템_생성;
-//import static com.sluv.server.fixture.ItemFixture.아이템_카테고리_생성;
-//import static com.sluv.server.fixture.UserFixture.카카오_유저_생성;
-//import static org.assertj.core.api.Assertions.assertThat;
-//import static org.mockito.ArgumentMatchers.any;
-//import static org.mockito.Mockito.when;
-//
-//import com.sluv.server.domain.brand.entity.Brand;
-//import com.sluv.server.domain.brand.repository.BrandRepository;
-//import com.sluv.server.domain.celeb.entity.Celeb;
-//import com.sluv.server.domain.celeb.entity.CelebCategory;
-//import com.sluv.server.domain.celeb.repository.CelebCategoryRepository;
-//import com.sluv.server.domain.celeb.repository.CelebRepository;
-//import com.sluv.server.domain.item.dto.ItemImgResDto;
-//import com.sluv.server.domain.item.dto.ItemPostReqDto;
-//import com.sluv.server.domain.item.entity.Item;
-//import com.sluv.server.domain.item.entity.ItemCategory;
-//import com.sluv.server.domain.item.entity.ItemImg;
-//import com.sluv.server.domain.item.repository.ItemCategoryRepository;
-//import com.sluv.server.domain.item.repository.ItemImgRepository;
-//import com.sluv.server.domain.item.repository.ItemRepository;
-//import com.sluv.server.domain.user.entity.User;
-//import com.sluv.server.domain.user.repository.UserRepository;
-//import com.sluv.server.global.ai.AiModelRepository;
-//import com.sluv.server.global.ai.AiModelService;
-//import com.sluv.server.global.cache.CacheService;
-//import java.util.List;
-//import org.junit.jupiter.api.AfterEach;
-//import org.junit.jupiter.api.DisplayName;
-//import org.junit.jupiter.api.Test;
-//import org.mockito.InjectMocks;
-//import org.mockito.Mock;
-//import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.boot.test.context.SpringBootTest;
-//import org.springframework.boot.test.mock.mockito.MockBean;
-//
-//@SpringBootTest
-//public class ItemServiceTest {
-//
-//    @Autowired
-//    private ItemService itemService;
-//
-//    @Mock
-//    private CacheService cacheService;
-//
-//    @InjectMocks
-//    private AiModelService aiModelService;
-//
-//    @MockBean
-//    private AiModelRepository aiModelRepository;
-//
-//    @Autowired
-//    private ItemRepository itemRepository;
-//
-//    @Autowired
-//    private UserRepository userRepository;
-//
-//    @Autowired
-//    private ItemCategoryRepository itemCategoryRepository;
-//
-//    @Autowired
-//    private ItemImgRepository itemImgRepository;
-//
-//    @Autowired
-//    private CelebCategoryRepository celebCategoryRepository;
-//
-//    @Autowired
-//    private CelebRepository celebRepository;
-//
-//    @Autowired
-//    private BrandRepository brandRepository;
-//
-//    @AfterEach
-//    void clear() {
-//
-//        itemImgRepository.deleteAll();
-//        itemRepository.deleteAll();
-//        itemCategoryRepository.deleteAll();
-//        celebRepository.deleteAll();
-//        celebCategoryRepository.deleteAll();
-//        userRepository.deleteAll();
-//        brandRepository.deleteAll();
-//    }
-//
-//    @DisplayName("아이템을 등록한다.")
-//    @Test
-//    void postItemTest() {
-//        //given
-//        User user = 카카오_유저_생성();
-//        CelebCategory celebCategory = 셀럽_카테고리_생성("배우", null);
-//        Celeb celeb = 셀럽_생성(celebCategory, "배우1", "Celeb1", null);
-//        ItemCategory itemCategory = 아이템_카테고리_생성("카테고리", null);
-//        Brand brand = 브랜드_생성("브랜드", "Brand");
-//        userRepository.save(user);
-//        celebCategoryRepository.save(celebCategory);
-//        celebRepository.save(celeb);
-//        itemCategoryRepository.save(itemCategory);
-//        brandRepository.save(brand);
-//        ItemImgResDto itemImgResDto = new ItemImgResDto("http://image", true, 0);
-//
-//        ItemPostReqDto itemPostReqDto = new ItemPostReqDto(null, List.of(itemImgResDto), celeb.getId(),
-//                null, null, itemCategory.getId(),
-//                brand.getId(), "item", 1000, null, null, null, null,
-//                null, null, null);
-//
-//        //when
-//        itemService.postItem(user, itemPostReqDto);
-//
-//        //then
-//        assertThat(itemRepository.findAll()).hasSize(1);
-//    }
-//
-//    @DisplayName("아이템을 수정한다.")
-//    @Test
-//    void fixItemTest() {
-//        //given
-//        User user = 카카오_유저_생성();
-//        CelebCategory celebCategory = 셀럽_카테고리_생성("배우", null);
-//        Celeb celeb = 셀럽_생성(celebCategory, "배우1", "Celeb1", null);
-//        ItemCategory itemCategory = 아이템_카테고리_생성("카테고리", null);
-//        Brand brand = 브랜드_생성("브랜드", "Brand");
-//        userRepository.save(user);
-//        celebCategoryRepository.save(celebCategory);
-//        celebRepository.save(celeb);
-//        itemCategoryRepository.save(itemCategory);
-//        brandRepository.save(brand);
-//
-//        Item item = 기본_아이템_생성(user, celeb, null, itemCategory,
-//                brand, null, "item", null, null, null, null);
-//        itemRepository.save(item);
-//
-//        ItemImgResDto itemImgResDto = new ItemImgResDto("http://image", true, 0);
-//        ItemImg itemImg = ItemImg.toEntity(item, itemImgResDto);
-//        itemImgRepository.save(itemImg);
-//
-//        ItemImg mainImg = itemImgRepository.findMainImg(1L);
-//        System.out.println(mainImg.getItemImgUrl());
-//
-//        ItemPostReqDto itemPostReqDto = new ItemPostReqDto(1L, List.of(itemImgResDto), celeb.getId(),
-//                null, null, itemCategory.getId(),
-//                brand.getId(), "fixedItem", 1000, null, null, null, null,
-//                null, null, null);
-//
-//        when(aiModelRepository.getItemColor(any(String.class))).thenReturn("color");
-//
-//        //when
-//        itemService.postItem(user, itemPostReqDto);
-//
-//        //then
-//        assertThat(itemRepository.findAll()).hasSize(1);
-//        assertThat(itemRepository.findById(1L).orElse(null)).extracting("name").isEqualTo("fixedItem");
-//    }
-//}
+package com.sluv.api.domain.item.service;
+
+import com.sluv.api.brand.dto.response.BrandSearchResponse;
+import com.sluv.api.celeb.dto.response.CelebSearchResponse;
+import com.sluv.api.item.dto.ItemCategoryDto;
+import com.sluv.api.item.dto.ItemDetailFixData;
+import com.sluv.api.item.dto.ItemDetailResDto;
+import com.sluv.api.item.service.ItemService;
+import com.sluv.domain.brand.entity.Brand;
+import com.sluv.domain.celeb.entity.Celeb;
+import com.sluv.domain.celeb.entity.CelebCategory;
+import com.sluv.domain.closet.entity.Closet;
+import com.sluv.domain.closet.service.ClosetDomainService;
+import com.sluv.domain.item.dto.ItemCountDto;
+import com.sluv.domain.item.dto.ItemStatusDto;
+import com.sluv.domain.item.entity.Item;
+import com.sluv.domain.item.entity.ItemCategory;
+import com.sluv.domain.item.enums.ItemStatus;
+import com.sluv.domain.item.exception.ItemNotActiveException;
+import com.sluv.domain.item.service.*;
+import com.sluv.domain.user.dto.UserInfoDto;
+import com.sluv.domain.user.entity.User;
+import com.sluv.domain.user.service.UserDomainService;
+import com.sluv.infra.cache.CacheService;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.context.ActiveProfiles;
+
+import java.util.Collections;
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.when;
+
+@ExtendWith(MockitoExtension.class)
+@ActiveProfiles("test")
+class ItemServiceTest {
+
+    @InjectMocks
+    private ItemService itemService;
+
+    @Mock
+    private ItemDomainService itemDomainService;
+    @Mock
+    private ItemImgDomainService itemImgDomainService;
+    @Mock
+    private ItemLinkDomainService itemLinkDomainService;
+    @Mock
+    private ItemHashtagDomainService itemHashtagDomainService;
+    @Mock
+    private UserDomainService userDomainService;
+    @Mock
+    private RecentItemDomainService recentItemDomainService;
+    @Mock
+    private ClosetDomainService closetDomainService;
+    @Mock
+    private CacheService<ItemDetailFixData> cacheService;
+
+
+    @Test
+    @DisplayName("아이템 상세 조회 - 캐시 미스")
+    void getItemDetail_cacheMiss() {
+        // given
+        Long userId = 1L;
+        Long itemId = 100L;
+
+        User user = mock(User.class);
+        when(user.getId()).thenReturn(userId);
+
+        Item item = mock(Item.class);
+        when(item.getId()).thenReturn(itemId);
+        when(item.getItemStatus()).thenReturn(ItemStatus.ACTIVE);
+        when(item.getViewNum()).thenReturn(10L);
+        when(item.getUser()).thenReturn(user);
+        when(item.getCategory()).thenReturn(mock(ItemCategory.class));
+
+        when(userDomainService.findByIdOrNull(userId)).thenReturn(user);
+        when(itemDomainService.findByIdForDetail(itemId)).thenReturn(item);
+        when(cacheService.findByKey(anyString())).thenReturn(null);
+        when(itemImgDomainService.findAllByItemId(itemId)).thenReturn(Collections.emptyList());
+        when(itemLinkDomainService.findAllByItemId(itemId)).thenReturn(Collections.emptyList());
+        when(itemHashtagDomainService.findAllByItemId(itemId)).thenReturn(Collections.emptyList());
+        when(itemDomainService.getCountDataByItemId(itemId)).thenReturn(new ItemCountDto(50, 20));
+
+        Closet closet = mock(Closet.class);
+        when(closet.getId()).thenReturn(1L);
+        when(closetDomainService.findAllByUserId(userId)).thenReturn(List.of(closet));
+
+        ItemStatusDto statusDto = new ItemStatusDto(true, true, false);
+        when(itemDomainService.getStatusDataByItemId(eq(itemId), any(User.class), anyList())).thenReturn(statusDto);
+
+        // when
+        ItemDetailResDto result = itemService.getItemDetail(userId, itemId);
+
+        // then
+        assertThat(result).isNotNull();
+        verify(item).increaseViewNum();
+        verify(recentItemDomainService).saveRecentItem(item, user);
+        verify(cacheService).saveWithKey(anyString(), any(ItemDetailFixData.class));
+    }
+
+    @Test
+    @DisplayName("아이템 상세 조회 - 캐시 히트")
+    void getItemDetail_cacheHit() {
+        // given
+        Long userId = 1L;
+        Long itemId = 100L;
+
+        User user = mock(User.class);
+        when(user.getId()).thenReturn(userId);
+
+        Item item = mock(Item.class);
+        when(item.getItemStatus()).thenReturn(ItemStatus.ACTIVE);
+        when(item.getViewNum()).thenReturn(10L);
+        when(item.getUser()).thenReturn(user);
+
+        ItemDetailFixData fixData = mock(ItemDetailFixData.class);
+
+        Celeb celeb = mock(Celeb.class);
+        CelebCategory celebCategory = mock(CelebCategory.class);
+        when(celeb.getCelebCategory()).thenReturn(celebCategory);
+        CelebSearchResponse celebRes = CelebSearchResponse.of(celeb);
+        when(fixData.getCeleb()).thenReturn(celebRes);
+        when(fixData.getNewCeleb()).thenReturn(null);
+
+        Brand brand = mock(Brand.class);
+        BrandSearchResponse brandRes = BrandSearchResponse.of(brand);
+        when(fixData.getBrand()).thenReturn(brandRes);
+        when(fixData.getNewBrand()).thenReturn(null);
+
+        ItemCategory itemCategory = mock(ItemCategory.class);
+        ItemCategoryDto categoryDto = ItemCategoryDto.of(itemCategory);
+        when(fixData.getCategory()).thenReturn(categoryDto);
+
+        UserInfoDto writerDto = UserInfoDto.of(user);
+        when(fixData.getWriter()).thenReturn(writerDto);
+
+        when(fixData.getImgList()).thenReturn(Collections.emptyList());
+        when(fixData.getLinkList()).thenReturn(Collections.emptyList());
+        when(fixData.getHashTagList()).thenReturn(Collections.emptyList());
+
+        when(cacheService.findByKey(anyString())).thenReturn(fixData);
+
+        when(userDomainService.findByIdOrNull(userId)).thenReturn(user);
+        when(itemDomainService.findByIdForDetail(itemId)).thenReturn(item);
+        when(itemDomainService.getCountDataByItemId(itemId))
+                .thenReturn(new ItemCountDto(50, 20));
+
+        Closet closet = mock(Closet.class);
+        when(closet.getId()).thenReturn(1L);
+        when(closetDomainService.findAllByUserId(userId)).thenReturn(List.of(closet));
+
+        ItemStatusDto statusDto = new ItemStatusDto(true, true, false);
+        when(itemDomainService.getStatusDataByItemId(eq(itemId), any(User.class), anyList()))
+                .thenReturn(statusDto);
+
+        // when
+        ItemDetailResDto result = itemService.getItemDetail(userId, itemId);
+
+        // then
+        assertThat(result).isNotNull();
+
+        verify(item).increaseViewNum();
+        verify(recentItemDomainService).saveRecentItem(item, user);
+
+        verify(itemImgDomainService, never()).findAllByItemId(anyLong());
+        verify(itemLinkDomainService, never()).findAllByItemId(anyLong());
+        verify(itemHashtagDomainService, never()).findAllByItemId(anyLong());
+        verify(cacheService, never()).saveWithKey(anyString(), any(ItemDetailFixData.class));
+    }
+
+
+    @Test
+    @DisplayName("비활성 아이템 조회 시 예외 발생")
+    void getItemDetail_ItemNotActive() {
+        // given
+        Long itemId = 100L;
+        Item item = mock(Item.class);
+        when(item.getItemStatus()).thenReturn(ItemStatus.DELETED);
+        when(itemDomainService.findByIdForDetail(itemId)).thenReturn(item);
+        when(userDomainService.findByIdOrNull(null)).thenReturn(null);
+
+        // when & then
+        assertThatThrownBy(() -> itemService.getItemDetail(null, itemId))
+                .isInstanceOf(ItemNotActiveException.class);
+    }
+
+}

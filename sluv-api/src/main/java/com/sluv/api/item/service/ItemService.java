@@ -258,7 +258,7 @@ public class ItemService {
 
         // 3. Brand
         BrandSearchResponse brand = item.getBrand() != null ?
-                BrandSearchResponse.of(item.getBrand())
+                BrandSearchResponse.from(item.getBrand())
                 : null;
 
         // 4. 작성자 info

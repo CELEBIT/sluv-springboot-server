@@ -30,7 +30,7 @@ public class BrandService {
         Page<Brand> brandPage = brandDomainService.findByAllBrandKrOrBrandEnStartingWith(brandName, pageable);
 
         List<BrandSearchResponse> dtoList = brandPage.stream()
-                .map(BrandSearchResponse::of)
+                .map(BrandSearchResponse::from)
                 .toList();
 
         return PaginationResponse.of(brandPage, dtoList);
@@ -40,7 +40,7 @@ public class BrandService {
     public List<BrandSearchResponse> findTopBrand() {
         return brandDomainService.findTopBrand()
                 .stream()
-                .map(BrandSearchResponse::of)
+                .map(BrandSearchResponse::from)
                 .toList();
     }
 

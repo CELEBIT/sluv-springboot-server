@@ -115,7 +115,7 @@ public class SearchService {
                 .toList();
 
         List<BrandSearchResponse> brandByContainKeyword = brandDomainService.getBrandContainKeyword(keyword).stream()
-                .map(BrandSearchResponse::of)
+                .map(BrandSearchResponse::from)
                 .toList();
 
         List<ItemKeywordSearchResDto> itemByContainKeyword = itemDomainService.getItemContainKeyword(keyword).stream()

@@ -29,11 +29,11 @@ public class BrandService {
     public PaginationResponse<BrandSearchResponse> findAllBrand(String brandName, Pageable pageable) {
         Page<Brand> brandPage = brandDomainService.findByAllBrandKrOrBrandEnStartingWith(brandName, pageable);
 
-        List<BrandSearchResponse> dtoList = brandPage.stream()
+        List<BrandSearchResponse> brandSearchResponses = brandPage.stream()
                 .map(BrandSearchResponse::from)
                 .toList();
 
-        return PaginationResponse.of(brandPage, dtoList);
+        return PaginationResponse.of(brandPage, brandSearchResponses);
     }
 
     @Transactional(readOnly = true)

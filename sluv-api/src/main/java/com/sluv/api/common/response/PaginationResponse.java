@@ -20,7 +20,7 @@ public class PaginationResponse<T> {
     @Schema(description = "데이터들")
     private List<T> content;
 
-    public static <T> PaginationResponse<T> create(Page<?> page, List<T> content) {
+    public static <T> PaginationResponse<T> of(Page<?> page, List<T> content) {
         return PaginationResponse.<T>builder()
                 .page(page.getNumber())
                 .hasNext(page.hasNext())

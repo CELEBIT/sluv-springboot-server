@@ -58,7 +58,7 @@ public class SearchEngineService {
         // 서치 데이터 등록
         searchService.postSearchData(keyword);
 
-        return CompletableFuture.completedFuture(PaginationResponse.create(searchItemPage, content));
+        return CompletableFuture.completedFuture(PaginationResponse.of(searchItemPage, content));
     }
 
     @Transactional
@@ -101,7 +101,7 @@ public class SearchEngineService {
         // 서치 데이터 등록
         searchService.postSearchData(keyword);
 
-        return CompletableFuture.completedFuture(PaginationResponse.create(searchQuestionPage, content));
+        return CompletableFuture.completedFuture(PaginationResponse.of(searchQuestionPage, content));
 
     }
 
@@ -122,7 +122,7 @@ public class SearchEngineService {
         // 서치 데이터 등록
         searchService.postSearchData(keyword);
 
-        return CompletableFuture.completedFuture(PaginationResponse.create(searchUserPage, content));
+        return CompletableFuture.completedFuture(PaginationResponse.of(searchUserPage, content));
     }
 
     @Transactional

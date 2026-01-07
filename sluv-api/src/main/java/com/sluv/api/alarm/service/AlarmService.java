@@ -34,7 +34,7 @@ public class AlarmService {
         List<AlarmResponse> content = alarmPage.stream()
                 .map(alarm -> AlarmResponse.of(alarm, getAlarmImages(alarm)))
                 .toList();
-        return PaginationResponse.create(alarmPage, content);
+        return PaginationResponse.of(alarmPage, content);
     }
 
     private AlarmImages getAlarmImages(Alarm alarm) {

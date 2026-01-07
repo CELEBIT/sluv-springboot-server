@@ -33,7 +33,7 @@ public class BrandService {
                 .map(BrandSearchResponse::of)
                 .toList();
 
-        return PaginationResponse.create(brandPage, dtoList);
+        return PaginationResponse.of(brandPage, dtoList);
     }
 
     @Transactional(readOnly = true)

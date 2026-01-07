@@ -630,7 +630,7 @@ public class QuestionService {
             return getQuestionSimpleResDto(question, qType);
         }).toList();
 
-        return PaginationResponse.create(questionPage, content);
+        return PaginationResponse.of(questionPage, content);
     }
 
     @Transactional(readOnly = true)
@@ -686,7 +686,7 @@ public class QuestionService {
                     questionVote);
         }).toList();
 
-        return PaginationResponse.create(questionPage, content);
+        return PaginationResponse.of(questionPage, content);
     }
 
     private Long getTotalVoteCount(List<QuestionImgResDto> imgList, List<QuestionItemResDto> itemImgList) {
@@ -722,7 +722,7 @@ public class QuestionService {
                 getQuestionSimpleResDto(question, "Find")
         ).toList();
 
-        return PaginationResponse.create(questionPage, content);
+        return PaginationResponse.of(questionPage, content);
     }
 
     @Transactional(readOnly = true)
@@ -739,7 +739,7 @@ public class QuestionService {
                 getQuestionSimpleResDto(question, "How")
         ).toList();
 
-        return PaginationResponse.create(questionPage, content);
+        return PaginationResponse.of(questionPage, content);
     }
 
     @Transactional(readOnly = true)
@@ -756,7 +756,7 @@ public class QuestionService {
                 getQuestionSimpleResDto(question, "Recommend")
         ).toList();
 
-        return PaginationResponse.create(questionPage, content);
+        return PaginationResponse.of(questionPage, content);
     }
 
     private String getQuestionCelebName(QuestionFind questionFind) {
@@ -869,7 +869,7 @@ public class QuestionService {
             return QuestionSimpleResDto.of(question, writer, likeNum, commentNum, imgList, itemImgList, categoryList);
         }).toList();
 
-        return PaginationResponse.create(page, content);
+        return PaginationResponse.of(page, content);
     }
 }
 

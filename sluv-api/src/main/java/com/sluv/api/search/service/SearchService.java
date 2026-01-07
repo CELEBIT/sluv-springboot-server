@@ -69,7 +69,7 @@ public class SearchService {
                 .map(searchData -> SearchKeywordResDto.of(searchData.getSearchWord()))
                 .toList();
 
-        return PaginationResponse.create(searchDataPage, content);
+        return PaginationResponse.of(searchDataPage, content);
     }
 
     @Async

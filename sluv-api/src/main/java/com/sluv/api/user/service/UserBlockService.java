@@ -45,6 +45,6 @@ public class UserBlockService {
                 .map(userBlock -> UserBlockDto.of(userBlock.getBlockedUser(), true))
                 .toList();
 
-        return PaginationResponse.create(blockUserPage, content);
+        return PaginationResponse.of(blockUserPage, content);
     }
 }

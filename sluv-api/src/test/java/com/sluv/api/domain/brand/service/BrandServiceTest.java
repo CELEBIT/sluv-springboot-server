@@ -5,8 +5,6 @@ import com.sluv.api.brand.service.BrandService;
 import com.sluv.api.common.response.PaginationResponse;
 import com.sluv.domain.brand.entity.Brand;
 import com.sluv.domain.brand.service.BrandDomainService;
-import com.sluv.domain.brand.service.RecentSelectBrandDomainService;
-import com.sluv.domain.user.service.UserDomainService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

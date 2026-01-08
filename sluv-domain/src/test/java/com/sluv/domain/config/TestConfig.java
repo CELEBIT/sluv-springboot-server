@@ -1,4 +1,4 @@
-package com.sluv.domain.item.config;
+package com.sluv.domain.config;
 
 import com.sluv.domain.config.QueryDslConfig;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

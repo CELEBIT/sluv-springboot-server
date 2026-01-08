@@ -25,6 +25,7 @@ public class BrandController {
     @GetMapping("/search")
     public ResponseEntity<SuccessDataResponse<PaginationResponse<BrandSearchResponse>>> getBrandSearch(
             @RequestParam String brandName, Pageable pageable) {
+        System.out.println("brandName = " + brandName + ", pageable = " + pageable);
         PaginationResponse<BrandSearchResponse> response = brandService.findAllBrand(brandName, pageable);
         return ResponseEntity.ok().body(SuccessDataResponse.create(response));
     }

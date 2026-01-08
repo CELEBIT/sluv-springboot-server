@@ -18,6 +18,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.ActiveProfiles;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -73,6 +74,21 @@ public class BrandServiceTest {
         assertThat(response.getContent().get(0).getBrandEn()).isEqualTo("NIKE");
     }
 
+    @Test
+    @DisplayName("Top 10 브랜드 검색")
+    void findTopBrandTest() {
+        // given
+        List<Brand> content = new ArrayList<>();
+        for (int i=1; i<=10; i++) {
+            content.add(Brand.of("나이키"+i, "NIKE"+i, "http://image.url"));
+        }
+        when(brandDomainService.findTopBrand()).thenReturn(content);
 
+        // when
+        List<BrandSearchResponse> topBrands = brandService.findTopBrand();
+
+        // then
+        assertThat(topBrands.size()).isEqualTo(10);
+    }
 
 }

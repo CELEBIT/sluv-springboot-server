@@ -19,6 +19,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -73,6 +74,27 @@ public class BrandControllerTest {
                 .andExpect(jsonPath("$.result.content[0].brandKr").value(brandKrName))
                 .andExpect(jsonPath("$.result.content[0].brandEn").value(brandEnName))
                 .andExpect(jsonPath("$.result.content[0].brandImgUrl").value(brandImageUrl));
+    }
+
+    @Test
+    @DisplayName("Top 10 브랜드 검색")
+    @WithMockUser("1")
+    void getTopBrandTest() throws Exception {
+        // given
+        List<BrandSearchResponse> content = new ArrayList<>();
+        for (int i=1; i<=10; i++) {
+            Brand brand = Brand.of("나이키" + i, "NIKE" + i, "http://image.url");
+            content.add(BrandSearchResponse.from(brand));
+        }
+
+        when(brandService.findTopBrand()).thenReturn(content);
+
+        // when & then
+        mockMvc.perform(get("/app/brand/top")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.isSuccess").value(true))
+                .andExpect(jsonPath("$.result.content.length").value(10));
     }
 
 }

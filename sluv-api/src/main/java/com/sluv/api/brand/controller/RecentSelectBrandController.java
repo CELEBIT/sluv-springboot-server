@@ -2,7 +2,6 @@ package com.sluv.api.brand.controller;
 
 import com.sluv.api.brand.dto.request.RecentSelectBrandRequest;
 import com.sluv.api.brand.dto.response.RecentSelectBrandResponse;
-import com.sluv.api.brand.service.BrandService;
 import com.sluv.api.brand.service.RecentSelectBrandService;
 import com.sluv.api.common.response.SuccessDataResponse;
 import com.sluv.api.common.response.SuccessResponse;
@@ -18,14 +17,13 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/app/brand/recent")
 public class RecentSelectBrandController {
-    private final BrandService brandService;
     private final RecentSelectBrandService recentSelectBrandService;
 
     @Operation(summary = "*최근 선택한 브랜드 검색", description = "최근 선택한 브랜드을 검색")
     @GetMapping("")
     public ResponseEntity<SuccessDataResponse<List<RecentSelectBrandResponse>>> getRecentSelectBrand(
             @CurrentUserId Long userId) {
-        List<RecentSelectBrandResponse> response = brandService.findRecentSelectBrand(userId);
+        List<RecentSelectBrandResponse> response = recentSelectBrandService.findRecentSelectBrand(userId);
         return ResponseEntity.ok().body(SuccessDataResponse.create(response));
     }
 

@@ -44,15 +44,5 @@ public class BrandService {
                 .toList();
     }
 
-    @Transactional(readOnly = true)
-    public List<RecentSelectBrandResponse> findRecentSelectBrand(Long userId) {
-        User user = userDomainService.findById(userId);
-        List<RecentSelectBrand> recentSelectBrandList = recentSelectBrandDomainService.getRecentSelectBrandTop20(user);
-
-        return recentSelectBrandList.stream()
-                .map(RecentSelectBrandResponse::of)
-                .toList();
-    }
-
 }
 

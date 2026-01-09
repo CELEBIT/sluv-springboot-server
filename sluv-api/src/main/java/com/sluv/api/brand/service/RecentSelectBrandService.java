@@ -56,7 +56,7 @@ public class RecentSelectBrandService {
         List<RecentSelectBrand> recentSelectBrandList = recentSelectBrandDomainService.getRecentSelectBrandTop20(user);
 
         return recentSelectBrandList.stream()
-                .map(RecentSelectBrandResponse::of)
+                .map(RecentSelectBrandResponse::from)
                 .toList();
     }
 

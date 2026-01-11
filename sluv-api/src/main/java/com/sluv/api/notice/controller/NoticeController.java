@@ -32,7 +32,7 @@ public class NoticeController {
             Pageable pageable) {
 
         PaginationResponse<NoticeSimpleResponse> response = noticeService.getAllNotice(pageable);
-        return ResponseEntity.ok().body(SuccessDataResponse.create(response));
+        return ResponseEntity.ok().body(SuccessDataResponse.from(response));
     }
 
     @Operation(
@@ -47,6 +47,6 @@ public class NoticeController {
             @PathVariable("noticeId") Long noticeId) {
 
         NoticeDetailResponse response = noticeService.getNoticeDetail(noticeId);
-        return ResponseEntity.ok().body(SuccessDataResponse.create(response));
+        return ResponseEntity.ok().body(SuccessDataResponse.from(response));
     }
 }

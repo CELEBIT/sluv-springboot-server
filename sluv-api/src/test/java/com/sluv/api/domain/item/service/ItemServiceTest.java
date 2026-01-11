@@ -131,7 +131,7 @@ class ItemServiceTest {
         when(fixData.getNewCeleb()).thenReturn(null);
 
         Brand brand = mock(Brand.class);
-        BrandSearchResponse brandRes = BrandSearchResponse.of(brand);
+        BrandSearchResponse brandRes = BrandSearchResponse.from(brand);
         when(fixData.getBrand()).thenReturn(brandRes);
         when(fixData.getNewBrand()).thenReturn(null);
 

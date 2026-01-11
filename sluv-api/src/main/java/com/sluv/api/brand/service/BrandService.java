@@ -29,28 +29,18 @@ public class BrandService {
     public PaginationResponse<BrandSearchResponse> findAllBrand(String brandName, Pageable pageable) {
         Page<Brand> brandPage = brandDomainService.findByAllBrandKrOrBrandEnStartingWith(brandName, pageable);
 
-        List<BrandSearchResponse> dtoList = brandPage.stream()
-                .map(BrandSearchResponse::of)
+        List<BrandSearchResponse> brandSearchResponses = brandPage.stream()
+                .map(BrandSearchResponse::from)
                 .toList();
 
-        return PaginationResponse.create(brandPage, dtoList);
+        return PaginationResponse.of(brandPage, brandSearchResponses);
     }
 
     @Transactional(readOnly = true)
     public List<BrandSearchResponse> findTopBrand() {
         return brandDomainService.findTopBrand()
                 .stream()
-                .map(BrandSearchResponse::of)
-                .toList();
-    }
-
-    @Transactional(readOnly = true)
-    public List<RecentSelectBrandResponse> findRecentSelectBrand(Long userId) {
-        User user = userDomainService.findById(userId);
-        List<RecentSelectBrand> recentSelectBrandList = recentSelectBrandDomainService.getRecentSelectBrandTop20(user);
-
-        return recentSelectBrandList.stream()
-                .map(RecentSelectBrandResponse::of)
+                .map(BrandSearchResponse::from)
                 .toList();
     }
 

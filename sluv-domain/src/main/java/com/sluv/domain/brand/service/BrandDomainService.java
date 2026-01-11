@@ -14,8 +14,8 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class BrandDomainService {
-    private final BrandRepository brandRepository;
 
+    private final BrandRepository brandRepository;
 
     public Page<Brand> findByAllBrandKrOrBrandEnStartingWith(String brandName, Pageable pageable) {
         return brandRepository.findByAllBrandKrOrBrandEnStartingWith(brandName, pageable);

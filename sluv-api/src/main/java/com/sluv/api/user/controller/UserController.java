@@ -50,14 +50,14 @@ public class UserController {
     public ResponseEntity<SuccessDataResponse<UserMypageResDto>> getTargetUserMypage(@CurrentUserId Long userId,
                                                                                      @PathVariable("userId") Long targetId) {
         UserMypageResDto response = userService.getUserMypage(userId, targetId);
-        return ResponseEntity.ok().body(SuccessDataResponse.create(response));
+        return ResponseEntity.ok().body(SuccessDataResponse.from(response));
     }
 
     @Operation(summary = "현재 유저의 마이페이지 조회", description = "User 토큰 필요")
     @GetMapping("/mypage")
     public ResponseEntity<SuccessDataResponse<UserMypageResDto>> getUserMypage(@CurrentUserId Long userId) {
         UserMypageResDto response = userService.getUserMypage(userId, null);
-        return ResponseEntity.ok().body(SuccessDataResponse.create(response));
+        return ResponseEntity.ok().body(SuccessDataResponse.from(response));
     }
 
     @Operation(summary = "특정 유저의 아이템 목록 조회", description = "User 토큰 필요. Pagination 적용.")
@@ -65,7 +65,7 @@ public class UserController {
     public ResponseEntity<SuccessDataResponse<PaginationResponse<ItemSimpleDto>>> getUserItem(
             @CurrentUserId Long userId, @PathVariable("userId") Long targetId, Pageable pageable) {
         PaginationResponse<ItemSimpleDto> response = userService.getUserItem(userId, targetId, pageable);
-        return ResponseEntity.ok().body(SuccessDataResponse.create(response));
+        return ResponseEntity.ok().body(SuccessDataResponse.from(response));
     }
 
     @Operation(summary = "*특정 유저의 옷장 목록 조회", description = "User 토큰 필요. Pagination 적용.")
@@ -73,14 +73,14 @@ public class UserController {
     public ResponseEntity<SuccessDataResponse<PaginationResponse<ClosetResponse>>> getUserCloset(
             @CurrentUserId Long userId, @PathVariable("userId") Long targetId, Pageable pageable) {
         PaginationResponse<ClosetResponse> response = userService.getUserCloset(userId, targetId, pageable);
-        return ResponseEntity.ok().body(SuccessDataResponse.create(response));
+        return ResponseEntity.ok().body(SuccessDataResponse.from(response));
     }
 
     @Operation(summary = "*유저의 이메일, 소셜 종류 조회", description = "User 토큰 필요.")
     @GetMapping("/social")
     public ResponseEntity<SuccessDataResponse<UserSocialDto>> getUserSocialData(@CurrentUserId Long userId) {
         UserSocialDto response = userService.getUserSocialData(userId);
-        return ResponseEntity.ok().body(SuccessDataResponse.create(response));
+        return ResponseEntity.ok().body(SuccessDataResponse.from(response));
     }
 
     @Operation(summary = "*유저의 프로필 이미지 수정", description = "User 토큰 필요. Pagination 적용.")
@@ -105,7 +105,7 @@ public class UserController {
     public ResponseEntity<SuccessDataResponse<PaginationCountResponse<ItemSimpleDto>>> getUserUploadItem(
             @CurrentUserId Long userId, Pageable pageable) {
         PaginationCountResponse<ItemSimpleDto> response = userService.getUserUploadItem(userId, pageable);
-        return ResponseEntity.ok().body(SuccessDataResponse.create(response));
+        return ResponseEntity.ok().body(SuccessDataResponse.from(response));
     }
 
     @Operation(summary = "*유저가 작성한 Question 게시글 조회", description = "User 토큰 필요. Pagination 적용.")
@@ -115,7 +115,7 @@ public class UserController {
 
         PaginationCountResponse<QuestionSimpleResDto> response = userService.getUserUploadQuestion(userId,
                 pageable);
-        return ResponseEntity.ok().body(SuccessDataResponse.create(response));
+        return ResponseEntity.ok().body(SuccessDataResponse.from(response));
     }
 
     @Operation(summary = "*유저가 작성한 Comment 게시글 조회", description = "User 토큰 필요. Pagination 적용.")
@@ -124,7 +124,7 @@ public class UserController {
             @CurrentUserId Long userId, Pageable pageable) {
         PaginationCountResponse<CommentSimpleResponse> response = userService.getUserUploadComment(userId,
                 pageable);
-        return ResponseEntity.ok().body(SuccessDataResponse.create(response));
+        return ResponseEntity.ok().body(SuccessDataResponse.from(response));
     }
 
     /**
@@ -136,21 +136,21 @@ public class UserController {
                                                                                      @Nullable @RequestParam("celebId") Long celebId,
                                                                                      @Nullable @RequestParam("isNewCeleb") Boolean isNewCeleb) {
         List<UserSearchInfoDto> response = userService.getHotSluver(userId, celebId, isNewCeleb);
-        return ResponseEntity.ok().body(SuccessDataResponse.create(response));
+        return ResponseEntity.ok().body(SuccessDataResponse.from(response));
     }
 
     @Operation(summary = "*약관 동의", description = "광고성 정보 수신 및 마케팅 활용 동의")
     @PostMapping("/terms")
     public ResponseEntity<SuccessDataResponse<UserTermsResDto>> postTerms(@CurrentUserId Long userId) {
         UserTermsResDto response = userService.postTerms(userId);
-        return ResponseEntity.ok().body(SuccessDataResponse.create(response));
+        return ResponseEntity.ok().body(SuccessDataResponse.from(response));
     }
 
     @Operation(summary = "*약관 동의 상태 조회", description = "광고성 정보 수신 및 마케팅 활용 동의 상태 조회")
     @GetMapping("/terms")
     public ResponseEntity<SuccessDataResponse<UserTermsResDto>> getUserTermsStatus(@CurrentUserId Long userId) {
         UserTermsResDto response = userService.findUserTermsStatus(userId);
-        return ResponseEntity.ok().body(SuccessDataResponse.create(response));
+        return ResponseEntity.ok().body(SuccessDataResponse.from(response));
     }
 
     @Operation(summary = "*회원 탈퇴", description = "회원 탈퇴 기능")
@@ -165,7 +165,7 @@ public class UserController {
     @PatchMapping("/alarm-status")
     public ResponseEntity<SuccessDataResponse<UserAlarmStatusResponse>> changeUserAlarmStatus(@CurrentUserId Long userId) {
         UserAlarmStatusResponse response = userService.changeAlarmStatus(userId);
-        return ResponseEntity.ok().body(SuccessDataResponse.create(response));
+        return ResponseEntity.ok().body(SuccessDataResponse.from(response));
     }
 
 }

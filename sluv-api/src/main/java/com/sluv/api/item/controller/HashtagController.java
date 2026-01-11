@@ -25,7 +25,7 @@ public class HashtagController {
     public ResponseEntity<SuccessDataResponse<PaginationResponse<HashtagResponseDto>>> getHashtag(
             @Nullable @RequestParam String name, Pageable pageable) {
         PaginationResponse<HashtagResponseDto> response = hashtagService.getHashtag(name, pageable);
-        return ResponseEntity.ok().body(SuccessDataResponse.create(response));
+        return ResponseEntity.ok().body(SuccessDataResponse.from(response));
     }
 
     @Operation(summary = "새로운 해쉬태그 등록",
@@ -34,6 +34,6 @@ public class HashtagController {
     public ResponseEntity<SuccessDataResponse<HashtagPostResponseDto>> postHashtag(
             @RequestBody HashtagRequestDto requestDto) {
         HashtagPostResponseDto response = hashtagService.postHashtag(requestDto);
-        return ResponseEntity.ok().body(SuccessDataResponse.create(response));
+        return ResponseEntity.ok().body(SuccessDataResponse.from(response));
     }
 }

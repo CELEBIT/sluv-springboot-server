@@ -80,7 +80,7 @@ public class TempItemResDto {
                 : null;
 
         NewBrandPostResponse newBrand = tempItem.getNewBrand() != null
-                ? NewBrandPostResponse.of(tempItem.getNewBrand())
+                ? NewBrandPostResponse.from(tempItem.getNewBrand())
                 : null;
 
         return TempItemResDto.builder()

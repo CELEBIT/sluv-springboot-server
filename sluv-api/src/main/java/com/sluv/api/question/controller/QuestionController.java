@@ -29,7 +29,7 @@ public class QuestionController {
     public ResponseEntity<SuccessDataResponse<QuestionPostResDto>> postFind(@CurrentUserId Long userId,
                                                                             @RequestBody QuestionFindPostReqDto dto) {
         QuestionPostResDto response = questionService.postQuestionFind(userId, dto);
-        return ResponseEntity.ok().body(SuccessDataResponse.create(response));
+        return ResponseEntity.ok().body(SuccessDataResponse.from(response));
     }
 
     @Operation(summary = "*이중에뭐살까 게시글 등록",
@@ -39,7 +39,7 @@ public class QuestionController {
                                                                            @RequestBody QuestionBuyPostReqDto dto) {
 
         QuestionPostResDto response = questionService.postQuestionBuy(userId, dto);
-        return ResponseEntity.ok().body(SuccessDataResponse.create(response));
+        return ResponseEntity.ok().body(SuccessDataResponse.from(response));
     }
 
     @Operation(summary = "*이거어때 게시글 등록",
@@ -50,7 +50,7 @@ public class QuestionController {
 
         QuestionPostResDto response = questionService.postQuestionHowabout(userId, dto);
 
-        return ResponseEntity.ok().body(SuccessDataResponse.create(response));
+        return ResponseEntity.ok().body(SuccessDataResponse.from(response));
     }
 
     @Operation(summary = "*추천해 줘 게시글 등록",
@@ -59,7 +59,7 @@ public class QuestionController {
     public ResponseEntity<SuccessDataResponse<QuestionPostResDto>> postRecommend(@CurrentUserId Long userId,
                                                                                  @RequestBody QuestionRecommendPostReqDto dto) {
         QuestionPostResDto response = questionService.postQuestionRecommend(userId, dto);
-        return ResponseEntity.ok().body(SuccessDataResponse.create(response));
+        return ResponseEntity.ok().body(SuccessDataResponse.from(response));
     }
 
     @Operation(summary = "Question 게시글 삭제",
@@ -94,7 +94,7 @@ public class QuestionController {
             @CurrentUserId Long userId, @PathVariable("questionId") Long questionId) {
 
         QuestionGetDetailResDto response = questionService.getQuestionDetail(userId, questionId);
-        return ResponseEntity.ok().body(SuccessDataResponse.create(response));
+        return ResponseEntity.ok().body(SuccessDataResponse.from(response));
     }
 
     @Operation(summary = "*QuestionBuy 게시글 투표", description = "User 토큰 필요. 좋아요 시스템과 동일.")
@@ -121,7 +121,7 @@ public class QuestionController {
             default -> throw new QuestionTypeNotFoundException();
         };
 
-        return ResponseEntity.ok().body(SuccessDataResponse.create(result));
+        return ResponseEntity.ok().body(SuccessDataResponse.from(result));
     }
 
     @Operation(summary = "Question 커뮤니티 게시글 종합 검색", description = "Pagination 적용. 최신순으로 조회")
@@ -129,7 +129,7 @@ public class QuestionController {
     public ResponseEntity<SuccessDataResponse<PaginationResponse<QuestionSimpleResDto>>> getQuestionTotalList(
             @CurrentUserId Long userId, Pageable pageable) {
         PaginationResponse<QuestionSimpleResDto> response = questionService.getTotalQuestionList(userId, pageable);
-        return ResponseEntity.ok().body(SuccessDataResponse.create(response));
+        return ResponseEntity.ok().body(SuccessDataResponse.from(response));
     }
 
     @Operation(summary = "QuestionFind 커뮤니티 게시글 검색",
@@ -141,7 +141,7 @@ public class QuestionController {
 
         PaginationResponse<QuestionSimpleResDto> response = questionService.getQuestionFindList(userId, celebId,
                 isNewCeleb, pageable);
-        return ResponseEntity.ok().body(SuccessDataResponse.create(response));
+        return ResponseEntity.ok().body(SuccessDataResponse.from(response));
     }
 
     @Operation(
@@ -162,7 +162,7 @@ public class QuestionController {
             Pageable pageable) {
         PaginationResponse<QuestionBuySimpleResDto> response = questionService.getQuestionBuyList(userId,
                 voteStatus, pageable);
-        return ResponseEntity.ok().body(SuccessDataResponse.create(response));
+        return ResponseEntity.ok().body(SuccessDataResponse.from(response));
     }
 
     @Operation(summary = "QuestionHowabout 커뮤니티 게시글 검색", description = "Pagination 적용. Ordering 최신순")
@@ -171,7 +171,7 @@ public class QuestionController {
             @CurrentUserId Long userId, Pageable pageable) {
         PaginationResponse<QuestionSimpleResDto> response = questionService.getQuestionHowaboutList(
                 userId, pageable);
-        return ResponseEntity.ok().body(SuccessDataResponse.create(response));
+        return ResponseEntity.ok().body(SuccessDataResponse.from(response));
     }
 
     @Operation(summary = "QuestionRecommend 커뮤니티 게시글 검색",
@@ -181,7 +181,7 @@ public class QuestionController {
             @CurrentUserId Long userId, @Nullable @RequestParam String hashtag, Pageable pageable) {
         PaginationResponse<QuestionSimpleResDto> response = questionService.getQuestionRecommendList(
                 userId, hashtag, pageable);
-        return ResponseEntity.ok().body(SuccessDataResponse.create(response));
+        return ResponseEntity.ok().body(SuccessDataResponse.from(response));
     }
 
     @Operation(summary = "일간 핫 커뮤니티 게시글 검색",
@@ -189,7 +189,7 @@ public class QuestionController {
     @GetMapping("/dailyhot")
     public ResponseEntity<SuccessDataResponse<List<QuestionHomeResDto>>> getDailyHotQuestionList(@CurrentUserId Long userId) {
         List<QuestionHomeResDto> response = questionService.getDailyHotQuestionList(userId);
-        return ResponseEntity.ok().body(SuccessDataResponse.create(response));
+        return ResponseEntity.ok().body(SuccessDataResponse.from(response));
     }
 
     @Operation(summary = "주간 핫 커뮤니티 게시글 검색",
@@ -199,6 +199,6 @@ public class QuestionController {
             @CurrentUserId Long userId, Pageable pageable) {
         PaginationResponse<QuestionSimpleResDto> response = questionService.getWeeklyHotQuestionList(
                 userId, pageable);
-        return ResponseEntity.ok().body(SuccessDataResponse.create(response));
+        return ResponseEntity.ok().body(SuccessDataResponse.from(response));
     }
 }

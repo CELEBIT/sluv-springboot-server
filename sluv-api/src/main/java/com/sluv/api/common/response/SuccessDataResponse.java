@@ -17,7 +17,7 @@ public class SuccessDataResponse<T> extends SuccessResponse {
         this.result = result;
     }
 
-    public static <T> SuccessDataResponse<T> create(T result) {
+    public static <T> SuccessDataResponse<T> from(T result) {
         return SuccessDataResponse.<T>builder()
                 .result(result)
                 .build();

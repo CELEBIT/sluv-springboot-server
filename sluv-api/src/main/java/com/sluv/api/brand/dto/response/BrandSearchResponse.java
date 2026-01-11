@@ -23,7 +23,7 @@ public class BrandSearchResponse implements Serializable {
     @Schema(description = "브랜드 이미지 URL")
     private String brandImgUrl;
 
-    public static BrandSearchResponse of(Brand brand) {
+    public static BrandSearchResponse from(Brand brand) {
         return BrandSearchResponse.builder()
                 .id(brand.getId())
                 .brandKr(brand.getBrandKr())

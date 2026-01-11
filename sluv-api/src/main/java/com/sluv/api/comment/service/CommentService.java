@@ -60,7 +60,7 @@ public class CommentService {
         // Content 제작
         List<CommentResponse> content = commentHelper.getCommentResDtos(user, commentPage.getContent());
 
-        return PaginationResponse.create(commentPage, content);
+        return PaginationResponse.of(commentPage, content);
     }
 
     /**

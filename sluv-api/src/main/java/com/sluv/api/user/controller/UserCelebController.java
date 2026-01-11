@@ -28,7 +28,7 @@ public class UserCelebController {
             @CurrentUserId Long userId) {
         List<InterestedCelebCategoryResponse> response = userCelebService.getInterestedCelebByCategory(
                 userId);
-        return ResponseEntity.ok().body(SuccessDataResponse.create(response));
+        return ResponseEntity.ok().body(SuccessDataResponse.from(response));
     }
 
     @Operation(summary = "*현재 유저의 관심 샐럽을 등록순을 기준으로 조회",
@@ -38,7 +38,7 @@ public class UserCelebController {
             @CurrentUserId Long userId) {
         List<InterestedCelebParentResponse> response = userCelebService.getInterestedCelebByPostTime(
                 userId);
-        return ResponseEntity.ok().body(SuccessDataResponse.create(response));
+        return ResponseEntity.ok().body(SuccessDataResponse.from(response));
     }
 
     @Operation(summary = "특정 유저의 관심 샐럽을 등록순을 기준으로 조회",
@@ -47,7 +47,7 @@ public class UserCelebController {
     public ResponseEntity<SuccessDataResponse<List<InterestedCelebParentResponse>>> getTargetUserInterestedCelebByPostTime(
             @PathVariable("userId") Long userId) {
         List<InterestedCelebParentResponse> response = userCelebService.getInterestedCelebByPostTime(userId);
-        return ResponseEntity.ok().body(SuccessDataResponse.create(response));
+        return ResponseEntity.ok().body(SuccessDataResponse.from(response));
     }
 
     @Operation(summary = "*특정 유저의 관심 샐럽을 카테고리를 기준으로 조회",
@@ -56,7 +56,7 @@ public class UserCelebController {
     public ResponseEntity<SuccessDataResponse<List<InterestedCelebCategoryResponse>>> getTargetUserInterestedCelebByCategory(
             @PathVariable("userId") Long userId) {
         List<InterestedCelebCategoryResponse> response = userCelebService.getInterestedCelebByCategory(userId);
-        return ResponseEntity.ok().body(SuccessDataResponse.create(response));
+        return ResponseEntity.ok().body(SuccessDataResponse.from(response));
     }
 
     @Operation(summary = "*유저의 관심 셀럽 업데이트", description = "User 토큰 필요")

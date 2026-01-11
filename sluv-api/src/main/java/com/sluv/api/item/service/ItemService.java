@@ -258,7 +258,7 @@ public class ItemService {
 
         // 3. Brand
         BrandSearchResponse brand = item.getBrand() != null ?
-                BrandSearchResponse.of(item.getBrand())
+                BrandSearchResponse.from(item.getBrand())
                 : null;
 
         // 4. 작성자 info
@@ -312,7 +312,7 @@ public class ItemService {
         Page<Item> recentItemPage = itemDomainService.getRecentItem(user, pageable);
         List<ItemSimpleDto> itemSimpleDtos = itemDomainService.getItemSimpleDto(user,
                 recentItemPage.getContent());
-        return PaginationResponse.create(recentItemPage, itemSimpleDtos);
+        return PaginationResponse.of(recentItemPage, itemSimpleDtos);
 
     }
 
@@ -322,7 +322,7 @@ public class ItemService {
         // User, Closet, Item 조인하여 ItemPage 조회
         Page<Item> itemPage = itemDomainService.getAllScrapItem(user, pageable);
         List<ItemSimpleDto> itemSimpleDtos = itemDomainService.getItemSimpleDto(user, itemPage.getContent());
-        return PaginationResponse.create(itemPage, itemSimpleDtos);
+        return PaginationResponse.of(itemPage, itemSimpleDtos);
     }
 
     @Transactional(readOnly = true)
@@ -340,7 +340,7 @@ public class ItemService {
         List<ItemSimpleDto> content =
                 itemDomainService.getItemSimpleDto(user, recommendItemPage.getContent());
 
-        return PaginationResponse.create(recommendItemPage, content);
+        return PaginationResponse.of(recommendItemPage, content);
     }
 
     /**
@@ -354,7 +354,7 @@ public class ItemService {
         // Content 조립
         List<ItemSimpleDto> content = itemDomainService.getItemSimpleDto(user, itemPage.getContent());
 
-        return PaginationResponse.create(itemPage, content);
+        return PaginationResponse.of(itemPage, content);
     }
 
     /**
@@ -371,7 +371,7 @@ public class ItemService {
         }
         Page<Item> itemPage = itemDomainService.getNowBuyItem(blockUserIds, pageable, dto);
         List<ItemSimpleDto> content = itemDomainService.getItemSimpleDto(user, itemPage.getContent());
-        return PaginationResponse.create(itemPage, content);
+        return PaginationResponse.of(itemPage, content);
     }
 
     @Transactional(readOnly = true)
@@ -390,7 +390,7 @@ public class ItemService {
         // Content 조립
         List<ItemSimpleDto> content = itemDomainService.getItemSimpleDto(user, itemPage.getContent());
 
-        return PaginationResponse.create(itemPage, content);
+        return PaginationResponse.of(itemPage, content);
     }
 
     @Transactional(readOnly = true)
@@ -405,7 +405,7 @@ public class ItemService {
 
         Page<Item> itemPage = itemDomainService.getLuxuryItem(blockUserIds, pageable, dto);
         List<ItemSimpleDto> content = itemDomainService.getItemSimpleDto(user, itemPage.getContent());
-        return PaginationResponse.create(itemPage, content);
+        return PaginationResponse.of(itemPage, content);
     }
 
     @Transactional(readOnly = true)
@@ -421,7 +421,7 @@ public class ItemService {
 
         Page<Item> itemPage = itemDomainService.getEfficientItem(blockUserIds, pageable, filterReqDto);
         List<ItemSimpleDto> content = itemDomainService.getItemSimpleDto(user, itemPage.getContent());
-        return PaginationResponse.create(itemPage, content);
+        return PaginationResponse.of(itemPage, content);
     }
 
     @Transactional(readOnly = true)
@@ -450,7 +450,7 @@ public class ItemService {
 
         List<ItemSimpleDto> content = itemDomainService.getItemSimpleDto(user, itemPage.getContent());
 
-        return PaginationResponse.create(itemPage, content);
+        return PaginationResponse.of(itemPage, content);
     }
 
     @Transactional(readOnly = true)

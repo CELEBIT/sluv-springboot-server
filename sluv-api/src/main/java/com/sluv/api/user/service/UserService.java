@@ -131,7 +131,7 @@ public class UserService {
                 .map(item -> itemHelper.convertItemToSimpleResDto(item, user))
                 .toList();
 
-        return PaginationResponse.create(itemPage, content);
+        return PaginationResponse.of(itemPage, content);
     }
 
     @Transactional(readOnly = true)
@@ -150,7 +150,7 @@ public class UserService {
                 .map(closet -> ClosetResponse.of(closet, itemScrapDomainService.countByClosetId(closet.getId())))
                 .toList();
 
-        return PaginationResponse.create(closetPage, content);
+        return PaginationResponse.of(closetPage, content);
     }
 
     @Transactional

@@ -52,7 +52,7 @@ public class FollowService {
         List<UserSearchInfoDto> content =
                 followDomainService.getUserSearchInfoDto(user, followerPage.getContent(), "follower");
 
-        return PaginationResponse.create(followerPage, content);
+        return PaginationResponse.of(followerPage, content);
     }
 
     @Transactional(readOnly = true)
@@ -66,7 +66,7 @@ public class FollowService {
         List<UserSearchInfoDto> content =
                 followDomainService.getUserSearchInfoDto(user, followerPage.getContent(), "followee");
 
-        return PaginationResponse.create(followerPage, content);
+        return PaginationResponse.of(followerPage, content);
     }
 
 }

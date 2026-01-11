@@ -28,8 +28,6 @@ public class RecentSelectBrandRepositoryImpl implements RecentSelectBrandReposit
                 .limit(20)
                 .orderBy(recentSelectBrand.createdAt.max().desc())
                 .fetch();
-
-//        return null;
     }
 
     @Override

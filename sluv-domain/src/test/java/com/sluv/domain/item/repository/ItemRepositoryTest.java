@@ -1,7 +1,7 @@
 package com.sluv.domain.item.repository;
 
 import com.sluv.domain.closet.repository.ClosetRepository;
-import com.sluv.domain.item.config.TestConfig;
+import com.sluv.domain.config.TestConfig;
 import com.sluv.domain.item.dto.ItemCountDto;
 import com.sluv.domain.item.dto.ItemStatusDto;
 import com.sluv.domain.item.entity.Item;

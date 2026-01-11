@@ -32,7 +32,7 @@ public class NoticeService {
                 .map(NoticeSimpleResponse::of)
                 .toList();
 
-        return PaginationResponse.create(noticePage, content);
+        return PaginationResponse.of(noticePage, content);
     }
 
     /**

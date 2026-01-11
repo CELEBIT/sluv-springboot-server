@@ -1,6 +1,7 @@
 package com.sluv.api.brand.service;
 
 import com.sluv.api.brand.dto.request.RecentSelectBrandRequest;
+import com.sluv.api.brand.dto.response.RecentSelectBrandResponse;
 import com.sluv.domain.brand.entity.Brand;
 import com.sluv.domain.brand.entity.NewBrand;
 import com.sluv.domain.brand.entity.RecentSelectBrand;
@@ -13,6 +14,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @Slf4j
@@ -45,6 +48,16 @@ public class RecentSelectBrandService {
         } else {
             recentSelectBrandDomainService.deleteByUserIdAndNewBrandId(userId, brandId);
         }
+    }
+
+    @Transactional(readOnly = true)
+    public List<RecentSelectBrandResponse> findRecentSelectBrand(Long userId) {
+        User user = userDomainService.findById(userId);
+        List<RecentSelectBrand> recentSelectBrands = recentSelectBrandDomainService.getRecentSelectBrandTop20(user);
+
+        return recentSelectBrands.stream()
+                .map(RecentSelectBrandResponse::from)
+                .toList();
     }
 
 }

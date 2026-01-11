@@ -101,4 +101,20 @@ public class RecentSelectBrandControllerTest {
                 .andExpect(jsonPath("$.isSuccess").value(true));
     }
 
+    @Test
+    @DisplayName("최근 선택한 브랜드 선택 삭제")
+    @WithMockUser("1")
+    void deleteRecentSelectBrandTest() throws Exception {
+        // given
+        doNothing().when(recentSelectBrandService).deleteRecentSelectBrand(1L, 1L, "Y");
+
+        // when & then
+        mockMvc.perform(delete("/app/brand/recent/{brandId}", 1L)
+                        .with(csrf())
+                        .queryParam("flag", "Y")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.isSuccess").value(true));
+    }
+
 }

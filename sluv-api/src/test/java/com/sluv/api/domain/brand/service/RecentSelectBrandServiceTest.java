@@ -116,4 +116,30 @@ public class RecentSelectBrandServiceTest {
         verify(recentSelectBrandDomainService).deleteAllByUserId(eq(1L));
     }
 
+    @Test
+    @DisplayName("최근 선택한 브랜드 삭제")
+    void deleteRecentSelectBrandTest() {
+        // given
+        doNothing().when(recentSelectBrandDomainService).deleteByUserIdAndBrandId(1L, 1L);
+
+        // when
+        recentSelectBrandService.deleteRecentSelectBrand(1L, 1L ,"Y");
+
+        // then
+        verify(recentSelectBrandDomainService).deleteByUserIdAndBrandId(1L, 1L);
+    }
+
+    @Test
+    @DisplayName("최근 선택한 브랜드 중 뉴브랜드 삭제")
+    void deleteRecentSelectBrandWithNewBrandTest() {
+        // given
+        doNothing().when(recentSelectBrandDomainService).deleteByUserIdAndNewBrandId(1L, 1L);
+
+        // when
+        recentSelectBrandService.deleteRecentSelectBrand(1L, 1L ,"N");
+
+        // then
+        verify(recentSelectBrandDomainService).deleteByUserIdAndNewBrandId(1L, 1L);
+    }
+
 }

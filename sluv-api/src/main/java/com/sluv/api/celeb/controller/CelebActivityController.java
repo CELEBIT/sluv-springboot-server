@@ -25,7 +25,7 @@ public class CelebActivityController {
     public ResponseEntity<SuccessDataResponse<List<CelebActivityResponse>>> getCelebActivity(
             @PathVariable("celebId") Long celebId) {
         List<CelebActivityResponse> response = celebActivityService.getCelebActivity(celebId);
-        return ResponseEntity.ok().body(SuccessDataResponse.create(response));
+        return ResponseEntity.ok().body(SuccessDataResponse.from(response));
     }
 
 }

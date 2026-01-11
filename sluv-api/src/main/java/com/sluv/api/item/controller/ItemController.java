@@ -34,7 +34,7 @@ public class ItemController {
     public ResponseEntity<SuccessDataResponse<ItemDetailResDto>> getItemDetail(@CurrentUserId Long userId,
                                                                                @PathVariable("itemId") Long itemId) {
         ItemDetailResDto response = itemService.getItemDetail(userId, itemId);
-        return ResponseEntity.ok().body(SuccessDataResponse.create(response));
+        return ResponseEntity.ok().body(SuccessDataResponse.from(response));
     }
 
     /**
@@ -45,7 +45,7 @@ public class ItemController {
     public ResponseEntity<SuccessDataResponse<List<ItemSimpleDto>>> getSameCelebItem(
             @CurrentUserId Long userId, @RequestParam("itemId") Long itemId) {
         List<ItemSimpleDto> response = itemService.getSameCelebItems(userId, itemId);
-        return ResponseEntity.ok().body(SuccessDataResponse.create(response));
+        return ResponseEntity.ok().body(SuccessDataResponse.from(response));
     }
 
     /**
@@ -56,7 +56,7 @@ public class ItemController {
     public ResponseEntity<SuccessDataResponse<List<ItemSimpleDto>>> getSameBrandItem(
             @CurrentUserId Long userId, @RequestParam("itemId") Long itemId) {
         List<ItemSimpleDto> response = itemService.getSameBrandItem(userId, itemId);
-        return ResponseEntity.ok().body(SuccessDataResponse.create(response));
+        return ResponseEntity.ok().body(SuccessDataResponse.from(response));
     }
 
     /**
@@ -68,7 +68,7 @@ public class ItemController {
             @CurrentUserId Long userId,
             @RequestParam("itemId") Long itemId) {
         List<ItemSimpleDto> response = itemService.getTogetherScrapItem(userId, itemId);
-        return ResponseEntity.ok().body(SuccessDataResponse.create(response));
+        return ResponseEntity.ok().body(SuccessDataResponse.from(response));
     }
 
     @Operation(summary = "*최근 본 아이템 조회", description = "User 토큰 필요. Pagination 적용. 최근 본 순서로 정렬.")
@@ -76,7 +76,7 @@ public class ItemController {
     public ResponseEntity<SuccessDataResponse<PaginationResponse<ItemSimpleDto>>> getRecentItem(
             @CurrentUserId Long userId, Pageable pageable) {
         PaginationResponse<ItemSimpleDto> response = itemService.getRecentItem(userId, pageable);
-        return ResponseEntity.ok().body(SuccessDataResponse.create(response));
+        return ResponseEntity.ok().body(SuccessDataResponse.from(response));
     }
 
     @Operation(summary = "*찜한 아이템 조회", description = "User 토큰 필요. Pagination 적용. 스크랩한 최신순으로 정렬.")
@@ -84,7 +84,7 @@ public class ItemController {
     public ResponseEntity<SuccessDataResponse<PaginationResponse<ItemSimpleDto>>> getScrapItem(
             @CurrentUserId Long userId, Pageable pageable) {
         PaginationResponse<ItemSimpleDto> response = itemService.getScrapItem(userId, pageable);
-        return ResponseEntity.ok().body(SuccessDataResponse.create(response));
+        return ResponseEntity.ok().body(SuccessDataResponse.from(response));
     }
 
     @Operation(summary = "*아이템 등록 및 수정", description = "User 토큰 필요")
@@ -92,7 +92,7 @@ public class ItemController {
     public ResponseEntity<SuccessDataResponse<ItemPostResDto>> postItem(@CurrentUserId Long userId,
                                                                         @RequestBody ItemPostReqDto reqDto) {
         ItemPostResDto response = itemService.postItem(userId, reqDto);
-        return ResponseEntity.ok().body(SuccessDataResponse.create(response));
+        return ResponseEntity.ok().body(SuccessDataResponse.from(response));
     }
 
     @Operation(summary = "아이템 게시글 좋아요", description = "User 토큰 필요")
@@ -120,7 +120,7 @@ public class ItemController {
     public ResponseEntity<SuccessDataResponse<PaginationResponse<ItemSimpleDto>>> getRecommendItem(
             @CurrentUserId Long userId, Pageable pageable) {
         PaginationResponse<ItemSimpleDto> response = itemService.getRecommendItem(userId, pageable);
-        return ResponseEntity.ok().body(SuccessDataResponse.create(response));
+        return ResponseEntity.ok().body(SuccessDataResponse.from(response));
     }
 
     @Operation(summary = "*핫한 셀럽들이 선택한 여름나기 아이템 조회",
@@ -131,7 +131,7 @@ public class ItemController {
             Pageable pageable,
             SearchFilterReqDto dto) {
         PaginationResponse<ItemSimpleDto> response = itemService.getSummerItem(userId, pageable, dto);
-        return ResponseEntity.ok().body(SuccessDataResponse.create(response));
+        return ResponseEntity.ok().body(SuccessDataResponse.from(response));
     }
 
     @Operation(summary = "*지금 당장 구매가능한 아이템 조회",
@@ -142,7 +142,7 @@ public class ItemController {
             Pageable pageable,
             SearchFilterReqDto dto) {
         PaginationResponse<ItemSimpleDto> response = itemService.getNowBuyItem(userId, pageable, dto);
-        return ResponseEntity.ok().body(SuccessDataResponse.create(response));
+        return ResponseEntity.ok().body(SuccessDataResponse.from(response));
     }
 
     @Operation(summary = "*실시간 뉴 아이템 조회", description = "WhenDiscovery 기준 아이템 조회. User 토큰 필요. Pagination 적용.")
@@ -151,7 +151,7 @@ public class ItemController {
             @CurrentUserId Long userId,
             Pageable pageable) {
         PaginationResponse<ItemSimpleDto> response = itemService.getNewItem(userId, pageable);
-        return ResponseEntity.ok().body(SuccessDataResponse.create(response));
+        return ResponseEntity.ok().body(SuccessDataResponse.from(response));
     }
 
     @Operation(summary = "*주목해야할 럭셔리 무드 아이템 조회", description = "User 토큰 필요. Pagination 적용.")
@@ -161,7 +161,7 @@ public class ItemController {
             Pageable pageable,
             SearchFilterReqDto dto) {
         PaginationResponse<ItemSimpleDto> response = itemService.getLuxuryItem(userId, pageable, dto);
-        return ResponseEntity.ok().body(SuccessDataResponse.create(response));
+        return ResponseEntity.ok().body(SuccessDataResponse.from(response));
     }
 
     @Operation(summary = "*가성비 좋은 선물 아이템 조회", description = "User 토큰 필요. Pagination 적용.")
@@ -171,7 +171,7 @@ public class ItemController {
             Pageable pageable,
             SearchFilterReqDto filterReqDto) {
         PaginationResponse<ItemSimpleDto> response = itemService.getEfficientItem(userId, pageable, filterReqDto);
-        return ResponseEntity.ok().body(SuccessDataResponse.create(response));
+        return ResponseEntity.ok().body(SuccessDataResponse.from(response));
     }
 
     @Deprecated
@@ -188,7 +188,7 @@ public class ItemController {
             throw new StandardNotFoundException();
         }
 
-        return ResponseEntity.ok().body(SuccessDataResponse.create(result));
+        return ResponseEntity.ok().body(SuccessDataResponse.from(result));
     }
 
     /**
@@ -200,7 +200,7 @@ public class ItemController {
     public ResponseEntity<SuccessDataResponse<PaginationResponse<ItemSimpleDto>>> getHotCelebItem(
             @CurrentUserId Long userId, Pageable pageable, SearchFilterReqDto dto) {
         PaginationResponse<ItemSimpleDto> response = itemService.getHotCelebItem(userId, pageable, dto);
-        return ResponseEntity.ok().body(SuccessDataResponse.create(response));
+        return ResponseEntity.ok().body(SuccessDataResponse.from(response));
     }
 
     /**
@@ -212,7 +212,7 @@ public class ItemController {
     public ResponseEntity<SuccessDataResponse<List<ItemSimpleDto>>> getCurationItem(
             @CurrentUserId Long userId) {
         List<ItemSimpleDto> response = itemService.getCurationItem(userId);
-        return ResponseEntity.ok().body(SuccessDataResponse.create(response));
+        return ResponseEntity.ok().body(SuccessDataResponse.from(response));
     }
 
     /**
@@ -223,7 +223,7 @@ public class ItemController {
     public ResponseEntity<SuccessDataResponse<List<ItemSimpleDto>>> getHowAboutItem(
             @CurrentUserId Long userId) {
         List<ItemSimpleDto> response = itemService.getHowAboutItem(userId);
-        return ResponseEntity.ok().body(SuccessDataResponse.create(response));
+        return ResponseEntity.ok().body(SuccessDataResponse.from(response));
     }
 
     @Operation(summary = "*트랜드 셀럽의 아이템", description = "홈 화면 직접 선정한 셀럽의 아이템 조회")
@@ -231,7 +231,7 @@ public class ItemController {
     public ResponseEntity<SuccessDataResponse<List<ItemSimpleDto>>> getTrendItems(
             @CurrentUserId Long userId, Pageable pageable) {
         List<ItemSimpleDto> response = itemService.getTrendItems(userId, pageable);
-        return ResponseEntity.ok().body(SuccessDataResponse.create(response));
+        return ResponseEntity.ok().body(SuccessDataResponse.from(response));
     }
 
 }

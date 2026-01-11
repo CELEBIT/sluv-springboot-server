@@ -53,9 +53,9 @@ public class RecentSelectBrandService {
     @Transactional(readOnly = true)
     public List<RecentSelectBrandResponse> findRecentSelectBrand(Long userId) {
         User user = userDomainService.findById(userId);
-        List<RecentSelectBrand> recentSelectBrandList = recentSelectBrandDomainService.getRecentSelectBrandTop20(user);
+        List<RecentSelectBrand> recentSelectBrands = recentSelectBrandDomainService.getRecentSelectBrandTop20(user);
 
-        return recentSelectBrandList.stream()
+        return recentSelectBrands.stream()
                 .map(RecentSelectBrandResponse::from)
                 .toList();
     }

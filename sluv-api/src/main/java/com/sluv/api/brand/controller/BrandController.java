@@ -25,16 +25,15 @@ public class BrandController {
     @GetMapping("/search")
     public ResponseEntity<SuccessDataResponse<PaginationResponse<BrandSearchResponse>>> getBrandSearch(
             @RequestParam String brandName, Pageable pageable) {
-        System.out.println("brandName = " + brandName + ", pageable = " + pageable);
         PaginationResponse<BrandSearchResponse> response = brandService.findAllBrand(brandName, pageable);
-        return ResponseEntity.ok().body(SuccessDataResponse.create(response));
+        return ResponseEntity.ok().body(SuccessDataResponse.from(response));
     }
 
     @Operation(summary = "인기 브랜드 검색", description = "인기 브랜드 검색(상위 10개)")
     @GetMapping("/top")
     public ResponseEntity<SuccessDataResponse<List<BrandSearchResponse>>> getTopBrand() {
         List<BrandSearchResponse> response = brandService.findTopBrand();
-        return ResponseEntity.ok().body(SuccessDataResponse.create(response));
+        return ResponseEntity.ok().body(SuccessDataResponse.from(response));
     }
 
 }

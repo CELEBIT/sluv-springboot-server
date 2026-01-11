@@ -24,7 +24,7 @@ public class ItemCategoryController {
     public ResponseEntity<SuccessDataResponse<List<ItemCategoryParentResponseDto>>> getItemCategory() {
 
         List<ItemCategoryParentResponseDto> response = itemCategoryService.getItemCategory();
-        return ResponseEntity.ok().body(SuccessDataResponse.create(response));
+        return ResponseEntity.ok().body(SuccessDataResponse.from(response));
     }
 
 }

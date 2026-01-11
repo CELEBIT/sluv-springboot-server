@@ -23,7 +23,7 @@ public class AlarmController {
     public ResponseEntity<SuccessDataResponse<PaginationResponse<AlarmResponse>>> getAlarms(
             @CurrentUserId Long userId, Pageable pageable) {
         PaginationResponse<AlarmResponse> response = alarmService.getAlarmsByUserId(userId, pageable);
-        return ResponseEntity.ok().body(SuccessDataResponse.create(response));
+        return ResponseEntity.ok().body(SuccessDataResponse.from(response));
     }
 
     @PatchMapping("/read")
@@ -50,7 +50,7 @@ public class AlarmController {
     @GetMapping("/check")
     public ResponseEntity<SuccessDataResponse<AlarmCheckResponse>> checkAlarmAllRead(@CurrentUserId Long userId) {
         AlarmCheckResponse response = alarmService.checkAlarmAllRead(userId);
-        return ResponseEntity.ok().body(SuccessDataResponse.create(response));
+        return ResponseEntity.ok().body(SuccessDataResponse.from(response));
     }
 
 }

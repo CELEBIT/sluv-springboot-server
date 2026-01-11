@@ -24,13 +24,13 @@ public class AdminController {
             @RequestBody AdminUserTokenRequest request) {
 
         AdminUserTokenResponse response = adminService.getUserTokenByAdmin(request);
-        return ResponseEntity.ok().body(SuccessDataResponse.create(response));
+        return ResponseEntity.ok().body(SuccessDataResponse.from(response));
     }
 
     @PostMapping("")
     public ResponseEntity<SuccessDataResponse<AdminResponse>> saveAdmin(@RequestBody AdminRequest request) {
         AdminResponse response = adminService.getAdminData(request);
-        return ResponseEntity.ok().body(SuccessDataResponse.create(response));
+        return ResponseEntity.ok().body(SuccessDataResponse.from(response));
     }
 
 }

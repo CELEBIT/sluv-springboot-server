@@ -24,7 +24,7 @@ public class RecentSelectBrandController {
     public ResponseEntity<SuccessDataResponse<List<RecentSelectBrandResponse>>> getRecentSelectBrand(
             @CurrentUserId Long userId) {
         List<RecentSelectBrandResponse> response = recentSelectBrandService.findRecentSelectBrand(userId);
-        return ResponseEntity.ok().body(SuccessDataResponse.create(response));
+        return ResponseEntity.ok().body(SuccessDataResponse.from(response));
     }
 
     @Operation(summary = "*최근 선택한 브랜드 등록", description = "User 토큰 필요")

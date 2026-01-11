@@ -49,7 +49,7 @@ public class SearchController {
         PaginationResponse<ItemSimpleDto> response = searchEngineService.getSearchItem(userId,
                 keyword, dto, pageable).get();
 
-        return ResponseEntity.ok().body(SuccessDataResponse.create(response));
+        return ResponseEntity.ok().body(SuccessDataResponse.from(response));
     }
 
     @Operation(
@@ -73,7 +73,7 @@ public class SearchController {
         PaginationResponse<QuestionSimpleResDto> response = searchEngineService.getSearchQuestion(
                 userId, keyword, qType, pageable).get();
 
-        return ResponseEntity.ok().body(SuccessDataResponse.create(response));
+        return ResponseEntity.ok().body(SuccessDataResponse.from(response));
     }
 
     @Operation(
@@ -92,7 +92,7 @@ public class SearchController {
             Pageable pageable) throws ExecutionException, InterruptedException {
         PaginationResponse<UserSearchInfoDto> response = searchEngineService.getSearchUser(
                 userId, keyword, pageable).get();
-        return ResponseEntity.ok().body(SuccessDataResponse.create(response));
+        return ResponseEntity.ok().body(SuccessDataResponse.from(response));
     }
 
     @Operation(
@@ -109,7 +109,7 @@ public class SearchController {
                                                                               @RequestParam("keyword") String keyword)
             throws ExecutionException, InterruptedException {
         SearchTotalResDto response = searchEngineTotalService.getSearchTotal(userId, keyword);
-        return ResponseEntity.ok().body(SuccessDataResponse.create(response));
+        return ResponseEntity.ok().body(SuccessDataResponse.from(response));
     }
 
     @Operation(
@@ -123,7 +123,7 @@ public class SearchController {
     public ResponseEntity<SuccessDataResponse<SearchItemCountResDto>> searchItemCount(
             @RequestParam("keyword") String keyword, SearchFilterReqDto dto) {
         SearchItemCountResDto response = searchEngineService.getSearchItemCount(keyword, dto);
-        return ResponseEntity.ok().body(SuccessDataResponse.create(response));
+        return ResponseEntity.ok().body(SuccessDataResponse.from(response));
     }
 
     @Operation(
@@ -137,7 +137,7 @@ public class SearchController {
     public ResponseEntity<SuccessDataResponse<List<RecentSearchChipResDto>>> getRecentSearch(
             @CurrentUserId Long userId) {
         List<RecentSearchChipResDto> response = searchService.getRecentSearch(userId);
-        return ResponseEntity.ok().body(SuccessDataResponse.create(response));
+        return ResponseEntity.ok().body(SuccessDataResponse.from(response));
     }
 
     @Operation(
@@ -151,7 +151,7 @@ public class SearchController {
     @GetMapping("/searchRank")
     public ResponseEntity<SuccessDataResponse<List<SearchKeywordResDto>>> getRecentSearch() {
         List<SearchKeywordResDto> response = searchService.getSearchRank();
-        return ResponseEntity.ok().body(SuccessDataResponse.create(response));
+        return ResponseEntity.ok().body(SuccessDataResponse.from(response));
     }
 
     @Operation(
@@ -166,7 +166,7 @@ public class SearchController {
             @RequestParam("keyword") String keyword,
             Pageable pageable) {
         PaginationResponse<SearchKeywordResDto> response = searchService.getSearchKeyword(keyword, pageable);
-        return ResponseEntity.ok().body(SuccessDataResponse.create(response));
+        return ResponseEntity.ok().body(SuccessDataResponse.from(response));
     }
 
     @Operation(
@@ -202,6 +202,6 @@ public class SearchController {
             @CurrentUserId Long userId,
             @RequestParam("keyword") String keyword) {
         SearchKeywordTotalResDto response = searchService.getAllDateByKeyword(userId, keyword);
-        return ResponseEntity.ok().body(SuccessDataResponse.create(response));
+        return ResponseEntity.ok().body(SuccessDataResponse.from(response));
     }
 }

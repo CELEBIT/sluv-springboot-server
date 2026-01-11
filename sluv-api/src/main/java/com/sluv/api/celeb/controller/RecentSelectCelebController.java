@@ -27,7 +27,7 @@ public class RecentSelectCelebController {
     public ResponseEntity<SuccessDataResponse<List<RecentSelectCelebResponse>>> getRecentSelectCeleb(
             @CurrentUserId Long userId) {
         List<RecentSelectCelebResponse> response = celebService.getUserRecentSelectCeleb(userId);
-        return ResponseEntity.ok().body(SuccessDataResponse.create(response));
+        return ResponseEntity.ok().body(SuccessDataResponse.from(response));
     }
 
     @Operation(summary = "*최근 선택한 셀럽 등록", description = "User 토큰 필요.")

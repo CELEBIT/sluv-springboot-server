@@ -23,7 +23,7 @@ public class ClosetController {
     @GetMapping("/list")
     public ResponseEntity<SuccessDataResponse<ClosetListCountResponse>> getClosetList(@CurrentUserId Long userId) {
         ClosetListCountResponse response = closetService.getClosetList(userId);
-        return ResponseEntity.ok().body(SuccessDataResponse.create(response));
+        return ResponseEntity.ok().body(SuccessDataResponse.from(response));
     }
 
     @Operation(summary = "옷장 이름 중복 검사", description = "옷장 등록 및 수정 시 호출")
@@ -31,7 +31,7 @@ public class ClosetController {
     public ResponseEntity<SuccessDataResponse<ClosetNameCheckResponse>> checkClosetNameDuplicated(
             @RequestParam("name") String name, @Nullable @RequestParam("id") Long closetId) {
         ClosetNameCheckResponse response = closetService.checkClosetNameDuplicated(name, closetId);
-        return ResponseEntity.ok().body(SuccessDataResponse.create(response));
+        return ResponseEntity.ok().body(SuccessDataResponse.from(response));
     }
 
     @Operation(summary = "*옷장 생성", description = "User 토큰 필요")

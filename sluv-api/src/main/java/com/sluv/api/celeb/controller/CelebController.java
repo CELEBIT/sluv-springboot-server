@@ -28,7 +28,7 @@ public class CelebController {
     public ResponseEntity<SuccessDataResponse<PaginationResponse<CelebSearchResponse>>> searchCelebByName(
             @RequestParam String celebName, Pageable pageable) {
         PaginationResponse<CelebSearchResponse> response = celebService.searchCeleb(celebName, pageable);
-        return ResponseEntity.ok().body(SuccessDataResponse.create(response));
+        return ResponseEntity.ok().body(SuccessDataResponse.from(response));
     }
 
     @Operation(summary = "관심셀럽 등록 시 Celeb 검색", description = "멤버 이름을 검색하면 그룹이 검색됨. Pagination X")
@@ -36,20 +36,20 @@ public class CelebController {
     public ResponseEntity<SuccessDataResponse<List<CelebSearchByCategoryResponse>>> searchInterestedCelebByName(
             @RequestParam String celebName) {
         List<CelebSearchByCategoryResponse> response = celebService.searchInterestedCelebByName(celebName);
-        return ResponseEntity.ok().body(SuccessDataResponse.create(response));
+        return ResponseEntity.ok().body(SuccessDataResponse.from(response));
     }
 
     @Operation(summary = "인기 셀럽 조회", description = "조회가 많이된 Celeb 상위 10개 조회")
     @GetMapping("/top")
     public ResponseEntity<SuccessDataResponse<List<CelebSearchResponse>>> searchTop10Celeb() {
         List<CelebSearchResponse> response = celebService.getTop10Celeb();
-        return ResponseEntity.ok().body(SuccessDataResponse.create(response));
+        return ResponseEntity.ok().body(SuccessDataResponse.from(response));
     }
 
     @Operation(summary = "관심 셀럽 조회 시, 카테고리별 셀럽 조회", description = "카테고리별 최대 30개를 한번에 전달, 카테고리는 순서 X, 셀럽는 가나다 순서.")
     @GetMapping("/category")
     public ResponseEntity<SuccessDataResponse<List<CelebSearchByCategoryResponse>>> searchCelebByCategory() {
         List<CelebSearchByCategoryResponse> response = celebService.getCelebByCategory();
-        return ResponseEntity.ok().body(SuccessDataResponse.create(response));
+        return ResponseEntity.ok().body(SuccessDataResponse.from(response));
     }
 }

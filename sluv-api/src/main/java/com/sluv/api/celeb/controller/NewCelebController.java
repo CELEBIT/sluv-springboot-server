@@ -24,7 +24,7 @@ public class NewCelebController {
     public ResponseEntity<SuccessDataResponse<NewCelebPostResponse>> postNewCeleb(
             @RequestBody NewCelebPostRequest request) {
         NewCelebPostResponse response = newCelebService.postNewCeleb(request);
-        return ResponseEntity.ok().body(SuccessDataResponse.create(response));
+        return ResponseEntity.ok().body(SuccessDataResponse.from(response));
     }
 
 }

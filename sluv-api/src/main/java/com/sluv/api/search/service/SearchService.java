@@ -69,7 +69,7 @@ public class SearchService {
                 .map(searchData -> SearchKeywordResDto.of(searchData.getSearchWord()))
                 .toList();
 
-        return PaginationResponse.create(searchDataPage, content);
+        return PaginationResponse.of(searchDataPage, content);
     }
 
     @Async
@@ -115,7 +115,7 @@ public class SearchService {
                 .toList();
 
         List<BrandSearchResponse> brandByContainKeyword = brandDomainService.getBrandContainKeyword(keyword).stream()
-                .map(BrandSearchResponse::of)
+                .map(BrandSearchResponse::from)
                 .toList();
 
         List<ItemKeywordSearchResDto> itemByContainKeyword = itemDomainService.getItemContainKeyword(keyword).stream()

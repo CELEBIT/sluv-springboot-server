@@ -48,7 +48,7 @@ public class ItemDetailFixData implements Serializable {
     ) {
 
         NewCelebPostResponse newCelebPostResponse = newCeleb == null ? null : NewCelebPostResponse.of(newCeleb);
-        NewBrandPostResponse newBrandPostResponse = newBrand == null ? null : NewBrandPostResponse.of(newBrand);
+        NewBrandPostResponse newBrandPostResponse = newBrand == null ? null : NewBrandPostResponse.from(newBrand);
 
         return ItemDetailFixData.builder()
                 .imgList(imgList)

@@ -29,7 +29,7 @@ public class UserBlockController {
     public ResponseEntity<SuccessDataResponse<PaginationResponse<UserBlockDto>>> getUserBlock(@CurrentUserId Long userId,
                                                                                               Pageable pageable) {
         PaginationResponse<UserBlockDto> response = userBlockService.getUserBlock(userId, pageable);
-        return ResponseEntity.ok().body(SuccessDataResponse.create(response));
+        return ResponseEntity.ok().body(SuccessDataResponse.from(response));
     }
 
 }

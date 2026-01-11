@@ -40,7 +40,7 @@ public class CelebService {
                 .map(CelebSearchResponse::of)
                 .toList();
 
-        return PaginationResponse.create(celebPage, content);
+        return PaginationResponse.of(celebPage, content);
 
     }
 

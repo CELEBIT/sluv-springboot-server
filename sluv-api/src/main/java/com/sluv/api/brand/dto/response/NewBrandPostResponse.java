@@ -19,7 +19,7 @@ public class NewBrandPostResponse implements Serializable {
     @Schema(description = "생성된 newBrand의 이름")
     private String newBrandName;
 
-    public static NewBrandPostResponse of(NewBrand newBrand) {
+    public static NewBrandPostResponse from(NewBrand newBrand) {
         return NewBrandPostResponse.builder()
                 .newBrandId(newBrand.getId())
                 .newBrandName(newBrand.getBrandName())

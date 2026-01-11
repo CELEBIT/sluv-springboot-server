@@ -28,7 +28,7 @@ public class UserLikeController {
             @CurrentUserId Long userId, Pageable pageable) {
 
         PaginationCountResponse<ItemSimpleDto> response = userLikeService.getUserLikeItem(userId, pageable);
-        return ResponseEntity.ok().body(SuccessDataResponse.create(response));
+        return ResponseEntity.ok().body(SuccessDataResponse.from(response));
     }
 
     @Operation(summary = "유저가 좋아요한 Question 게시글 조회", description = "User 토큰 필요. Pagination 적용.")
@@ -37,7 +37,7 @@ public class UserLikeController {
             @CurrentUserId Long userId, Pageable pageable) {
         PaginationCountResponse<QuestionSimpleResDto> response = userLikeService.getUserLikeQuestion(userId,
                 pageable);
-        return ResponseEntity.ok().body(SuccessDataResponse.create(response));
+        return ResponseEntity.ok().body(SuccessDataResponse.from(response));
     }
 
     @Operation(summary = "유저가 좋아요한 Comment 조회", description = "User 토큰 필요. Pagination 적용.")
@@ -46,6 +46,6 @@ public class UserLikeController {
             @CurrentUserId Long userId, Pageable pageable) {
         PaginationCountResponse<CommentSimpleResponse> response = userLikeService.getUserLikeComment(userId,
                 pageable);
-        return ResponseEntity.ok().body(SuccessDataResponse.create(response));
+        return ResponseEntity.ok().body(SuccessDataResponse.from(response));
     }
 }

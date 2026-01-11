@@ -24,7 +24,7 @@ public class NewBrandController {
     public ResponseEntity<SuccessDataResponse<NewBrandPostResponse>> postNewBrand(
             @RequestBody NewBrandPostRequest request) {
         NewBrandPostResponse response = newBrandService.postNewBrand(request);
-        return ResponseEntity.ok().body(SuccessDataResponse.create(response));
+        return ResponseEntity.ok().body(SuccessDataResponse.from(response));
     }
 
 }

@@ -23,7 +23,7 @@ public class AWSS3Controller {
     public ResponseEntity<SuccessDataResponse<PreSingedUrlResDto>> getUserProfileUrl(
             @RequestParam ImgExtension imgExtension) {
         PreSingedUrlResDto response = awss3Service.forUserProfile(imgExtension);
-        return ResponseEntity.ok().body(SuccessDataResponse.create(response));
+        return ResponseEntity.ok().body(SuccessDataResponse.from(response));
     }
 
     @Operation(summary = "아이템 이미지 업로드", description = "아이템 이미지 업로드\n imgExtension: 이미지 확장자")
@@ -31,7 +31,7 @@ public class AWSS3Controller {
     public ResponseEntity<SuccessDataResponse<PreSingedUrlResDto>> getItemImgUrl(
             @RequestParam ImgExtension imgExtension) {
         PreSingedUrlResDto response = awss3Service.forItem(imgExtension);
-        return ResponseEntity.ok().body(SuccessDataResponse.create(response));
+        return ResponseEntity.ok().body(SuccessDataResponse.from(response));
     }
 
     @Operation(summary = "커뮤니티 게시글 이미지 업로드", description = "커뮤니티 게시글 이미지 업로드\n imgExtension: 이미지 확장자")
@@ -39,7 +39,7 @@ public class AWSS3Controller {
     public ResponseEntity<SuccessDataResponse<PreSingedUrlResDto>> getQuestionImgUrl(
             @RequestParam ImgExtension imgExtension) {
         PreSingedUrlResDto response = awss3Service.forCommunityPost(imgExtension);
-        return ResponseEntity.ok().body(SuccessDataResponse.create(response));
+        return ResponseEntity.ok().body(SuccessDataResponse.from(response));
     }
 
     @Operation(summary = "커뮤니티 댓글 이미지 업로드", description = "커뮤니티 댓글 이미지 업로드\n imgExtension: 이미지 확장자")
@@ -47,7 +47,7 @@ public class AWSS3Controller {
     public ResponseEntity<SuccessDataResponse<PreSingedUrlResDto>> getCommentImgUrl(
             @RequestParam ImgExtension imgExtension) {
         PreSingedUrlResDto response = awss3Service.forCommunityComment(imgExtension);
-        return ResponseEntity.ok().body(SuccessDataResponse.create(response));
+        return ResponseEntity.ok().body(SuccessDataResponse.from(response));
     }
 
     @Operation(summary = "옷장 이미지 업로드", description = "옷장 이미지 업로드\n imgExtension: 이미지 확장자")
@@ -55,6 +55,6 @@ public class AWSS3Controller {
     public ResponseEntity<SuccessDataResponse<PreSingedUrlResDto>> getClosetImgUrl(
             @RequestParam ImgExtension imgExtension) {
         PreSingedUrlResDto response = awss3Service.forCloset(imgExtension);
-        return ResponseEntity.ok().body(SuccessDataResponse.create(response));
+        return ResponseEntity.ok().body(SuccessDataResponse.from(response));
     }
 }

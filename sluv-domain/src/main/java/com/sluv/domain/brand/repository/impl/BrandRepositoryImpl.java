@@ -41,7 +41,6 @@ public class BrandRepositoryImpl implements BrandRepositoryCustom {
 
     @Override
     public List<Brand> findTop10By() {
-
         return jpaQueryFactory.select(recentSelectBrand.brand)
                 .from(recentSelectBrand)
                 .groupBy(recentSelectBrand.brand)

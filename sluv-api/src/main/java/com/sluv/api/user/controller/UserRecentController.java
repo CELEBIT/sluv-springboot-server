@@ -25,7 +25,7 @@ public class UserRecentController {
     public ResponseEntity<SuccessDataResponse<PaginationCountResponse<ItemSimpleDto>>> getUserRecentItem(
             @CurrentUserId Long userId, Pageable pageable) {
         PaginationCountResponse<ItemSimpleDto> response = userRecentService.getUserRecentItem(userId, pageable);
-        return ResponseEntity.ok().body(SuccessDataResponse.create(response));
+        return ResponseEntity.ok().body(SuccessDataResponse.from(response));
     }
 
     @Operation(summary = "*유저의 최근 본 Question 조회", description = "User 토큰 필요. Pagination 적용.")
@@ -34,6 +34,6 @@ public class UserRecentController {
             @CurrentUserId Long userId, Pageable pageable) {
         PaginationCountResponse<QuestionSimpleResDto> response = userRecentService.getUserRecentQuestion(
                 userId, pageable);
-        return ResponseEntity.ok().body(SuccessDataResponse.create(response));
+        return ResponseEntity.ok().body(SuccessDataResponse.from(response));
     }
 }

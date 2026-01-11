@@ -29,7 +29,7 @@ public class HashtagService {
         Page<HashtagCountDto> hashtagPage = hashtagDomainService.findAllByContent(name, pageable);
         List<HashtagResponseDto> dtoList = hashtagPage
                 .stream().map(hashtagHelper::convertHashtagCountDtoToHashtagResponseDto).toList();
-        return PaginationResponse.create(hashtagPage, dtoList);
+        return PaginationResponse.of(hashtagPage, dtoList);
     }
 
     @Transactional

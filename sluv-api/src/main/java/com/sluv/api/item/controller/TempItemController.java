@@ -26,7 +26,7 @@ public class TempItemController {
     public ResponseEntity<SuccessDataResponse<PaginationCountResponse<TempItemResDto>>> getTempItemList(
             @CurrentUserId Long userId, Pageable pageable) {
         PaginationCountResponse<TempItemResDto> response = tempItemService.getTempItemList(userId, pageable);
-        return ResponseEntity.ok().body(SuccessDataResponse.create(response));
+        return ResponseEntity.ok().body(SuccessDataResponse.from(response));
     }
 
     @Operation(summary = "*임시저장 아이템 갯수 조회", description = "User 토큰 필요")
@@ -34,7 +34,7 @@ public class TempItemController {
     public ResponseEntity<SuccessDataResponse<TempItemCountResDto>> getTempItemCount(
             @CurrentUserId Long userId) {
         TempItemCountResDto response = tempItemService.countTempItemCount(userId);
-        return ResponseEntity.ok().body(SuccessDataResponse.create(response));
+        return ResponseEntity.ok().body(SuccessDataResponse.from(response));
     }
 
     @Operation(summary = "*Item 임시저장", description = "User 토큰 필요")
@@ -42,7 +42,7 @@ public class TempItemController {
     public ResponseEntity<SuccessDataResponse<TempItemPostResDto>> postTempItem(@CurrentUserId Long userId,
                                                                                 @RequestBody TempItemPostReqDto reqDto) {
         TempItemPostResDto response = TempItemPostResDto.of(tempItemService.postTempItem(userId, reqDto));
-        return ResponseEntity.ok().body(SuccessDataResponse.create(response));
+        return ResponseEntity.ok().body(SuccessDataResponse.from(response));
     }
 
     @Operation(summary = "임시저장 아이템 선택삭제", description = "User 토큰 필요")

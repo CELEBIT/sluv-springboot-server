@@ -25,7 +25,7 @@ public class NewBrandService {
             webHookService.sendCreateNewBrandMessage(newBrand);
         }
 
-        return NewBrandPostResponse.of(newBrand);
+        return NewBrandPostResponse.from(newBrand);
     }
 
 

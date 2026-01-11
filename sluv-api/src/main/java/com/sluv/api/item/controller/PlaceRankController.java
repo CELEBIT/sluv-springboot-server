@@ -27,7 +27,7 @@ public class PlaceRankController {
     @GetMapping("/top")
     public ResponseEntity<SuccessDataResponse<List<HotPlaceResDto>>> getTopPlace() {
         List<HotPlaceResDto> response = itemService.getTopPlace();
-        return ResponseEntity.ok().body(SuccessDataResponse.create(response));
+        return ResponseEntity.ok().body(SuccessDataResponse.from(response));
     }
 
     @Operation(summary = "*유저가 최근 입력한 장소 검색", description = "User 토큰 필요")
@@ -35,7 +35,7 @@ public class PlaceRankController {
     public ResponseEntity<SuccessDataResponse<List<PlaceRankResDto>>> getRecentPlaceTop20(
             @CurrentUserId Long userId) {
         List<PlaceRankResDto> response = placeRankService.getRecentPlaceTop20(userId);
-        return ResponseEntity.ok().body(SuccessDataResponse.create(response));
+        return ResponseEntity.ok().body(SuccessDataResponse.from(response));
     }
 
     @Operation(summary = "*최근 입력한 장소 등록", description = "User 토큰 필요.")

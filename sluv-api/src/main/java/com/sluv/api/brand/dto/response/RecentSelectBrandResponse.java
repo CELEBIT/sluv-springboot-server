@@ -22,7 +22,7 @@ public class RecentSelectBrandResponse {
     @Schema(description = "브랜드(Y)와 뉴브랜드(N)를 구분하는 플래그")
     private String flag;
 
-    public static RecentSelectBrandResponse of(RecentSelectBrand recentSelectBrand) {
+    public static RecentSelectBrandResponse from(RecentSelectBrand recentSelectBrand) {
         Long id;
         String brandName;
         String brandImgUrl;

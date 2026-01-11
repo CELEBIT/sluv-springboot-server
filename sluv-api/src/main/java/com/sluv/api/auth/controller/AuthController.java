@@ -48,7 +48,7 @@ public class AuthController {
         visitCounter.countVisit(loginUser.getId());
 
         AuthResponse response = authService.getAuthResDto(loginUser);
-        return ResponseEntity.ok().body(SuccessDataResponse.create(response));
+        return ResponseEntity.ok().body(SuccessDataResponse.from(response));
     }
 
     @Deprecated
@@ -59,7 +59,7 @@ public class AuthController {
         User user = authService.findLogInUser(userId);
 //        authService.checkFcm(user);
         AutoLoginResponse response = AutoLoginResponse.of(user);
-        return ResponseEntity.ok().body(SuccessDataResponse.create(response));
+        return ResponseEntity.ok().body(SuccessDataResponse.from(response));
     }
 
     @Operation(summary = "*자동 로그인", description = "토큰 만료 시 error code : 4002")
@@ -73,7 +73,7 @@ public class AuthController {
         User user = authService.findLogInUser(userId);
 //        authService.checkFcm(user);
         AutoLoginResponse response = AutoLoginResponse.of(user);
-        return ResponseEntity.ok().body(SuccessDataResponse.create(response));
+        return ResponseEntity.ok().body(SuccessDataResponse.from(response));
     }
 
     @Operation(summary = "*FCM 토큰 갱신", description = "FCM 토큰을 갱신")

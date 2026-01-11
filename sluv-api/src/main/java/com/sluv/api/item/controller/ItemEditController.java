@@ -31,6 +31,6 @@ public class ItemEditController {
     public ResponseEntity<SuccessDataResponse<ItemEditReqResponseDto>> getItemEdit(@CurrentUserId Long userId,
                                                                                    @PathVariable(name = "editReqId") Long editReqId) {
         ItemEditReqResponseDto response = itemEditReqService.getItemEdit(userId, editReqId);
-        return ResponseEntity.ok().body(SuccessDataResponse.create(response));
+        return ResponseEntity.ok().body(SuccessDataResponse.from(response));
     }
 }

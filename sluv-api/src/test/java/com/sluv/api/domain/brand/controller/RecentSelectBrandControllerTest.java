@@ -24,8 +24,7 @@ import java.util.List;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -81,6 +80,21 @@ public class RecentSelectBrandControllerTest {
         // when & then
         mockMvc.perform(post("/app/brand/recent")
                         .content(objectMapper.writeValueAsString(requestDto))
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.isSuccess").value(true));
+    }
+
+    @Test
+    @DisplayName("최근 선택한 브랜드 모두 삭제")
+    @WithMockUser("1")
+    void deleteAllRecentSelectBrandTest() throws Exception {
+        // given
+        doNothing().when(recentSelectBrandService).deleteAllRecentSelectBrand(eq(1L));
+
+        // when & then
+        mockMvc.perform(delete("/app/brand/recent")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())

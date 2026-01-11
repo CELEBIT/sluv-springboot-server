@@ -103,4 +103,17 @@ public class RecentSelectBrandServiceTest {
         verify(recentSelectBrandDomainService).saveRecentSelectBrand(any(RecentSelectBrand.class));
     }
 
+    @Test
+    @DisplayName("최근 선택한 브랜드 모두 삭제")
+    void deleteAllRecentSelectBrandTest() {
+        // given
+        doNothing().when(recentSelectBrandDomainService).deleteAllByUserId(1L);
+
+        // when
+        recentSelectBrandService.deleteAllRecentSelectBrand(1L);
+
+        // then
+        verify(recentSelectBrandDomainService).deleteAllByUserId(eq(1L));
+    }
+
 }

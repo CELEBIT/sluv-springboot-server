@@ -27,7 +27,6 @@ import com.sluv.domain.user.entity.User;
 import com.sluv.domain.user.service.UserBlockDomainService;
 import com.sluv.domain.user.service.UserDomainService;
 import com.sluv.infra.alarm.service.QuestionAlarmService;
-import com.sluv.infra.counter.view.ViewCounter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -60,7 +59,6 @@ public class QuestionService {
     private final UserDomainService userDomainService;
     private final UserBlockDomainService userBlockDomainService;
 
-    private final ViewCounter viewCounter;
     private final QuestionAlarmService questionAlarmService;
 
 
@@ -283,23 +281,7 @@ public class QuestionService {
         Question question = questionDomainService.findById(questionId);
         User nowUser = userDomainService.findById(nowUserId);
 
-        // Question Type 분류
-        String qType;
-        if (question != null) {
-            if (question instanceof QuestionFind) {
-                qType = "Find";
-            } else if (question instanceof QuestionBuy) {
-                qType = "Buy";
-            } else if (question instanceof QuestionHowabout) {
-                qType = "How";
-            } else if (question instanceof QuestionRecommend) {
-                qType = "Recommend";
-            } else {
-                qType = null;
-            }
-        } else {
-            qType = null;
-        }
+        String qType = getQuestionTypeOrNull(question);
 
         // 작성자
         User writer = userDomainService.findByIdOrNull(question.getUser().getId());
@@ -337,7 +319,7 @@ public class QuestionService {
                     );
                     QuestionVoteDataDto questionVoteDataDto = null;
                     // QuestionBuy일 경우 투표수 추가.
-                    if (qType != null & qType.equals("Buy")) {
+                    if (qType != null && qType.equals("Buy")) {
                         questionVoteDataDto = getVoteData(questionId, (long) questionItem.getSortOrder());
                     }
 
@@ -408,6 +390,27 @@ public class QuestionService {
 
     private void increaseQuestionViewNum(Long userId, Question question) {
         question.increaseSearchNum();
+    }
+
+    private String getQuestionTypeOrNull(Question question) {
+        if (question instanceof QuestionFind) {
+            return "Find";
+        } else if (question instanceof QuestionBuy) {
+            return "Buy";
+        } else if (question instanceof QuestionHowabout) {
+            return "How";
+        } else if (question instanceof QuestionRecommend) {
+            return "Recommend";
+        }
+        return null;
+    }
+
+    private String getQuestionType(Question question) {
+        String qType = getQuestionTypeOrNull(question);
+        if (qType == null) {
+            throw new QuestionTypeNotFoundException();
+        }
+        return qType;
     }
 
     /**
@@ -545,7 +548,6 @@ public class QuestionService {
     public QuestionSimpleResDto getQuestionSimpleResDto(Question question, String qType) {
         List<QuestionImgSimpleDto> imgList = new ArrayList<>();
         List<QuestionImgSimpleDto> itemImgList = new ArrayList<>();
-        String celebName = null;
         List<String> categoryNameList = null;
 
 //        if (!qType.equals("Buy")) {
@@ -615,18 +617,7 @@ public class QuestionService {
 
         Page<Question> questionPage = questionDomainService.getTotalQuestionList(blockUserIds, pageable);
         List<QuestionSimpleResDto> content = questionPage.stream().map(question -> {
-            String qType;
-            if (question instanceof QuestionBuy) {
-                qType = "Buy";
-            } else if (question instanceof QuestionFind) {
-                qType = "Find";
-            } else if (question instanceof QuestionHowabout) {
-                qType = "Howabout";
-            } else if (question instanceof QuestionRecommend) {
-                qType = "Recommend";
-            } else {
-                throw new QuestionTypeNotFoundException();
-            }
+            String qType = getQuestionType(question);
             return getQuestionSimpleResDto(question, qType);
         }).toList();
 
@@ -759,14 +750,6 @@ public class QuestionService {
         return PaginationResponse.of(questionPage, content);
     }
 
-    private String getQuestionCelebName(QuestionFind questionFind) {
-        return questionFind.getCeleb() != null
-                ? questionFind.getCeleb().getParent() != null
-                ? questionFind.getCeleb().getParent().getCelebNameKr() + " " + questionFind.getCeleb().getCelebNameKr()
-                : questionFind.getCeleb().getCelebNameKr()
-                : questionFind.getNewCeleb().getCelebName();
-    }
-
     /**
      * 일일 Hot Question 조회 기능.
      */
@@ -872,4 +855,3 @@ public class QuestionService {
         return PaginationResponse.of(page, content);
     }
 }
-

@@ -3,6 +3,7 @@ package com.sluv.api.question.service;
 import com.sluv.api.celeb.dto.response.CelebChipResponse;
 import com.sluv.api.common.response.PaginationResponse;
 import com.sluv.api.question.dto.*;
+import com.sluv.api.question.helper.QuestionImgHelper;
 import com.sluv.domain.celeb.entity.Celeb;
 import com.sluv.domain.celeb.entity.NewCeleb;
 import com.sluv.domain.celeb.service.CelebDomainService;
@@ -60,6 +61,7 @@ public class QuestionService {
     private final UserBlockDomainService userBlockDomainService;
 
     private final QuestionAlarmService questionAlarmService;
+    private final QuestionImgHelper questionImgHelper;
 
 
     @Transactional
@@ -90,7 +92,7 @@ public class QuestionService {
         QuestionFind newQuestionFind = (QuestionFind) questionDomainService.saveQuestion(questionFind);
 
         // 3. QuestionImg 저장
-        postQuestionImgs(dto.getImgList(), newQuestionFind);
+        questionImgHelper.saveQuestionImg(dto.getImgList(), newQuestionFind);
 
         // 4. QuestionItem 저장
         postQuestionItems(dto.getItemList(), newQuestionFind);
@@ -118,7 +120,7 @@ public class QuestionService {
         QuestionBuy newQuestionBuy = (QuestionBuy) questionDomainService.saveQuestion(questionBuy);
 
         // 3. QuestionImg 저장
-        postQuestionImgs(dto.getImgList(), newQuestionBuy);
+        questionImgHelper.saveQuestionImg(dto.getImgList(), newQuestionBuy);
 
         // 4. QuestionItem 저장
         postQuestionItems(dto.getItemList(), newQuestionBuy);
@@ -146,7 +148,7 @@ public class QuestionService {
         QuestionHowabout newQuestionHowabout = (QuestionHowabout) questionDomainService.saveQuestion(questionHowabout);
 
         // 3. QuestionImg 저장
-        postQuestionImgs(dto.getImgList(), newQuestionHowabout);
+        questionImgHelper.saveQuestionImg(dto.getImgList(), newQuestionHowabout);
 
         // 4. QuestionItem 저장
         postQuestionItems(dto.getItemList(), newQuestionHowabout);
@@ -187,30 +189,12 @@ public class QuestionService {
 
         // 4. QuestionImg 저장
 
-        postQuestionImgs(dto.getImgList(), newQuestionRecommend);
+        questionImgHelper.saveQuestionImg(dto.getImgList(), newQuestionRecommend);
 
         // 4. QuestionItem 저장
         postQuestionItems(dto.getItemList(), newQuestionRecommend);
 
         return QuestionPostResDto.of(newQuestionRecommend.getId());
-    }
-
-    /**
-     * Question Img 저장 메소드
-     */
-    private void postQuestionImgs(List<QuestionImgReqDto> dtoList, Question question) {
-        // Question에 대한 Img 초기화
-        questionImgDomainService.deleteAllByQuestionId(question.getId());
-
-        if (dtoList != null) {
-            // Question Img들 추가
-            List<QuestionImg> imgList = dtoList.stream()
-                    .map(imgDto -> QuestionImg.toEntity(question, imgDto.getImgUrl(), imgDto.getDescription(),
-                            imgDto.getRepresentFlag(), imgDto.getSortOrder()))
-                    .toList();
-
-            questionImgDomainService.saveAll(imgList);
-        }
     }
 
     /**

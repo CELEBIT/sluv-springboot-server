@@ -4,6 +4,7 @@ import com.sluv.api.celeb.dto.response.CelebChipResponse;
 import com.sluv.api.common.response.PaginationResponse;
 import com.sluv.api.question.dto.*;
 import com.sluv.api.question.helper.QuestionImgHelper;
+import com.sluv.api.question.helper.QuestionItemHelper;
 import com.sluv.domain.celeb.entity.Celeb;
 import com.sluv.domain.celeb.entity.NewCeleb;
 import com.sluv.domain.celeb.service.CelebDomainService;
@@ -62,6 +63,7 @@ public class QuestionService {
 
     private final QuestionAlarmService questionAlarmService;
     private final QuestionImgHelper questionImgHelper;
+    private final QuestionItemHelper questionItemHelper;
 
 
     @Transactional
@@ -95,7 +97,7 @@ public class QuestionService {
         questionImgHelper.saveQuestionImg(dto.getImgList(), newQuestionFind);
 
         // 4. QuestionItem 저장
-        postQuestionItems(dto.getItemList(), newQuestionFind);
+        questionItemHelper.saveQuestionItem(dto.getItemList(), newQuestionFind);
 
         return QuestionPostResDto.of(newQuestionFind.getId());
 
@@ -123,7 +125,7 @@ public class QuestionService {
         questionImgHelper.saveQuestionImg(dto.getImgList(), newQuestionBuy);
 
         // 4. QuestionItem 저장
-        postQuestionItems(dto.getItemList(), newQuestionBuy);
+        questionItemHelper.saveQuestionItem(dto.getItemList(), newQuestionBuy);
 
         return QuestionPostResDto.of(newQuestionBuy.getId());
     }
@@ -151,7 +153,7 @@ public class QuestionService {
         questionImgHelper.saveQuestionImg(dto.getImgList(), newQuestionHowabout);
 
         // 4. QuestionItem 저장
-        postQuestionItems(dto.getItemList(), newQuestionHowabout);
+        questionItemHelper.saveQuestionItem(dto.getItemList(), newQuestionHowabout);
 
         return QuestionPostResDto.of(newQuestionHowabout.getId());
     }
@@ -192,28 +194,9 @@ public class QuestionService {
         questionImgHelper.saveQuestionImg(dto.getImgList(), newQuestionRecommend);
 
         // 4. QuestionItem 저장
-        postQuestionItems(dto.getItemList(), newQuestionRecommend);
+        questionItemHelper.saveQuestionItem(dto.getItemList(), newQuestionRecommend);
 
         return QuestionPostResDto.of(newQuestionRecommend.getId());
-    }
-
-    /**
-     * Questim Item 저장 메소드
-     */
-    private void postQuestionItems(List<QuestionItemReqDto> dtoList, Question question) {
-        // Question에 대한 Item 초기화
-        questionItemDomainService.deleteAllByQuestionId(question.getId());
-        if (dtoList != null) {
-            // Question Item들 추가
-            List<QuestionItem> items = dtoList.stream().map(itemDto -> {
-                        Item item = itemDomainService.findById(itemDto.getItemId());
-                        return QuestionItem.toEntity(question, item, itemDto.getDescription(), itemDto.getRepresentFlag(),
-                                itemDto.getSortOrder());
-                    }
-            ).toList();
-
-            questionItemDomainService.saveAll(items);
-        }
     }
 
     @Transactional

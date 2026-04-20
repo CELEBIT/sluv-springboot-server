@@ -13,12 +13,12 @@ import java.util.List;
 
 @Component
 @RequiredArgsConstructor
-public class QuestionItemHelper {
+public class QuestionItemManager {
 
     private final QuestionItemDomainService questionItemDomainService;
     private final ItemDomainService itemDomainService;
 
-    public void saveQuestionItem(List<QuestionItemReqDto> itemRequests, Question question) {
+    public void saveItems(List<QuestionItemReqDto> itemRequests, Question question) {
         questionItemDomainService.deleteAllByQuestionId(question.getId());
 
         if (itemRequests != null) {

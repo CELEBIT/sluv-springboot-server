@@ -5,7 +5,7 @@ import com.sluv.api.question.dto.QuestionBuySimpleResDto;
 import com.sluv.api.question.dto.QuestionImgResDto;
 import com.sluv.api.question.dto.QuestionItemResDto;
 import com.sluv.api.question.dto.QuestionVoteDataDto;
-import com.sluv.api.question.helper.QuestionResponseHelper;
+import com.sluv.api.question.helper.QuestionResponseAssembler;
 import com.sluv.domain.item.dto.ItemSimpleDto;
 import com.sluv.domain.item.service.ItemImgDomainService;
 import com.sluv.domain.question.dto.QuestionSimpleResDto;
@@ -37,7 +37,7 @@ public class QuestionFeedService {
 
     private final QuestionDomainService questionDomainService;
     private final UserBlockDomainService userBlockDomainService;
-    private final QuestionResponseHelper questionResponseHelper;
+    private final QuestionResponseAssembler questionResponseAssembler;
     private final QuestionImgDomainService questionImgDomainService;
     private final QuestionItemDomainService questionItemDomainService;
     private final ItemImgDomainService itemImgDomainService;
@@ -113,7 +113,7 @@ public class QuestionFeedService {
 
     private PaginationResponse<QuestionSimpleResDto> toQuestionSimpleResponse(Page<? extends Question> questions) {
         List<QuestionSimpleResDto> questionResponses = questions.stream()
-                .map(questionResponseHelper::getQuestionSimpleResponseWithMainImage)
+                .map(questionResponseAssembler::getQuestionSimpleResponseWithMainImage)
                 .toList();
 
         return PaginationResponse.of(questions, questionResponses);

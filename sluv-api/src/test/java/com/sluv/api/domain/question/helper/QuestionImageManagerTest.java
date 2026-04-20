@@ -1,7 +1,7 @@
 package com.sluv.api.domain.question.helper;
 
 import com.sluv.api.question.dto.QuestionImgReqDto;
-import com.sluv.api.question.helper.QuestionImgHelper;
+import com.sluv.api.question.helper.QuestionImageManager;
 import com.sluv.domain.question.entity.QuestionHowabout;
 import com.sluv.domain.question.entity.QuestionImg;
 import com.sluv.domain.question.service.QuestionImgDomainService;
@@ -20,22 +20,22 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
-public class QuestionImgHelperTest {
+public class QuestionImageManagerTest {
 
     @InjectMocks
-    private QuestionImgHelper questionImgHelper;
+    private QuestionImageManager questionImageManager;
 
     @Mock
     private QuestionImgDomainService questionImgDomainService;
 
     @Test
     @DisplayName("질문 이미지 목록이 null이면 기존 이미지만 삭제한다.")
-    void saveQuestionImgWithNullListTest() {
+    void saveImagesWithNullRequestTest() {
         // given
         QuestionHowabout question = createQuestion(1L);
 
         // when
-        questionImgHelper.saveQuestionImg(null, question);
+        questionImageManager.saveImages(null, question);
 
         // then
         verify(questionImgDomainService).deleteAllByQuestionId(question.getId());
@@ -44,7 +44,7 @@ public class QuestionImgHelperTest {
 
     @Test
     @DisplayName("질문 이미지 목록을 저장한다.")
-    void saveQuestionImgTest() {
+    void saveImagesTest() {
         // given
         QuestionHowabout question = createQuestion(1L);
         List<QuestionImgReqDto> imageRequests = List.of(
@@ -63,7 +63,7 @@ public class QuestionImgHelperTest {
         );
 
         // when
-        questionImgHelper.saveQuestionImg(imageRequests, question);
+        questionImageManager.saveImages(imageRequests, question);
 
         // then
         verify(questionImgDomainService).deleteAllByQuestionId(question.getId());

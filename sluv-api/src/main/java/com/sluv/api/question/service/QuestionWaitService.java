@@ -1,6 +1,6 @@
 package com.sluv.api.question.service;
 
-import com.sluv.api.question.helper.QuestionResponseHelper;
+import com.sluv.api.question.helper.QuestionResponseAssembler;
 import com.sluv.domain.celeb.entity.Celeb;
 import com.sluv.domain.celeb.service.CelebDomainService;
 import com.sluv.domain.question.dto.QuestionSimpleResDto;
@@ -21,7 +21,7 @@ public class QuestionWaitService {
     private final UserDomainService userDomainService;
     private final UserBlockDomainService userBlockDomainService;
     private final CelebDomainService celebDomainService;
-    private final QuestionResponseHelper questionResponseHelper;
+    private final QuestionResponseAssembler questionResponseAssembler;
 
     @Transactional(readOnly = true)
     public List<QuestionSimpleResDto> getWaitQuestionBuy(Long userId, Long questionId) {
@@ -30,7 +30,7 @@ public class QuestionWaitService {
         List<Celeb> interestedCelebs = getInterestedCelebs(user);
 
         return questionDomainService.getWaitQuestionBuy(user, questionId, interestedCelebs, blockedUserIds).stream()
-                .map(questionResponseHelper::getQuestionSimpleResponseWithMainImage)
+                .map(questionResponseAssembler::getQuestionSimpleResponseWithMainImage)
                 .toList();
     }
 
@@ -41,7 +41,7 @@ public class QuestionWaitService {
         List<Celeb> interestedCelebs = getInterestedCelebs(user);
 
         return questionDomainService.getWaitQuestionFind(user, questionId, interestedCelebs, blockedUserIds).stream()
-                .map(questionResponseHelper::getQuestionSimpleResponseWithMainImage)
+                .map(questionResponseAssembler::getQuestionSimpleResponseWithMainImage)
                 .toList();
     }
 
@@ -51,7 +51,7 @@ public class QuestionWaitService {
         List<Long> blockedUserIds = getBlockedUserIds(userId);
 
         return questionDomainService.getWaitQuestionHowabout(user, questionId, blockedUserIds).stream()
-                .map(questionResponseHelper::getQuestionSimpleResponseWithMainImage)
+                .map(questionResponseAssembler::getQuestionSimpleResponseWithMainImage)
                 .toList();
     }
 
@@ -61,7 +61,7 @@ public class QuestionWaitService {
         List<Long> blockedUserIds = getBlockedUserIds(userId);
 
         return questionDomainService.getWaitQuestionRecommend(user, questionId, blockedUserIds).stream()
-                .map(questionResponseHelper::getQuestionSimpleResponseWithMainImage)
+                .map(questionResponseAssembler::getQuestionSimpleResponseWithMainImage)
                 .toList();
     }
 

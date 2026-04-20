@@ -3,7 +3,7 @@ package com.sluv.api.domain.question.service;
 import com.sluv.api.common.response.PaginationResponse;
 import com.sluv.api.question.dto.QuestionBuySimpleResDto;
 import com.sluv.api.question.dto.QuestionVoteDataDto;
-import com.sluv.api.question.helper.QuestionResponseHelper;
+import com.sluv.api.question.helper.QuestionResponseAssembler;
 import com.sluv.api.question.service.QuestionFeedService;
 import com.sluv.api.question.service.QuestionVoteService;
 import com.sluv.domain.auth.enums.SnsType;
@@ -60,7 +60,7 @@ public class QuestionFeedServiceTest {
     private UserBlockDomainService userBlockDomainService;
 
     @Mock
-    private QuestionResponseHelper questionResponseHelper;
+    private QuestionResponseAssembler questionResponseAssembler;
 
     @Mock
     private QuestionImgDomainService questionImgDomainService;
@@ -95,7 +95,7 @@ public class QuestionFeedServiceTest {
 
         when(userBlockDomainService.getAllBlockedUser(userId)).thenReturn(List.of(userBlock));
         when(questionDomainService.getTotalQuestionList(List.of(blockedUser.getId()), pageable)).thenReturn(questions);
-        when(questionResponseHelper.getQuestionSimpleResponseWithMainImage(question)).thenReturn(response);
+        when(questionResponseAssembler.getQuestionSimpleResponseWithMainImage(question)).thenReturn(response);
 
         // when
         PaginationResponse<QuestionSimpleResDto> result = questionFeedService.getTotalQuestions(userId, pageable);
@@ -116,7 +116,7 @@ public class QuestionFeedServiceTest {
         Page<Question> questions = new PageImpl<>(List.of(question), pageable, 1);
 
         when(questionDomainService.getTotalQuestionList(List.of(), pageable)).thenReturn(questions);
-        when(questionResponseHelper.getQuestionSimpleResponseWithMainImage(question)).thenReturn(response);
+        when(questionResponseAssembler.getQuestionSimpleResponseWithMainImage(question)).thenReturn(response);
 
         // when
         PaginationResponse<QuestionSimpleResDto> result = questionFeedService.getTotalQuestions(null, pageable);
@@ -142,7 +142,7 @@ public class QuestionFeedServiceTest {
         when(userBlockDomainService.getAllBlockedUser(userId)).thenReturn(List.of());
         when(questionDomainService.getQuestionFindList(celebId, isNewCeleb, List.of(), pageable))
                 .thenReturn(questions);
-        when(questionResponseHelper.getQuestionSimpleResponseWithMainImage(question)).thenReturn(response);
+        when(questionResponseAssembler.getQuestionSimpleResponseWithMainImage(question)).thenReturn(response);
 
         // when
         PaginationResponse<QuestionSimpleResDto> result = questionFeedService.getFindQuestions(
@@ -171,7 +171,7 @@ public class QuestionFeedServiceTest {
         when(userBlockDomainService.getAllBlockedUser(userId)).thenReturn(List.of());
         when(questionDomainService.getQuestionHowaboutList(List.of(), pageable))
                 .thenReturn(questions);
-        when(questionResponseHelper.getQuestionSimpleResponseWithMainImage(question)).thenReturn(response);
+        when(questionResponseAssembler.getQuestionSimpleResponseWithMainImage(question)).thenReturn(response);
 
         // when
         PaginationResponse<QuestionSimpleResDto> result = questionFeedService.getHowaboutQuestions(userId, pageable);
@@ -196,7 +196,7 @@ public class QuestionFeedServiceTest {
         when(userBlockDomainService.getAllBlockedUser(userId)).thenReturn(List.of());
         when(questionDomainService.getQuestionRecommendList(hashtag, List.of(), pageable))
                 .thenReturn(questions);
-        when(questionResponseHelper.getQuestionSimpleResponseWithMainImage(question)).thenReturn(response);
+        when(questionResponseAssembler.getQuestionSimpleResponseWithMainImage(question)).thenReturn(response);
 
         // when
         PaginationResponse<QuestionSimpleResDto> result = questionFeedService.getRecommendQuestions(

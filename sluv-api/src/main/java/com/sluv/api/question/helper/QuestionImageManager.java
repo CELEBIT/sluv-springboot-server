@@ -11,11 +11,11 @@ import java.util.List;
 
 @Component
 @RequiredArgsConstructor
-public class QuestionImgHelper {
+public class QuestionImageManager {
 
     private final QuestionImgDomainService questionImgDomainService;
 
-    public void saveQuestionImg(List<QuestionImgReqDto> imageRequests, Question question) {
+    public void saveImages(List<QuestionImgReqDto> imageRequests, Question question) {
         questionImgDomainService.deleteAllByQuestionId(question.getId());
 
         if (imageRequests != null) {

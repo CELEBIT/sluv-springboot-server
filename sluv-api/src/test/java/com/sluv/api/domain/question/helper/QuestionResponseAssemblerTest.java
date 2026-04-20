@@ -1,7 +1,7 @@
 package com.sluv.api.domain.question.helper;
 
 import com.sluv.api.question.dto.QuestionHomeResDto;
-import com.sluv.api.question.helper.QuestionResponseHelper;
+import com.sluv.api.question.helper.QuestionResponseAssembler;
 import com.sluv.domain.auth.enums.SnsType;
 import com.sluv.domain.celeb.entity.Celeb;
 import com.sluv.domain.comment.repository.CommentRepository;
@@ -37,10 +37,10 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class QuestionResponseHelperTest {
+public class QuestionResponseAssemblerTest {
 
     @InjectMocks
-    private QuestionResponseHelper questionResponseHelper;
+    private QuestionResponseAssembler questionResponseAssembler;
 
     @Mock
     private ItemImgRepository itemImgRepository;
@@ -102,7 +102,7 @@ public class QuestionResponseHelperTest {
         when(userRepository.findById(writer.getId())).thenReturn(Optional.of(writer));
 
         // when
-        QuestionSimpleResDto response = questionResponseHelper.getQuestionSimpleResponse(question);
+        QuestionSimpleResDto response = questionResponseAssembler.getQuestionSimpleResponse(question);
 
         // then
         assertThat(response.getQType()).isEqualTo("Buy");
@@ -136,7 +136,7 @@ public class QuestionResponseHelperTest {
         when(userRepository.findById(writer.getId())).thenReturn(Optional.of(writer));
 
         // when
-        QuestionSimpleResDto response = questionResponseHelper.getQuestionSimpleResponse(question);
+        QuestionSimpleResDto response = questionResponseAssembler.getQuestionSimpleResponse(question);
 
         // then
         assertThat(response.getQType()).isEqualTo("Find");
@@ -190,7 +190,7 @@ public class QuestionResponseHelperTest {
         when(userRepository.findById(writer.getId())).thenReturn(Optional.of(writer));
 
         // when
-        QuestionSimpleResDto response = questionResponseHelper.getQuestionSimpleResponseWithMainImage(question);
+        QuestionSimpleResDto response = questionResponseAssembler.getQuestionSimpleResponseWithMainImage(question);
 
         // then
         assertThat(response.getQType()).isEqualTo("Find");
@@ -218,7 +218,7 @@ public class QuestionResponseHelperTest {
         when(userRepository.findById(writer.getId())).thenReturn(Optional.of(writer));
 
         // when
-        QuestionSimpleResDto response = questionResponseHelper.getQuestionSimpleResponse(question);
+        QuestionSimpleResDto response = questionResponseAssembler.getQuestionSimpleResponse(question);
 
         // then
         assertThat(response.getQType()).isEqualTo("How");
@@ -254,7 +254,7 @@ public class QuestionResponseHelperTest {
         when(userRepository.findById(writer.getId())).thenReturn(Optional.of(writer));
 
         // when
-        QuestionSimpleResDto response = questionResponseHelper.getQuestionSimpleResponse(question);
+        QuestionSimpleResDto response = questionResponseAssembler.getQuestionSimpleResponse(question);
 
         // then
         assertThat(response.getQType()).isEqualTo("Recommend");
@@ -304,7 +304,7 @@ public class QuestionResponseHelperTest {
         when(userRepository.findById(writer.getId())).thenReturn(Optional.of(writer));
 
         // when
-        QuestionSimpleResDto response = questionResponseHelper.getQuestionSimpleResponseWithMainImage(question);
+        QuestionSimpleResDto response = questionResponseAssembler.getQuestionSimpleResponseWithMainImage(question);
 
         // then
         assertThat(response.getQType()).isEqualTo("Buy");
@@ -343,7 +343,7 @@ public class QuestionResponseHelperTest {
         when(userRepository.findById(writer.getId())).thenReturn(Optional.of(writer));
 
         // when
-        QuestionSimpleResDto response = questionResponseHelper.getQuestionSimpleResponseWithMainImage(question);
+        QuestionSimpleResDto response = questionResponseAssembler.getQuestionSimpleResponseWithMainImage(question);
 
         // then
         assertThat(response.getQType()).isEqualTo("Recommend");
@@ -390,7 +390,7 @@ public class QuestionResponseHelperTest {
         when(userRepository.findById(writer.getId())).thenReturn(Optional.of(writer));
 
         // when
-        QuestionHomeResDto response = questionResponseHelper.getQuestionHomeResponse(question);
+        QuestionHomeResDto response = questionResponseAssembler.getQuestionHomeResponse(question);
 
         // then
         assertThat(response.getQType()).isEqualTo("Buy");
@@ -442,7 +442,7 @@ public class QuestionResponseHelperTest {
         when(userRepository.findById(writer.getId())).thenReturn(Optional.of(writer));
 
         // when
-        QuestionSimpleResDto response = questionResponseHelper.getQuestionSimpleResponseWithImages(question);
+        QuestionSimpleResDto response = questionResponseAssembler.getQuestionSimpleResponseWithImages(question);
 
         // then
         assertThat(response.getQType()).isEqualTo("Recommend");

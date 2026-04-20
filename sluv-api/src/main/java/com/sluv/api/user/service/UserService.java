@@ -7,7 +7,7 @@ import com.sluv.api.common.response.PaginationResponse;
 import com.sluv.api.item.helper.ItemHelper;
 import com.sluv.api.item.service.ItemCacheService;
 import com.sluv.api.item.service.TempItemService;
-import com.sluv.api.question.helper.QuestionResponseHelper;
+import com.sluv.api.question.helper.QuestionResponseAssembler;
 import com.sluv.api.user.dto.*;
 import com.sluv.domain.closet.entity.Closet;
 import com.sluv.domain.closet.service.ClosetDomainService;
@@ -61,7 +61,7 @@ public class UserService {
     private final UserBlockDomainService userBlockDomainService;
 
     private final ItemHelper itemHelper;
-    private final QuestionResponseHelper questionResponseHelper;
+    private final QuestionResponseAssembler questionResponseAssembler;
     private final ItemCacheService itemCacheService;
     private final WebHookService webHookService;
     private final UserWithdrawDataService userWithdrawDataService;
@@ -195,7 +195,7 @@ public class UserService {
         Page<Question> questionPage = questionDomainService.getUserAllQuestion(user, pageable);
 
         List<QuestionSimpleResDto> content = questionPage.stream()
-                .map(questionResponseHelper::getQuestionSimpleResponse)
+                .map(questionResponseAssembler::getQuestionSimpleResponse)
                 .toList();
 
         return new PaginationCountResponse<>(questionPage.hasNext(), questionPage.getNumber(), content,

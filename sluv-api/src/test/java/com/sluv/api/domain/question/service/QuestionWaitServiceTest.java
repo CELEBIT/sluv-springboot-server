@@ -1,6 +1,6 @@
 package com.sluv.api.domain.question.service;
 
-import com.sluv.api.question.helper.QuestionResponseHelper;
+import com.sluv.api.question.helper.QuestionResponseAssembler;
 import com.sluv.api.question.service.QuestionWaitService;
 import com.sluv.domain.celeb.entity.Celeb;
 import com.sluv.domain.celeb.service.CelebDomainService;
@@ -46,7 +46,7 @@ public class QuestionWaitServiceTest {
     private CelebDomainService celebDomainService;
 
     @Mock
-    private QuestionResponseHelper questionResponseHelper;
+    private QuestionResponseAssembler questionResponseAssembler;
 
     @Test
     @DisplayName("Buy 대기 질문을 조회한다.")
@@ -66,7 +66,7 @@ public class QuestionWaitServiceTest {
         when(celebDomainService.findInterestedCeleb(user)).thenReturn(List.of(interestedCeleb));
         when(questionDomainService.getWaitQuestionBuy(user, questionId, List.of(interestedCeleb), List.of(blockedUser.getId())))
                 .thenReturn(List.of(question));
-        when(questionResponseHelper.getQuestionSimpleResponseWithMainImage(question)).thenReturn(response);
+        when(questionResponseAssembler.getQuestionSimpleResponseWithMainImage(question)).thenReturn(response);
 
         // when
         List<QuestionSimpleResDto> result = questionWaitService.getWaitQuestionBuy(userId, questionId);
@@ -92,7 +92,7 @@ public class QuestionWaitServiceTest {
         when(celebDomainService.findInterestedCeleb(user)).thenReturn(List.of(interestedCeleb));
         when(questionDomainService.getWaitQuestionFind(user, questionId, List.of(interestedCeleb), List.of()))
                 .thenReturn(List.of(question));
-        when(questionResponseHelper.getQuestionSimpleResponseWithMainImage(question)).thenReturn(response);
+        when(questionResponseAssembler.getQuestionSimpleResponseWithMainImage(question)).thenReturn(response);
 
         // when
         List<QuestionSimpleResDto> result = questionWaitService.getWaitQuestionFind(userId, questionId);
@@ -116,7 +116,7 @@ public class QuestionWaitServiceTest {
         when(userBlockDomainService.getAllBlockedUser(userId)).thenReturn(List.of());
         when(questionDomainService.getWaitQuestionHowabout(user, questionId, List.of()))
                 .thenReturn(List.of(question));
-        when(questionResponseHelper.getQuestionSimpleResponseWithMainImage(question)).thenReturn(response);
+        when(questionResponseAssembler.getQuestionSimpleResponseWithMainImage(question)).thenReturn(response);
 
         // when
         List<QuestionSimpleResDto> result = questionWaitService.getWaitQuestionHowabout(userId, questionId);
@@ -141,7 +141,7 @@ public class QuestionWaitServiceTest {
         when(userBlockDomainService.getAllBlockedUser(userId)).thenReturn(List.of());
         when(questionDomainService.getWaitQuestionRecommend(user, questionId, List.of()))
                 .thenReturn(List.of(question));
-        when(questionResponseHelper.getQuestionSimpleResponseWithMainImage(question)).thenReturn(response);
+        when(questionResponseAssembler.getQuestionSimpleResponseWithMainImage(question)).thenReturn(response);
 
         // when
         List<QuestionSimpleResDto> result = questionWaitService.getWaitQuestionRecommend(userId, questionId);

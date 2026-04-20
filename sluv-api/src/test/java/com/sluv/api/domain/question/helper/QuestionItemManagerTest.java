@@ -1,7 +1,7 @@
 package com.sluv.api.domain.question.helper;
 
 import com.sluv.api.question.dto.QuestionItemReqDto;
-import com.sluv.api.question.helper.QuestionItemHelper;
+import com.sluv.api.question.helper.QuestionItemManager;
 import com.sluv.domain.item.entity.Item;
 import com.sluv.domain.item.service.ItemDomainService;
 import com.sluv.domain.question.entity.QuestionHowabout;
@@ -23,10 +23,10 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class QuestionItemHelperTest {
+public class QuestionItemManagerTest {
 
     @InjectMocks
-    private QuestionItemHelper questionItemHelper;
+    private QuestionItemManager questionItemManager;
 
     @Mock
     private QuestionItemDomainService questionItemDomainService;
@@ -36,12 +36,12 @@ public class QuestionItemHelperTest {
 
     @Test
     @DisplayName("질문 아이템 목록이 null이면 기존 아이템만 삭제한다.")
-    void saveQuestionItemWithNullListTest() {
+    void saveItemsWithNullRequestTest() {
         // given
         QuestionHowabout question = createQuestion(1L);
 
         // when
-        questionItemHelper.saveQuestionItem(null, question);
+        questionItemManager.saveItems(null, question);
 
         // then
         verify(questionItemDomainService).deleteAllByQuestionId(question.getId());
@@ -51,7 +51,7 @@ public class QuestionItemHelperTest {
 
     @Test
     @DisplayName("질문 아이템 목록을 저장한다.")
-    void saveQuestionItemTest() {
+    void saveItemsTest() {
         // given
         QuestionHowabout question = createQuestion(1L);
         Item firstItem = createItem(10L, "첫 번째 아이템");
@@ -75,7 +75,7 @@ public class QuestionItemHelperTest {
         when(itemDomainService.findById(secondItem.getId())).thenReturn(secondItem);
 
         // when
-        questionItemHelper.saveQuestionItem(itemRequests, question);
+        questionItemManager.saveItems(itemRequests, question);
 
         // then
         verify(questionItemDomainService).deleteAllByQuestionId(question.getId());

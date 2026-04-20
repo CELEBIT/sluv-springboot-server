@@ -2,7 +2,7 @@ package com.sluv.api.domain.question.service;
 
 import com.sluv.api.common.response.PaginationResponse;
 import com.sluv.api.question.dto.QuestionHomeResDto;
-import com.sluv.api.question.helper.QuestionResponseHelper;
+import com.sluv.api.question.helper.QuestionResponseAssembler;
 import com.sluv.api.question.service.QuestionRankService;
 import com.sluv.domain.auth.enums.SnsType;
 import com.sluv.domain.question.dto.QuestionSimpleResDto;
@@ -39,7 +39,7 @@ public class QuestionRankServiceTest {
     private UserBlockDomainService userBlockDomainService;
 
     @Mock
-    private QuestionResponseHelper questionResponseHelper;
+    private QuestionResponseAssembler questionResponseAssembler;
 
     @Test
     @DisplayName("일간 인기 질문을 조회한다.")
@@ -62,7 +62,7 @@ public class QuestionRankServiceTest {
 
         when(userBlockDomainService.getAllBlockedUser(userId)).thenReturn(List.of(createUserBlock(user, blockedUser)));
         when(questionDomainService.getDailyHotQuestion(List.of(blockedUser.getId()))).thenReturn(List.of(question));
-        when(questionResponseHelper.getQuestionHomeResponse(question)).thenReturn(response);
+        when(questionResponseAssembler.getQuestionHomeResponse(question)).thenReturn(response);
 
         // when
         List<QuestionHomeResDto> result = questionRankService.getDailyHotQuestions(userId);
@@ -95,7 +95,7 @@ public class QuestionRankServiceTest {
         when(userBlockDomainService.getAllBlockedUser(userId)).thenReturn(List.of(createUserBlock(user, blockedUser)));
         when(questionDomainService.getWeeklyHotQuestion(List.of(blockedUser.getId()), pageable))
                 .thenReturn(new PageImpl<>(List.of(question), pageable, 1));
-        when(questionResponseHelper.getQuestionSimpleResponseWithImages(question)).thenReturn(response);
+        when(questionResponseAssembler.getQuestionSimpleResponseWithImages(question)).thenReturn(response);
 
         // when
         PaginationResponse<QuestionSimpleResDto> result = questionRankService.getWeeklyHotQuestions(userId, pageable);

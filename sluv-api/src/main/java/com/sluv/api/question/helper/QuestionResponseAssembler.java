@@ -30,7 +30,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class QuestionResponseHelper {
+public class QuestionResponseAssembler {
 
     private final ItemImgRepository itemImgRepository;
     private final QuestionImgRepository questionImgRepository;

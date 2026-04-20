@@ -2,8 +2,8 @@ package com.sluv.api.question.service;
 
 import com.sluv.api.celeb.dto.response.CelebChipResponse;
 import com.sluv.api.question.dto.*;
-import com.sluv.api.question.helper.QuestionImgHelper;
-import com.sluv.api.question.helper.QuestionItemHelper;
+import com.sluv.api.question.helper.QuestionImageManager;
+import com.sluv.api.question.helper.QuestionItemManager;
 import com.sluv.domain.celeb.entity.Celeb;
 import com.sluv.domain.celeb.entity.NewCeleb;
 import com.sluv.domain.celeb.service.CelebDomainService;
@@ -50,8 +50,8 @@ public class QuestionService {
     private final QuestionVoteDomainService questionVoteDomainService;
     private final UserDomainService userDomainService;
 
-    private final QuestionImgHelper questionImgHelper;
-    private final QuestionItemHelper questionItemHelper;
+    private final QuestionImageManager questionImageManager;
+    private final QuestionItemManager questionItemManager;
     private final QuestionVoteService questionVoteService;
 
 
@@ -83,10 +83,10 @@ public class QuestionService {
         QuestionFind newQuestionFind = (QuestionFind) questionDomainService.saveQuestion(questionFind);
 
         // 3. QuestionImg 저장
-        questionImgHelper.saveQuestionImg(dto.getImgList(), newQuestionFind);
+        questionImageManager.saveImages(dto.getImgList(), newQuestionFind);
 
         // 4. QuestionItem 저장
-        questionItemHelper.saveQuestionItem(dto.getItemList(), newQuestionFind);
+        questionItemManager.saveItems(dto.getItemList(), newQuestionFind);
 
         return QuestionPostResDto.of(newQuestionFind.getId());
 
@@ -111,10 +111,10 @@ public class QuestionService {
         QuestionBuy newQuestionBuy = (QuestionBuy) questionDomainService.saveQuestion(questionBuy);
 
         // 3. QuestionImg 저장
-        questionImgHelper.saveQuestionImg(dto.getImgList(), newQuestionBuy);
+        questionImageManager.saveImages(dto.getImgList(), newQuestionBuy);
 
         // 4. QuestionItem 저장
-        questionItemHelper.saveQuestionItem(dto.getItemList(), newQuestionBuy);
+        questionItemManager.saveItems(dto.getItemList(), newQuestionBuy);
 
         return QuestionPostResDto.of(newQuestionBuy.getId());
     }
@@ -139,10 +139,10 @@ public class QuestionService {
         QuestionHowabout newQuestionHowabout = (QuestionHowabout) questionDomainService.saveQuestion(questionHowabout);
 
         // 3. QuestionImg 저장
-        questionImgHelper.saveQuestionImg(dto.getImgList(), newQuestionHowabout);
+        questionImageManager.saveImages(dto.getImgList(), newQuestionHowabout);
 
         // 4. QuestionItem 저장
-        questionItemHelper.saveQuestionItem(dto.getItemList(), newQuestionHowabout);
+        questionItemManager.saveItems(dto.getItemList(), newQuestionHowabout);
 
         return QuestionPostResDto.of(newQuestionHowabout.getId());
     }
@@ -179,11 +179,10 @@ public class QuestionService {
         questionRecommendCategoryDomainService.saveAll(recommendCategories);
 
         // 4. QuestionImg 저장
+        questionImageManager.saveImages(dto.getImgList(), newQuestionRecommend);
 
-        questionImgHelper.saveQuestionImg(dto.getImgList(), newQuestionRecommend);
-
-        // 4. QuestionItem 저장
-        questionItemHelper.saveQuestionItem(dto.getItemList(), newQuestionRecommend);
+        // 5. QuestionItem 저장
+        questionItemManager.saveItems(dto.getItemList(), newQuestionRecommend);
 
         return QuestionPostResDto.of(newQuestionRecommend.getId());
     }

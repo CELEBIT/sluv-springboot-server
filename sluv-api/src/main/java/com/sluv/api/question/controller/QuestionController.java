@@ -169,10 +169,10 @@ public class QuestionController {
                     """
     )
     @GetMapping("/buy")
-    public ResponseEntity<SuccessDataResponse<PaginationResponse<QuestionBuySimpleResDto>>> getQuestionBuyList(
+    public ResponseEntity<SuccessDataResponse<PaginationResponse<QuestionBuySimpleResDto>>> getBuyQuestions(
             @CurrentUserId Long userId, @Nullable @RequestParam("voteStatus") String voteStatus,
             Pageable pageable) {
-        PaginationResponse<QuestionBuySimpleResDto> response = questionService.getQuestionBuyList(userId,
+        PaginationResponse<QuestionBuySimpleResDto> response = questionFeedService.getBuyQuestions(userId,
                 voteStatus, pageable);
         return ResponseEntity.ok().body(SuccessDataResponse.from(response));
     }

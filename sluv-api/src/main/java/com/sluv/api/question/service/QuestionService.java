@@ -1,7 +1,6 @@
 package com.sluv.api.question.service;
 
 import com.sluv.api.celeb.dto.response.CelebChipResponse;
-import com.sluv.api.common.response.PaginationResponse;
 import com.sluv.api.question.dto.*;
 import com.sluv.api.question.helper.QuestionImgHelper;
 import com.sluv.api.question.helper.QuestionItemHelper;
@@ -22,12 +21,9 @@ import com.sluv.domain.question.entity.*;
 import com.sluv.domain.question.enums.QuestionStatus;
 import com.sluv.domain.question.service.*;
 import com.sluv.domain.user.entity.User;
-import com.sluv.domain.user.service.UserBlockDomainService;
 import com.sluv.domain.user.service.UserDomainService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -53,7 +49,6 @@ public class QuestionService {
     private final ClosetDomainService closetDomainService;
     private final QuestionVoteDomainService questionVoteDomainService;
     private final UserDomainService userDomainService;
-    private final UserBlockDomainService userBlockDomainService;
 
     private final QuestionImgHelper questionImgHelper;
     private final QuestionItemHelper questionItemHelper;
@@ -327,62 +322,6 @@ public class QuestionService {
             return "Recommend";
         }
         return null;
-    }
-
-    @Transactional(readOnly = true)
-    public PaginationResponse<QuestionBuySimpleResDto> getQuestionBuyList(Long userId, String voteStatus,
-                                                                          Pageable pageable) {
-        User user = userDomainService.findById(userId);
-        List<Long> blockUserIds = new ArrayList<>();
-        if (userId != null) {
-            blockUserIds = userBlockDomainService.getAllBlockedUser(userId).stream()
-                    .map(userBlock -> userBlock.getBlockedUser().getId())
-                    .toList();
-        }
-
-        Page<QuestionBuy> questionPage = questionDomainService.getQuestionBuyList(voteStatus, blockUserIds, pageable);
-
-        List<QuestionBuySimpleResDto> content = questionPage.stream().map(question -> {
-
-            List<QuestionImgResDto> imgList = questionImgDomainService.findAllByQuestionId(question.getId())
-                    .stream()
-                    .map(questionImg -> {
-                        QuestionVoteDataDto voteDataDto = questionVoteService.getVoteData(questionImg.getQuestion().getId(),
-                                (long) questionImg.getSortOrder());
-
-                        return QuestionImgResDto.of(questionImg, voteDataDto);
-                    }).toList();
-
-            // 아이템 이미지 URL
-            List<QuestionItemResDto> itemImgList = questionItemDomainService.findAllByQuestionId(question.getId())
-                    .stream()
-                    .map(questionItem -> {
-                        ItemSimpleDto itemSimpleDto = ItemSimpleDto.of(
-                                questionItem.getItem(),
-                                itemImgDomainService.findMainImg(questionItem.getItem().getId()),
-                                null
-                        );
-                        QuestionVoteDataDto questionVoteDataDto = questionVoteService.getVoteData(questionItem.getQuestion().getId(),
-                                (long) questionItem.getSortOrder());
-                        return QuestionItemResDto.of(questionItem, itemSimpleDto, questionVoteDataDto);
-                    }).toList();
-
-            Long voteCount = questionVoteService.getTotalVoteCount(imgList, itemImgList);
-
-            QuestionVote questionVote = null;
-            if (user != null) {
-                questionVote = questionVoteDomainService.findByQuestionIdAndUserIdOrNull(question.getId(),
-                        user.getId());
-            }
-
-            User writer = userDomainService.findByIdOrNull(question.getUser().getId());
-
-            return QuestionBuySimpleResDto.of(user, question, writer, voteCount, imgList, itemImgList,
-                    question.getVoteEndTime(),
-                    questionVote);
-        }).toList();
-
-        return PaginationResponse.of(questionPage, content);
     }
 
 }

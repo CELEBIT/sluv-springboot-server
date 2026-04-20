@@ -1,23 +1,19 @@
 package com.sluv.api.domain.question.helper;
 
 import com.sluv.api.question.dto.QuestionHomeResDto;
+import com.sluv.api.question.helper.QuestionImageManager;
 import com.sluv.api.question.helper.QuestionResponseAssembler;
 import com.sluv.domain.auth.enums.SnsType;
 import com.sluv.domain.celeb.entity.Celeb;
 import com.sluv.domain.comment.repository.CommentRepository;
 import com.sluv.domain.item.entity.Item;
-import com.sluv.domain.item.entity.ItemImg;
-import com.sluv.domain.item.repository.ItemImgRepository;
+import com.sluv.domain.question.dto.QuestionImgSimpleDto;
 import com.sluv.domain.question.dto.QuestionSimpleResDto;
 import com.sluv.domain.question.entity.QuestionBuy;
 import com.sluv.domain.question.entity.QuestionFind;
 import com.sluv.domain.question.entity.QuestionHowabout;
-import com.sluv.domain.question.entity.QuestionImg;
-import com.sluv.domain.question.entity.QuestionItem;
 import com.sluv.domain.question.entity.QuestionRecommend;
 import com.sluv.domain.question.entity.QuestionRecommendCategory;
-import com.sluv.domain.question.repository.QuestionImgRepository;
-import com.sluv.domain.question.repository.QuestionItemRepository;
 import com.sluv.domain.question.repository.QuestionLikeRepository;
 import com.sluv.domain.question.repository.QuestionRecommendCategoryRepository;
 import com.sluv.domain.user.entity.User;
@@ -43,13 +39,7 @@ public class QuestionResponseAssemblerTest {
     private QuestionResponseAssembler questionResponseAssembler;
 
     @Mock
-    private ItemImgRepository itemImgRepository;
-
-    @Mock
-    private QuestionImgRepository questionImgRepository;
-
-    @Mock
-    private QuestionItemRepository questionItemRepository;
+    private QuestionImageManager questionImageManager;
 
     @Mock
     private QuestionLikeRepository questionLikeRepository;
@@ -74,29 +64,12 @@ public class QuestionResponseAssemblerTest {
                 .title("질문 제목")
                 .content("질문 내용")
                 .build();
-        QuestionImg questionImg = QuestionImg.builder()
-                .question(question)
-                .imgUrl("https://question-image.test/1.jpg")
-                .sortOrder(1)
-                .representFlag(true)
-                .build();
         Item item = createItem(20L);
-        QuestionItem questionItem = QuestionItem.builder()
-                .question(question)
-                .item(item)
-                .sortOrder(1)
-                .representFlag(true)
-                .build();
-        ItemImg itemImg = ItemImg.builder()
-                .item(item)
-                .itemImgUrl("https://item-image.test/1.jpg")
-                .sortOrder(1)
-                .representFlag(true)
-                .build();
 
-        when(questionImgRepository.findAllByQuestionId(question.getId())).thenReturn(List.of(questionImg));
-        when(questionItemRepository.findAllByQuestionId(question.getId())).thenReturn(List.of(questionItem));
-        when(itemImgRepository.findMainImg(item.getId())).thenReturn(itemImg);
+        when(questionImageManager.getQuestionImages(question))
+                .thenReturn(List.of(new QuestionImgSimpleDto("https://question-image.test/1.jpg", 1L)));
+        when(questionImageManager.getBuyItemMainImages(question))
+                .thenReturn(List.of(new QuestionImgSimpleDto("https://item-image.test/1.jpg", 1L)));
         when(questionLikeRepository.countByQuestionId(question.getId())).thenReturn(2L);
         when(commentRepository.countByQuestionId(question.getId())).thenReturn(3L);
         when(userRepository.findById(writer.getId())).thenReturn(Optional.of(writer));
@@ -131,6 +104,8 @@ public class QuestionResponseAssemblerTest {
                 .celeb(childCeleb)
                 .build();
 
+        when(questionImageManager.getQuestionImages(question)).thenReturn(null);
+        when(questionImageManager.getBuyItemMainImages(question)).thenReturn(null);
         when(questionLikeRepository.countByQuestionId(question.getId())).thenReturn(1L);
         when(commentRepository.countByQuestionId(question.getId())).thenReturn(4L);
         when(userRepository.findById(writer.getId())).thenReturn(Optional.of(writer));
@@ -144,8 +119,6 @@ public class QuestionResponseAssemblerTest {
         assertThat(response.getImgList()).isNull();
         assertThat(response.getItemImgList()).isNull();
         assertThat(response.getCategoryName()).isNull();
-        verify(questionImgRepository, never()).findAllByQuestionId(question.getId());
-        verify(questionItemRepository, never()).findAllByQuestionId(question.getId());
         verify(questionRecommendCategoryRepository, never()).findAllByQuestionId(question.getId());
     }
 
@@ -162,29 +135,14 @@ public class QuestionResponseAssemblerTest {
                 .content("질문 내용")
                 .celeb(celeb)
                 .build();
-        QuestionImg questionImg = QuestionImg.builder()
-                .question(question)
-                .imgUrl("https://question-image.test/main.jpg")
-                .sortOrder(1)
-                .representFlag(true)
-                .build();
         Item item = createItem(20L);
-        QuestionItem questionItem = QuestionItem.builder()
-                .question(question)
-                .item(item)
-                .sortOrder(1)
-                .representFlag(true)
-                .build();
-        ItemImg itemImg = ItemImg.builder()
-                .item(item)
-                .itemImgUrl("https://item-image.test/main.jpg")
-                .sortOrder(1)
-                .representFlag(true)
-                .build();
 
-        when(questionImgRepository.findByQuestionIdAndRepresentFlag(question.getId(), true)).thenReturn(questionImg);
-        when(questionItemRepository.findByQuestionIdAndRepresentFlag(question.getId(), true)).thenReturn(questionItem);
-        when(itemImgRepository.findMainImg(item.getId())).thenReturn(itemImg);
+        when(questionImageManager.getQuestionImagesWithMainImage(question))
+                .thenReturn(List.of(
+                        new QuestionImgSimpleDto("https://question-image.test/main.jpg", 1L),
+                        new QuestionImgSimpleDto("https://item-image.test/main.jpg", 1L)
+                ));
+        when(questionImageManager.getItemMainImagesForCard(question)).thenReturn(List.of());
         when(questionLikeRepository.countByQuestionId(question.getId())).thenReturn(1L);
         when(commentRepository.countByQuestionId(question.getId())).thenReturn(2L);
         when(userRepository.findById(writer.getId())).thenReturn(Optional.of(writer));
@@ -213,6 +171,8 @@ public class QuestionResponseAssemblerTest {
                 .content("질문 내용")
                 .build();
 
+        when(questionImageManager.getQuestionImages(question)).thenReturn(null);
+        when(questionImageManager.getBuyItemMainImages(question)).thenReturn(null);
         when(questionLikeRepository.countByQuestionId(question.getId())).thenReturn(5L);
         when(commentRepository.countByQuestionId(question.getId())).thenReturn(6L);
         when(userRepository.findById(writer.getId())).thenReturn(Optional.of(writer));
@@ -227,8 +187,6 @@ public class QuestionResponseAssemblerTest {
         assertThat(response.getImgList()).isNull();
         assertThat(response.getItemImgList()).isNull();
         assertThat(response.getCategoryName()).isNull();
-        verify(questionImgRepository, never()).findAllByQuestionId(question.getId());
-        verify(questionItemRepository, never()).findAllByQuestionId(question.getId());
         verify(questionRecommendCategoryRepository, never()).findAllByQuestionId(question.getId());
     }
 
@@ -248,6 +206,8 @@ public class QuestionResponseAssemblerTest {
                 QuestionRecommendCategory.toEntity(question, "아우터")
         );
 
+        when(questionImageManager.getQuestionImages(question)).thenReturn(null);
+        when(questionImageManager.getBuyItemMainImages(question)).thenReturn(null);
         when(questionRecommendCategoryRepository.findAllByQuestionId(question.getId())).thenReturn(categories);
         when(questionLikeRepository.countByQuestionId(question.getId())).thenReturn(7L);
         when(commentRepository.countByQuestionId(question.getId())).thenReturn(8L);
@@ -261,8 +221,6 @@ public class QuestionResponseAssemblerTest {
         assertThat(response.getCategoryName()).containsExactly("상의", "아우터");
         assertThat(response.getImgList()).isNull();
         assertThat(response.getItemImgList()).isNull();
-        verify(questionImgRepository, never()).findAllByQuestionId(question.getId());
-        verify(questionItemRepository, never()).findAllByQuestionId(question.getId());
     }
 
     @Test
@@ -276,29 +234,12 @@ public class QuestionResponseAssemblerTest {
                 .title("질문 제목")
                 .content("질문 내용")
                 .build();
-        QuestionImg questionImg = QuestionImg.builder()
-                .question(question)
-                .imgUrl("https://question-image.test/1.jpg")
-                .sortOrder(1)
-                .representFlag(true)
-                .build();
         Item item = createItem(20L);
-        QuestionItem questionItem = QuestionItem.builder()
-                .question(question)
-                .item(item)
-                .sortOrder(1)
-                .representFlag(true)
-                .build();
-        ItemImg itemImg = ItemImg.builder()
-                .item(item)
-                .itemImgUrl("https://item-image.test/1.jpg")
-                .sortOrder(1)
-                .representFlag(true)
-                .build();
 
-        when(questionImgRepository.findAllByQuestionId(question.getId())).thenReturn(List.of(questionImg));
-        when(questionItemRepository.findAllByQuestionId(question.getId())).thenReturn(List.of(questionItem));
-        when(itemImgRepository.findMainImg(item.getId())).thenReturn(itemImg);
+        when(questionImageManager.getQuestionImagesWithMainImage(question))
+                .thenReturn(List.of(new QuestionImgSimpleDto("https://question-image.test/1.jpg", 1L)));
+        when(questionImageManager.getItemMainImagesForCard(question))
+                .thenReturn(List.of(new QuestionImgSimpleDto("https://item-image.test/1.jpg", 1L)));
         when(questionLikeRepository.countByQuestionId(question.getId())).thenReturn(3L);
         when(commentRepository.countByQuestionId(question.getId())).thenReturn(4L);
         when(userRepository.findById(writer.getId())).thenReturn(Optional.of(writer));
@@ -325,18 +266,14 @@ public class QuestionResponseAssemblerTest {
                 .title("질문 제목")
                 .content("질문 내용")
                 .build();
-        QuestionImg questionImg = QuestionImg.builder()
-                .question(question)
-                .imgUrl("https://question-image.test/recommend.jpg")
-                .sortOrder(1)
-                .representFlag(true)
-                .build();
         List<QuestionRecommendCategory> categories = List.of(
                 QuestionRecommendCategory.toEntity(question, "상의"),
                 QuestionRecommendCategory.toEntity(question, "신발")
         );
 
-        when(questionImgRepository.findByQuestionIdAndRepresentFlag(question.getId(), true)).thenReturn(questionImg);
+        when(questionImageManager.getQuestionImagesWithMainImage(question))
+                .thenReturn(List.of(new QuestionImgSimpleDto("https://question-image.test/recommend.jpg", 1L)));
+        when(questionImageManager.getItemMainImagesForCard(question)).thenReturn(List.of());
         when(questionRecommendCategoryRepository.findAllByQuestionId(question.getId())).thenReturn(categories);
         when(questionLikeRepository.countByQuestionId(question.getId())).thenReturn(5L);
         when(commentRepository.countByQuestionId(question.getId())).thenReturn(6L);
@@ -364,29 +301,13 @@ public class QuestionResponseAssemblerTest {
                 .title("질문 제목")
                 .content("질문 내용")
                 .build();
-        QuestionImg questionImg = QuestionImg.builder()
-                .question(question)
-                .imgUrl("https://question-image.test/2.jpg")
-                .sortOrder(2)
-                .representFlag(true)
-                .build();
         Item item = createItem(20L);
-        QuestionItem questionItem = QuestionItem.builder()
-                .question(question)
-                .item(item)
-                .sortOrder(1)
-                .representFlag(true)
-                .build();
-        ItemImg itemImg = ItemImg.builder()
-                .item(item)
-                .itemImgUrl("https://item-image.test/1.jpg")
-                .sortOrder(1)
-                .representFlag(true)
-                .build();
 
-        when(questionImgRepository.findAllByQuestionId(question.getId())).thenReturn(List.of(questionImg));
-        when(questionItemRepository.findAllByQuestionId(question.getId())).thenReturn(List.of(questionItem));
-        when(itemImgRepository.findMainImg(item.getId())).thenReturn(itemImg);
+        when(questionImageManager.getQuestionImagesForHome(question))
+                .thenReturn(List.of(
+                        new QuestionImgSimpleDto("https://item-image.test/1.jpg", 1L),
+                        new QuestionImgSimpleDto("https://question-image.test/2.jpg", 2L)
+                ));
         when(userRepository.findById(writer.getId())).thenReturn(Optional.of(writer));
 
         // when
@@ -409,33 +330,16 @@ public class QuestionResponseAssemblerTest {
                 .title("질문 제목")
                 .content("질문 내용")
                 .build();
-        QuestionImg questionImg = QuestionImg.builder()
-                .question(question)
-                .imgUrl("https://question-image.test/all.jpg")
-                .sortOrder(1)
-                .representFlag(true)
-                .build();
         Item item = createItem(20L);
-        QuestionItem questionItem = QuestionItem.builder()
-                .question(question)
-                .item(item)
-                .sortOrder(2)
-                .representFlag(true)
-                .build();
-        ItemImg itemImg = ItemImg.builder()
-                .item(item)
-                .itemImgUrl("https://item-image.test/all.jpg")
-                .sortOrder(2)
-                .representFlag(true)
-                .build();
         List<QuestionRecommendCategory> categories = List.of(
                 QuestionRecommendCategory.toEntity(question, "상의"),
                 QuestionRecommendCategory.toEntity(question, "신발")
         );
 
-        when(questionImgRepository.findAllByQuestionId(question.getId())).thenReturn(List.of(questionImg));
-        when(questionItemRepository.findAllByQuestionId(question.getId())).thenReturn(List.of(questionItem));
-        when(itemImgRepository.findMainImg(item.getId())).thenReturn(itemImg);
+        when(questionImageManager.getAllQuestionImages(question))
+                .thenReturn(List.of(new QuestionImgSimpleDto("https://question-image.test/all.jpg", 1L)));
+        when(questionImageManager.getAllItemMainImages(question))
+                .thenReturn(List.of(new QuestionImgSimpleDto("https://item-image.test/all.jpg", 2L)));
         when(questionRecommendCategoryRepository.findAllByQuestionId(question.getId())).thenReturn(categories);
         when(questionLikeRepository.countByQuestionId(question.getId())).thenReturn(3L);
         when(commentRepository.countByQuestionId(question.getId())).thenReturn(4L);

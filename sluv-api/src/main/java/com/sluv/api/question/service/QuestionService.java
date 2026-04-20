@@ -11,11 +11,6 @@ import com.sluv.domain.celeb.service.NewCelebDomainService;
 import com.sluv.domain.closet.entity.Closet;
 import com.sluv.domain.closet.service.ClosetDomainService;
 import com.sluv.domain.comment.service.CommentDomainService;
-import com.sluv.domain.item.dto.ItemSimpleDto;
-import com.sluv.domain.item.entity.ItemImg;
-import com.sluv.domain.item.service.ItemDomainService;
-import com.sluv.domain.item.service.ItemImgDomainService;
-import com.sluv.domain.item.service.ItemScrapDomainService;
 import com.sluv.domain.question.dto.QuestionSimpleResDto;
 import com.sluv.domain.question.entity.*;
 import com.sluv.domain.question.enums.QuestionStatus;
@@ -27,25 +22,20 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
-import java.util.*;
+import java.util.List;
+import java.util.function.Function;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class QuestionService {
     private final QuestionDomainService questionDomainService;
-    private final QuestionImgDomainService questionImgDomainService;
-    private final QuestionItemDomainService questionItemDomainService;
     private final QuestionRecommendCategoryDomainService questionRecommendCategoryDomainService;
     private final QuestionLikeDomainService questionLikeDomainService;
     private final CommentDomainService commentDomainService;
-    private final ItemDomainService itemDomainService;
-    private final ItemImgDomainService itemImgDomainService;
     private final CelebDomainService celebDomainService;
     private final NewCelebDomainService newCelebDomainService;
     private final RecentQuestionDomainService recentQuestionDomainService;
-    private final ItemScrapDomainService itemScrapDomainService;
     private final ClosetDomainService closetDomainService;
     private final QuestionVoteDomainService questionVoteDomainService;
     private final UserDomainService userDomainService;
@@ -198,115 +188,107 @@ public class QuestionService {
     public QuestionGetDetailResDto getQuestionDetail(Long nowUserId, Long questionId) {
         Question question = questionDomainService.findById(questionId);
         User nowUser = userDomainService.findById(nowUserId);
-
-        String qType = getQuestionTypeOrNull(question);
-
-        // 작성자
+        String questionType = getQuestionTypeOrNull(question);
         User writer = userDomainService.findByIdOrNull(question.getUser().getId());
+        List<Closet> closets = getClosets(nowUser);
 
-        // Question img List
-        List<QuestionImgResDto> questionImgList = questionImgDomainService.findAllByQuestionId(questionId).
-                stream()
-                .map(questionImg -> {
-                            QuestionVoteDataDto voteDataDto = null;
-                            // QuestionBuy 라면
-                            if (qType != null && qType.equals("Buy")) {
-                                voteDataDto = questionVoteService.getVoteData(questionId, (long) questionImg.getSortOrder());
-                            }
-
-                            return QuestionImgResDto.of(questionImg, voteDataDto);
-                        }
-                ).toList();
-
-        List<Closet> closets;
-
-        if (nowUser != null) {
-            closets = closetDomainService.findAllByUserId(nowUser.getId());
-        } else {
-            closets = new ArrayList<>();
-        }
-
-        // Question Item List
-        List<QuestionItemResDto> questionItemList = questionItemDomainService.findAllByQuestionId(questionId)
-                .stream()
-                .map(questionItem -> {
-                    ItemSimpleDto itemSimpleDto = ItemSimpleDto.of(
-                            questionItem.getItem(),
-                            itemImgDomainService.findMainImg(questionItem.getItem().getId()),
-                            itemScrapDomainService.getItemScrapStatus(questionItem.getItem(), closets)
-                    );
-                    QuestionVoteDataDto questionVoteDataDto = null;
-                    // QuestionBuy일 경우 투표수 추가.
-                    if (qType != null && qType.equals("Buy")) {
-                        questionVoteDataDto = questionVoteService.getVoteData(questionId, (long) questionItem.getSortOrder());
-                    }
-
-                    return QuestionItemResDto.of(questionItem, itemSimpleDto, questionVoteDataDto);
-                }).toList();
-
-        // Question Like Num Count
+        List<QuestionImgResDto> questionImages = questionImageManager.getQuestionImageResponses(
+                questionId,
+                getVoteDataResolver(questionId, questionType)
+        );
+        List<QuestionItemResDto> questionItems = questionItemManager.getQuestionItemResponses(
+                questionId,
+                closets,
+                getVoteDataResolver(questionId, questionType)
+        );
         Long questionLikeNum = questionLikeDomainService.countByQuestionId(questionId);
-
-        // Question Comment Num Count
         Long questionCommentNum = commentDomainService.countByQuestionId(questionId);
+        Boolean currentUserLike = hasCurrentUserLike(nowUser, questionId);
+        QuestionDetailTypeData typeData = getQuestionDetailTypeData(question, questionType, nowUser);
 
-        // hasLike 검색
-        Boolean currentUserLike =
-                nowUser != null && questionLikeDomainService.existsByQuestionIdAndUserId(questionId, nowUser.getId());
-
-        CelebChipResponse celeb = null;
-        CelebChipResponse newCeleb = null;
-        LocalDateTime voteEndTime = null;
-        Long totalVoteNum = null;
-        Long voteStatus = null;
-        List<String> recommendCategoryList = null;
-
-        switch (qType) {
-            case "Find" -> {
-                QuestionFind questionFind = (QuestionFind) question;
-                if (questionFind.getCeleb() != null) {
-                    celeb = CelebChipResponse.of(questionFind.getCeleb());
-                } else {
-                    newCeleb = CelebChipResponse.of(questionFind.getNewCeleb());
-                }
-            }
-            case "Buy" -> {
-                QuestionBuy questionBuy = (QuestionBuy) question;
-                QuestionVote questionVote =
-                        nowUser != null ?
-                                questionVoteDomainService.findByQuestionIdAndUserIdOrNull(questionId, nowUser.getId())
-                                : null;
-                voteEndTime = questionBuy.getVoteEndTime();
-                totalVoteNum = questionVoteDomainService.countByQuestionId(questionId);
-                voteStatus = questionVote != null
-                        ? questionVote.getVoteSortOrder()
-                        : null;
-            }
-            case "Recommend" ->
-                    recommendCategoryList = questionRecommendCategoryDomainService.findAllByQuestionId(questionId)
-                            .stream().map(QuestionRecommendCategory::getName).toList();
-        }
-
-        // RecentQuestion 등록
         if (nowUser != null) {
-            recentQuestionDomainService.saveRecentQuestion(nowUser, qType, question);
-
-            // SearchNum 증가
-            increaseQuestionViewNum(nowUser.getId(), question);
+            recentQuestionDomainService.saveRecentQuestion(nowUser, questionType, question);
+            increaseQuestionViewNum(question);
         }
 
         return QuestionGetDetailResDto.of(
-                question, qType, writer,
-                questionImgList, questionItemList,
+                question, questionType, writer,
+                questionImages, questionItems,
                 questionLikeNum, questionCommentNum, currentUserLike,
                 writer != null && nowUser != null && nowUser.getId().equals(writer.getId()),
-                celeb, newCeleb,
-                voteEndTime, totalVoteNum, voteStatus,
-                recommendCategoryList
+                typeData.celeb(), typeData.newCeleb(),
+                typeData.voteEndTime(), typeData.totalVoteNum(), typeData.voteStatus(),
+                typeData.recommendCategories()
         );
     }
 
-    private void increaseQuestionViewNum(Long userId, Question question) {
+    private List<Closet> getClosets(User user) {
+        if (user == null) {
+            return List.of();
+        }
+
+        return closetDomainService.findAllByUserId(user.getId());
+    }
+
+    private Function<Integer, QuestionVoteDataDto> getVoteDataResolver(Long questionId, String questionType) {
+        if (!"Buy".equals(questionType)) {
+            return sortOrder -> null;
+        }
+
+        return sortOrder -> questionVoteService.getVoteData(questionId, sortOrder.longValue());
+    }
+
+    private Boolean hasCurrentUserLike(User nowUser, Long questionId) {
+        return nowUser != null && questionLikeDomainService.existsByQuestionIdAndUserId(questionId, nowUser.getId());
+    }
+
+    private QuestionDetailTypeData getQuestionDetailTypeData(Question question, String questionType, User nowUser) {
+        return switch (questionType) {
+            case "Find" -> getFindQuestionDetailData((QuestionFind) question);
+            case "Buy" -> getBuyQuestionDetailData((QuestionBuy) question, nowUser);
+            case "Recommend" -> getRecommendQuestionDetailData(question.getId());
+            default -> QuestionDetailTypeData.empty();
+        };
+    }
+
+    private QuestionDetailTypeData getFindQuestionDetailData(QuestionFind question) {
+        CelebChipResponse celeb = null;
+        CelebChipResponse newCeleb = null;
+
+        if (question.getCeleb() != null) {
+            celeb = CelebChipResponse.of(question.getCeleb());
+        } else {
+            newCeleb = CelebChipResponse.of(question.getNewCeleb());
+        }
+
+        return QuestionDetailTypeData.ofCeleb(celeb, newCeleb);
+    }
+
+    private QuestionDetailTypeData getBuyQuestionDetailData(QuestionBuy question, User nowUser) {
+        QuestionVote questionVote = nowUser != null
+                ? questionVoteDomainService.findByQuestionIdAndUserIdOrNull(question.getId(), nowUser.getId())
+                : null;
+        Long voteStatus = questionVote != null
+                ? questionVote.getVoteSortOrder()
+                : null;
+
+        return QuestionDetailTypeData.ofVote(
+                question.getVoteEndTime(),
+                questionVoteDomainService.countByQuestionId(question.getId()),
+                voteStatus
+        );
+    }
+
+    private QuestionDetailTypeData getRecommendQuestionDetailData(Long questionId) {
+        List<String> recommendCategories = questionRecommendCategoryDomainService.findAllByQuestionId(questionId)
+                .stream()
+                .map(QuestionRecommendCategory::getName)
+                .toList();
+
+        return QuestionDetailTypeData.ofRecommendCategories(recommendCategories);
+    }
+
+    private void increaseQuestionViewNum(Question question) {
         question.increaseSearchNum();
     }
 

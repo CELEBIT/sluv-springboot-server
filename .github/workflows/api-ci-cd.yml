@@ -11,10 +11,6 @@ on:
       - 'env/**'
       - '.env'
 
-concurrency:
-  group: ${{ github.ref_name }}
-  cancel-in-progress: false
-
 jobs:
   api-ci-cd:
     runs-on: ubuntu-latest
@@ -58,19 +54,32 @@ jobs:
           flags: 'g'
 
 
-      - name: Deploy to Local Server
+      - name: Wait for deploy lock and deploy api
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.LOCAL_SERVER_HOST }}
           username: ${{ secrets.LOCAL_SERVER_USER }}
           password: ${{ secrets.LOCAL_SERVER_SSH_PASSWORD }}
           script: |
+            set -e
             branchName=${{ github.ref_name }}
-            echo ${branchName}
-            echo ${{ secrets.LOCAL_SERVER_SUDO_PASSWORD }} | sudo -S chmod +x /home/sluv/${branchName}-server/${branchName}-deploy-script.sh
-            echo "chmod Clear"
-            echo ${{ secrets.LOCAL_SERVER_SUDO_PASSWORD }} | sudo -S /home/sluv/${branchName}-server/${branchName}-deploy-script.sh
-            echo "Process Clear"
+            lockFile="/tmp/sluv-${branchName}-deploy.lock"
+
+            (
+              echo "[deploy-lock] api deploy is waiting for lock: ${lockFile}"
+              if ! flock -w 1800 200; then
+                echo "[deploy-lock] api deploy failed to acquire lock after 1800 seconds"
+                exit 1
+              fi
+
+              echo "[deploy-lock] api deploy acquired lock"
+              echo "[deploy] api deploy started for branch: ${branchName}"
+              echo ${{ secrets.LOCAL_SERVER_SUDO_PASSWORD }} | sudo -S chmod +x /home/sluv/${branchName}-server/${branchName}-deploy-script.sh
+              echo "[deploy] chmod clear"
+              echo ${{ secrets.LOCAL_SERVER_SUDO_PASSWORD }} | sudo -S /home/sluv/${branchName}-server/${branchName}-deploy-script.sh
+              echo "[deploy] api deploy finished"
+              echo "[deploy-lock] api deploy releasing lock"
+            ) 200>${lockFile}
 
   current-time:
     needs: api-ci-cd

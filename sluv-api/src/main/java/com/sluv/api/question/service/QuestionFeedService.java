@@ -29,7 +29,7 @@ public class QuestionFeedService {
         List<Long> blockedUserIds = getBlockedUserIds(userId);
         Page<Question> questions = questionDomainService.getTotalQuestionList(blockedUserIds, pageable);
 
-        return questionResponseHelper.getQuestionSimpleResponsesWithMainImage(questions);
+        return toQuestionSimpleResponse(questions);
     }
 
     @Transactional(readOnly = true)
@@ -43,7 +43,7 @@ public class QuestionFeedService {
                 pageable
         );
 
-        return questionResponseHelper.getQuestionSimpleResponsesWithMainImage(questions);
+        return toQuestionSimpleResponse(questions);
     }
 
     @Transactional(readOnly = true)
@@ -51,7 +51,7 @@ public class QuestionFeedService {
         List<Long> blockedUserIds = getBlockedUserIds(userId);
         Page<QuestionHowabout> questions = questionDomainService.getQuestionHowaboutList(blockedUserIds, pageable);
 
-        return questionResponseHelper.getQuestionSimpleResponsesWithMainImage(questions);
+        return toQuestionSimpleResponse(questions);
     }
 
     @Transactional(readOnly = true)
@@ -64,7 +64,7 @@ public class QuestionFeedService {
                 pageable
         );
 
-        return questionResponseHelper.getQuestionSimpleResponsesWithMainImage(questions);
+        return toQuestionSimpleResponse(questions);
     }
 
     private List<Long> getBlockedUserIds(Long userId) {
@@ -75,6 +75,14 @@ public class QuestionFeedService {
         return userBlockDomainService.getAllBlockedUser(userId).stream()
                 .map(userBlock -> userBlock.getBlockedUser().getId())
                 .toList();
+    }
+
+    private PaginationResponse<QuestionSimpleResDto> toQuestionSimpleResponse(Page<? extends Question> questions) {
+        List<QuestionSimpleResDto> questionResponses = questions.stream()
+                .map(questionResponseHelper::getQuestionSimpleResponseWithMainImage)
+                .toList();
+
+        return PaginationResponse.of(questions, questionResponses);
     }
 
 }

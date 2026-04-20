@@ -59,7 +59,7 @@ public class QuestionFeedServiceTest {
 
         when(userBlockDomainService.getAllBlockedUser(userId)).thenReturn(List.of(userBlock));
         when(questionDomainService.getTotalQuestionList(List.of(blockedUser.getId()), pageable)).thenReturn(questions);
-        whenQuestionResponseHelperReturns(questions, response);
+        when(questionResponseHelper.getQuestionSimpleResponseWithMainImage(question)).thenReturn(response);
 
         // when
         PaginationResponse<QuestionSimpleResDto> result = questionFeedService.getTotalQuestions(userId, pageable);
@@ -80,7 +80,7 @@ public class QuestionFeedServiceTest {
         Page<Question> questions = new PageImpl<>(List.of(question), pageable, 1);
 
         when(questionDomainService.getTotalQuestionList(List.of(), pageable)).thenReturn(questions);
-        whenQuestionResponseHelperReturns(questions, response);
+        when(questionResponseHelper.getQuestionSimpleResponseWithMainImage(question)).thenReturn(response);
 
         // when
         PaginationResponse<QuestionSimpleResDto> result = questionFeedService.getTotalQuestions(null, pageable);
@@ -106,7 +106,7 @@ public class QuestionFeedServiceTest {
         when(userBlockDomainService.getAllBlockedUser(userId)).thenReturn(List.of());
         when(questionDomainService.getQuestionFindList(celebId, isNewCeleb, List.of(), pageable))
                 .thenReturn(questions);
-        whenQuestionResponseHelperReturns(questions, response);
+        when(questionResponseHelper.getQuestionSimpleResponseWithMainImage(question)).thenReturn(response);
 
         // when
         PaginationResponse<QuestionSimpleResDto> result = questionFeedService.getFindQuestions(
@@ -135,7 +135,7 @@ public class QuestionFeedServiceTest {
         when(userBlockDomainService.getAllBlockedUser(userId)).thenReturn(List.of());
         when(questionDomainService.getQuestionHowaboutList(List.of(), pageable))
                 .thenReturn(questions);
-        whenQuestionResponseHelperReturns(questions, response);
+        when(questionResponseHelper.getQuestionSimpleResponseWithMainImage(question)).thenReturn(response);
 
         // when
         PaginationResponse<QuestionSimpleResDto> result = questionFeedService.getHowaboutQuestions(userId, pageable);
@@ -160,7 +160,7 @@ public class QuestionFeedServiceTest {
         when(userBlockDomainService.getAllBlockedUser(userId)).thenReturn(List.of());
         when(questionDomainService.getQuestionRecommendList(hashtag, List.of(), pageable))
                 .thenReturn(questions);
-        whenQuestionResponseHelperReturns(questions, response);
+        when(questionResponseHelper.getQuestionSimpleResponseWithMainImage(question)).thenReturn(response);
 
         // when
         PaginationResponse<QuestionSimpleResDto> result = questionFeedService.getRecommendQuestions(
@@ -193,15 +193,5 @@ public class QuestionFeedServiceTest {
                 .id(questionId)
                 .title("질문 피드")
                 .build();
-    }
-
-    private void whenQuestionResponseHelperReturns(Page<? extends Question> questions, QuestionSimpleResDto response) {
-        PaginationResponse<QuestionSimpleResDto> paginationResponse = PaginationResponse.<QuestionSimpleResDto>builder()
-                .page(questions.getNumber())
-                .hasNext(questions.hasNext())
-                .content(List.of(response))
-                .build();
-
-        when(questionResponseHelper.getQuestionSimpleResponsesWithMainImage(questions)).thenReturn(paginationResponse);
     }
 }

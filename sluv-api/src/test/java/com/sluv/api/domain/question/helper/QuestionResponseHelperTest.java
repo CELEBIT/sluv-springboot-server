@@ -1,6 +1,6 @@
 package com.sluv.api.domain.question.helper;
 
-import com.sluv.api.common.response.PaginationResponse;
+import com.sluv.api.question.dto.QuestionHomeResDto;
 import com.sluv.api.question.helper.QuestionResponseHelper;
 import com.sluv.domain.auth.enums.SnsType;
 import com.sluv.domain.celeb.entity.Celeb;
@@ -30,9 +30,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.never;
@@ -357,41 +354,103 @@ public class QuestionResponseHelperTest {
     }
 
     @Test
-    @DisplayName("대표 이미지가 필요한 질문 Page를 PaginationResponse로 변환한다.")
-    void getQuestionSimpleResponsesWithMainImageTest() {
+    @DisplayName("홈 질문 응답은 Buy 질문의 질문 이미지와 아이템 대표 이미지를 합쳐 정렬한다.")
+    void getQuestionHomeResponseWithBuyTest() {
         // given
-        Pageable pageable = PageRequest.of(0, 10);
         User writer = createUser(10L);
-        QuestionHowabout question = QuestionHowabout.builder()
-                .id(8L)
+        QuestionBuy question = QuestionBuy.builder()
+                .id(9L)
                 .user(writer)
                 .title("질문 제목")
                 .content("질문 내용")
                 .build();
         QuestionImg questionImg = QuestionImg.builder()
                 .question(question)
-                .imgUrl("https://question-image.test/how.jpg")
+                .imgUrl("https://question-image.test/2.jpg")
+                .sortOrder(2)
+                .representFlag(true)
+                .build();
+        Item item = createItem(20L);
+        QuestionItem questionItem = QuestionItem.builder()
+                .question(question)
+                .item(item)
+                .sortOrder(1)
+                .representFlag(true)
+                .build();
+        ItemImg itemImg = ItemImg.builder()
+                .item(item)
+                .itemImgUrl("https://item-image.test/1.jpg")
                 .sortOrder(1)
                 .representFlag(true)
                 .build();
 
-        when(questionImgRepository.findByQuestionIdAndRepresentFlag(question.getId(), true)).thenReturn(questionImg);
-        when(questionLikeRepository.countByQuestionId(question.getId())).thenReturn(1L);
-        when(commentRepository.countByQuestionId(question.getId())).thenReturn(2L);
+        when(questionImgRepository.findAllByQuestionId(question.getId())).thenReturn(List.of(questionImg));
+        when(questionItemRepository.findAllByQuestionId(question.getId())).thenReturn(List.of(questionItem));
+        when(itemImgRepository.findMainImg(item.getId())).thenReturn(itemImg);
         when(userRepository.findById(writer.getId())).thenReturn(Optional.of(writer));
 
         // when
-        PaginationResponse<QuestionSimpleResDto> response = questionResponseHelper.getQuestionSimpleResponsesWithMainImage(
-                new PageImpl<>(List.of(question), pageable, 1)
-        );
+        QuestionHomeResDto response = questionResponseHelper.getQuestionHomeResponse(question);
 
         // then
-        assertThat(response.getPage()).isZero();
-        assertThat(response.getHasNext()).isFalse();
-        assertThat(response.getContent()).hasSize(1);
-        assertThat(response.getContent().get(0).getQType()).isEqualTo("How");
-        assertThat(response.getContent().get(0).getImgList().get(0).getImgUrl())
-                .isEqualTo("https://question-image.test/how.jpg");
+        assertThat(response.getQType()).isEqualTo("Buy");
+        assertThat(response.getImgList()).extracting("imgUrl")
+                .containsExactly("https://item-image.test/1.jpg", "https://question-image.test/2.jpg");
+    }
+
+    @Test
+    @DisplayName("모든 이미지가 필요한 질문 응답에는 질문 이미지와 아이템 대표 이미지를 분리해서 포함한다.")
+    void getQuestionSimpleResponseWithImagesTest() {
+        // given
+        User writer = createUser(10L);
+        QuestionRecommend question = QuestionRecommend.builder()
+                .id(10L)
+                .user(writer)
+                .title("질문 제목")
+                .content("질문 내용")
+                .build();
+        QuestionImg questionImg = QuestionImg.builder()
+                .question(question)
+                .imgUrl("https://question-image.test/all.jpg")
+                .sortOrder(1)
+                .representFlag(true)
+                .build();
+        Item item = createItem(20L);
+        QuestionItem questionItem = QuestionItem.builder()
+                .question(question)
+                .item(item)
+                .sortOrder(2)
+                .representFlag(true)
+                .build();
+        ItemImg itemImg = ItemImg.builder()
+                .item(item)
+                .itemImgUrl("https://item-image.test/all.jpg")
+                .sortOrder(2)
+                .representFlag(true)
+                .build();
+        List<QuestionRecommendCategory> categories = List.of(
+                QuestionRecommendCategory.toEntity(question, "상의"),
+                QuestionRecommendCategory.toEntity(question, "신발")
+        );
+
+        when(questionImgRepository.findAllByQuestionId(question.getId())).thenReturn(List.of(questionImg));
+        when(questionItemRepository.findAllByQuestionId(question.getId())).thenReturn(List.of(questionItem));
+        when(itemImgRepository.findMainImg(item.getId())).thenReturn(itemImg);
+        when(questionRecommendCategoryRepository.findAllByQuestionId(question.getId())).thenReturn(categories);
+        when(questionLikeRepository.countByQuestionId(question.getId())).thenReturn(3L);
+        when(commentRepository.countByQuestionId(question.getId())).thenReturn(4L);
+        when(userRepository.findById(writer.getId())).thenReturn(Optional.of(writer));
+
+        // when
+        QuestionSimpleResDto response = questionResponseHelper.getQuestionSimpleResponseWithImages(question);
+
+        // then
+        assertThat(response.getQType()).isEqualTo("Recommend");
+        assertThat(response.getImgList()).hasSize(1);
+        assertThat(response.getItemImgList()).hasSize(1);
+        assertThat(response.getCategoryName()).containsExactly("상의", "신발");
+        assertThat(response.getLikeNum()).isEqualTo(3L);
+        assertThat(response.getCommentNum()).isEqualTo(4L);
     }
 
     private User createUser(Long id) {

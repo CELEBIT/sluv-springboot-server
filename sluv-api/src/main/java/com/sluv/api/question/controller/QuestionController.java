@@ -6,6 +6,7 @@ import com.sluv.api.common.response.SuccessResponse;
 import com.sluv.api.question.dto.*;
 import com.sluv.api.question.service.QuestionFeedService;
 import com.sluv.api.question.service.QuestionLikeService;
+import com.sluv.api.question.service.QuestionRankService;
 import com.sluv.api.question.service.QuestionReportService;
 import com.sluv.api.question.service.QuestionService;
 import com.sluv.api.question.service.QuestionVoteService;
@@ -29,6 +30,7 @@ public class QuestionController {
     private final QuestionService questionService;
     private final QuestionFeedService questionFeedService;
     private final QuestionLikeService questionLikeService;
+    private final QuestionRankService questionRankService;
     private final QuestionReportService questionReportService;
     private final QuestionVoteService questionVoteService;
     private final QuestionWaitService questionWaitService;
@@ -197,17 +199,17 @@ public class QuestionController {
     @Operation(summary = "일간 핫 커뮤니티 게시글 검색",
             description = " 10개 조회. Ordering 인기순(조회수 + 좋아요 수 + 댓글 수). 매일 00시 00분 00초를 기준으로 업데이트")
     @GetMapping("/dailyhot")
-    public ResponseEntity<SuccessDataResponse<List<QuestionHomeResDto>>> getDailyHotQuestionList(@CurrentUserId Long userId) {
-        List<QuestionHomeResDto> response = questionService.getDailyHotQuestionList(userId);
+    public ResponseEntity<SuccessDataResponse<List<QuestionHomeResDto>>> getDailyHotQuestions(@CurrentUserId Long userId) {
+        List<QuestionHomeResDto> response = questionRankService.getDailyHotQuestions(userId);
         return ResponseEntity.ok().body(SuccessDataResponse.from(response));
     }
 
     @Operation(summary = "주간 핫 커뮤니티 게시글 검색",
             description = "Pagination 적용. Ordering 조회수 + 좋아요 수 + 댓글 수. Filtering 현재를 기점으로 일주일간 작성된 글")
     @GetMapping("/weeklyhot")
-    public ResponseEntity<SuccessDataResponse<PaginationResponse<QuestionSimpleResDto>>> getWeeklyHotQuestionList(
+    public ResponseEntity<SuccessDataResponse<PaginationResponse<QuestionSimpleResDto>>> getWeeklyHotQuestions(
             @CurrentUserId Long userId, Pageable pageable) {
-        PaginationResponse<QuestionSimpleResDto> response = questionService.getWeeklyHotQuestionList(
+        PaginationResponse<QuestionSimpleResDto> response = questionRankService.getWeeklyHotQuestions(
                 userId, pageable);
         return ResponseEntity.ok().body(SuccessDataResponse.from(response));
     }

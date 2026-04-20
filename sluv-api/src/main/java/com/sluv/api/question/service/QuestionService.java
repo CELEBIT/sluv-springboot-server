@@ -17,7 +17,6 @@ import com.sluv.domain.item.entity.ItemImg;
 import com.sluv.domain.item.service.ItemDomainService;
 import com.sluv.domain.item.service.ItemImgDomainService;
 import com.sluv.domain.item.service.ItemScrapDomainService;
-import com.sluv.domain.question.dto.QuestionImgSimpleDto;
 import com.sluv.domain.question.dto.QuestionSimpleResDto;
 import com.sluv.domain.question.entity.*;
 import com.sluv.domain.question.enums.QuestionStatus;
@@ -386,108 +385,4 @@ public class QuestionService {
         return PaginationResponse.of(questionPage, content);
     }
 
-    /**
-     * 일일 Hot Question 조회 기능.
-     */
-    @Transactional(readOnly = true)
-    public List<QuestionHomeResDto> getDailyHotQuestionList(Long userId) {
-        List<Long> blockUserIds = new ArrayList<>();
-        if (userId != null) {
-            blockUserIds = userBlockDomainService.getAllBlockedUser(userId).stream()
-                    .map(userBlock -> userBlock.getBlockedUser().getId())
-                    .toList();
-        }
-
-        List<Question> dailyHoyQuestionList = questionDomainService.getDailyHotQuestion(blockUserIds);
-
-        List<QuestionHomeResDto> result = dailyHoyQuestionList.stream().map(question -> {
-            List<QuestionImgSimpleDto> questionImgSimpleList = getQuestionImgSimpleList(question);
-            User writer = userDomainService.findByIdOrNull(question.getUser().getId());
-            return QuestionHomeResDto.of(question, writer, questionImgSimpleList);
-
-        }).toList();
-
-        return result;
-
-    }
-
-    private List<QuestionImgSimpleDto> getQuestionImgSimpleList(Question question) {
-
-        // Question이 QuestionBuy인 경우 모든 이미지를 순서대로 조회
-        if (question instanceof QuestionBuy) {
-            List<QuestionImgSimpleDto> result = new ArrayList<>();
-
-            List<QuestionImg> questionImgList = questionImgDomainService.findAllByQuestionId(question.getId());
-            List<ItemImg> questionItemImgList = questionItemDomainService.findAllByQuestionId(question.getId()).stream()
-                    .map(questionItem -> itemImgDomainService.findMainImg(questionItem.getItem().getId())).toList();
-
-            questionImgList.forEach(questionImg -> result.add(QuestionImgSimpleDto.of(questionImg)));
-            questionItemImgList.forEach(itemImg -> result.add(QuestionImgSimpleDto.of(itemImg)));
-
-            result.sort(Comparator.comparing(QuestionImgSimpleDto::getSortOrder));
-
-            return result;
-        } else {// 그 외에는 대표이미지만 조화
-
-            QuestionImg questionImg = questionImgDomainService.findByQuestionIdAndRepresentFlag(question.getId(), true);
-            QuestionItem questionItem = questionItemDomainService.findByQuestionIdAndRepresentFlag(question.getId(),
-                    true);
-
-            String imgUrl = null;
-
-            if (questionImg != null) {
-                imgUrl = questionImg.getImgUrl();
-            } else if (questionItem != null) {
-                imgUrl = itemImgDomainService.findMainImg(questionItem.getItem().getId()).getItemImgUrl();
-            }
-
-            return imgUrl != null
-                    ? Arrays.asList(new QuestionImgSimpleDto(imgUrl, 0L))
-                    : null;
-        }
-    }
-
-    /**
-     * 주간 Hot Question 조회 기능.
-     */
-    @Transactional(readOnly = true)
-    public PaginationResponse<QuestionSimpleResDto> getWeeklyHotQuestionList(Long userId, Pageable pageable) {
-        List<Long> blockUserIds = new ArrayList<>();
-        if (userId != null) {
-            blockUserIds = userBlockDomainService.getAllBlockedUser(userId).stream()
-                    .map(userBlock -> userBlock.getBlockedUser().getId())
-                    .toList();
-        }
-
-        Page<Question> page = questionDomainService.getWeeklyHotQuestion(blockUserIds, pageable);
-
-        List<QuestionSimpleResDto> content = page.stream().map(question -> {
-            List<String> categoryList = null;
-            if (question instanceof QuestionRecommend) {
-                categoryList = questionRecommendCategoryDomainService.findAllByQuestionId(question.getId())
-                        .stream()
-                        .map(QuestionRecommendCategory::getName).toList();
-            }
-
-            List<QuestionImgSimpleDto> imgList = questionImgDomainService.findAllByQuestionId(question.getId())
-                    .stream()
-                    .map(QuestionImgSimpleDto::of)
-                    .toList();
-
-            List<QuestionImgSimpleDto> itemImgList = questionItemDomainService.findAllByQuestionId(question.getId())
-                    .stream()
-                    .map(questionItem ->
-                            QuestionImgSimpleDto.of(itemImgDomainService.findMainImg(questionItem.getItem().getId()))
-                    )
-                    .toList();
-
-            Long commentNum = commentDomainService.countByQuestionId(question.getId());
-            Long likeNum = questionLikeDomainService.countByQuestionId(question.getId());
-            User writer = userDomainService.findByIdOrNull(question.getUser().getId());
-
-            return QuestionSimpleResDto.of(question, writer, likeNum, commentNum, imgList, itemImgList, categoryList);
-        }).toList();
-
-        return PaginationResponse.of(page, content);
-    }
 }

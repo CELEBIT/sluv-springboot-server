@@ -1,6 +1,6 @@
 package com.sluv.api.question.helper;
 
-import com.sluv.api.common.response.PaginationResponse;
+import com.sluv.api.question.dto.QuestionHomeResDto;
 import com.sluv.domain.comment.repository.CommentRepository;
 import com.sluv.domain.item.entity.ItemImg;
 import com.sluv.domain.item.repository.ItemImgRepository;
@@ -22,9 +22,10 @@ import com.sluv.domain.question.repository.QuestionRecommendCategoryRepository;
 import com.sluv.domain.user.entity.User;
 import com.sluv.domain.user.repository.UserRepository;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -43,7 +44,7 @@ public class QuestionResponseHelper {
         validateQuestionType(question);
 
         List<QuestionImgSimpleDto> questionImages = getQuestionImages(question);
-        List<QuestionImgSimpleDto> itemMainImages = getItemMainImages(question);
+        List<QuestionImgSimpleDto> itemMainImages = getBuyItemMainImages(question);
         List<String> recommendCategoryNames = getRecommendCategoryNames(question);
         Long likeNum = questionLikeRepository.countByQuestionId(question.getId());
         Long commentNum = commentRepository.countByQuestionId(question.getId());
@@ -64,7 +65,7 @@ public class QuestionResponseHelper {
         validateQuestionType(question);
 
         List<QuestionImgSimpleDto> questionImages = getQuestionImagesWithMainImage(question);
-        List<QuestionImgSimpleDto> itemMainImages = getItemMainImagesWithMainImage(question);
+        List<QuestionImgSimpleDto> itemMainImages = getItemMainImagesForCard(question);
         List<String> recommendCategoryNames = getRecommendCategoryNames(question);
         Long likeNum = questionLikeRepository.countByQuestionId(question.getId());
         Long commentNum = commentRepository.countByQuestionId(question.getId());
@@ -81,14 +82,34 @@ public class QuestionResponseHelper {
         );
     }
 
-    public PaginationResponse<QuestionSimpleResDto> getQuestionSimpleResponsesWithMainImage(
-            Page<? extends Question> questions
-    ) {
-        List<QuestionSimpleResDto> questionResponses = questions.stream()
-                .map(this::getQuestionSimpleResponseWithMainImage)
-                .toList();
+    public QuestionHomeResDto getQuestionHomeResponse(Question question) {
+        validateQuestionType(question);
 
-        return PaginationResponse.of(questions, questionResponses);
+        List<QuestionImgSimpleDto> questionImages = getQuestionImagesForHome(question);
+        User writer = userRepository.findById(question.getUser().getId()).orElse(null);
+
+        return QuestionHomeResDto.of(question, writer, questionImages);
+    }
+
+    public QuestionSimpleResDto getQuestionSimpleResponseWithImages(Question question) {
+        validateQuestionType(question);
+
+        List<QuestionImgSimpleDto> questionImages = getAllQuestionImages(question);
+        List<QuestionImgSimpleDto> itemMainImages = getAllItemMainImages(question);
+        List<String> recommendCategoryNames = getRecommendCategoryNames(question);
+        Long likeNum = questionLikeRepository.countByQuestionId(question.getId());
+        Long commentNum = commentRepository.countByQuestionId(question.getId());
+        User writer = userRepository.findById(question.getUser().getId()).orElse(null);
+
+        return QuestionSimpleResDto.of(
+                question,
+                writer,
+                likeNum,
+                commentNum,
+                questionImages,
+                itemMainImages,
+                recommendCategoryNames
+        );
     }
 
     private void validateQuestionType(Question question) {
@@ -107,6 +128,10 @@ public class QuestionResponseHelper {
             return null;
         }
 
+        return getAllQuestionImages(question);
+    }
+
+    private List<QuestionImgSimpleDto> getAllQuestionImages(Question question) {
         return questionImgRepository.findAllByQuestionId(question.getId()).stream()
                 .map(QuestionImgSimpleDto::of)
                 .toList();
@@ -131,11 +156,15 @@ public class QuestionResponseHelper {
         return questionImages;
     }
 
-    private List<QuestionImgSimpleDto> getItemMainImages(Question question) {
+    private List<QuestionImgSimpleDto> getBuyItemMainImages(Question question) {
         if (!(question instanceof QuestionBuy)) {
             return null;
         }
 
+        return getAllItemMainImages(question);
+    }
+
+    private List<QuestionImgSimpleDto> getAllItemMainImages(Question question) {
         return questionItemRepository.findAllByQuestionId(question.getId()).stream()
                 .map(questionItem -> {
                     ItemImg mainImg = itemImgRepository.findMainImg(questionItem.getItem().getId());
@@ -144,12 +173,12 @@ public class QuestionResponseHelper {
                 .toList();
     }
 
-    private List<QuestionImgSimpleDto> getItemMainImagesWithMainImage(Question question) {
+    private List<QuestionImgSimpleDto> getItemMainImagesForCard(Question question) {
         if (!(question instanceof QuestionBuy)) {
             return new ArrayList<>();
         }
 
-        return getItemMainImages(question);
+        return getBuyItemMainImages(question);
     }
 
     private QuestionImgSimpleDto getItemMainImage(Question question) {
@@ -160,6 +189,31 @@ public class QuestionResponseHelper {
 
         ItemImg mainItemImage = itemImgRepository.findMainImg(mainQuestionItem.getItem().getId());
         return QuestionImgSimpleDto.of(mainItemImage);
+    }
+
+    private List<QuestionImgSimpleDto> getQuestionImagesForHome(Question question) {
+        if (question instanceof QuestionBuy) {
+            List<QuestionImgSimpleDto> questionImages = new ArrayList<>();
+            questionImages.addAll(getQuestionImages(question));
+            questionImages.addAll(getBuyItemMainImages(question));
+            questionImages.sort(Comparator.comparing(QuestionImgSimpleDto::getSortOrder));
+
+            return questionImages;
+        }
+
+        QuestionImg mainQuestionImage = questionImgRepository.findByQuestionIdAndRepresentFlag(question.getId(), true);
+        QuestionItem mainQuestionItem = questionItemRepository.findByQuestionIdAndRepresentFlag(question.getId(), true);
+        String imageUrl = null;
+
+        if (mainQuestionImage != null) {
+            imageUrl = mainQuestionImage.getImgUrl();
+        } else if (mainQuestionItem != null) {
+            imageUrl = itemImgRepository.findMainImg(mainQuestionItem.getItem().getId()).getItemImgUrl();
+        }
+
+        return imageUrl != null
+                ? Arrays.asList(new QuestionImgSimpleDto(imageUrl, 0L))
+                : null;
     }
 
     private List<String> getRecommendCategoryNames(Question question) {

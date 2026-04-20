@@ -4,6 +4,7 @@ import com.sluv.api.common.response.PaginationResponse;
 import com.sluv.api.common.response.SuccessDataResponse;
 import com.sluv.api.common.response.SuccessResponse;
 import com.sluv.api.question.dto.*;
+import com.sluv.api.question.service.QuestionLikeService;
 import com.sluv.api.question.service.QuestionReportService;
 import com.sluv.api.question.service.QuestionService;
 import com.sluv.api.question.service.QuestionVoteService;
@@ -24,6 +25,7 @@ import java.util.List;
 @RequestMapping("/app/question")
 public class QuestionController {
     private final QuestionService questionService;
+    private final QuestionLikeService questionLikeService;
     private final QuestionReportService questionReportService;
     private final QuestionVoteService questionVoteService;
 
@@ -78,7 +80,7 @@ public class QuestionController {
     @PostMapping("/{questionId}/like")
     public ResponseEntity<SuccessResponse> postQuestionLike(@CurrentUserId Long userId,
                                                             @PathVariable("questionId") Long questionId) {
-        questionService.postQuestionLike(userId, questionId);
+        questionLikeService.postQuestionLike(userId, questionId);
         return ResponseEntity.ok().body(SuccessResponse.create());
     }
 

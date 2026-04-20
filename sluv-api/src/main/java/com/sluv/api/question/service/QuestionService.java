@@ -26,7 +26,6 @@ import com.sluv.domain.question.service.*;
 import com.sluv.domain.user.entity.User;
 import com.sluv.domain.user.service.UserBlockDomainService;
 import com.sluv.domain.user.service.UserDomainService;
-import com.sluv.infra.alarm.service.QuestionAlarmService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -58,7 +57,6 @@ public class QuestionService {
     private final UserDomainService userDomainService;
     private final UserBlockDomainService userBlockDomainService;
 
-    private final QuestionAlarmService questionAlarmService;
     private final QuestionImgHelper questionImgHelper;
     private final QuestionItemHelper questionItemHelper;
     private final QuestionVoteService questionVoteService;
@@ -202,25 +200,6 @@ public class QuestionService {
         log.info("질문 게시글 삭제 - 질문 게시글 : {}", questionId);
         Question question = questionDomainService.findById(questionId);
         question.changeQuestionStatus(QuestionStatus.DELETED);
-    }
-
-    @Transactional
-    public void postQuestionLike(Long userId, Long questionId) {
-        User user = userDomainService.findById(userId);
-        log.info("질문 게시글 좋아요 - 사용자 : {}, 질문 게시글 : {}", user.getId(), questionId);
-        // 해당 유저의 Question 게시물 like 여부 검색
-        Boolean likeStatus = questionLikeDomainService.existsByQuestionIdAndUserId(questionId, user.getId());
-        Question question = questionDomainService.findById(questionId);
-
-        if (likeStatus) {
-            // like가 있다면 삭제
-            questionLikeDomainService.deleteByQuestionIdAndUserId(questionId, user.getId());
-        } else {
-            // like가 없다면 등록
-            questionLikeDomainService.saveQuestionLike(user, question);
-            questionAlarmService.sendAlarmAboutQuestionLike(user.getId(), question.getId());
-        }
-
     }
 
     @Transactional

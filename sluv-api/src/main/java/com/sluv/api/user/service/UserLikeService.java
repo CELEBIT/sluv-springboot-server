@@ -2,7 +2,7 @@ package com.sluv.api.user.service;
 
 import com.sluv.api.comment.dto.reponse.CommentSimpleResponse;
 import com.sluv.api.common.response.PaginationCountResponse;
-import com.sluv.api.question.mapper.QuestionDtoMapper;
+import com.sluv.api.question.helper.QuestionResponseHelper;
 import com.sluv.domain.comment.entity.Comment;
 import com.sluv.domain.comment.service.CommentDomainService;
 import com.sluv.domain.item.dto.ItemSimpleDto;
@@ -34,7 +34,7 @@ public class UserLikeService {
     private final QuestionDomainService questionDomainService;
     private final CommentDomainService commentDomainService;
 
-    private final QuestionDtoMapper questionDtoMapper;
+    private final QuestionResponseHelper questionResponseHelper;
 
 
     /**
@@ -68,7 +68,7 @@ public class UserLikeService {
         Page<Question> questionPage = questionDomainService.getUserLikeQuestion(user, blockUserIds, pageable);
 
         List<QuestionSimpleResDto> content = questionPage.stream()
-                .map(questionDtoMapper::dtoBuildByQuestionType).toList();
+                .map(questionResponseHelper::dtoBuildByQuestionType).toList();
 
         return new PaginationCountResponse<>(questionPage.hasNext(), questionPage.getNumber(), content,
                 questionPage.getTotalElements());

@@ -1,4 +1,4 @@
-package com.sluv.api.question.mapper;
+package com.sluv.api.question.helper;
 
 import com.sluv.domain.comment.repository.CommentRepository;
 import com.sluv.domain.item.entity.ItemImg;
@@ -24,7 +24,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class QuestionDtoMapper {
+public class QuestionResponseHelper {
 
     private final ItemImgRepository itemImgRepository;
     private final QuestionImgRepository questionImgRepository;

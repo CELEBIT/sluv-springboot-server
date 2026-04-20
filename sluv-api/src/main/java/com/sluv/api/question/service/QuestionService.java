@@ -5,6 +5,7 @@ import com.sluv.api.common.response.PaginationResponse;
 import com.sluv.api.question.dto.*;
 import com.sluv.api.question.helper.QuestionImgHelper;
 import com.sluv.api.question.helper.QuestionItemHelper;
+import com.sluv.api.question.helper.QuestionResponseHelper;
 import com.sluv.domain.celeb.entity.Celeb;
 import com.sluv.domain.celeb.entity.NewCeleb;
 import com.sluv.domain.celeb.service.CelebDomainService;
@@ -21,7 +22,6 @@ import com.sluv.domain.question.dto.QuestionImgSimpleDto;
 import com.sluv.domain.question.dto.QuestionSimpleResDto;
 import com.sluv.domain.question.entity.*;
 import com.sluv.domain.question.enums.QuestionStatus;
-import com.sluv.domain.question.exception.QuestionTypeNotFoundException;
 import com.sluv.domain.question.service.*;
 import com.sluv.domain.user.entity.User;
 import com.sluv.domain.user.service.UserBlockDomainService;
@@ -59,6 +59,7 @@ public class QuestionService {
 
     private final QuestionImgHelper questionImgHelper;
     private final QuestionItemHelper questionItemHelper;
+    private final QuestionResponseHelper questionResponseHelper;
     private final QuestionVoteService questionVoteService;
 
 
@@ -331,14 +332,6 @@ public class QuestionService {
         return null;
     }
 
-    private String getQuestionType(Question question) {
-        String qType = getQuestionTypeOrNull(question);
-        if (qType == null) {
-            throw new QuestionTypeNotFoundException();
-        }
-        return qType;
-    }
-
     /**
      * Question 상세보기 하단의 추천 게시글
      */
@@ -356,7 +349,7 @@ public class QuestionService {
 
         return questionDomainService.getWaitQuestionBuy(user, questionId, interestedCelebs, blockUserIds)
                 .stream()
-                .map(questionBuy -> getQuestionSimpleResDto(questionBuy, "Buy"))
+                .map(questionResponseHelper::getQuestionSimpleResponseWithMainImage)
                 .toList();
     }
 
@@ -372,7 +365,7 @@ public class QuestionService {
 
         return questionDomainService.getWaitQuestionRecommend(user, questionId, blockUserIds)
                 .stream()
-                .map(questionRecommend -> getQuestionSimpleResDto(questionRecommend, "Recommend"))
+                .map(questionResponseHelper::getQuestionSimpleResponseWithMainImage)
                 .toList();
     }
 
@@ -389,7 +382,7 @@ public class QuestionService {
 
         return questionDomainService.getWaitQuestionHowabout(user, questionId, blockUserIds)
                 .stream()
-                .map(questionHowabout -> getQuestionSimpleResDto(questionHowabout, "How"))
+                .map(questionResponseHelper::getQuestionSimpleResponseWithMainImage)
                 .toList();
     }
 
@@ -411,66 +404,8 @@ public class QuestionService {
 
         return questionDomainService.getWaitQuestionFind(user, questionId, interestedCelebs, blockUserIds)
                 .stream()
-                .map(questionFind -> getQuestionSimpleResDto(questionFind, "Find"))
+                .map(questionResponseHelper::getQuestionSimpleResponseWithMainImage)
                 .toList();
-    }
-
-    public QuestionSimpleResDto getQuestionSimpleResDto(Question question, String qType) {
-        List<QuestionImgSimpleDto> imgList = new ArrayList<>();
-        List<QuestionImgSimpleDto> itemImgList = new ArrayList<>();
-        List<String> categoryNameList = null;
-
-//        if (!qType.equals("Buy")) {
-        if (!(question instanceof QuestionBuy)) {
-            // 이미지 URL
-            QuestionImg questionImg = questionImgDomainService.findByQuestionIdAndRepresentFlag(question.getId(), true);
-
-            // 이미지 Dto로 변경
-            if (questionImg != null) {
-                imgList.add(QuestionImgSimpleDto.of(questionImg));
-            }
-
-            // 아이템 이미지 URL
-            QuestionItem questionItem = questionItemDomainService.findByQuestionIdAndRepresentFlag(question.getId(),
-                    true);
-
-            // 아이템 이미지 Dto로 변경
-            if (questionItem != null) {
-                ItemImg mainImg = itemImgDomainService.findMainImg(questionItem.getItem().getId());
-                imgList.add(QuestionImgSimpleDto.of(mainImg));
-            }
-
-        } else {
-            // 이미지 URL
-            imgList = questionImgDomainService.findAllByQuestionId(question.getId())
-                    .stream()
-                    .map(QuestionImgSimpleDto::of).toList();
-
-            // 아이템 이미지 URL
-            itemImgList = questionItemDomainService.findAllByQuestionId(question.getId())
-                    .stream()
-                    .map(item -> {
-                        ItemImg mainImg = itemImgDomainService.findMainImg(item.getItem().getId());
-                        return QuestionImgSimpleDto.of(mainImg);
-                    }).toList();
-        }
-
-//        if (qType.equals("Recommend")) {
-        if (question instanceof QuestionRecommend) {
-            categoryNameList = questionRecommendCategoryDomainService.findAllByQuestionId(question.getId()).stream()
-                    .map(QuestionRecommendCategory::getName).toList();
-        }
-
-        // Question 좋아요 수
-        Long likeNum = questionLikeDomainService.countByQuestionId(question.getId());
-
-        // Question 댓글 수
-        Long commentNum = commentDomainService.countByQuestionId(question.getId());
-
-        User writer = userDomainService.findByIdOrNull(question.getUser().getId());
-
-        return QuestionSimpleResDto.of(question, writer, likeNum, commentNum,
-                imgList, itemImgList, categoryNameList);
     }
 
     /**
@@ -486,10 +421,9 @@ public class QuestionService {
         }
 
         Page<Question> questionPage = questionDomainService.getTotalQuestionList(blockUserIds, pageable);
-        List<QuestionSimpleResDto> content = questionPage.stream().map(question -> {
-            String qType = getQuestionType(question);
-            return getQuestionSimpleResDto(question, qType);
-        }).toList();
+        List<QuestionSimpleResDto> content = questionPage.stream()
+                .map(questionResponseHelper::getQuestionSimpleResponseWithMainImage)
+                .toList();
 
         return PaginationResponse.of(questionPage, content);
     }
@@ -565,9 +499,9 @@ public class QuestionService {
 
         Page<QuestionFind> questionPage = questionDomainService.getQuestionFindList(celebId, isNewCeleb, blockUserIds, pageable);
 
-        List<QuestionSimpleResDto> content = questionPage.stream().map(question ->
-                getQuestionSimpleResDto(question, "Find")
-        ).toList();
+        List<QuestionSimpleResDto> content = questionPage.stream()
+                .map(questionResponseHelper::getQuestionSimpleResponseWithMainImage)
+                .toList();
 
         return PaginationResponse.of(questionPage, content);
     }
@@ -582,9 +516,9 @@ public class QuestionService {
         }
 
         Page<QuestionHowabout> questionPage = questionDomainService.getQuestionHowaboutList(blockUserIds, pageable);
-        List<QuestionSimpleResDto> content = questionPage.stream().map(question ->
-                getQuestionSimpleResDto(question, "How")
-        ).toList();
+        List<QuestionSimpleResDto> content = questionPage.stream()
+                .map(questionResponseHelper::getQuestionSimpleResponseWithMainImage)
+                .toList();
 
         return PaginationResponse.of(questionPage, content);
     }
@@ -599,9 +533,9 @@ public class QuestionService {
         }
 
         Page<QuestionRecommend> questionPage = questionDomainService.getQuestionRecommendList(hashtag, blockUserIds, pageable);
-        List<QuestionSimpleResDto> content = questionPage.stream().map(question ->
-                getQuestionSimpleResDto(question, "Recommend")
-        ).toList();
+        List<QuestionSimpleResDto> content = questionPage.stream()
+                .map(questionResponseHelper::getQuestionSimpleResponseWithMainImage)
+                .toList();
 
         return PaginationResponse.of(questionPage, content);
     }

@@ -149,6 +149,58 @@ public class QuestionResponseHelperTest {
     }
 
     @Test
+    @DisplayName("대표 이미지가 필요한 Find 질문 응답에는 질문 대표 이미지와 아이템 대표 이미지를 포함한다.")
+    void getQuestionSimpleResponseWithMainImageAndFindTest() {
+        // given
+        User writer = createUser(10L);
+        Celeb celeb = createCeleb(2L, null, "셀럽");
+        QuestionFind question = QuestionFind.builder()
+                .id(5L)
+                .user(writer)
+                .title("질문 제목")
+                .content("질문 내용")
+                .celeb(celeb)
+                .build();
+        QuestionImg questionImg = QuestionImg.builder()
+                .question(question)
+                .imgUrl("https://question-image.test/main.jpg")
+                .sortOrder(1)
+                .representFlag(true)
+                .build();
+        Item item = createItem(20L);
+        QuestionItem questionItem = QuestionItem.builder()
+                .question(question)
+                .item(item)
+                .sortOrder(1)
+                .representFlag(true)
+                .build();
+        ItemImg itemImg = ItemImg.builder()
+                .item(item)
+                .itemImgUrl("https://item-image.test/main.jpg")
+                .sortOrder(1)
+                .representFlag(true)
+                .build();
+
+        when(questionImgRepository.findByQuestionIdAndRepresentFlag(question.getId(), true)).thenReturn(questionImg);
+        when(questionItemRepository.findByQuestionIdAndRepresentFlag(question.getId(), true)).thenReturn(questionItem);
+        when(itemImgRepository.findMainImg(item.getId())).thenReturn(itemImg);
+        when(questionLikeRepository.countByQuestionId(question.getId())).thenReturn(1L);
+        when(commentRepository.countByQuestionId(question.getId())).thenReturn(2L);
+        when(userRepository.findById(writer.getId())).thenReturn(Optional.of(writer));
+
+        // when
+        QuestionSimpleResDto response = questionResponseHelper.getQuestionSimpleResponseWithMainImage(question);
+
+        // then
+        assertThat(response.getQType()).isEqualTo("Find");
+        assertThat(response.getImgList()).hasSize(2);
+        assertThat(response.getImgList().get(0).getImgUrl()).isEqualTo("https://question-image.test/main.jpg");
+        assertThat(response.getImgList().get(1).getImgUrl()).isEqualTo("https://item-image.test/main.jpg");
+        assertThat(response.getItemImgList()).isEmpty();
+        assertThat(response.getCategoryName()).isNull();
+    }
+
+    @Test
     @DisplayName("How 질문 응답은 공통 응답 값만 포함한다.")
     void getQuestionSimpleResponseWithHowTest() {
         // given
@@ -210,6 +262,94 @@ public class QuestionResponseHelperTest {
         assertThat(response.getItemImgList()).isNull();
         verify(questionImgRepository, never()).findAllByQuestionId(question.getId());
         verify(questionItemRepository, never()).findAllByQuestionId(question.getId());
+    }
+
+    @Test
+    @DisplayName("대표 이미지가 필요한 Buy 질문 응답에는 모든 질문 이미지와 모든 아이템 대표 이미지를 분리해서 포함한다.")
+    void getQuestionSimpleResponseWithMainImageAndBuyTest() {
+        // given
+        User writer = createUser(10L);
+        QuestionBuy question = QuestionBuy.builder()
+                .id(6L)
+                .user(writer)
+                .title("질문 제목")
+                .content("질문 내용")
+                .build();
+        QuestionImg questionImg = QuestionImg.builder()
+                .question(question)
+                .imgUrl("https://question-image.test/1.jpg")
+                .sortOrder(1)
+                .representFlag(true)
+                .build();
+        Item item = createItem(20L);
+        QuestionItem questionItem = QuestionItem.builder()
+                .question(question)
+                .item(item)
+                .sortOrder(1)
+                .representFlag(true)
+                .build();
+        ItemImg itemImg = ItemImg.builder()
+                .item(item)
+                .itemImgUrl("https://item-image.test/1.jpg")
+                .sortOrder(1)
+                .representFlag(true)
+                .build();
+
+        when(questionImgRepository.findAllByQuestionId(question.getId())).thenReturn(List.of(questionImg));
+        when(questionItemRepository.findAllByQuestionId(question.getId())).thenReturn(List.of(questionItem));
+        when(itemImgRepository.findMainImg(item.getId())).thenReturn(itemImg);
+        when(questionLikeRepository.countByQuestionId(question.getId())).thenReturn(3L);
+        when(commentRepository.countByQuestionId(question.getId())).thenReturn(4L);
+        when(userRepository.findById(writer.getId())).thenReturn(Optional.of(writer));
+
+        // when
+        QuestionSimpleResDto response = questionResponseHelper.getQuestionSimpleResponseWithMainImage(question);
+
+        // then
+        assertThat(response.getQType()).isEqualTo("Buy");
+        assertThat(response.getImgList()).hasSize(1);
+        assertThat(response.getImgList().get(0).getImgUrl()).isEqualTo("https://question-image.test/1.jpg");
+        assertThat(response.getItemImgList()).hasSize(1);
+        assertThat(response.getItemImgList().get(0).getImgUrl()).isEqualTo("https://item-image.test/1.jpg");
+    }
+
+    @Test
+    @DisplayName("대표 이미지가 필요한 Recommend 질문 응답에는 카테고리 이름을 포함한다.")
+    void getQuestionSimpleResponseWithMainImageAndRecommendTest() {
+        // given
+        User writer = createUser(10L);
+        QuestionRecommend question = QuestionRecommend.builder()
+                .id(7L)
+                .user(writer)
+                .title("질문 제목")
+                .content("질문 내용")
+                .build();
+        QuestionImg questionImg = QuestionImg.builder()
+                .question(question)
+                .imgUrl("https://question-image.test/recommend.jpg")
+                .sortOrder(1)
+                .representFlag(true)
+                .build();
+        List<QuestionRecommendCategory> categories = List.of(
+                QuestionRecommendCategory.toEntity(question, "상의"),
+                QuestionRecommendCategory.toEntity(question, "신발")
+        );
+
+        when(questionImgRepository.findByQuestionIdAndRepresentFlag(question.getId(), true)).thenReturn(questionImg);
+        when(questionRecommendCategoryRepository.findAllByQuestionId(question.getId())).thenReturn(categories);
+        when(questionLikeRepository.countByQuestionId(question.getId())).thenReturn(5L);
+        when(commentRepository.countByQuestionId(question.getId())).thenReturn(6L);
+        when(userRepository.findById(writer.getId())).thenReturn(Optional.of(writer));
+
+        // when
+        QuestionSimpleResDto response = questionResponseHelper.getQuestionSimpleResponseWithMainImage(question);
+
+        // then
+        assertThat(response.getQType()).isEqualTo("Recommend");
+        assertThat(response.getImgList()).hasSize(1);
+        assertThat(response.getImgList().get(0).getImgUrl()).isEqualTo("https://question-image.test/recommend.jpg");
+        assertThat(response.getCategoryName()).containsExactly("상의", "신발");
+        assertThat(response.getItemImgList()).isEmpty();
     }
 
     private User createUser(Long id) {

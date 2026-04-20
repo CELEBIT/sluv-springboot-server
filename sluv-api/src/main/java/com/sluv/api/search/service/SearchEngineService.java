@@ -1,7 +1,7 @@
 package com.sluv.api.search.service;
 
 import com.sluv.api.common.response.PaginationResponse;
-import com.sluv.api.question.service.QuestionService;
+import com.sluv.api.question.helper.QuestionResponseAssembler;
 import com.sluv.api.search.dto.SearchItemCountResDto;
 import com.sluv.api.search.engine.SearchEngine;
 import com.sluv.domain.item.dto.ItemSimpleDto;
@@ -34,7 +34,7 @@ public class SearchEngineService {
     private final SearchEngine searchEngine;
 
     private final SearchService searchService;
-    private final QuestionService questionService;
+    private final QuestionResponseAssembler questionResponseAssembler;
 
     private final ItemDomainService itemDomainService;
     private final UserDomainService userDomainService;
@@ -92,7 +92,7 @@ public class SearchEngineService {
 
         List<QuestionSimpleResDto> content = searchQuestionPage.stream()
                 .map(question ->
-                        questionService.getQuestionSimpleResDto((Question) question, qType)
+                        questionResponseAssembler.getQuestionSimpleResponseWithMainImage((Question) question)
                 ).toList();
 
         // 최근 검색 등록

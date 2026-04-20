@@ -1,5 +1,6 @@
 package com.sluv.api.question.helper;
 
+import com.sluv.api.common.response.PaginationResponse;
 import com.sluv.domain.comment.repository.CommentRepository;
 import com.sluv.domain.item.entity.ItemImg;
 import com.sluv.domain.item.repository.ItemImgRepository;
@@ -23,6 +24,7 @@ import com.sluv.domain.user.repository.UserRepository;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -77,6 +79,16 @@ public class QuestionResponseHelper {
                 itemMainImages,
                 recommendCategoryNames
         );
+    }
+
+    public PaginationResponse<QuestionSimpleResDto> getQuestionSimpleResponsesWithMainImage(
+            Page<? extends Question> questions
+    ) {
+        List<QuestionSimpleResDto> questionResponses = questions.stream()
+                .map(this::getQuestionSimpleResponseWithMainImage)
+                .toList();
+
+        return PaginationResponse.of(questions, questionResponses);
     }
 
     private void validateQuestionType(Question question) {

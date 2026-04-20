@@ -4,6 +4,7 @@ import com.sluv.api.common.response.PaginationResponse;
 import com.sluv.api.common.response.SuccessDataResponse;
 import com.sluv.api.common.response.SuccessResponse;
 import com.sluv.api.question.dto.*;
+import com.sluv.api.question.service.QuestionFeedService;
 import com.sluv.api.question.service.QuestionLikeService;
 import com.sluv.api.question.service.QuestionReportService;
 import com.sluv.api.question.service.QuestionService;
@@ -26,6 +27,7 @@ import java.util.List;
 @RequestMapping("/app/question")
 public class QuestionController {
     private final QuestionService questionService;
+    private final QuestionFeedService questionFeedService;
     private final QuestionLikeService questionLikeService;
     private final QuestionReportService questionReportService;
     private final QuestionVoteService questionVoteService;
@@ -134,20 +136,20 @@ public class QuestionController {
 
     @Operation(summary = "Question 커뮤니티 게시글 종합 검색", description = "Pagination 적용. 최신순으로 조회")
     @GetMapping("/total")
-    public ResponseEntity<SuccessDataResponse<PaginationResponse<QuestionSimpleResDto>>> getQuestionTotalList(
+    public ResponseEntity<SuccessDataResponse<PaginationResponse<QuestionSimpleResDto>>> getTotalQuestions(
             @CurrentUserId Long userId, Pageable pageable) {
-        PaginationResponse<QuestionSimpleResDto> response = questionService.getTotalQuestionList(userId, pageable);
+        PaginationResponse<QuestionSimpleResDto> response = questionFeedService.getTotalQuestions(userId, pageable);
         return ResponseEntity.ok().body(SuccessDataResponse.from(response));
     }
 
     @Operation(summary = "QuestionFind 커뮤니티 게시글 검색",
             description = "Pagination 적용. Ordering: 최신순으로 조회. Filtering: celebId.\n isNewCeleb이 null일 경우 정식 셀럽으로 간주")
     @GetMapping("/find")
-    public ResponseEntity<SuccessDataResponse<PaginationResponse<QuestionSimpleResDto>>> getQuestionFindList(
+    public ResponseEntity<SuccessDataResponse<PaginationResponse<QuestionSimpleResDto>>> getFindQuestions(
             @CurrentUserId Long userId, @Nullable @RequestParam("celebId") Long celebId,
             @Nullable @RequestParam("isNewCeleb") Boolean isNewCeleb, Pageable pageable) {
 
-        PaginationResponse<QuestionSimpleResDto> response = questionService.getQuestionFindList(userId, celebId,
+        PaginationResponse<QuestionSimpleResDto> response = questionFeedService.getFindQuestions(userId, celebId,
                 isNewCeleb, pageable);
         return ResponseEntity.ok().body(SuccessDataResponse.from(response));
     }
@@ -175,9 +177,9 @@ public class QuestionController {
 
     @Operation(summary = "QuestionHowabout 커뮤니티 게시글 검색", description = "Pagination 적용. Ordering 최신순")
     @GetMapping("/howabout")
-    public ResponseEntity<SuccessDataResponse<PaginationResponse<QuestionSimpleResDto>>> getQuestionHowaboutList(
+    public ResponseEntity<SuccessDataResponse<PaginationResponse<QuestionSimpleResDto>>> getHowaboutQuestions(
             @CurrentUserId Long userId, Pageable pageable) {
-        PaginationResponse<QuestionSimpleResDto> response = questionService.getQuestionHowaboutList(
+        PaginationResponse<QuestionSimpleResDto> response = questionFeedService.getHowaboutQuestions(
                 userId, pageable);
         return ResponseEntity.ok().body(SuccessDataResponse.from(response));
     }
@@ -185,9 +187,9 @@ public class QuestionController {
     @Operation(summary = "QuestionRecommend 커뮤니티 게시글 검색",
             description = "Pagination 적용. Ordering 최신순. Filtering 전체, 특정해시태그")
     @GetMapping("/recommend")
-    public ResponseEntity<SuccessDataResponse<PaginationResponse<QuestionSimpleResDto>>> getQuestionRecommendList(
+    public ResponseEntity<SuccessDataResponse<PaginationResponse<QuestionSimpleResDto>>> getRecommendQuestions(
             @CurrentUserId Long userId, @Nullable @RequestParam String hashtag, Pageable pageable) {
-        PaginationResponse<QuestionSimpleResDto> response = questionService.getQuestionRecommendList(
+        PaginationResponse<QuestionSimpleResDto> response = questionFeedService.getRecommendQuestions(
                 userId, hashtag, pageable);
         return ResponseEntity.ok().body(SuccessDataResponse.from(response));
     }

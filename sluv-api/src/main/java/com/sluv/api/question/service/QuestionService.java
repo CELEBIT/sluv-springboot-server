@@ -5,7 +5,6 @@ import com.sluv.api.common.response.PaginationResponse;
 import com.sluv.api.question.dto.*;
 import com.sluv.api.question.helper.QuestionImgHelper;
 import com.sluv.api.question.helper.QuestionItemHelper;
-import com.sluv.api.question.helper.QuestionResponseHelper;
 import com.sluv.domain.celeb.entity.Celeb;
 import com.sluv.domain.celeb.entity.NewCeleb;
 import com.sluv.domain.celeb.service.CelebDomainService;
@@ -59,7 +58,6 @@ public class QuestionService {
 
     private final QuestionImgHelper questionImgHelper;
     private final QuestionItemHelper questionItemHelper;
-    private final QuestionResponseHelper questionResponseHelper;
     private final QuestionVoteService questionVoteService;
 
 
@@ -332,26 +330,6 @@ public class QuestionService {
         return null;
     }
 
-    /**
-     * Question 리스트를 최신순으로 조회
-     */
-    @Transactional(readOnly = true)
-    public PaginationResponse<QuestionSimpleResDto> getTotalQuestionList(Long userId, Pageable pageable) {
-        List<Long> blockUserIds = new ArrayList<>();
-        if (userId != null) {
-            blockUserIds = userBlockDomainService.getAllBlockedUser(userId).stream()
-                    .map(userBlock -> userBlock.getBlockedUser().getId())
-                    .toList();
-        }
-
-        Page<Question> questionPage = questionDomainService.getTotalQuestionList(blockUserIds, pageable);
-        List<QuestionSimpleResDto> content = questionPage.stream()
-                .map(questionResponseHelper::getQuestionSimpleResponseWithMainImage)
-                .toList();
-
-        return PaginationResponse.of(questionPage, content);
-    }
-
     @Transactional(readOnly = true)
     public PaginationResponse<QuestionBuySimpleResDto> getQuestionBuyList(Long userId, String voteStatus,
                                                                           Pageable pageable) {
@@ -404,62 +382,6 @@ public class QuestionService {
                     question.getVoteEndTime(),
                     questionVote);
         }).toList();
-
-        return PaginationResponse.of(questionPage, content);
-    }
-
-    /**
-     * QuestionFind 커뮤니티 게시글 조회.
-     */
-    @Transactional(readOnly = true)
-    public PaginationResponse<QuestionSimpleResDto> getQuestionFindList(Long userId, Long celebId, Boolean isNewCeleb,
-                                                                        Pageable pageable) {
-        List<Long> blockUserIds = new ArrayList<>();
-        if (userId != null) {
-            blockUserIds = userBlockDomainService.getAllBlockedUser(userId).stream()
-                    .map(userBlock -> userBlock.getBlockedUser().getId())
-                    .toList();
-        }
-
-        Page<QuestionFind> questionPage = questionDomainService.getQuestionFindList(celebId, isNewCeleb, blockUserIds, pageable);
-
-        List<QuestionSimpleResDto> content = questionPage.stream()
-                .map(questionResponseHelper::getQuestionSimpleResponseWithMainImage)
-                .toList();
-
-        return PaginationResponse.of(questionPage, content);
-    }
-
-    @Transactional(readOnly = true)
-    public PaginationResponse<QuestionSimpleResDto> getQuestionHowaboutList(Long userId, Pageable pageable) {
-        List<Long> blockUserIds = new ArrayList<>();
-        if (userId != null) {
-            blockUserIds = userBlockDomainService.getAllBlockedUser(userId).stream()
-                    .map(userBlock -> userBlock.getBlockedUser().getId())
-                    .toList();
-        }
-
-        Page<QuestionHowabout> questionPage = questionDomainService.getQuestionHowaboutList(blockUserIds, pageable);
-        List<QuestionSimpleResDto> content = questionPage.stream()
-                .map(questionResponseHelper::getQuestionSimpleResponseWithMainImage)
-                .toList();
-
-        return PaginationResponse.of(questionPage, content);
-    }
-
-    @Transactional(readOnly = true)
-    public PaginationResponse<QuestionSimpleResDto> getQuestionRecommendList(Long userId, String hashtag, Pageable pageable) {
-        List<Long> blockUserIds = new ArrayList<>();
-        if (userId != null) {
-            blockUserIds = userBlockDomainService.getAllBlockedUser(userId).stream()
-                    .map(userBlock -> userBlock.getBlockedUser().getId())
-                    .toList();
-        }
-
-        Page<QuestionRecommend> questionPage = questionDomainService.getQuestionRecommendList(hashtag, blockUserIds, pageable);
-        List<QuestionSimpleResDto> content = questionPage.stream()
-                .map(questionResponseHelper::getQuestionSimpleResponseWithMainImage)
-                .toList();
 
         return PaginationResponse.of(questionPage, content);
     }

@@ -1,5 +1,6 @@
 package com.sluv.api.domain.question.helper;
 
+import com.sluv.api.common.response.PaginationResponse;
 import com.sluv.api.question.helper.QuestionResponseHelper;
 import com.sluv.domain.auth.enums.SnsType;
 import com.sluv.domain.celeb.entity.Celeb;
@@ -29,6 +30,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.never;
@@ -350,6 +354,44 @@ public class QuestionResponseHelperTest {
         assertThat(response.getImgList().get(0).getImgUrl()).isEqualTo("https://question-image.test/recommend.jpg");
         assertThat(response.getCategoryName()).containsExactly("상의", "신발");
         assertThat(response.getItemImgList()).isEmpty();
+    }
+
+    @Test
+    @DisplayName("대표 이미지가 필요한 질문 Page를 PaginationResponse로 변환한다.")
+    void getQuestionSimpleResponsesWithMainImageTest() {
+        // given
+        Pageable pageable = PageRequest.of(0, 10);
+        User writer = createUser(10L);
+        QuestionHowabout question = QuestionHowabout.builder()
+                .id(8L)
+                .user(writer)
+                .title("질문 제목")
+                .content("질문 내용")
+                .build();
+        QuestionImg questionImg = QuestionImg.builder()
+                .question(question)
+                .imgUrl("https://question-image.test/how.jpg")
+                .sortOrder(1)
+                .representFlag(true)
+                .build();
+
+        when(questionImgRepository.findByQuestionIdAndRepresentFlag(question.getId(), true)).thenReturn(questionImg);
+        when(questionLikeRepository.countByQuestionId(question.getId())).thenReturn(1L);
+        when(commentRepository.countByQuestionId(question.getId())).thenReturn(2L);
+        when(userRepository.findById(writer.getId())).thenReturn(Optional.of(writer));
+
+        // when
+        PaginationResponse<QuestionSimpleResDto> response = questionResponseHelper.getQuestionSimpleResponsesWithMainImage(
+                new PageImpl<>(List.of(question), pageable, 1)
+        );
+
+        // then
+        assertThat(response.getPage()).isZero();
+        assertThat(response.getHasNext()).isFalse();
+        assertThat(response.getContent()).hasSize(1);
+        assertThat(response.getContent().get(0).getQType()).isEqualTo("How");
+        assertThat(response.getContent().get(0).getImgList().get(0).getImgUrl())
+                .isEqualTo("https://question-image.test/how.jpg");
     }
 
     private User createUser(Long id) {

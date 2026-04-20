@@ -21,7 +21,6 @@ import com.sluv.domain.question.dto.QuestionImgSimpleDto;
 import com.sluv.domain.question.dto.QuestionSimpleResDto;
 import com.sluv.domain.question.entity.*;
 import com.sluv.domain.question.enums.QuestionStatus;
-import com.sluv.domain.question.exception.QuestionReportDuplicateException;
 import com.sluv.domain.question.exception.QuestionTypeNotFoundException;
 import com.sluv.domain.question.service.*;
 import com.sluv.domain.user.entity.User;
@@ -47,7 +46,6 @@ public class QuestionService {
     private final QuestionItemDomainService questionItemDomainService;
     private final QuestionRecommendCategoryDomainService questionRecommendCategoryDomainService;
     private final QuestionLikeDomainService questionLikeDomainService;
-    private final QuestionReportDomainService questionReportDomainService;
     private final CommentDomainService commentDomainService;
     private final ItemDomainService itemDomainService;
     private final ItemImgDomainService itemImgDomainService;
@@ -223,24 +221,6 @@ public class QuestionService {
             questionAlarmService.sendAlarmAboutQuestionLike(user.getId(), question.getId());
         }
 
-    }
-
-    @Transactional
-    public void postQuestionReport(Long userId, Long questionId, QuestionReportReqDto dto) {
-        User user = userDomainService.findById(userId);
-        log.info("질문 게시글 신고 - 사용자 : {}, 질문 게시글 : {}, 사유 : {}", user.getId(), questionId, dto.getReason());
-        Boolean reportExist = questionReportDomainService.existsByQuestionIdAndReporterId(questionId, user.getId());
-
-        if (!reportExist) {
-            // 신고 내역이 없다면 신고 등록.
-            Question question = questionDomainService.findById(questionId);
-
-            questionReportDomainService.saveQuestionReport(user, question, dto.getReason(), dto.getContent());
-
-        } else {
-            // 신고 내역이 있다면 중복 신고 방지.
-            throw new QuestionReportDuplicateException();
-        }
     }
 
     @Transactional

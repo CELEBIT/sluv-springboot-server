@@ -4,6 +4,7 @@ import com.sluv.api.common.response.PaginationResponse;
 import com.sluv.api.common.response.SuccessDataResponse;
 import com.sluv.api.common.response.SuccessResponse;
 import com.sluv.api.question.dto.*;
+import com.sluv.api.question.service.QuestionReportService;
 import com.sluv.api.question.service.QuestionService;
 import com.sluv.api.question.service.QuestionVoteService;
 import com.sluv.common.annotation.CurrentUserId;
@@ -23,6 +24,7 @@ import java.util.List;
 @RequestMapping("/app/question")
 public class QuestionController {
     private final QuestionService questionService;
+    private final QuestionReportService questionReportService;
     private final QuestionVoteService questionVoteService;
 
     @Operation(summary = "*찾아주세요 게시글 등록",
@@ -86,7 +88,7 @@ public class QuestionController {
     public ResponseEntity<SuccessResponse> postQuestionReport(@CurrentUserId Long userId,
                                                               @PathVariable("questionId") Long questionId,
                                                               @RequestBody QuestionReportReqDto dto) {
-        questionService.postQuestionReport(userId, questionId, dto);
+        questionReportService.postQuestionReport(userId, questionId, dto);
         return ResponseEntity.ok().body(SuccessResponse.create());
     }
 

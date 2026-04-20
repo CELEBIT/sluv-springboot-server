@@ -8,6 +8,7 @@ import com.sluv.api.question.service.QuestionLikeService;
 import com.sluv.api.question.service.QuestionReportService;
 import com.sluv.api.question.service.QuestionService;
 import com.sluv.api.question.service.QuestionVoteService;
+import com.sluv.api.question.service.QuestionWaitService;
 import com.sluv.common.annotation.CurrentUserId;
 import com.sluv.domain.question.dto.QuestionSimpleResDto;
 import com.sluv.domain.question.exception.QuestionTypeNotFoundException;
@@ -28,6 +29,7 @@ public class QuestionController {
     private final QuestionLikeService questionLikeService;
     private final QuestionReportService questionReportService;
     private final QuestionVoteService questionVoteService;
+    private final QuestionWaitService questionWaitService;
 
     @Operation(summary = "*찾아주세요 게시글 등록",
             description = "User 토큰 필요. 생성: id -> null. 수정: id -> 해당 Question Id")
@@ -120,10 +122,10 @@ public class QuestionController {
             @RequestParam("questionId") Long questionId,
             @RequestParam("qType") String qType) {
         List<QuestionSimpleResDto> result = switch (qType) {
-            case "Buy" -> questionService.getWaitQuestionBuy(userId, questionId);
-            case "Find" -> questionService.getWaitQuestionFind(userId, questionId);
-            case "How" -> questionService.getWaitQuestionHowabout(userId, questionId);
-            case "Recommend" -> questionService.getWaitQuestionRecommend(userId, questionId);
+            case "Buy" -> questionWaitService.getWaitQuestionBuy(userId, questionId);
+            case "Find" -> questionWaitService.getWaitQuestionFind(userId, questionId);
+            case "How" -> questionWaitService.getWaitQuestionHowabout(userId, questionId);
+            case "Recommend" -> questionWaitService.getWaitQuestionRecommend(userId, questionId);
             default -> throw new QuestionTypeNotFoundException();
         };
 

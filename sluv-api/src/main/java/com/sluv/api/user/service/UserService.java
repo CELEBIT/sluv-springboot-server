@@ -195,7 +195,7 @@ public class UserService {
         Page<Question> questionPage = questionDomainService.getUserAllQuestion(user, pageable);
 
         List<QuestionSimpleResDto> content = questionPage.stream()
-                .map(questionResponseHelper::dtoBuildByQuestionType)
+                .map(questionResponseHelper::getQuestionSimpleResponse)
                 .toList();
 
         return new PaginationCountResponse<>(questionPage.hasNext(), questionPage.getNumber(), content,

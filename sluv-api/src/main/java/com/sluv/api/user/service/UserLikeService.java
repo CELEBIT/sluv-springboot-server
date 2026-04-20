@@ -68,7 +68,8 @@ public class UserLikeService {
         Page<Question> questionPage = questionDomainService.getUserLikeQuestion(user, blockUserIds, pageable);
 
         List<QuestionSimpleResDto> content = questionPage.stream()
-                .map(questionResponseHelper::dtoBuildByQuestionType).toList();
+                .map(questionResponseHelper::getQuestionSimpleResponse)
+                .toList();
 
         return new PaginationCountResponse<>(questionPage.hasNext(), questionPage.getNumber(), content,
                 questionPage.getTotalElements());

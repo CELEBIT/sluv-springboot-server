@@ -13,7 +13,6 @@ import com.sluv.domain.closet.entity.Closet;
 import com.sluv.domain.closet.service.ClosetDomainService;
 import com.sluv.domain.comment.service.CommentDomainService;
 import com.sluv.domain.item.dto.ItemSimpleDto;
-import com.sluv.domain.item.entity.Item;
 import com.sluv.domain.item.entity.ItemImg;
 import com.sluv.domain.item.service.ItemDomainService;
 import com.sluv.domain.item.service.ItemImgDomainService;
@@ -64,6 +63,7 @@ public class QuestionService {
     private final QuestionAlarmService questionAlarmService;
     private final QuestionImgHelper questionImgHelper;
     private final QuestionItemHelper questionItemHelper;
+    private final QuestionVoteService questionVoteService;
 
 
     @Transactional
@@ -260,7 +260,7 @@ public class QuestionService {
                             QuestionVoteDataDto voteDataDto = null;
                             // QuestionBuy 라면
                             if (qType != null && qType.equals("Buy")) {
-                                voteDataDto = getVoteData(questionId, (long) questionImg.getSortOrder());
+                                voteDataDto = questionVoteService.getVoteData(questionId, (long) questionImg.getSortOrder());
                             }
 
                             return QuestionImgResDto.of(questionImg, voteDataDto);
@@ -287,7 +287,7 @@ public class QuestionService {
                     QuestionVoteDataDto questionVoteDataDto = null;
                     // QuestionBuy일 경우 투표수 추가.
                     if (qType != null && qType.equals("Buy")) {
-                        questionVoteDataDto = getVoteData(questionId, (long) questionItem.getSortOrder());
+                        questionVoteDataDto = questionVoteService.getVoteData(questionId, (long) questionItem.getSortOrder());
                     }
 
                     return QuestionItemResDto.of(questionItem, itemSimpleDto, questionVoteDataDto);
@@ -378,62 +378,6 @@ public class QuestionService {
             throw new QuestionTypeNotFoundException();
         }
         return qType;
-    }
-
-    /**
-     * builder에 VoteNum, VotePercent 탑재
-     */
-    private QuestionVoteDataDto getVoteData(Long questionId, Long sortOrder) {
-        List<QuestionVote> questionVotes = questionVoteDomainService.findAllByQuestionId(questionId);
-
-        // 해당 SortOrder의 투표 수
-        Long voteNum = 0L;
-        for (QuestionVote questionVote : questionVotes) {
-            if (Objects.equals(questionVote.getVoteSortOrder(), sortOrder)) {
-                voteNum++;
-            }
-        }
-
-        return QuestionVoteDataDto.of(
-                voteNum,
-                questionVotes.size() != 0
-                        ? getVotePercent(voteNum, questionVotes.stream().count())
-                        : 0
-        );
-    }
-
-    /**
-     * QuestionVote 퍼센트 계산.
-     */
-    private Double getVotePercent(Long voteNum, Long totalVoteNum) {
-        double div = (double) voteNum / (double) totalVoteNum;
-        return Math.round(div * 1000) / 10.0;
-    }
-
-    /**
-     * QuestionBuy 등록 및 취소
-     */
-    @Transactional
-    public void postQuestionVote(Long userId, Long questionId, QuestionVoteReqDto dto) {
-        User user = userDomainService.findById(userId);
-        log.info("질문 게시글 투표 - 사용자 : {}, 질문 게시글 : {}, 투표 : {}", user.getId(), questionId, dto.getVoteSortOrder());
-        QuestionVote questionVote = questionVoteDomainService.findByQuestionIdAndUserIdOrNull(questionId, user.getId());
-
-        if (questionVote == null) {
-            // 투표 등록
-
-            // Question 검색
-            Question question = questionDomainService.findById(questionId);
-
-            // QuestionVote 생성 및 저장
-            questionVoteDomainService.saveQuestionVote(question, user, dto.getVoteSortOrder());
-
-        } else {
-            // 투표 취소
-
-            // 해당 QuestionVote 삭제.
-            questionVoteDomainService.deleteById(questionVote.getId());
-        }
     }
 
     /**
@@ -609,7 +553,7 @@ public class QuestionService {
             List<QuestionImgResDto> imgList = questionImgDomainService.findAllByQuestionId(question.getId())
                     .stream()
                     .map(questionImg -> {
-                        QuestionVoteDataDto voteDataDto = getVoteData(questionImg.getQuestion().getId(),
+                        QuestionVoteDataDto voteDataDto = questionVoteService.getVoteData(questionImg.getQuestion().getId(),
                                 (long) questionImg.getSortOrder());
 
                         return QuestionImgResDto.of(questionImg, voteDataDto);
@@ -624,12 +568,12 @@ public class QuestionService {
                                 itemImgDomainService.findMainImg(questionItem.getItem().getId()),
                                 null
                         );
-                        QuestionVoteDataDto questionVoteDataDto = getVoteData(questionItem.getQuestion().getId(),
+                        QuestionVoteDataDto questionVoteDataDto = questionVoteService.getVoteData(questionItem.getQuestion().getId(),
                                 (long) questionItem.getSortOrder());
                         return QuestionItemResDto.of(questionItem, itemSimpleDto, questionVoteDataDto);
                     }).toList();
 
-            Long voteCount = getTotalVoteCount(imgList, itemImgList);
+            Long voteCount = questionVoteService.getTotalVoteCount(imgList, itemImgList);
 
             QuestionVote questionVote = null;
             if (user != null) {
@@ -645,20 +589,6 @@ public class QuestionService {
         }).toList();
 
         return PaginationResponse.of(questionPage, content);
-    }
-
-    private Long getTotalVoteCount(List<QuestionImgResDto> imgList, List<QuestionItemResDto> itemImgList) {
-        long totalVoteCount = 0L;
-
-        for (QuestionImgResDto questionImgResDto : imgList) {
-            totalVoteCount += questionImgResDto.getVoteNum();
-        }
-
-        for (QuestionItemResDto questionItemResDto : itemImgList) {
-            totalVoteCount += questionItemResDto.getVoteNum();
-        }
-
-        return totalVoteCount;
     }
 
     /**

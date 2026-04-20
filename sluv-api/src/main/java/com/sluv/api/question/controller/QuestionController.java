@@ -5,6 +5,7 @@ import com.sluv.api.common.response.SuccessDataResponse;
 import com.sluv.api.common.response.SuccessResponse;
 import com.sluv.api.question.dto.*;
 import com.sluv.api.question.service.QuestionService;
+import com.sluv.api.question.service.QuestionVoteService;
 import com.sluv.common.annotation.CurrentUserId;
 import com.sluv.domain.question.dto.QuestionSimpleResDto;
 import com.sluv.domain.question.exception.QuestionTypeNotFoundException;
@@ -22,6 +23,7 @@ import java.util.List;
 @RequestMapping("/app/question")
 public class QuestionController {
     private final QuestionService questionService;
+    private final QuestionVoteService questionVoteService;
 
     @Operation(summary = "*찾아주세요 게시글 등록",
             description = "User 토큰 필요. 생성: id -> null. 수정: id -> 해당 Question Id")
@@ -102,7 +104,7 @@ public class QuestionController {
     public ResponseEntity<SuccessResponse> postQuestionVote(@CurrentUserId Long userId,
                                                             @PathVariable("questionId") Long questionId,
                                                             @RequestBody QuestionVoteReqDto dto) {
-        questionService.postQuestionVote(userId, questionId, dto);
+        questionVoteService.postQuestionVote(userId, questionId, dto);
         return ResponseEntity.ok().body(SuccessResponse.create());
     }
 

@@ -1,6 +1,7 @@
 package com.sluv.api.question.service;
 
 import com.sluv.api.celeb.dto.response.CelebChipResponse;
+import com.sluv.api.moderation.service.QuestionModerationService;
 import com.sluv.api.question.dto.*;
 import com.sluv.api.question.helper.QuestionImageManager;
 import com.sluv.api.question.helper.QuestionItemManager;
@@ -43,6 +44,7 @@ public class QuestionService {
     private final QuestionImageManager questionImageManager;
     private final QuestionItemManager questionItemManager;
     private final QuestionVoteService questionVoteService;
+    private final QuestionModerationService questionModerationService;
 
 
     @Transactional
@@ -78,6 +80,8 @@ public class QuestionService {
         // 4. QuestionItem 저장
         questionItemManager.saveItems(dto.getItemList(), newQuestionFind);
 
+        questionModerationService.createQuestionJobIfEnabled(newQuestionFind);
+
         return QuestionPostResDto.of(newQuestionFind.getId());
 
     }
@@ -106,6 +110,8 @@ public class QuestionService {
         // 4. QuestionItem 저장
         questionItemManager.saveItems(dto.getItemList(), newQuestionBuy);
 
+        questionModerationService.createQuestionJobIfEnabled(newQuestionBuy);
+
         return QuestionPostResDto.of(newQuestionBuy.getId());
     }
 
@@ -133,6 +139,8 @@ public class QuestionService {
 
         // 4. QuestionItem 저장
         questionItemManager.saveItems(dto.getItemList(), newQuestionHowabout);
+
+        questionModerationService.createQuestionJobIfEnabled(newQuestionHowabout);
 
         return QuestionPostResDto.of(newQuestionHowabout.getId());
     }
@@ -173,6 +181,8 @@ public class QuestionService {
 
         // 5. QuestionItem 저장
         questionItemManager.saveItems(dto.getItemList(), newQuestionRecommend);
+
+        questionModerationService.createQuestionJobIfEnabled(newQuestionRecommend);
 
         return QuestionPostResDto.of(newQuestionRecommend.getId());
     }

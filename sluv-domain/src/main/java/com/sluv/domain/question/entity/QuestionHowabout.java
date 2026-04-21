@@ -20,6 +20,11 @@ public class QuestionHowabout extends Question {
     }
 
     public static QuestionHowabout toEntity(User user, Long questionId, String title, String content) {
+        return toEntity(user, questionId, title, content, QuestionStatus.ACTIVE);
+    }
+
+    public static QuestionHowabout toEntity(User user, Long questionId, String title, String content,
+                                            QuestionStatus questionStatus) {
         QuestionHowaboutBuilder builder = QuestionHowabout.builder();
 
         if (questionId != null) {
@@ -30,7 +35,7 @@ public class QuestionHowabout extends Question {
                 .user(user)
                 .title(title)
                 .content(content)
-                .questionStatus(QuestionStatus.ACTIVE)
+                .questionStatus(questionStatus)
                 .build();
     }
 }

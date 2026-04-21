@@ -20,6 +20,11 @@ public class QuestionRecommend extends Question {
     }
 
     public static QuestionRecommend toEntity(User user, Long questionId, String title, String content) {
+        return toEntity(user, questionId, title, content, QuestionStatus.ACTIVE);
+    }
+
+    public static QuestionRecommend toEntity(User user, Long questionId, String title, String content,
+                                             QuestionStatus questionStatus) {
         QuestionRecommendBuilder builder = QuestionRecommend.builder();
 
         if (questionId != null) {
@@ -31,7 +36,7 @@ public class QuestionRecommend extends Question {
                 .user(user)
                 .title(title)
                 .content(content)
-                .questionStatus(QuestionStatus.ACTIVE)
+                .questionStatus(questionStatus)
                 .build();
     }
 }

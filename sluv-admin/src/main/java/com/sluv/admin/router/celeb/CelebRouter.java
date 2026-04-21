@@ -5,7 +5,7 @@ import com.sluv.admin.celeb.dto.CelebPageResponse;
 import com.sluv.admin.celeb.service.CelebCategoryService;
 import com.sluv.admin.celeb.service.CelebService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.lang.Nullable;
+import jakarta.annotation.Nullable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;

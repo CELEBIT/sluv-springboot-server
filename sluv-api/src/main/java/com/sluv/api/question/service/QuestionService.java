@@ -1,6 +1,8 @@
 package com.sluv.api.question.service;
 
 import com.sluv.api.celeb.dto.response.CelebChipResponse;
+import com.sluv.api.moderation.service.QuestionModerationService;
+import com.sluv.api.moderation.service.QuestionModerationStatusService;
 import com.sluv.api.question.dto.*;
 import com.sluv.api.question.helper.QuestionImageManager;
 import com.sluv.api.question.helper.QuestionItemManager;
@@ -43,6 +45,8 @@ public class QuestionService {
     private final QuestionImageManager questionImageManager;
     private final QuestionItemManager questionItemManager;
     private final QuestionVoteService questionVoteService;
+    private final QuestionModerationService questionModerationService;
+    private final QuestionModerationStatusService questionModerationStatusService;
 
 
     @Transactional
@@ -66,8 +70,9 @@ public class QuestionService {
             newCeleb = newCelebDomainService.findByNewCelebIdOrNull(dto.getNewCelebId());
         }
 
+        QuestionStatus questionStatus = getQuestionStatus(dto.getId());
         QuestionFind questionFind = QuestionFind.toEntity(user, dto.getId(), dto.getTitle(), dto.getContent(), celeb,
-                newCeleb);
+                newCeleb, questionStatus);
 
         // 2. QuestionFind 저장
         QuestionFind newQuestionFind = (QuestionFind) questionDomainService.saveQuestion(questionFind);
@@ -77,6 +82,8 @@ public class QuestionService {
 
         // 4. QuestionItem 저장
         questionItemManager.saveItems(dto.getItemList(), newQuestionFind);
+
+        questionModerationService.createQuestionJobIfEnabled(newQuestionFind);
 
         return QuestionPostResDto.of(newQuestionFind.getId());
 
@@ -95,7 +102,9 @@ public class QuestionService {
                 user.getId(), dto.getId() == null ? null : dto.getId(), dto.getTitle());
 
         // 1. 생성 or 수정
-        QuestionBuy questionBuy = QuestionBuy.toEntity(user, dto.getId(), dto.getTitle(), dto.getVoteEndTime());
+        QuestionStatus questionStatus = getQuestionStatus(dto.getId());
+        QuestionBuy questionBuy = QuestionBuy.toEntity(user, dto.getId(), dto.getTitle(), dto.getVoteEndTime(),
+                questionStatus);
 
         // 2. QuestionBuy 저장
         QuestionBuy newQuestionBuy = (QuestionBuy) questionDomainService.saveQuestion(questionBuy);
@@ -105,6 +114,8 @@ public class QuestionService {
 
         // 4. QuestionItem 저장
         questionItemManager.saveItems(dto.getItemList(), newQuestionBuy);
+
+        questionModerationService.createQuestionJobIfEnabled(newQuestionBuy);
 
         return QuestionPostResDto.of(newQuestionBuy.getId());
     }
@@ -122,8 +133,9 @@ public class QuestionService {
                 user.getId(), dto.getId() == null ? null : dto.getId(), dto.getTitle());
 
         // 1. 생성 or 수정
+        QuestionStatus questionStatus = getQuestionStatus(dto.getId());
         QuestionHowabout questionHowabout = QuestionHowabout.toEntity(user, dto.getId(), dto.getTitle(),
-                dto.getContent());
+                dto.getContent(), questionStatus);
 
         // 2. QuestionHotabout 저장
         QuestionHowabout newQuestionHowabout = (QuestionHowabout) questionDomainService.saveQuestion(questionHowabout);
@@ -133,6 +145,8 @@ public class QuestionService {
 
         // 4. QuestionItem 저장
         questionItemManager.saveItems(dto.getItemList(), newQuestionHowabout);
+
+        questionModerationService.createQuestionJobIfEnabled(newQuestionHowabout);
 
         return QuestionPostResDto.of(newQuestionHowabout.getId());
     }
@@ -150,8 +164,9 @@ public class QuestionService {
         log.info("추천해줘 게시글 등록 or 수정 - 사용자 : {}, 질문 게시글 : {}, 질문 게시글 제목 : {}",
                 user.getId(), dto.getId() == null ? null : dto.getId(), dto.getTitle());
         // 1. 생성 or 수정
+        QuestionStatus questionStatus = getQuestionStatus(dto.getId());
         QuestionRecommend questionRecommend = QuestionRecommend.toEntity(user, dto.getId(), dto.getTitle(),
-                dto.getContent());
+                dto.getContent(), questionStatus);
 
         // 2. QuestionRecommend 저장
         QuestionRecommend newQuestionRecommend = (QuestionRecommend) questionDomainService.saveQuestion(
@@ -173,6 +188,8 @@ public class QuestionService {
 
         // 5. QuestionItem 저장
         questionItemManager.saveItems(dto.getItemList(), newQuestionRecommend);
+
+        questionModerationService.createQuestionJobIfEnabled(newQuestionRecommend);
 
         return QuestionPostResDto.of(newQuestionRecommend.getId());
     }
@@ -228,6 +245,14 @@ public class QuestionService {
         }
 
         return closetDomainService.findAllByUserId(user.getId());
+    }
+
+    private QuestionStatus getQuestionStatus(Long questionId) {
+        if (questionId == null) {
+            return questionModerationStatusService.getInitialQuestionStatus();
+        }
+
+        return questionModerationStatusService.getUpdateQuestionStatus();
     }
 
     private Function<Integer, QuestionVoteDataDto> getVoteDataResolver(Long questionId, String questionType) {

@@ -38,6 +38,11 @@ public class QuestionFind extends Question {
 
     public static QuestionFind toEntity(User user, Long questionId, String title, String content, Celeb celeb,
                                         NewCeleb newCeleb) {
+        return toEntity(user, questionId, title, content, celeb, newCeleb, QuestionStatus.ACTIVE);
+    }
+
+    public static QuestionFind toEntity(User user, Long questionId, String title, String content, Celeb celeb,
+                                        NewCeleb newCeleb, QuestionStatus questionStatus) {
         QuestionFindBuilder builder = QuestionFind.builder();
 
         if (questionId != null) {
@@ -51,7 +56,7 @@ public class QuestionFind extends Question {
                 .content(content)
                 .celeb(celeb)
                 .newCeleb(newCeleb)
-                .questionStatus(QuestionStatus.ACTIVE)
+                .questionStatus(questionStatus)
                 .build();
     }
 }

@@ -3,7 +3,7 @@ package com.sluv.api.auth.dto.request;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.lang.Nullable;
+import jakarta.annotation.Nullable;
 
 @Getter
 @NoArgsConstructor

@@ -2,7 +2,7 @@ package com.sluv.admin.celeb.dto;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.lang.Nullable;
+import jakarta.annotation.Nullable;
 
 @Getter
 @NoArgsConstructor

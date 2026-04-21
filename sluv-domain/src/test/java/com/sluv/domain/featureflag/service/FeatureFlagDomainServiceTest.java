@@ -85,4 +85,18 @@ public class FeatureFlagDomainServiceTest {
         // then
         assertThat(enabled).isFalse();
     }
+
+    @Test
+    @DisplayName("MODERATION_QUESTION_UPDATE_PENDING이 DB에 없으면 기본값 false를 반환한다.")
+    void moderationQuestionUpdatePendingDefaultValueTest() {
+        // given
+        when(featureFlagRepository.findByFlagKey(FeatureFlagKey.MODERATION_QUESTION_UPDATE_PENDING))
+                .thenReturn(Optional.empty());
+
+        // when
+        boolean enabled = featureFlagDomainService.isEnabled(FeatureFlagKey.MODERATION_QUESTION_UPDATE_PENDING);
+
+        // then
+        assertThat(enabled).isFalse();
+    }
 }

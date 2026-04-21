@@ -21,7 +21,9 @@ public class FeatureFlagDomainService {
     private boolean getDefaultValue(FeatureFlagKey flagKey) {
         return switch (flagKey) {
             case MODERATION_JOB_CREATION -> true;
-            case MODERATION_QUESTION_CREATE_PENDING, MODERATION_AUTO_APPLY_RESULT -> false;
+            case MODERATION_QUESTION_CREATE_PENDING,
+                 MODERATION_QUESTION_UPDATE_PENDING,
+                 MODERATION_AUTO_APPLY_RESULT -> false;
         };
     }
 }

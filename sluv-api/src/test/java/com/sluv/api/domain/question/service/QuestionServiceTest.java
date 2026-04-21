@@ -1,6 +1,7 @@
 package com.sluv.api.domain.question.service;
 
 import com.sluv.api.moderation.service.QuestionModerationService;
+import com.sluv.api.moderation.service.QuestionModerationStatusService;
 import com.sluv.api.question.dto.QuestionBuyPostReqDto;
 import com.sluv.api.question.dto.QuestionFindPostReqDto;
 import com.sluv.api.question.dto.QuestionHowaboutPostReqDto;
@@ -18,6 +19,7 @@ import com.sluv.domain.question.entity.QuestionBuy;
 import com.sluv.domain.question.entity.QuestionFind;
 import com.sluv.domain.question.entity.QuestionHowabout;
 import com.sluv.domain.question.entity.QuestionRecommend;
+import com.sluv.domain.question.enums.QuestionStatus;
 import com.sluv.domain.question.service.QuestionDomainService;
 import com.sluv.domain.question.service.QuestionLikeDomainService;
 import com.sluv.domain.question.service.QuestionRecommendCategoryDomainService;
@@ -29,6 +31,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -87,6 +90,9 @@ public class QuestionServiceTest {
     @Mock
     private QuestionModerationService questionModerationService;
 
+    @Mock
+    private QuestionModerationStatusService questionModerationStatusService;
+
     @Test
     @DisplayName("찾아주세요 질문 신규 등록 후 검수 작업 생성을 요청한다.")
     void postQuestionFindCreatesModerationJobTest() {
@@ -107,6 +113,7 @@ public class QuestionServiceTest {
                 .build();
 
         when(userDomainService.findById(userId)).thenReturn(user);
+        when(questionModerationStatusService.getInitialQuestionStatus()).thenReturn(QuestionStatus.ACTIVE);
         when(questionDomainService.saveQuestion(org.mockito.ArgumentMatchers.any(QuestionFind.class)))
                 .thenReturn(savedQuestion);
 
@@ -139,6 +146,7 @@ public class QuestionServiceTest {
                 .build();
 
         when(userDomainService.findById(userId)).thenReturn(user);
+        when(questionModerationStatusService.getUpdateQuestionStatus()).thenReturn(QuestionStatus.ACTIVE);
         when(questionDomainService.saveQuestion(org.mockito.ArgumentMatchers.any(QuestionFind.class)))
                 .thenReturn(savedQuestion);
 
@@ -170,6 +178,7 @@ public class QuestionServiceTest {
                 .build();
 
         when(userDomainService.findById(userId)).thenReturn(user);
+        when(questionModerationStatusService.getInitialQuestionStatus()).thenReturn(QuestionStatus.ACTIVE);
         when(questionDomainService.saveQuestion(org.mockito.ArgumentMatchers.any(QuestionBuy.class)))
                 .thenReturn(savedQuestion);
 
@@ -201,6 +210,7 @@ public class QuestionServiceTest {
                 .build();
 
         when(userDomainService.findById(userId)).thenReturn(user);
+        when(questionModerationStatusService.getInitialQuestionStatus()).thenReturn(QuestionStatus.ACTIVE);
         when(questionDomainService.saveQuestion(org.mockito.ArgumentMatchers.any(QuestionHowabout.class)))
                 .thenReturn(savedQuestion);
 
@@ -233,6 +243,7 @@ public class QuestionServiceTest {
                 .build();
 
         when(userDomainService.findById(userId)).thenReturn(user);
+        when(questionModerationStatusService.getInitialQuestionStatus()).thenReturn(QuestionStatus.ACTIVE);
         when(questionDomainService.saveQuestion(org.mockito.ArgumentMatchers.any(QuestionRecommend.class)))
                 .thenReturn(savedQuestion);
 
@@ -242,6 +253,75 @@ public class QuestionServiceTest {
         // then
         assertThat(response.getId()).isEqualTo(savedQuestion.getId());
         verify(questionModerationService).createQuestionJobIfEnabled(savedQuestion);
+    }
+
+    @Test
+    @DisplayName("찾아주세요 질문 신규 등록 시 생성 PENDING 플래그가 반영된 상태로 저장한다.")
+    void postQuestionFindAppliesInitialModerationStatusTest() {
+        // given
+        Long userId = 10L;
+        User user = createUser(userId);
+        QuestionFindPostReqDto request = QuestionFindPostReqDto.builder()
+                .title("찾아주세요")
+                .content("질문 내용")
+                .imgList(List.of())
+                .itemList(List.of())
+                .build();
+        QuestionFind savedQuestion = QuestionFind.builder()
+                .id(1L)
+                .user(user)
+                .title(request.getTitle())
+                .content(request.getContent())
+                .questionStatus(QuestionStatus.PENDING)
+                .build();
+
+        when(userDomainService.findById(userId)).thenReturn(user);
+        when(questionModerationStatusService.getInitialQuestionStatus()).thenReturn(QuestionStatus.PENDING);
+        when(questionDomainService.saveQuestion(org.mockito.ArgumentMatchers.any(QuestionFind.class)))
+                .thenReturn(savedQuestion);
+
+        // when
+        questionService.postQuestionFind(userId, request);
+
+        // then
+        ArgumentCaptor<QuestionFind> captor = ArgumentCaptor.forClass(QuestionFind.class);
+        verify(questionDomainService).saveQuestion(captor.capture());
+        assertThat(captor.getValue().getQuestionStatus()).isEqualTo(QuestionStatus.PENDING);
+    }
+
+    @Test
+    @DisplayName("찾아주세요 질문 수정 시 수정 PENDING 플래그가 반영된 상태로 저장한다.")
+    void updateQuestionFindAppliesUpdateModerationStatusTest() {
+        // given
+        Long userId = 10L;
+        User user = createUser(userId);
+        QuestionFindPostReqDto request = QuestionFindPostReqDto.builder()
+                .id(1L)
+                .title("수정된 찾아주세요")
+                .content("수정된 질문 내용")
+                .imgList(List.of())
+                .itemList(List.of())
+                .build();
+        QuestionFind savedQuestion = QuestionFind.builder()
+                .id(request.getId())
+                .user(user)
+                .title(request.getTitle())
+                .content(request.getContent())
+                .questionStatus(QuestionStatus.PENDING)
+                .build();
+
+        when(userDomainService.findById(userId)).thenReturn(user);
+        when(questionModerationStatusService.getUpdateQuestionStatus()).thenReturn(QuestionStatus.PENDING);
+        when(questionDomainService.saveQuestion(org.mockito.ArgumentMatchers.any(QuestionFind.class)))
+                .thenReturn(savedQuestion);
+
+        // when
+        questionService.postQuestionFind(userId, request);
+
+        // then
+        ArgumentCaptor<QuestionFind> captor = ArgumentCaptor.forClass(QuestionFind.class);
+        verify(questionDomainService).saveQuestion(captor.capture());
+        assertThat(captor.getValue().getQuestionStatus()).isEqualTo(QuestionStatus.PENDING);
     }
 
     private User createUser(Long id) {

@@ -63,4 +63,13 @@ public class ModerationJob extends BaseEntity {
     private LocalDateTime reviewedAt;
 
     private LocalDateTime processedAt;
+
+    public static ModerationJob createQuestionJob(Long questionId, Long requestedBy) {
+        return ModerationJob.builder()
+                .targetType(ModerationTargetType.QUESTION)
+                .targetId(questionId)
+                .requestedBy(requestedBy)
+                .status(ModerationJobStatus.REQUESTED)
+                .build();
+    }
 }

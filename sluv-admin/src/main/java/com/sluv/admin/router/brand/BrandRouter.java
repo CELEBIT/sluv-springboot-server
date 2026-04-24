@@ -3,7 +3,7 @@ package com.sluv.admin.router.brand;
 import com.sluv.admin.brand.dto.BrandPageResponse;
 import com.sluv.admin.brand.service.BrandService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.lang.Nullable;
+import jakarta.annotation.Nullable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;

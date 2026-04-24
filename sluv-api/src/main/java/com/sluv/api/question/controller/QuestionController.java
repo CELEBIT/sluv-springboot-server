@@ -4,7 +4,13 @@ import com.sluv.api.common.response.PaginationResponse;
 import com.sluv.api.common.response.SuccessDataResponse;
 import com.sluv.api.common.response.SuccessResponse;
 import com.sluv.api.question.dto.*;
+import com.sluv.api.question.service.QuestionFeedService;
+import com.sluv.api.question.service.QuestionLikeService;
+import com.sluv.api.question.service.QuestionRankService;
+import com.sluv.api.question.service.QuestionReportService;
 import com.sluv.api.question.service.QuestionService;
+import com.sluv.api.question.service.QuestionVoteService;
+import com.sluv.api.question.service.QuestionWaitService;
 import com.sluv.common.annotation.CurrentUserId;
 import com.sluv.domain.question.dto.QuestionSimpleResDto;
 import com.sluv.domain.question.exception.QuestionTypeNotFoundException;
@@ -12,7 +18,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
-import org.springframework.lang.Nullable;
+import jakarta.annotation.Nullable;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,6 +28,12 @@ import java.util.List;
 @RequestMapping("/app/question")
 public class QuestionController {
     private final QuestionService questionService;
+    private final QuestionFeedService questionFeedService;
+    private final QuestionLikeService questionLikeService;
+    private final QuestionRankService questionRankService;
+    private final QuestionReportService questionReportService;
+    private final QuestionVoteService questionVoteService;
+    private final QuestionWaitService questionWaitService;
 
     @Operation(summary = "*찾아주세요 게시글 등록",
             description = "User 토큰 필요. 생성: id -> null. 수정: id -> 해당 Question Id")
@@ -74,7 +86,7 @@ public class QuestionController {
     @PostMapping("/{questionId}/like")
     public ResponseEntity<SuccessResponse> postQuestionLike(@CurrentUserId Long userId,
                                                             @PathVariable("questionId") Long questionId) {
-        questionService.postQuestionLike(userId, questionId);
+        questionLikeService.postQuestionLike(userId, questionId);
         return ResponseEntity.ok().body(SuccessResponse.create());
     }
 
@@ -84,7 +96,7 @@ public class QuestionController {
     public ResponseEntity<SuccessResponse> postQuestionReport(@CurrentUserId Long userId,
                                                               @PathVariable("questionId") Long questionId,
                                                               @RequestBody QuestionReportReqDto dto) {
-        questionService.postQuestionReport(userId, questionId, dto);
+        questionReportService.postQuestionReport(userId, questionId, dto);
         return ResponseEntity.ok().body(SuccessResponse.create());
     }
 
@@ -102,7 +114,7 @@ public class QuestionController {
     public ResponseEntity<SuccessResponse> postQuestionVote(@CurrentUserId Long userId,
                                                             @PathVariable("questionId") Long questionId,
                                                             @RequestBody QuestionVoteReqDto dto) {
-        questionService.postQuestionVote(userId, questionId, dto);
+        questionVoteService.postQuestionVote(userId, questionId, dto);
         return ResponseEntity.ok().body(SuccessResponse.create());
     }
 
@@ -114,10 +126,10 @@ public class QuestionController {
             @RequestParam("questionId") Long questionId,
             @RequestParam("qType") String qType) {
         List<QuestionSimpleResDto> result = switch (qType) {
-            case "Buy" -> questionService.getWaitQuestionBuy(userId, questionId);
-            case "Find" -> questionService.getWaitQuestionFind(userId, questionId);
-            case "How" -> questionService.getWaitQuestionHowabout(userId, questionId);
-            case "Recommend" -> questionService.getWaitQuestionRecommend(userId, questionId);
+            case "Buy" -> questionWaitService.getWaitQuestionBuy(userId, questionId);
+            case "Find" -> questionWaitService.getWaitQuestionFind(userId, questionId);
+            case "How" -> questionWaitService.getWaitQuestionHowabout(userId, questionId);
+            case "Recommend" -> questionWaitService.getWaitQuestionRecommend(userId, questionId);
             default -> throw new QuestionTypeNotFoundException();
         };
 
@@ -126,20 +138,20 @@ public class QuestionController {
 
     @Operation(summary = "Question 커뮤니티 게시글 종합 검색", description = "Pagination 적용. 최신순으로 조회")
     @GetMapping("/total")
-    public ResponseEntity<SuccessDataResponse<PaginationResponse<QuestionSimpleResDto>>> getQuestionTotalList(
+    public ResponseEntity<SuccessDataResponse<PaginationResponse<QuestionSimpleResDto>>> getTotalQuestions(
             @CurrentUserId Long userId, Pageable pageable) {
-        PaginationResponse<QuestionSimpleResDto> response = questionService.getTotalQuestionList(userId, pageable);
+        PaginationResponse<QuestionSimpleResDto> response = questionFeedService.getTotalQuestions(userId, pageable);
         return ResponseEntity.ok().body(SuccessDataResponse.from(response));
     }
 
     @Operation(summary = "QuestionFind 커뮤니티 게시글 검색",
             description = "Pagination 적용. Ordering: 최신순으로 조회. Filtering: celebId.\n isNewCeleb이 null일 경우 정식 셀럽으로 간주")
     @GetMapping("/find")
-    public ResponseEntity<SuccessDataResponse<PaginationResponse<QuestionSimpleResDto>>> getQuestionFindList(
+    public ResponseEntity<SuccessDataResponse<PaginationResponse<QuestionSimpleResDto>>> getFindQuestions(
             @CurrentUserId Long userId, @Nullable @RequestParam("celebId") Long celebId,
             @Nullable @RequestParam("isNewCeleb") Boolean isNewCeleb, Pageable pageable) {
 
-        PaginationResponse<QuestionSimpleResDto> response = questionService.getQuestionFindList(userId, celebId,
+        PaginationResponse<QuestionSimpleResDto> response = questionFeedService.getFindQuestions(userId, celebId,
                 isNewCeleb, pageable);
         return ResponseEntity.ok().body(SuccessDataResponse.from(response));
     }
@@ -157,19 +169,19 @@ public class QuestionController {
                     """
     )
     @GetMapping("/buy")
-    public ResponseEntity<SuccessDataResponse<PaginationResponse<QuestionBuySimpleResDto>>> getQuestionBuyList(
+    public ResponseEntity<SuccessDataResponse<PaginationResponse<QuestionBuySimpleResDto>>> getBuyQuestions(
             @CurrentUserId Long userId, @Nullable @RequestParam("voteStatus") String voteStatus,
             Pageable pageable) {
-        PaginationResponse<QuestionBuySimpleResDto> response = questionService.getQuestionBuyList(userId,
+        PaginationResponse<QuestionBuySimpleResDto> response = questionFeedService.getBuyQuestions(userId,
                 voteStatus, pageable);
         return ResponseEntity.ok().body(SuccessDataResponse.from(response));
     }
 
     @Operation(summary = "QuestionHowabout 커뮤니티 게시글 검색", description = "Pagination 적용. Ordering 최신순")
     @GetMapping("/howabout")
-    public ResponseEntity<SuccessDataResponse<PaginationResponse<QuestionSimpleResDto>>> getQuestionHowaboutList(
+    public ResponseEntity<SuccessDataResponse<PaginationResponse<QuestionSimpleResDto>>> getHowaboutQuestions(
             @CurrentUserId Long userId, Pageable pageable) {
-        PaginationResponse<QuestionSimpleResDto> response = questionService.getQuestionHowaboutList(
+        PaginationResponse<QuestionSimpleResDto> response = questionFeedService.getHowaboutQuestions(
                 userId, pageable);
         return ResponseEntity.ok().body(SuccessDataResponse.from(response));
     }
@@ -177,9 +189,9 @@ public class QuestionController {
     @Operation(summary = "QuestionRecommend 커뮤니티 게시글 검색",
             description = "Pagination 적용. Ordering 최신순. Filtering 전체, 특정해시태그")
     @GetMapping("/recommend")
-    public ResponseEntity<SuccessDataResponse<PaginationResponse<QuestionSimpleResDto>>> getQuestionRecommendList(
+    public ResponseEntity<SuccessDataResponse<PaginationResponse<QuestionSimpleResDto>>> getRecommendQuestions(
             @CurrentUserId Long userId, @Nullable @RequestParam String hashtag, Pageable pageable) {
-        PaginationResponse<QuestionSimpleResDto> response = questionService.getQuestionRecommendList(
+        PaginationResponse<QuestionSimpleResDto> response = questionFeedService.getRecommendQuestions(
                 userId, hashtag, pageable);
         return ResponseEntity.ok().body(SuccessDataResponse.from(response));
     }
@@ -187,17 +199,17 @@ public class QuestionController {
     @Operation(summary = "일간 핫 커뮤니티 게시글 검색",
             description = " 10개 조회. Ordering 인기순(조회수 + 좋아요 수 + 댓글 수). 매일 00시 00분 00초를 기준으로 업데이트")
     @GetMapping("/dailyhot")
-    public ResponseEntity<SuccessDataResponse<List<QuestionHomeResDto>>> getDailyHotQuestionList(@CurrentUserId Long userId) {
-        List<QuestionHomeResDto> response = questionService.getDailyHotQuestionList(userId);
+    public ResponseEntity<SuccessDataResponse<List<QuestionHomeResDto>>> getDailyHotQuestions(@CurrentUserId Long userId) {
+        List<QuestionHomeResDto> response = questionRankService.getDailyHotQuestions(userId);
         return ResponseEntity.ok().body(SuccessDataResponse.from(response));
     }
 
     @Operation(summary = "주간 핫 커뮤니티 게시글 검색",
             description = "Pagination 적용. Ordering 조회수 + 좋아요 수 + 댓글 수. Filtering 현재를 기점으로 일주일간 작성된 글")
     @GetMapping("/weeklyhot")
-    public ResponseEntity<SuccessDataResponse<PaginationResponse<QuestionSimpleResDto>>> getWeeklyHotQuestionList(
+    public ResponseEntity<SuccessDataResponse<PaginationResponse<QuestionSimpleResDto>>> getWeeklyHotQuestions(
             @CurrentUserId Long userId, Pageable pageable) {
-        PaginationResponse<QuestionSimpleResDto> response = questionService.getWeeklyHotQuestionList(
+        PaginationResponse<QuestionSimpleResDto> response = questionRankService.getWeeklyHotQuestions(
                 userId, pageable);
         return ResponseEntity.ok().body(SuccessDataResponse.from(response));
     }

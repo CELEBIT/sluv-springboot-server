@@ -27,6 +27,11 @@ public class QuestionBuy extends Question {
     }
 
     public static QuestionBuy toEntity(User user, Long questionId, String title, LocalDateTime voteEndTime) {
+        return toEntity(user, questionId, title, voteEndTime, QuestionStatus.ACTIVE);
+    }
+
+    public static QuestionBuy toEntity(User user, Long questionId, String title, LocalDateTime voteEndTime,
+                                       QuestionStatus questionStatus) {
         QuestionBuyBuilder builder = QuestionBuy.builder();
 
         if (questionId != null) {
@@ -37,7 +42,7 @@ public class QuestionBuy extends Question {
                 .user(user)
                 .title(title)
                 .voteEndTime(voteEndTime)
-                .questionStatus(QuestionStatus.ACTIVE)
+                .questionStatus(questionStatus)
                 .build();
     }
 }
